@@ -22,7 +22,7 @@
 
 #include "RiaApplication.h"
 #include "RigActiveCellInfo.h"
-#include "RigReservoirGridTools.h"
+#include "RimReservoirGridTools.h"
 
 #include "Rim3dView.h"
 #include "RimCase.h"
@@ -225,9 +225,9 @@ void RimCellRangeFilter::setDefaultValues( int sliceDirection, int defaultSlice 
     if ( !grid ) return;
 
     auto rimView     = firstAncestorOrThisOfType<Rim3dView>();
-    auto actCellInfo = RigReservoirGridTools::activeCellInfo( rimView );
+    auto actCellInfo = RimReservoirGridTools::activeCellInfo( rimView );
 
-    const cvf::StructGridInterface* mainGrid = RigReservoirGridTools::mainGrid( m_srcCase );
+    const cvf::StructGridInterface* mainGrid = RimReservoirGridTools::mainGrid( m_srcCase );
 
     if ( grid == mainGrid && actCellInfo )
     {
@@ -314,10 +314,10 @@ void RimCellRangeFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
 
     const cvf::StructGridInterface* grid = selectedGrid();
 
-    const cvf::StructGridInterface* mainGrid = RigReservoirGridTools::mainGrid( m_srcCase );
+    const cvf::StructGridInterface* mainGrid = RimReservoirGridTools::mainGrid( m_srcCase );
 
     auto rimView     = firstAncestorOrThisOfType<Rim3dView>();
-    auto actCellInfo = RigReservoirGridTools::activeCellInfo( rimView );
+    auto actCellInfo = RimReservoirGridTools::activeCellInfo( rimView );
 
     bool isRadialGrid = isMainGridRadial();
 

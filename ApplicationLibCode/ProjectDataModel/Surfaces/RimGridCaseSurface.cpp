@@ -21,7 +21,7 @@
 #include "RigActiveCellInfo.h"
 #include "RigCaseCellResultsData.h"
 #include "RigMainGrid.h"
-#include "RigReservoirGridTools.h"
+#include "RimReservoirGridTools.h"
 #include "Surface/RigSurface.h"
 
 #include "RimCase.h"
@@ -127,7 +127,7 @@ void RimGridCaseSurface::defineEditorAttribute( const caf::PdmFieldHandle* field
     auto* myAttr = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute );
     if ( myAttr && m_case )
     {
-        const cvf::StructGridInterface* grid = RigReservoirGridTools::mainGrid( m_case );
+        const cvf::StructGridInterface* grid = RimReservoirGridTools::mainGrid( m_case );
         if ( !grid ) return;
 
         myAttr->m_minimum = 1;

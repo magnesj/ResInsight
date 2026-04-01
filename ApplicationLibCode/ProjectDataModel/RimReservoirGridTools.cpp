@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RigReservoirGridTools.h"
+#include "RimReservoirGridTools.h"
 
 #include "RiaGuiApplication.h"
 
@@ -43,10 +43,10 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-int RigReservoirGridTools::gridCount( RimCase* rimCase )
+int RimReservoirGridTools::gridCount( RimCase* rimCase )
 {
-    RigMainGrid*          eclipseMainGrid       = RigReservoirGridTools::eclipseMainGrid( rimCase );
-    RigFemPartCollection* geoMechPartCollection = RigReservoirGridTools::geoMechPartCollection( rimCase );
+    RigMainGrid*          eclipseMainGrid       = RimReservoirGridTools::eclipseMainGrid( rimCase );
+    RigFemPartCollection* geoMechPartCollection = RimReservoirGridTools::geoMechPartCollection( rimCase );
 
     if ( eclipseMainGrid )
     {
@@ -63,7 +63,7 @@ int RigReservoirGridTools::gridCount( RimCase* rimCase )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const cvf::StructGridInterface* RigReservoirGridTools::mainGrid( RimCase* rimCase )
+const cvf::StructGridInterface* RimReservoirGridTools::mainGrid( RimCase* rimCase )
 {
     return gridByIndex( rimCase, 0 );
 }
@@ -71,10 +71,10 @@ const cvf::StructGridInterface* RigReservoirGridTools::mainGrid( RimCase* rimCas
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const cvf::StructGridInterface* RigReservoirGridTools::gridByIndex( RimCase* rimCase, int gridIndex )
+const cvf::StructGridInterface* RimReservoirGridTools::gridByIndex( RimCase* rimCase, int gridIndex )
 {
-    RigMainGrid*          eclipseMainGrid       = RigReservoirGridTools::eclipseMainGrid( rimCase );
-    RigFemPartCollection* geoMechPartCollection = RigReservoirGridTools::geoMechPartCollection( rimCase );
+    RigMainGrid*          eclipseMainGrid       = RimReservoirGridTools::eclipseMainGrid( rimCase );
+    RigFemPartCollection* geoMechPartCollection = RimReservoirGridTools::geoMechPartCollection( rimCase );
 
     if ( eclipseMainGrid )
     {
@@ -91,10 +91,10 @@ const cvf::StructGridInterface* RigReservoirGridTools::gridByIndex( RimCase* rim
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RigReservoirGridTools::gridName( RimCase* rimCase, int gridIndex )
+QString RimReservoirGridTools::gridName( RimCase* rimCase, int gridIndex )
 {
-    RigMainGrid*          eclipseMainGrid       = RigReservoirGridTools::eclipseMainGrid( rimCase );
-    RigFemPartCollection* geoMechPartCollection = RigReservoirGridTools::geoMechPartCollection( rimCase );
+    RigMainGrid*          eclipseMainGrid       = RimReservoirGridTools::eclipseMainGrid( rimCase );
+    RigFemPartCollection* geoMechPartCollection = RimReservoirGridTools::geoMechPartCollection( rimCase );
 
     if ( eclipseMainGrid )
     {
@@ -111,7 +111,7 @@ QString RigReservoirGridTools::gridName( RimCase* rimCase, int gridIndex )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const RigActiveCellInfo* RigReservoirGridTools::activeCellInfo( Rim3dView* rimView )
+const RigActiveCellInfo* RimReservoirGridTools::activeCellInfo( Rim3dView* rimView )
 {
     RimEclipseView* eclipseView = dynamic_cast<RimEclipseView*>( rimView );
     if ( eclipseView )
@@ -125,7 +125,7 @@ const RigActiveCellInfo* RigReservoirGridTools::activeCellInfo( Rim3dView* rimVi
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigReservoirGridTools::refreshEclipseCaseDataAndViews( RimEclipseCase* eclipseCase )
+void RimReservoirGridTools::refreshEclipseCaseDataAndViews( RimEclipseCase* eclipseCase )
 {
     RiaGuiApplication* guiApp = nullptr;
     if ( RiaGuiApplication::isRunning() )
@@ -155,7 +155,7 @@ void RigReservoirGridTools::refreshEclipseCaseDataAndViews( RimEclipseCase* ecli
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigMainGrid* RigReservoirGridTools::eclipseMainGrid( RimCase* rimCase )
+RigMainGrid* RimReservoirGridTools::eclipseMainGrid( RimCase* rimCase )
 {
     RimEclipseCase* eclipseCase = dynamic_cast<RimEclipseCase*>( rimCase );
     if ( eclipseCase && eclipseCase->eclipseCaseData() )
@@ -169,7 +169,7 @@ RigMainGrid* RigReservoirGridTools::eclipseMainGrid( RimCase* rimCase )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigFemPartCollection* RigReservoirGridTools::geoMechPartCollection( RimCase* rimCase )
+RigFemPartCollection* RimReservoirGridTools::geoMechPartCollection( RimCase* rimCase )
 {
     RimGeoMechCase* geoMechCase = dynamic_cast<RimGeoMechCase*>( rimCase );
     if ( geoMechCase && geoMechCase->geoMechData() )
@@ -183,7 +183,7 @@ RigFemPartCollection* RigReservoirGridTools::geoMechPartCollection( RimCase* rim
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigReservoirGridTools::computeCachedData( RimEclipseCase* eclipseCase )
+void RimReservoirGridTools::computeCachedData( RimEclipseCase* eclipseCase )
 {
     if ( !eclipseCase ) return;
 
@@ -212,7 +212,7 @@ void RigReservoirGridTools::computeCachedData( RimEclipseCase* eclipseCase )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigReservoirGridTools::deleteAllCachedData( RimEclipseCase* eclipseCase )
+void RimReservoirGridTools::deleteAllCachedData( RimEclipseCase* eclipseCase )
 {
     if ( !eclipseCase ) return;
 

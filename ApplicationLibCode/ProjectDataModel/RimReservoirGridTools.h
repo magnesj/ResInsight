@@ -40,7 +40,7 @@ class QString;
 ///
 ///
 //==================================================================================================
-class RigReservoirGridTools
+class RimReservoirGridTools
 {
 public:
     static int                             gridCount( RimCase* rimCase );
@@ -66,7 +66,7 @@ private:
 ///
 //--------------------------------------------------------------------------------------------------
 template <class InputIterator>
-QString RigReservoirGridTools::globalCellIndicesToOneBasedIJKText( InputIterator first, InputIterator last, const RigMainGrid* mainGrid )
+QString RimReservoirGridTools::globalCellIndicesToOneBasedIJKText( InputIterator first, InputIterator last, const RigMainGrid* mainGrid )
 {
     QString txt;
 

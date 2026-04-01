@@ -31,7 +31,7 @@
 #include "RigCell.h"
 #include "RigEclipseCaseData.h"
 #include "RigMainGrid.h"
-#include "RigReservoirGridTools.h"
+#include "RimReservoirGridTools.h"
 
 #include "RimEclipseCase.h"
 #include "RimEclipseView.h"
@@ -118,7 +118,7 @@ void RicCreateTemporaryLgrFeature::onActionTriggered( bool isChecked )
 
         createLgrsForWellPaths( wellPaths, eclipseCase, timeStep, refinement, splitType, completionTypes, &wellsIntersectingOtherLgrs );
 
-        RigReservoirGridTools::refreshEclipseCaseDataAndViews( eclipseCase );
+        RimReservoirGridTools::refreshEclipseCaseDataAndViews( eclipseCase );
 
         if ( !wellsIntersectingOtherLgrs.empty() )
         {

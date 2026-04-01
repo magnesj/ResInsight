@@ -28,7 +28,7 @@
 #include "RicCreateTemporaryLgrFeature.h"
 #include "RicDeleteTemporaryLgrsFeature.h"
 
-#include "RigReservoirGridTools.h"
+#include "RimReservoirGridTools.h"
 
 #include "RimDialogData.h"
 #include "RimEclipseCase.h"
@@ -123,7 +123,7 @@ caf::PdmScriptResponse RicfCreateLgrForCompletions::execute()
                                        RigCompletionData::CompletionType::FISHBONES },
                                      &wellsIntersectingOtherLgrs );
 
-    RigReservoirGridTools::refreshEclipseCaseDataAndViews( eclipseCase );
+    RimReservoirGridTools::refreshEclipseCaseDataAndViews( eclipseCase );
 
     caf::PdmScriptResponse response;
     if ( !wellsIntersectingOtherLgrs.empty() )

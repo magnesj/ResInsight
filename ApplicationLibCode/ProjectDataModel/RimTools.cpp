@@ -23,7 +23,7 @@
 #include "RigFemPart.h"
 #include "RigFemPartCollection.h"
 #include "RigGeoMechCaseData.h"
-#include "RigReservoirGridTools.h"
+#include "RimReservoirGridTools.h"
 
 #include "Polygons/RimPolygon.h"
 #include "Polygons/RimPolygonCollection.h"
@@ -406,9 +406,9 @@ void RimTools::eclipseGridOptionItems( QList<caf::PdmOptionItemInfo>* options, R
 {
     if ( !options ) return;
 
-    for ( int gIdx = 0; gIdx < RigReservoirGridTools::gridCount( eCase ); gIdx++ )
+    for ( int gIdx = 0; gIdx < RimReservoirGridTools::gridCount( eCase ); gIdx++ )
     {
-        QString gridName = RigReservoirGridTools::gridName( eCase, gIdx );
+        QString gridName = RimReservoirGridTools::gridName( eCase, gIdx );
         if ( gIdx == 0 )
         {
             if ( gridName.isEmpty() )
