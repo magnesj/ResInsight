@@ -38,13 +38,6 @@
 #include "RigNNCData.h"
 #include "RigStatisticsMath.h"
 
-#include "RimEclipseCase.h"
-#include "RimEclipseView.h"
-#include "RimProject.h"
-#include "RimPropertyFilterCollection.h"
-#include "RimRegularGridCase.h"
-#include "RimTools.h"
-
 #include "cafProgressInfo.h"
 #include "cafVecIjk.h"
 
@@ -58,19 +51,17 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigWellTargetMapping::generateCandidates( RimEclipseCase*            eclipseCase,
-                                               size_t                     timeStepIdx,
-                                               VolumeType                 volumeType,
-                                               VolumesType                volumesType,
-                                               VolumeResultType           volumeResultType,
-                                               const RigFloodingSettings& floodingSettings,
-                                               const ClusteringLimits&    limits,
-                                               bool                       skipUndefinedResults,
-                                               bool                       setTimeStepInView = true )
+void RigWellTargetMapping::generateCandidates( RigCaseCellResultsData*       resultsData,
+                                               RigMainGrid*                  mainGrid,
+                                               size_t                        timeStepIdx,
+                                               VolumeType                    volumeType,
+                                               VolumesType                   volumesType,
+                                               VolumeResultType              volumeResultType,
+                                               const RigFloodingSettings&    floodingSettings,
+                                               const ClusteringLimits&       limits,
+                                               bool                          skipUndefinedResults,
+                                               RiaDefines::EclipseUnitSystem unitsType )
 {
-    if ( !eclipseCase->ensureReservoirCaseIsOpen() ) return;
-
-    auto resultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
     if ( !resultsData ) return;
 
     auto activeCellCount = RigWellTargetMappingTools::getActiveCellCount( resultsData );
@@ -79,11 +70,6 @@ void RigWellTargetMapping::generateCandidates( RimEclipseCase*            eclips
         RiaLogging::error( "No active cells found" );
         return;
     }
-
-    auto caseData = eclipseCase->eclipseCaseData();
-    if ( !caseData ) return;
-
-    RiaDefines::EclipseUnitSystem unitsType = caseData->unitsType();
 
     RigWellTargetMappingTools::DataContainer data;
     data.volume = getVolumeVector( *resultsData, unitsType, volumeType, volumesType, volumeResultType, timeStepIdx, floodingSettings );
@@ -134,7 +120,6 @@ void RigWellTargetMapping::generateCandidates( RimEclipseCase*            eclips
     resultsData->ensureKnownResultLoaded( transmissibilityZAddress );
     data.transmissibilityZ = resultsData->cellScalarResults( transmissibilityZAddress, 0 );
 
-    auto mainGrid = eclipseCase->eclipseCaseData()->mainGrid();
     if ( mainGrid != nullptr )
     {
         data.transmissibilityNNC = mainGrid->nncData()->staticConnectionScalarResultByName( RiaDefines::propertyNameCombTrans() );
@@ -294,23 +279,6 @@ void RigWellTargetMapping::generateCandidates( RimEclipseCase*            eclips
         RigWellTargetMappingTools::createResultVector( resultsData, "TOTAL_SFIPOIL", totalSfipOil, timeStepIdx );
         RigWellTargetMappingTools::createResultVector( resultsData, "TOTAL_SFIPGAS", totalSfipGas, timeStepIdx );
     }
-    eclipseCase->updateResultAddressCollection();
-
-    // Update views and property filters
-    RimProject* proj = RimProject::current();
-    proj->scheduleCreateDisplayModelAndRedrawAllViews();
-    for ( auto view : eclipseCase->reservoirViews() )
-    {
-        if ( auto eclipseView = dynamic_cast<RimEclipseView*>( view ) )
-        {
-            if ( setTimeStepInView )
-            {
-                eclipseView->setCurrentTimeStep( (int)timeStepIdx );
-            }
-            eclipseView->scheduleReservoirGridGeometryRegen();
-            eclipseView->propertyFilterCollection()->updateConnectedEditors();
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -356,48 +324,28 @@ std::vector<double> RigWellTargetMapping::getVolumeVector( RigCaseCellResultsDat
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimRegularGridCase* RigWellTargetMapping::generateEnsembleCandidates( const std::vector<RimEclipseCase*>& cases,
-                                                                      size_t                              timeStepIdx,
-                                                                      const cvf::Vec3st&                  resultGridCellCount,
-                                                                      VolumeType                          volumeType,
-                                                                      VolumesType                         volumesType,
-                                                                      VolumeResultType                    volumeResultType,
-                                                                      const RigFloodingSettings&          floodingSettings,
-                                                                      const ClusteringLimits&             limits )
+cvf::BoundingBox RigWellTargetMapping::computeEnsembleBoundingBox( const std::vector<CasePair>& cases, size_t timeStepIdx )
 {
-    RiaLogging::debug( "Generating ensemble statistics" );
-
-    caf::ProgressInfo progInfo( cases.size() * 2, "Generating ensemble statistics" );
-
-    for ( auto eclipseCase : cases )
-    {
-        auto task = progInfo.task( "Generating realization statistics.", 1 );
-
-        generateCandidates( eclipseCase, timeStepIdx, volumeType, volumesType, volumeResultType, floodingSettings, limits, false );
-    }
-
     cvf::BoundingBox boundingBox;
-    for ( auto eclipseCase : cases )
+    for ( const auto& [caseResultsData, caseMainGrid] : cases )
     {
-        auto             caseResultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
-        auto             caseMainGrid    = eclipseCase->mainGrid();
-        cvf::BoundingBox bb              = RigWellTargetMappingTools::computeBoundingBoxForResult( caseResultsData,
+        cvf::BoundingBox bb = RigWellTargetMappingTools::computeBoundingBoxForResult( caseResultsData,
                                                                                       caseMainGrid,
                                                                                       RigWellTargetMapping::wellTargetResultName(),
                                                                                       timeStepIdx );
         boundingBox.add( bb );
     }
+    return boundingBox;
+}
 
-    RiaLogging::debug(
-        QString( "Clusters bounding box min: [%1 %2 %3]" ).arg( boundingBox.min().x() ).arg( boundingBox.min().y() ).arg( boundingBox.min().z() ) );
-    RiaLogging::debug(
-        QString( "Clusters bounding box max: [%1 %2 %3]" ).arg( boundingBox.max().x() ).arg( boundingBox.max().y() ).arg( boundingBox.max().z() ) );
-
-    RimRegularGridCase* targetCase = new RimRegularGridCase;
-    targetCase->setBoundingBox( boundingBox );
-    targetCase->setCellCount( resultGridCellCount );
-    targetCase->createModel();
-
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigWellTargetMapping::aggregateEnsembleResults( const std::vector<CasePair>& cases,
+                                                     RigCaseCellResultsData*      targetResultsData,
+                                                     RigMainGrid*                 targetMainGrid,
+                                                     size_t                       timeStepIdx )
+{
     std::vector<int> occurrence;
 
     std::map<QString, std::vector<std::vector<double>>> resultNamesAndSamples;
@@ -411,14 +359,8 @@ RimRegularGridCase* RigWellTargetMapping::generateEnsembleCandidates( const std:
     resultNamesAndSamples["TOTAL_SFIPOIL"]        = {};
     resultNamesAndSamples["TOTAL_SFIPGAS"]        = {};
 
-    auto targetResultsData = targetCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
-    auto targetMainGrid    = targetCase->mainGrid();
-
-    for ( auto eclipseCase : cases )
+    for ( const auto& [caseResultsData, caseMainGrid] : cases )
     {
-        auto task            = progInfo.task( "Accumulating results.", 1 );
-        auto caseResultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
-        auto caseMainGrid    = eclipseCase->mainGrid();
         RigWellTargetMappingTools::accumulateResultsForSingleCase( caseResultsData,
                                                                    caseMainGrid,
                                                                    targetResultsData,
@@ -428,14 +370,13 @@ RimRegularGridCase* RigWellTargetMapping::generateEnsembleCandidates( const std:
                                                                    timeStepIdx );
     }
 
-    auto createFractionVector = []( const std::vector<int>& occurrence, int maxRealizationCount ) -> std::vector<double>
+    auto createFractionVector = []( const std::vector<int>& occ, int maxRealizationCount ) -> std::vector<double>
     {
-        std::vector<double> fractions( occurrence.size() );
-        std::transform( occurrence.begin(),
-                        occurrence.end(),
+        std::vector<double> fractions( occ.size() );
+        std::transform( occ.begin(),
+                        occ.end(),
                         fractions.begin(),
                         [maxRealizationCount]( int value ) { return static_cast<double>( value ) / maxRealizationCount; } );
-
         return fractions;
     };
 
@@ -447,8 +388,6 @@ RimRegularGridCase* RigWellTargetMapping::generateEnsembleCandidates( const std:
     {
         RigWellTargetMappingTools::computeStatisticsAndCreateVectors( targetResultsData, resultName, vec );
     }
-
-    return targetCase;
 }
 
 //--------------------------------------------------------------------------------------------------

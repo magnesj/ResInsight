@@ -41,12 +41,14 @@
 #include "RimEclipsePropertyFilterCollection.h"
 #include "RimEclipseResultDefinition.h"
 #include "RimEclipseView.h"
+#include "RimProject.h"
 #include "RimRegularGridCase.h"
 #include "RimReservoirGridEnsemble.h"
 #include "RimTools.h"
 
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiSliderTools.h"
+#include "cafProgressInfo.h"
 
 #include "cvfMath.h"
 
@@ -366,11 +368,20 @@ cvf::Vec3st RimWellTargetMapping::getResultGridCellCount() const
 //--------------------------------------------------------------------------------------------------
 void RimWellTargetMapping::generateCandidates( RimEclipseCase* eclipseCase, bool setTimeStepInView )
 {
+    if ( !eclipseCase->ensureReservoirCaseIsOpen() ) return;
+
+    auto resultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+    if ( !resultsData ) return;
+    auto mainGrid = eclipseCase->mainGrid();
+    auto caseData = eclipseCase->eclipseCaseData();
+    if ( !caseData ) return;
+
     RigWellTargetMapping::ClusteringLimits limits = getClusteringLimits();
     RigFloodingSettings floodingSettings( m_oilFloodingType(), m_userDefinedFloodingOil(), m_gasFloodingType(), m_userDefinedFloodingGas() );
 
     bool skipUndefinedResults = true;
-    RigWellTargetMapping::generateCandidates( eclipseCase,
+    RigWellTargetMapping::generateCandidates( resultsData,
+                                              mainGrid,
                                               m_timeStep(),
                                               m_volumeType(),
                                               m_volumesType(),
@@ -378,7 +389,20 @@ void RimWellTargetMapping::generateCandidates( RimEclipseCase* eclipseCase, bool
                                               floodingSettings,
                                               limits,
                                               skipUndefinedResults,
-                                              setTimeStepInView );
+                                              caseData->unitsType() );
+
+    eclipseCase->updateResultAddressCollection();
+
+    RimProject::current()->scheduleCreateDisplayModelAndRedrawAllViews();
+    for ( auto view : eclipseCase->reservoirViews() )
+    {
+        if ( auto eclipseView = dynamic_cast<RimEclipseView*>( view ) )
+        {
+            if ( setTimeStepInView ) eclipseView->setCurrentTimeStep( (int)m_timeStep() );
+            eclipseView->scheduleReservoirGridGeometryRegen();
+            eclipseView->propertyFilterCollection()->updateConnectedEditors();
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -393,14 +417,50 @@ void RimWellTargetMapping::generateEnsembleStatistics()
     RigWellTargetMapping::ClusteringLimits limits              = getClusteringLimits();
     RigFloodingSettings floodingSettings( m_oilFloodingType(), m_userDefinedFloodingOil(), m_gasFloodingType(), m_userDefinedFloodingGas() );
 
-    RimRegularGridCase* regularGridCase = RigWellTargetMapping::generateEnsembleCandidates( ensemble->cases(),
-                                                                                            m_timeStep(),
-                                                                                            resultGridCellCount,
-                                                                                            m_volumeType(),
-                                                                                            m_volumesType(),
-                                                                                            m_volumeResultType(),
-                                                                                            floodingSettings,
-                                                                                            limits );
+    RiaLogging::debug( "Generating ensemble statistics" );
+
+    caf::ProgressInfo progInfo( ensemble->cases().size() + 1, "Generating ensemble statistics" );
+
+    std::vector<RigWellTargetMapping::CasePair> casePairs;
+    for ( auto eclipseCase : ensemble->cases() )
+    {
+        auto task = progInfo.task( "Generating realization statistics.", 1 );
+        if ( !eclipseCase->ensureReservoirCaseIsOpen() ) continue;
+        auto caseResultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+        if ( !caseResultsData ) continue;
+        auto caseMainGrid = eclipseCase->mainGrid();
+        auto caseData     = eclipseCase->eclipseCaseData();
+        if ( !caseData ) continue;
+        casePairs.push_back( { caseResultsData, caseMainGrid } );
+        RigWellTargetMapping::generateCandidates( caseResultsData,
+                                                  caseMainGrid,
+                                                  m_timeStep(),
+                                                  m_volumeType(),
+                                                  m_volumesType(),
+                                                  m_volumeResultType(),
+                                                  floodingSettings,
+                                                  limits,
+                                                  false,
+                                                  caseData->unitsType() );
+    }
+
+    cvf::BoundingBox boundingBox = RigWellTargetMapping::computeEnsembleBoundingBox( casePairs, m_timeStep() );
+    RiaLogging::debug(
+        QString( "Clusters bounding box min: [%1 %2 %3]" ).arg( boundingBox.min().x() ).arg( boundingBox.min().y() ).arg( boundingBox.min().z() ) );
+    RiaLogging::debug(
+        QString( "Clusters bounding box max: [%1 %2 %3]" ).arg( boundingBox.max().x() ).arg( boundingBox.max().y() ).arg( boundingBox.max().z() ) );
+
+    RimRegularGridCase* regularGridCase = new RimRegularGridCase;
+    regularGridCase->setBoundingBox( boundingBox );
+    regularGridCase->setCellCount( resultGridCellCount );
+    regularGridCase->createModel();
+
+    {
+        auto task       = progInfo.task( "Accumulating results.", 1 );
+        auto targetData = regularGridCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+        auto targetGrid = regularGridCase->mainGrid();
+        RigWellTargetMapping::aggregateEnsembleResults( casePairs, targetData, targetGrid, m_timeStep() );
+    }
 
     regularGridCase->setCustomCaseName( "Ensemble Grid" );
 
