@@ -27,9 +27,6 @@
 #include "Well/RigWellResultFrame.h"
 #include "Well/RigWellResultPoint.h"
 
-#include "RigNumberOfFloodedPoreVolumesCalculator.h"
-
-#include "RimEclipseCase.h"
 #include "RimEclipseResultCase.h"
 #include "RimEclipseView.h"
 #include "RimSimWellInViewCollection.h"
@@ -112,50 +109,6 @@ RigFlowDiagResults* RimFlowDiagSolution::flowDiagResults()
         }
 
         m_flowDiagResults = std::make_unique<RigFlowDiagResults>( this, timeStepCount );
-
-        m_flowDiagResults->setActiveCellInfoCallback(
-            [this]() -> const RigActiveCellInfo*
-            {
-                auto eclCase = firstAncestorOrThisOfType<RimEclipseResultCase>();
-                if ( !eclCase || !eclCase->eclipseCaseData() ) return nullptr;
-                return eclCase->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
-            } );
-
-        m_flowDiagResults->setSolverInterfaceCallback(
-            [this]() -> RigFlowDiagSolverInterface*
-            {
-                auto eclCase = firstAncestorOrThisOfType<RimEclipseResultCase>();
-                if ( !eclCase ) return nullptr;
-                return eclCase->flowDiagSolverInterface();
-            } );
-
-        m_flowDiagResults->setCaseResultsDataCallback(
-            [this]() -> RigCaseCellResultsData*
-            {
-                auto eclCase = firstAncestorOrThisOfType<RimEclipseResultCase>();
-                if ( !eclCase ) return nullptr;
-                return eclCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
-            } );
-
-        m_flowDiagResults->setTracerNamesCallback( [this]() { return tracerNames(); } );
-
-        m_flowDiagResults->setTracerStatusCallback( [this]( const QString& tracerName, size_t timeStepIndex )
-                                                    { return tracerStatusInTimeStep( tracerName, timeStepIndex ); } );
-
-        m_flowDiagResults->setAllInjectorTracerActiveCellIndicesCallback( [this]( size_t timeStepIndex )
-                                                                          { return allInjectorTracerActiveCellIndices( timeStepIndex ); } );
-
-        m_flowDiagResults->setAllProducerTracerActiveCellIndicesCallback( [this]( size_t timeStepIndex )
-                                                                          { return allProducerTracerActiveCellIndices( timeStepIndex ); } );
-
-        m_flowDiagResults->setNumFloodedPVCallback(
-            [this]( const std::vector<QString>& tracerNames ) -> std::vector<std::vector<double>>
-            {
-                auto eclipseCase = firstAncestorOrThisOfType<RimEclipseCase>();
-                if ( !eclipseCase ) return {};
-                RigNumberOfFloodedPoreVolumesCalculator calc( eclipseCase, tracerNames );
-                return std::move( calc.numberOfFloodedPorevolumes() );
-            } );
     }
 
     return m_flowDiagResults.get();
