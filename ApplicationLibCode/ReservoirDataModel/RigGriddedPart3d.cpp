@@ -21,9 +21,6 @@
 #include "RigActiveCellInfo.h"
 #include "RigMainGrid.h"
 
-#include "RimFaultReactivationDataAccess.h"
-#include "RimFaultReactivationEnums.h"
-
 #include "cvfBoundingBox.h"
 #include "cvfPlane.h"
 #include "cvfTextureImage.h"
