@@ -1,7 +1,6 @@
 set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigAccWellFlowCalculator.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseWellLogExtractor.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigFishbonesGeometry.h
     ${CMAKE_CURRENT_LIST_DIR}/RigGeoMechWellLogExtractor.h
     ${CMAKE_CURRENT_LIST_DIR}/RigMswCenterLineCalculator.h
     ${CMAKE_CURRENT_LIST_DIR}/RigOsduWellLogData.h
@@ -17,7 +16,6 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigWellLogIndexDepthOffset.h
     ${CMAKE_CURRENT_LIST_DIR}/RigWellPath.h
     ${CMAKE_CURRENT_LIST_DIR}/RigWellPathFormations.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigWellPathGeometryExporter.h
     ${CMAKE_CURRENT_LIST_DIR}/RigWellPathGeometryTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RigWellPathIntersectionTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RigWellResultBranch.h
@@ -34,7 +32,6 @@ set(SOURCE_GROUP_HEADER_FILES
 set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigAccWellFlowCalculator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseWellLogExtractor.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigFishbonesGeometry.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigGeoMechWellLogExtractor.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigMswCenterLineCalculator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigOsduWellLogData.cpp
@@ -48,7 +45,6 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigWellLogIndexDepthOffset.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigWellPath.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigWellPathFormations.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigWellPathGeometryExporter.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigWellPathGeometryTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigWellPathIntersectionTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigWellResultBranch.cpp

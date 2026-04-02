@@ -55,7 +55,7 @@ class DeckKeyword;
 /// Tool for exporting simulation input files (sector models)
 ///
 //==================================================================================================
-class RigSimulationInputTool
+class RimSimulationInputTool
 {
 public:
     // Data structures for NNC export

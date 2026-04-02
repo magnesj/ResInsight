@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "ReservoirDataModel/SimulationFile/RigSimulationInputTool.h"
+#include "ProjectDataModel/RimSimulationInputTool.h"
 
 #include "cvfVector3.h"
 
@@ -47,7 +47,7 @@ class DeckRecord;
 ///
 ///
 //==================================================================================================
-namespace RigEclipseResultTools
+namespace RimEclipseResultTools
 {
 struct BorderCellFace;
 }
@@ -67,8 +67,8 @@ Opm::DeckKeyword wsegaicdKeyword( const RigMswTableData& mswData );
 Opm::DeckKeyword wsegsicdKeyword( const RigMswTableData& mswData );
 
 Opm::DeckKeyword faultsKeyword( const RigMainGrid* mainGrid, const cvf::Vec3st& min, const cvf::Vec3st& max, const RigRefinement& refinement );
-Opm::DeckKeyword bcconKeyword( const std::vector<RigEclipseResultTools::BorderCellFace>& borderCellFaces );
-Opm::DeckKeyword bcpropKeyword( const std::vector<RigEclipseResultTools::BorderCellFace>& boundaryConditions,
+Opm::DeckKeyword bcconKeyword( const std::vector<RimEclipseResultTools::BorderCellFace>& borderCellFaces );
+Opm::DeckKeyword bcpropKeyword( const std::vector<RimEclipseResultTools::BorderCellFace>& boundaryConditions,
                                 const std::vector<Opm::DeckRecord>&                       boundaryConditionProperties );
 Opm::DeckKeyword operaterKeyword( std::string          targetProperty,
                                   int                  regionId,
@@ -76,7 +76,7 @@ Opm::DeckKeyword operaterKeyword( std::string          targetProperty,
                                   std::string          inputProperty,
                                   std::optional<float> alpha = std::nullopt,
                                   std::optional<float> beta  = std::nullopt );
-Opm::DeckKeyword editnncKeyword( const std::vector<RigSimulationInputTool::TransformedNNCConnection>& connections );
+Opm::DeckKeyword editnncKeyword( const std::vector<RimSimulationInputTool::TransformedNNCConnection>& connections );
 
 Opm::DeckKeyword datesKeyword( const QDateTime& date );
 QString          deckKeywordToString( const Opm::DeckKeyword& keyword );

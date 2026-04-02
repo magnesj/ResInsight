@@ -39,10 +39,10 @@ class RimFracture;
 ///  Eclipse reservoir cells open for flow is defined by reservoirCellIndicesOpenForFlow
 ///
 //==================================================================================================
-class RigEclipseToStimPlanCellTransmissibilityCalculator
+class RimEclipseToStimPlanCellTransmissibilityCalculator
 {
 public:
-    explicit RigEclipseToStimPlanCellTransmissibilityCalculator( const RimEclipseCase*  caseToApply,
+    explicit RimEclipseToStimPlanCellTransmissibilityCalculator( const RimEclipseCase*  caseToApply,
                                                                  cvf::Mat4d             fractureTransform,
                                                                  double                 skinFactor,
                                                                  double                 cDarcy,

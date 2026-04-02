@@ -19,14 +19,14 @@
 #include "gtest/gtest.h"
 
 #include "Well/RigWellPath.h"
-#include "Well/RigWellPathGeometryExporter.h"
+#include "WellPath/RimWellPathGeometryExporter.h"
 
 #include "cvfVector3.h"
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-TEST( RigWellPathGeometryExporter, VerticalPath )
+TEST( RimWellPathGeometryExporter, VerticalPath )
 {
     double x = 457313.52;
     double y = 7320309.71;
@@ -47,7 +47,7 @@ TEST( RigWellPathGeometryExporter, VerticalPath )
     std::vector<double> yValues;
     std::vector<double> tvdValues;
     std::vector<double> mdValues;
-    RigWellPathGeometryExporter::computeWellPathDataForExport( rigWellPath, mdStepSize, rkbOffset, xValues, yValues, tvdValues, mdValues );
+    RimWellPathGeometryExporter::computeWellPathDataForExport( rigWellPath, mdStepSize, rkbOffset, xValues, yValues, tvdValues, mdValues );
 
     double firstMd               = inputMds.front();
     double lastMd                = inputMds.back();

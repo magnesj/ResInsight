@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RigEclipseToStimPlanCalculator.h"
+#include "RimEclipseToStimPlanCalculator.h"
 
 #include "RiaLogging.h"
 #include "RiaThermalFractureDefines.h"
@@ -26,8 +26,6 @@
 #include "RigCaseCellResultsData.h"
 #include "RigCellGeometryTools.h"
 #include "RigEclipseCaseData.h"
-#include "RigEclipseToStimPlanCellTransmissibilityCalculator.h"
-#include "RigEclipseToThermalCellTransmissibilityCalculator.h"
 #include "RigFractureCell.h"
 #include "RigFractureGrid.h"
 #include "RigFractureTransmissibilityEquations.h"
@@ -36,6 +34,8 @@
 #include "RigResultAccessorFactory.h"
 #include "RigThermalFractureDefinition.h"
 #include "RigTransmissibilityCondenser.h"
+#include "RimEclipseToStimPlanCellTransmissibilityCalculator.h"
+#include "RimEclipseToThermalCellTransmissibilityCalculator.h"
 
 #include "RimEclipseCase.h"
 #include "RimEllipseFractureTemplate.h"
@@ -47,7 +47,7 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigEclipseToStimPlanCalculator::RigEclipseToStimPlanCalculator( const RimEclipseCase*  caseToApply,
+RimEclipseToStimPlanCalculator::RimEclipseToStimPlanCalculator( const RimEclipseCase*  caseToApply,
                                                                 cvf::Mat4d             fractureTransform,
                                                                 double                 skinFactor,
                                                                 double                 cDarcy,
@@ -66,7 +66,7 @@ RigEclipseToStimPlanCalculator::RigEclipseToStimPlanCalculator( const RimEclipse
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigEclipseToStimPlanCalculator::computeValues()
+void RimEclipseToStimPlanCalculator::computeValues()
 {
     auto reservoirCellIndicesOpenForFlow = RimFractureContainmentTools::reservoirCellIndicesOpenForFlow( m_case, m_fracture );
 
@@ -124,7 +124,7 @@ void RigEclipseToStimPlanCalculator::computeValues()
         const RigFractureCell& fractureCell = m_fractureGrid.fractureCells()[i];
         if ( !fractureCell.hasNonZeroConductivity() ) continue;
 
-        std::unique_ptr<RigEclipseToStimPlanCellTransmissibilityCalculator> eclToFractureTransCalc;
+        std::unique_ptr<RimEclipseToStimPlanCellTransmissibilityCalculator> eclToFractureTransCalc;
 
         if ( thermalFractureTemplate != nullptr )
         {
@@ -140,7 +140,7 @@ void RigEclipseToStimPlanCalculator::computeValues()
             double relativePermeability = 1.0;
 
             auto filterPressureDropType = thermalFractureTemplate->filterCakePressureDropType();
-            eclToFractureTransCalc      = std::make_unique<RigEclipseToThermalCellTransmissibilityCalculator>( m_case,
+            eclToFractureTransCalc      = std::make_unique<RimEclipseToThermalCellTransmissibilityCalculator>( m_case,
                                                                                                           m_fractureTransform,
                                                                                                           m_fractureSkinFactor,
                                                                                                           m_cDarcy,
@@ -155,7 +155,7 @@ void RigEclipseToStimPlanCalculator::computeValues()
         }
         else
         {
-            eclToFractureTransCalc = std::make_unique<RigEclipseToStimPlanCellTransmissibilityCalculator>( m_case,
+            eclToFractureTransCalc = std::make_unique<RimEclipseToStimPlanCellTransmissibilityCalculator>( m_case,
                                                                                                            m_fractureTransform,
                                                                                                            m_fractureSkinFactor,
                                                                                                            m_cDarcy,
@@ -178,7 +178,7 @@ using CellIdxSpace = RigTransmissibilityCondenser::CellAddress;
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigEclipseToStimPlanCalculator::appendDataToTransmissibilityCondenser( bool                          useFiniteConductivityInFracture,
+void RimEclipseToStimPlanCalculator::appendDataToTransmissibilityCondenser( bool                          useFiniteConductivityInFracture,
                                                                             RigTransmissibilityCondenser* condenser ) const
 {
     for ( const auto& eclToFractureTransCalc : m_singleFractureCellCalculators )
@@ -212,7 +212,7 @@ void RigEclipseToStimPlanCalculator::appendDataToTransmissibilityCondenser( bool
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigEclipseToStimPlanCalculator::totalEclipseAreaOpenForFlow() const
+double RimEclipseToStimPlanCalculator::totalEclipseAreaOpenForFlow() const
 {
     double area = 0.0;
 
@@ -229,7 +229,7 @@ double RigEclipseToStimPlanCalculator::totalEclipseAreaOpenForFlow() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigEclipseToStimPlanCalculator::areaWeightedMatrixPermeability() const
+double RimEclipseToStimPlanCalculator::areaWeightedMatrixPermeability() const
 {
     RiaWeightedMeanCalculator<double> calc;
 
@@ -253,7 +253,7 @@ double RigEclipseToStimPlanCalculator::areaWeightedMatrixPermeability() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigEclipseToStimPlanCalculator::areaWeightedWidth() const
+double RimEclipseToStimPlanCalculator::areaWeightedWidth() const
 {
     double width = 0.0;
 
@@ -298,7 +298,7 @@ double RigEclipseToStimPlanCalculator::areaWeightedWidth() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigEclipseToStimPlanCalculator::areaWeightedConductivity() const
+double RimEclipseToStimPlanCalculator::areaWeightedConductivity() const
 {
     RiaWeightedMeanCalculator<double> calc;
 
@@ -319,7 +319,7 @@ double RigEclipseToStimPlanCalculator::areaWeightedConductivity() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigEclipseToStimPlanCalculator::longestYSectionOpenForFlow() const
+double RimEclipseToStimPlanCalculator::longestYSectionOpenForFlow() const
 {
     // For each I, find the longest aggregated distance along J with continuous fracture cells with conductivity above
     // zero connected to Eclipse cells open for flow

@@ -29,7 +29,7 @@ class RimEclipseCase;
 class RimEclipseView;
 class RigGridExportAdapter;
 
-namespace RigEclipseResultTools
+namespace RimEclipseResultTools
 {
 enum BorderType : int
 {
@@ -66,4 +66,4 @@ std::vector<BorderCellFace> generateBorderCellFaces( const RigGridExportAdapter&
                                                      const std::vector<int>&     borderResult,
                                                      const std::vector<int>&     bcconResult );
 
-} // namespace RigEclipseResultTools
+} // namespace RimEclipseResultTools

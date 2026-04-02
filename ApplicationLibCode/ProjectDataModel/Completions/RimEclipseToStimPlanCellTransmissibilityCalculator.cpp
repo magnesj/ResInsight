@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RigEclipseToStimPlanCellTransmissibilityCalculator.h"
+#include "RimEclipseToStimPlanCellTransmissibilityCalculator.h"
 
 #include "RigActiveCellInfo.h"
 #include "RigCaseCellResultsData.h"
@@ -41,7 +41,7 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigEclipseToStimPlanCellTransmissibilityCalculator::RigEclipseToStimPlanCellTransmissibilityCalculator( const RimEclipseCase* caseToApply,
+RimEclipseToStimPlanCellTransmissibilityCalculator::RimEclipseToStimPlanCellTransmissibilityCalculator( const RimEclipseCase* caseToApply,
                                                                                                         cvf::Mat4d fractureTransform,
                                                                                                         double     skinFactor,
                                                                                                         double     cDarcy,
@@ -56,7 +56,7 @@ RigEclipseToStimPlanCellTransmissibilityCalculator::RigEclipseToStimPlanCellTran
 {
 }
 
-void RigEclipseToStimPlanCellTransmissibilityCalculator::computeValues( const std::set<size_t>& reservoirCellIndicesOpenForFlow )
+void RimEclipseToStimPlanCellTransmissibilityCalculator::computeValues( const std::set<size_t>& reservoirCellIndicesOpenForFlow )
 {
     calculateStimPlanCellsMatrixTransmissibility( reservoirCellIndicesOpenForFlow );
 }
@@ -64,7 +64,7 @@ void RigEclipseToStimPlanCellTransmissibilityCalculator::computeValues( const st
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const std::vector<size_t>& RigEclipseToStimPlanCellTransmissibilityCalculator::globalIndiciesToContributingEclipseCells() const
+const std::vector<size_t>& RimEclipseToStimPlanCellTransmissibilityCalculator::globalIndiciesToContributingEclipseCells() const
 {
     return m_globalIndiciesToContributingEclipseCells;
 }
@@ -72,7 +72,7 @@ const std::vector<size_t>& RigEclipseToStimPlanCellTransmissibilityCalculator::g
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const std::vector<double>& RigEclipseToStimPlanCellTransmissibilityCalculator::contributingEclipseCellTransmissibilities() const
+const std::vector<double>& RimEclipseToStimPlanCellTransmissibilityCalculator::contributingEclipseCellTransmissibilities() const
 {
     return m_contributingEclipseCellTransmissibilities;
 }
@@ -80,7 +80,7 @@ const std::vector<double>& RigEclipseToStimPlanCellTransmissibilityCalculator::c
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const std::vector<double>& RigEclipseToStimPlanCellTransmissibilityCalculator::contributingEclipseCellIntersectionAreas() const
+const std::vector<double>& RimEclipseToStimPlanCellTransmissibilityCalculator::contributingEclipseCellIntersectionAreas() const
 {
     return m_contributingEclipseCellAreas;
 }
@@ -88,7 +88,7 @@ const std::vector<double>& RigEclipseToStimPlanCellTransmissibilityCalculator::c
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const std::vector<double>& RigEclipseToStimPlanCellTransmissibilityCalculator::contributingEclipseCellPermeabilities() const
+const std::vector<double>& RimEclipseToStimPlanCellTransmissibilityCalculator::contributingEclipseCellPermeabilities() const
 {
     return m_contributingEclipseCellPermeabilities;
 }
@@ -96,7 +96,7 @@ const std::vector<double>& RigEclipseToStimPlanCellTransmissibilityCalculator::c
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigEclipseToStimPlanCellTransmissibilityCalculator::areaOpenForFlow() const
+double RimEclipseToStimPlanCellTransmissibilityCalculator::areaOpenForFlow() const
 {
     double area = 0.0;
 
@@ -111,7 +111,7 @@ double RigEclipseToStimPlanCellTransmissibilityCalculator::areaOpenForFlow() con
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const RigFractureCell& RigEclipseToStimPlanCellTransmissibilityCalculator::fractureCell() const
+const RigFractureCell& RimEclipseToStimPlanCellTransmissibilityCalculator::fractureCell() const
 {
     return m_stimPlanCell;
 }
@@ -119,7 +119,7 @@ const RigFractureCell& RigEclipseToStimPlanCellTransmissibilityCalculator::fract
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<QString> RigEclipseToStimPlanCellTransmissibilityCalculator::requiredResultNames()
+std::vector<QString> RimEclipseToStimPlanCellTransmissibilityCalculator::requiredResultNames()
 {
     std::vector<QString> resultNames;
     resultNames.push_back( "PERMX" );
@@ -136,7 +136,7 @@ std::vector<QString> RigEclipseToStimPlanCellTransmissibilityCalculator::require
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<QString> RigEclipseToStimPlanCellTransmissibilityCalculator::optionalResultNames()
+std::vector<QString> RimEclipseToStimPlanCellTransmissibilityCalculator::optionalResultNames()
 {
     std::vector<QString> resultNames;
     resultNames.push_back( "NTG" );
@@ -147,7 +147,7 @@ std::vector<QString> RigEclipseToStimPlanCellTransmissibilityCalculator::optiona
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigEclipseToStimPlanCellTransmissibilityCalculator::calculateStimPlanCellsMatrixTransmissibility(
+void RimEclipseToStimPlanCellTransmissibilityCalculator::calculateStimPlanCellsMatrixTransmissibility(
     const std::set<size_t>& reservoirCellIndicesOpenForFlow )
 {
     // Not calculating flow into fracture if stimPlan cell cond value is 0 (assumed to be outside the fracture):
@@ -343,7 +343,7 @@ void RigEclipseToStimPlanCellTransmissibilityCalculator::calculateStimPlanCellsM
 ///
 //--------------------------------------------------------------------------------------------------
 std::vector<size_t>
-    RigEclipseToStimPlanCellTransmissibilityCalculator::getPotentiallyFracturedCellsForPolygon( const std::vector<cvf::Vec3d>& polygon ) const
+    RimEclipseToStimPlanCellTransmissibilityCalculator::getPotentiallyFracturedCellsForPolygon( const std::vector<cvf::Vec3d>& polygon ) const
 {
     const RigMainGrid* mainGrid = m_case->eclipseCaseData()->mainGrid();
     if ( !mainGrid ) return {};
@@ -373,7 +373,7 @@ std::vector<size_t>
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::ref<RigResultAccessor> RigEclipseToStimPlanCellTransmissibilityCalculator::createResultAccessor( const RimEclipseCase* eclipseCase,
+cvf::ref<RigResultAccessor> RimEclipseToStimPlanCellTransmissibilityCalculator::createResultAccessor( const RimEclipseCase* eclipseCase,
                                                                                                       const QString&        uiResultName )
 {
     RiaDefines::PorosityModelType porosityModel   = RiaDefines::PorosityModelType::MATRIX_MODEL;
@@ -386,7 +386,7 @@ cvf::ref<RigResultAccessor> RigEclipseToStimPlanCellTransmissibilityCalculator::
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigEclipseToStimPlanCellTransmissibilityCalculator::calculateTransmissibility( const cvf::Vec3d& transmissibilityVector,
+double RimEclipseToStimPlanCellTransmissibilityCalculator::calculateTransmissibility( const cvf::Vec3d& transmissibilityVector,
                                                                                       double            fractureArea )
 {
     return transmissibilityVector.length();

@@ -28,7 +28,7 @@ class RigWellPath;
 //==================================================================================================
 ///
 //==================================================================================================
-class RigWellPathGeometryExporter
+class RimWellPathGeometryExporter
 {
 public:
     static void computeWellPathDataForExport( gsl::not_null<const RimWellPath*> wellPath,

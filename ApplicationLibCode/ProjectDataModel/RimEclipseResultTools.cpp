@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RigEclipseResultTools.h"
+#include "RimEclipseResultTools.h"
 
 #include "RiaDefines.h"
 #include "RiaLogging.h"
@@ -37,7 +37,7 @@
 
 #include "cafVecIjk.h"
 
-namespace RigEclipseResultTools
+namespace RimEclipseResultTools
 {
 namespace
 {
@@ -316,143 +316,6 @@ int findMaxBcconValue( RimEclipseCase* eclipseCase )
 }
 
 //--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::vector<int>
-    generateBcconResult( RimEclipseCase* eclipseCase, const std::vector<int>& borderResult, const caf::VecIjk0& min, const caf::VecIjk0& max )
-{
-    if ( eclipseCase == nullptr ) return {};
-
-    auto grid = eclipseCase->eclipseCaseData()->mainGrid();
-    if ( !grid ) return {};
-
-    if ( borderResult.empty() )
-    {
-        RiaLogging::warning( "Border result is empty - cannot generate BCCON result" );
-        return {};
-    }
-
-    auto activeReservoirCellIdxs =
-        eclipseCase->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL )->activeReservoirCellIndices();
-
-    size_t reservoirCellCount =
-        eclipseCase->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL )->reservoirCellCount();
-    std::vector<int> result( reservoirCellCount, 0 );
-
-    // Iterate through all active cells
-    for ( auto activeCellIdx : activeReservoirCellIdxs )
-    {
-        // Check if this cell is a border cell
-        int borderValue = borderResult[activeCellIdx.value()];
-        if ( borderValue != BorderType::BORDER_CELL ) continue;
-
-        // Get IJK indices for this cell
-        size_t i, j, k;
-        if ( !grid->ijkFromCellIndex( activeCellIdx.value(), &i, &j, &k ) ) continue;
-
-        // Determine which face of the box this cell is on
-        // Priority: I faces, then J faces, then K faces (for corner/edge cells)
-        int bcconValue = 0;
-
-        if ( i == min.x() )
-        {
-            bcconValue = 1; // I- face
-        }
-        else if ( i == max.x() )
-        {
-            bcconValue = 2; // I+ face
-        }
-        else if ( j == min.y() )
-        {
-            bcconValue = 3; // J- face
-        }
-        else if ( j == max.y() )
-        {
-            bcconValue = 4; // J+ face
-        }
-        else if ( k == min.z() )
-        {
-            bcconValue = 5; // K- face
-        }
-        else if ( k == max.z() )
-        {
-            bcconValue = 6; // K+ face
-        }
-
-        result[activeCellIdx.value()] = bcconValue;
-    }
-
-    return result;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::vector<BorderCellFace>
-    generateBorderCellFaces( RimEclipseCase* eclipseCase, const std::vector<int>& borderResult, const std::vector<int>& bcconResult )
-{
-    if ( eclipseCase == nullptr ) return {};
-
-    auto grid = eclipseCase->eclipseCaseData()->mainGrid();
-    if ( !grid ) return {};
-
-    if ( borderResult.empty() || bcconResult.empty() ) return {};
-
-    auto activeReservoirCellIdxs =
-        eclipseCase->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL )->activeReservoirCellIndices();
-
-    std::vector<BorderCellFace> borderCellFaces;
-
-    // Iterate through all active cells
-    for ( auto activeCellIdx : activeReservoirCellIdxs )
-    {
-        // Check if this cell is a border cell
-        int borderValue = borderResult[activeCellIdx.value()];
-        if ( borderValue != BorderType::BORDER_CELL ) continue;
-
-        // Get IJK indices for this cell
-        if ( auto ijk = grid->ijkFromCellIndex( activeCellIdx.value() ) )
-        {
-            // Check all 6 faces
-            std::vector<cvf::StructGridInterface::FaceType> faces = cvf::StructGridInterface::validFaceTypes();
-
-            for ( auto faceType : faces )
-            {
-                // Get neighbor cell IJK
-                size_t ni, nj, nk;
-                cvf::StructGridInterface::neighborIJKAtCellFace( ijk->i(), ijk->j(), ijk->k(), faceType, &ni, &nj, &nk );
-
-                // Check if neighbor is within bounds
-                if ( ni >= grid->cellCountI() || nj >= grid->cellCountJ() || nk >= grid->cellCountK() ) continue;
-
-                // Get neighbor reservoir cell index
-                size_t neighborReservoirIdx = grid->cellIndexFromIJK( ni, nj, nk );
-
-                // Find active cell index for neighbor
-                auto it =
-                    std::find( activeReservoirCellIdxs.begin(), activeReservoirCellIdxs.end(), ReservoirCellIndex( neighborReservoirIdx ) );
-                if ( it == activeReservoirCellIdxs.end() ) continue; // Neighbor not active
-
-                // Check if neighbor is an interior cell
-                int neighborBorderValue = borderResult[neighborReservoirIdx];
-                if ( neighborBorderValue == BorderType::INTERIOR_CELL )
-                {
-                    // Get boundary condition value from BCCON grid property
-                    int boundaryCondition = bcconResult[activeCellIdx.value()];
-                    if ( boundaryCondition > 0 )
-                    {
-                        // Add this face to the result
-                        borderCellFaces.push_back( { *ijk, faceType, boundaryCondition } );
-                    }
-                }
-            }
-        }
-    }
-
-    return borderCellFaces;
-}
-
-//--------------------------------------------------------------------------------------------------
 /// Generate BCCON result for refined grid
 /// Returns a vector sized for the refined grid with BCCON values (1-6 for faces, 0 for non-border)
 //--------------------------------------------------------------------------------------------------
@@ -579,4 +442,4 @@ std::vector<BorderCellFace> generateBorderCellFaces( const RigGridExportAdapter&
     return borderCellFaces;
 }
 
-} // namespace RigEclipseResultTools
+} // namespace RimEclipseResultTools

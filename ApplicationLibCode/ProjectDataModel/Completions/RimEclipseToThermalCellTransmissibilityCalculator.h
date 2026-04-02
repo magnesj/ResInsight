@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "RigEclipseToStimPlanCellTransmissibilityCalculator.h"
+#include "RimEclipseToStimPlanCellTransmissibilityCalculator.h"
 
 #include "cvfMatrix4.h"
 #include "cvfObject.h"
@@ -41,10 +41,10 @@ class RimFracture;
 ///  Eclipse reservoir cells open for flow is defined by reservoirCellIndicesOpenForFlow
 ///
 //==================================================================================================
-class RigEclipseToThermalCellTransmissibilityCalculator : public RigEclipseToStimPlanCellTransmissibilityCalculator
+class RimEclipseToThermalCellTransmissibilityCalculator : public RimEclipseToStimPlanCellTransmissibilityCalculator
 {
 public:
-    explicit RigEclipseToThermalCellTransmissibilityCalculator( const RimEclipseCase*                              caseToApply,
+    explicit RimEclipseToThermalCellTransmissibilityCalculator( const RimEclipseCase*                              caseToApply,
                                                                 cvf::Mat4d                                         fractureTransform,
                                                                 double                                             skinFactor,
                                                                 double                                             cDarcy,

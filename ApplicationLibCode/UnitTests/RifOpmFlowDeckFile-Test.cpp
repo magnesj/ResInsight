@@ -5,7 +5,7 @@
 #include "RifOpmDeckTools.h"
 #include "RifOpmFlowDeckFile.h"
 
-#include "RigEclipseResultTools.h"
+#include "RimEclipseResultTools.h"
 
 #include "ProjectDataModel/Jobs/RimKeywordFactory.h"
 
@@ -371,7 +371,7 @@ TEST( RifOpmFlowDeckFileTest, BcpropKeyword )
     ASSERT_TRUE( loadSuccess ) << "Failed to load deck file";
 
     // Create boundary conditions with different indices
-    std::vector<RigEclipseResultTools::BorderCellFace> boundaryConditions;
+    std::vector<RimEclipseResultTools::BorderCellFace> boundaryConditions;
     boundaryConditions.push_back( { caf::VecIjk0( 5, 5, 2 ), cvf::StructGridInterface::POS_I, 1 } );
     boundaryConditions.push_back( { caf::VecIjk0( 5, 6, 2 ), cvf::StructGridInterface::POS_J, 1 } );
     boundaryConditions.push_back( { caf::VecIjk0( 6, 5, 2 ), cvf::StructGridInterface::NEG_I, 2 } );

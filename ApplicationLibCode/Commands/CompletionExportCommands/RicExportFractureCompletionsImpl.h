@@ -31,7 +31,7 @@ class RigFractureGrid;
 class RicWellPathFractureReportItem;
 class RigWellPath;
 class RigTransmissibilityCondenser;
-class RigEclipseToStimPlanCalculator;
+class RimEclipseToStimPlanCalculator;
 class RigCaseCellResultsData;
 
 class RimEclipseCase;
@@ -134,7 +134,7 @@ private:
     static double sumUpTransmissibilities( const std::vector<RigCompletionData>& allCompletionsForOneFracture );
 
     static void calculateAndSetReportItemData( const std::vector<RigCompletionData>& allCompletionsForOneFracture,
-                                               const RigEclipseToStimPlanCalculator& calculator,
+                                               const RimEclipseToStimPlanCalculator& calculator,
                                                RicWellPathFractureReportItem&        reportItem );
 
     static void outputIntermediateResultsText( QTextStream*                  outputStreamForIntermediateResultsText,

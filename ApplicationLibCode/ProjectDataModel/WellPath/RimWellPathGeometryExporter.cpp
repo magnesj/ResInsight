@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RigWellPathGeometryExporter.h"
+#include "RimWellPathGeometryExporter.h"
 
 #include "RigWellPath.h"
 
@@ -28,7 +28,7 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigWellPathGeometryExporter::computeWellPathDataForExport( gsl::not_null<const RimWellPath*> wellPath,
+void RimWellPathGeometryExporter::computeWellPathDataForExport( gsl::not_null<const RimWellPath*> wellPath,
                                                                 double                            mdStepSize,
                                                                 std::vector<double>&              xValues,
                                                                 std::vector<double>&              yValues,
@@ -69,7 +69,7 @@ void RigWellPathGeometryExporter::computeWellPathDataForExport( gsl::not_null<co
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigWellPathGeometryExporter::computeWellPathDataForExport( const RigWellPath&   wellPathGeom,
+void RimWellPathGeometryExporter::computeWellPathDataForExport( const RigWellPath&   wellPathGeom,
                                                                 double               mdStepSize,
                                                                 double               rkbOffset,
                                                                 std::vector<double>& xValues,

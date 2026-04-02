@@ -31,10 +31,10 @@ class RimFishbones;
 ///
 ///
 //==================================================================================================
-class RigFisbonesGeometry
+class RimFishbonesGeometry
 {
 public:
-    explicit RigFisbonesGeometry( RimFishbones* fishbonesSub );
+    explicit RimFishbonesGeometry( RimFishbones* fishbonesSub );
 
     std::vector<std::pair<cvf::Vec3d, double>> coordsForLateral( size_t subIndex, size_t lateralIndex ) const;
 

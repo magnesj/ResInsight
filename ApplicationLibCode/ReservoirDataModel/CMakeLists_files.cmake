@@ -25,7 +25,6 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseNativeVisibleCellsStatCalc.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultAddress.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultInfo.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RigElasticProperties.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEnsembleParameter.h
     ${CMAKE_CURRENT_LIST_DIR}/RigInterpolationTools.h
@@ -112,7 +111,6 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseNativeVisibleCellsStatCalc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultAddress.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultInfo.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigElasticProperties.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEnsembleParameter.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigInterpolationTools.cpp

@@ -21,7 +21,7 @@
 #include "RiaColorTables.h"
 #include "RiaEclipseUnitTools.h"
 
-#include "Well/RigFishbonesGeometry.h"
+#include "Completions/RimFishbonesGeometry.h"
 #include "Well/RigWellPath.h"
 
 #include "RimFishbonesCollection.h"
@@ -124,7 +124,7 @@ RimFishbones::RimFishbones()
     m_pipeProperties.uiCapability()->setUiTreeChildrenHidden( true );
     m_pipeProperties = pipeProperties;
 
-    m_rigFishbonesGeometry = std::make_unique<RigFisbonesGeometry>( this );
+    m_rigFishbonesGeometry = std::make_unique<RimFishbonesGeometry>( this );
     setDeletable( true );
 }
 

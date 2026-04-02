@@ -20,7 +20,7 @@
 
 #include "RiaPorosityModel.h"
 
-#include "RigEclipseToStimPlanCellTransmissibilityCalculator.h"
+#include "RimEclipseToStimPlanCellTransmissibilityCalculator.h"
 
 #include "cvfMatrix4.h"
 
@@ -37,10 +37,10 @@ class RimFracture;
 //==================================================================================================
 ///
 //==================================================================================================
-class RigEclipseToStimPlanCalculator
+class RimEclipseToStimPlanCalculator
 {
 public:
-    explicit RigEclipseToStimPlanCalculator( const RimEclipseCase*  caseToApply,
+    explicit RimEclipseToStimPlanCalculator( const RimEclipseCase*  caseToApply,
                                              cvf::Mat4d             fractureTransform,
                                              double                 skinFactor,
                                              double                 cDarcy,
@@ -69,5 +69,5 @@ private:
     cvf::Mat4d             m_fractureTransform;
     const RigFractureGrid& m_fractureGrid;
 
-    std::map<size_t, std::unique_ptr<RigEclipseToStimPlanCellTransmissibilityCalculator>> m_singleFractureCellCalculators;
+    std::map<size_t, std::unique_ptr<RimEclipseToStimPlanCellTransmissibilityCalculator>> m_singleFractureCellCalculators;
 };

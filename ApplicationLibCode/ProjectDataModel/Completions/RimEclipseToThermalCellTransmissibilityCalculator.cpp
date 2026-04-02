@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RigEclipseToThermalCellTransmissibilityCalculator.h"
+#include "RimEclipseToThermalCellTransmissibilityCalculator.h"
 
 #include "RimEclipseCase.h"
 #include "RimFracture.h"
@@ -25,7 +25,7 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigEclipseToThermalCellTransmissibilityCalculator::RigEclipseToThermalCellTransmissibilityCalculator(
+RimEclipseToThermalCellTransmissibilityCalculator::RimEclipseToThermalCellTransmissibilityCalculator(
     const RimEclipseCase*                              caseToApply,
     cvf::Mat4d                                         fractureTransform,
     double                                             skinFactor,
@@ -38,7 +38,7 @@ RigEclipseToThermalCellTransmissibilityCalculator::RigEclipseToThermalCellTransm
     double                                             filtrateThickness,
     double                                             viscosity,
     double                                             relativePermeability )
-    : RigEclipseToStimPlanCellTransmissibilityCalculator( caseToApply, fractureTransform, skinFactor, cDarcy, stimPlanCell, fracture )
+    : RimEclipseToStimPlanCellTransmissibilityCalculator( caseToApply, fractureTransform, skinFactor, cDarcy, stimPlanCell, fracture )
     , m_filterCakePressureDrop( filterCakePressureDrop )
     , m_injectivityFactor( injectivityFactor )
     , m_filterCakeMobility( filterCakeMobility )
@@ -51,7 +51,7 @@ RigEclipseToThermalCellTransmissibilityCalculator::RigEclipseToThermalCellTransm
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigEclipseToThermalCellTransmissibilityCalculator::calculateTransmissibility( const cvf::Vec3d& transmissibilityVector,
+double RimEclipseToThermalCellTransmissibilityCalculator::calculateTransmissibility( const cvf::Vec3d& transmissibilityVector,
                                                                                      double            fractureArea )
 {
     double fractureMatrixTransimissibility = transmissibilityVector.length();

@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RigFishbonesGeometry.h"
+#include "RimFishbonesGeometry.h"
 
 #include "RigWellPath.h"
 
@@ -28,7 +28,7 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigFisbonesGeometry::RigFisbonesGeometry( RimFishbones* fishbonesSub )
+RimFishbonesGeometry::RimFishbonesGeometry( RimFishbones* fishbonesSub )
     : m_fishbonesSub( fishbonesSub )
 {
 }
@@ -36,7 +36,7 @@ RigFisbonesGeometry::RigFisbonesGeometry( RimFishbones* fishbonesSub )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<std::pair<cvf::Vec3d, double>> RigFisbonesGeometry::coordsForLateral( size_t subIndex, size_t lateralIndex ) const
+std::vector<std::pair<cvf::Vec3d, double>> RimFishbonesGeometry::coordsForLateral( size_t subIndex, size_t lateralIndex ) const
 {
     CVF_ASSERT( lateralIndex < m_fishbonesSub->lateralLengths().size() );
 
@@ -63,11 +63,11 @@ std::vector<std::pair<cvf::Vec3d, double>> RigFisbonesGeometry::coordsForLateral
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFisbonesGeometry::computeLateralPositionAndOrientation( size_t      subIndex,
-                                                                size_t      lateralIndex,
-                                                                cvf::Vec3d* startCoord,
-                                                                cvf::Vec3d* startDirection,
-                                                                cvf::Mat4d* buildAngleMatrix ) const
+void RimFishbonesGeometry::computeLateralPositionAndOrientation( size_t      subIndex,
+                                                                 size_t      lateralIndex,
+                                                                 cvf::Vec3d* startCoord,
+                                                                 cvf::Vec3d* startDirection,
+                                                                 cvf::Mat4d* buildAngleMatrix ) const
 {
     auto wellPath = m_fishbonesSub->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
 
@@ -91,7 +91,7 @@ void RigFisbonesGeometry::computeLateralPositionAndOrientation( size_t      subI
 
         cvf::Vec3d alongWellPath = ( p2 - p1 ).getNormalized();
 
-        if ( RigFisbonesGeometry::closestMainAxis( alongWellPath ) == cvf::Vec3d::Z_AXIS )
+        if ( RimFishbonesGeometry::closestMainAxis( alongWellPath ) == cvf::Vec3d::Z_AXIS )
         {
             // Use Y-AXIS if well path is heading close to Z-AXIS
             lateralInitialDirection = cvf::Vec3d::Y_AXIS;
@@ -128,11 +128,11 @@ void RigFisbonesGeometry::computeLateralPositionAndOrientation( size_t      subI
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<std::pair<cvf::Vec3d, double>> RigFisbonesGeometry::computeCoordsAlongLateral( double            startMeasuredDepth,
-                                                                                           double            lateralLength,
-                                                                                           const cvf::Vec3d& startCoord,
-                                                                                           const cvf::Vec3d& startDirection,
-                                                                                           const cvf::Mat4d& buildAngleMatrix )
+std::vector<std::pair<cvf::Vec3d, double>> RimFishbonesGeometry::computeCoordsAlongLateral( double            startMeasuredDepth,
+                                                                                            double            lateralLength,
+                                                                                            const cvf::Vec3d& startCoord,
+                                                                                            const cvf::Vec3d& startDirection,
+                                                                                            const cvf::Mat4d& buildAngleMatrix )
 {
     std::vector<std::pair<cvf::Vec3d, double>> coords;
 
@@ -172,7 +172,7 @@ std::vector<std::pair<cvf::Vec3d, double>> RigFisbonesGeometry::computeCoordsAlo
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::Vec3d RigFisbonesGeometry::closestMainAxis( const cvf::Vec3d& vec )
+cvf::Vec3d RimFishbonesGeometry::closestMainAxis( const cvf::Vec3d& vec )
 {
     size_t maxComponent = 0;
     double maxValue     = cvf::Math::abs( vec.x() );
