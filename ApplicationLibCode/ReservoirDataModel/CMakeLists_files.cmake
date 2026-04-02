@@ -35,9 +35,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagInterfaceTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResultAddress.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResultFrames.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResults.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagSolverInterface.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagStatCalc.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagTimeStepResult.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagDefines.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFormationNames.h
@@ -121,9 +119,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagDefines.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResultAddress.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResultFrames.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResults.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagSolverInterface.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagStatCalc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagTimeStepResult.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagDefines.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFormationNames.cpp

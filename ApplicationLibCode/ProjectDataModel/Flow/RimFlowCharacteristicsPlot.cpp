@@ -24,7 +24,7 @@
 
 #include "RigActiveCellInfo.h"
 #include "RigEclipseCaseData.h"
-#include "RigFlowDiagResults.h"
+#include "RimFlowDiagResults.h"
 
 #include "RimEclipseCaseTools.h"
 #include "RimEclipseCellColors.h"
@@ -176,7 +176,7 @@ void RimFlowCharacteristicsPlot::updateCurrentTimeStep()
     if ( m_timeStepSelectionType() != ALL_AVAILABLE ) return;
     if ( !m_flowDiagSolution() ) return;
 
-    RigFlowDiagResults* flowResult          = m_flowDiagSolution->flowDiagResults();
+    RimFlowDiagResults* flowResult          = m_flowDiagSolution->flowDiagResults();
     std::vector<int>    calculatedTimesteps = flowResult->calculatedTimeSteps( RigFlowDiagResultAddress::PHASE_ALL );
 
     if ( m_currentlyPlottedTimeSteps == calculatedTimesteps ) return;
@@ -204,15 +204,15 @@ void RimFlowCharacteristicsPlot::setInjectorsAndProducers( const std::vector<QSt
 
     if ( producers.empty() && !injectors.empty() )
     {
-        m_cellFilter = RigFlowDiagResults::CELLS_FLOODED;
+        m_cellFilter = RimFlowDiagResults::CELLS_FLOODED;
     }
     else if ( !producers.empty() && injectors.empty() )
     {
-        m_cellFilter = RigFlowDiagResults::CELLS_DRAINED;
+        m_cellFilter = RimFlowDiagResults::CELLS_DRAINED;
     }
     else if ( !producers.empty() && !injectors.empty() )
     {
-        m_cellFilter = RigFlowDiagResults::CELLS_COMMUNICATION;
+        m_cellFilter = RimFlowDiagResults::CELLS_COMMUNICATION;
     }
 
     m_selectedTracerNames = allTracers;
@@ -322,7 +322,7 @@ QList<caf::PdmOptionItemInfo> RimFlowCharacteristicsPlot::calculateValueOptions(
                 RimFlowDiagSolution::TracerStatusType tracerStatus = m_flowDiagSolution->tracerStatusOverall( tracerName );
                 if ( tracerStatus == RimFlowDiagSolution::TracerStatusType::CLOSED ) continue;
 
-                if ( m_cellFilter() == RigFlowDiagResults::CELLS_FLOODED )
+                if ( m_cellFilter() == RimFlowDiagResults::CELLS_FLOODED )
                 {
                     if ( tracerStatus == RimFlowDiagSolution::TracerStatusType::INJECTOR ||
                          tracerStatus == RimFlowDiagSolution::TracerStatusType::VARYING )
@@ -330,7 +330,7 @@ QList<caf::PdmOptionItemInfo> RimFlowCharacteristicsPlot::calculateValueOptions(
                         sortedTracerNames.push_back( std::make_pair( tracerName, tracerName ) );
                     }
                 }
-                else if ( m_cellFilter() == RigFlowDiagResults::CELLS_DRAINED )
+                else if ( m_cellFilter() == RimFlowDiagResults::CELLS_DRAINED )
                 {
                     if ( tracerStatus == RimFlowDiagSolution::TracerStatusType::PRODUCER ||
                          tracerStatus == RimFlowDiagSolution::TracerStatusType::VARYING )
@@ -338,7 +338,7 @@ QList<caf::PdmOptionItemInfo> RimFlowCharacteristicsPlot::calculateValueOptions(
                         sortedTracerNames.push_back( std::make_pair( tracerName, tracerName ) );
                     }
                 }
-                else if ( m_cellFilter() == RigFlowDiagResults::CELLS_COMMUNICATION )
+                else if ( m_cellFilter() == RimFlowDiagResults::CELLS_COMMUNICATION )
                 {
                     QString prefix;
                     switch ( tracerStatus )
@@ -418,23 +418,23 @@ void RimFlowCharacteristicsPlot::defineUiOrdering( QString uiConfigName, caf::Pd
     {
         caf::PdmUiGroup* regionGroup = uiOrdering.addNewGroup( "Region" );
         regionGroup->add( &m_cellFilter );
-        if ( m_cellFilter() == RigFlowDiagResults::CELLS_COMMUNICATION || m_cellFilter() == RigFlowDiagResults::CELLS_DRAINED ||
-             m_cellFilter() == RigFlowDiagResults::CELLS_FLOODED )
+        if ( m_cellFilter() == RimFlowDiagResults::CELLS_COMMUNICATION || m_cellFilter() == RimFlowDiagResults::CELLS_DRAINED ||
+             m_cellFilter() == RimFlowDiagResults::CELLS_FLOODED )
         {
             regionGroup->add( &m_tracerFilter );
             regionGroup->add( &m_selectedTracerNames );
             regionGroup->addNewButton( "Show Region", [this]() { onShowRegionClicked(); } );
         }
-        else if ( m_cellFilter() == RigFlowDiagResults::CELLS_VISIBLE )
+        else if ( m_cellFilter() == RimFlowDiagResults::CELLS_VISIBLE )
         {
             regionGroup->add( &m_cellFilterView );
         }
 
-        if ( m_cellFilter() == RigFlowDiagResults::CELLS_COMMUNICATION )
+        if ( m_cellFilter() == RimFlowDiagResults::CELLS_COMMUNICATION )
         {
             regionGroup->add( &m_minCommunication );
         }
-        else if ( m_cellFilter() == RigFlowDiagResults::CELLS_DRAINED || m_cellFilter() == RigFlowDiagResults::CELLS_FLOODED )
+        else if ( m_cellFilter() == RimFlowDiagResults::CELLS_DRAINED || m_cellFilter() == RimFlowDiagResults::CELLS_FLOODED )
         {
             regionGroup->add( &m_maxTof );
         }
@@ -490,7 +490,7 @@ void RimFlowCharacteristicsPlot::onShowRegionClicked()
 {
     if ( m_case )
     {
-        if ( m_cellFilter() != RigFlowDiagResults::CELLS_ACTIVE )
+        if ( m_cellFilter() != RimFlowDiagResults::CELLS_ACTIVE )
         {
             RimEclipseView* view = RicSelectOrCreateViewFeatureImpl::showViewSelection( m_case,
                                                                                         "FlowCharacteristicsLastUsedView",
@@ -504,7 +504,7 @@ void RimFlowCharacteristicsPlot::onShowRegionClicked()
                 view->cellResult()->setFlowDiagTracerSelectionType( RimEclipseResultDefinition::FlowTracerSelectionType::FLOW_TR_BY_SELECTION );
                 view->cellResult()->setSelectedTracers( m_selectedTracerNames );
 
-                if ( m_cellFilter() == RigFlowDiagResults::CELLS_COMMUNICATION )
+                if ( m_cellFilter() == RimFlowDiagResults::CELLS_COMMUNICATION )
                 {
                     view->cellResult()->setResultVariable( RigFlowDiagDefines::communicationResultName() );
                 }
@@ -589,7 +589,7 @@ void RimFlowCharacteristicsPlot::onLoadDataAndUpdate()
 
     if ( m_flowDiagSolution && m_flowCharPlotWidget )
     {
-        RigFlowDiagResults* flowResult = m_flowDiagSolution->flowDiagResults();
+        RimFlowDiagResults* flowResult = m_flowDiagSolution->flowDiagResults();
         if ( !flowResult ) return;
 
         {
@@ -614,7 +614,7 @@ void RimFlowCharacteristicsPlot::onLoadDataAndUpdate()
         m_flowCharPlotWidget->removeAllCurves();
 
         std::vector<QString> selectedTracerNames = m_selectedTracerNames();
-        if ( m_cellFilter() == RigFlowDiagResults::CELLS_ACTIVE )
+        if ( m_cellFilter() == RimFlowDiagResults::CELLS_ACTIVE )
         {
             if ( m_flowDiagSolution )
             {
@@ -626,7 +626,7 @@ void RimFlowCharacteristicsPlot::onLoadDataAndUpdate()
 
         for ( int timeStepIdx : m_currentlyPlottedTimeSteps )
         {
-            if ( m_cellFilter() == RigFlowDiagResults::CELLS_VISIBLE )
+            if ( m_cellFilter() == RimFlowDiagResults::CELLS_VISIBLE )
             {
                 cvf::UByteArray visibleCells;
 
@@ -704,7 +704,7 @@ void RimFlowCharacteristicsPlot::assignIdIfNecessary()
 //--------------------------------------------------------------------------------------------------
 void RimFlowCharacteristicsPlot::viewGeometryUpdated()
 {
-    if ( m_cellFilter() == RigFlowDiagResults::CELLS_VISIBLE )
+    if ( m_cellFilter() == RimFlowDiagResults::CELLS_VISIBLE )
     {
         // Only need to reload data if cell filtering is based on visible cells in view.
         onLoadDataAndUpdate();

@@ -35,7 +35,7 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimFlowDiagVisibleCellsStatCalc::RimFlowDiagVisibleCellsStatCalc( RigFlowDiagResults*             resultsData,
+RimFlowDiagVisibleCellsStatCalc::RimFlowDiagVisibleCellsStatCalc( RimFlowDiagResults*             resultsData,
                                                                   const RigFlowDiagResultAddress& resVarAddr,
                                                                   const cvf::UByteArray*          cellVisibilities )
     : m_resultsData( resultsData )

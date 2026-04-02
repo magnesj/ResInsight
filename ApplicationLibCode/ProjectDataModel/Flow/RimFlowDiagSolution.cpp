@@ -21,7 +21,7 @@
 #include "RigActiveCellInfo.h"
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
-#include "RigFlowDiagResults.h"
+#include "RimFlowDiagResults.h"
 #include "RigMainGrid.h"
 #include "Well/RigSimWellData.h"
 #include "Well/RigWellResultFrame.h"
@@ -93,7 +93,7 @@ QString RimFlowDiagSolution::userDescription() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigFlowDiagResults* RimFlowDiagSolution::flowDiagResults()
+RimFlowDiagResults* RimFlowDiagSolution::flowDiagResults()
 {
     if ( !m_flowDiagResults )
     {
@@ -108,7 +108,7 @@ RigFlowDiagResults* RimFlowDiagSolution::flowDiagResults()
             timeStepCount = eclCase->eclipseCaseData()->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->maxTimeStepCount();
         }
 
-        m_flowDiagResults = std::make_unique<RigFlowDiagResults>( this, timeStepCount );
+        m_flowDiagResults = std::make_unique<RimFlowDiagResults>( this, timeStepCount );
     }
 
     return m_flowDiagResults.get();
@@ -117,7 +117,7 @@ RigFlowDiagResults* RimFlowDiagSolution::flowDiagResults()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const RigFlowDiagResults* RimFlowDiagSolution::flowDiagResults() const
+const RimFlowDiagResults* RimFlowDiagSolution::flowDiagResults() const
 {
     return m_flowDiagResults.get();
 }

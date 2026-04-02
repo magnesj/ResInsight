@@ -26,16 +26,16 @@
 
 class RigCaseCellResultsData;
 class RigHistogramCalculator;
-class RigFlowDiagResults;
+class RimFlowDiagResults;
 
 //==================================================================================================
 ///
 //==================================================================================================
 
-class RigFlowDiagStatCalc : public RigStatisticsCalculator
+class RimFlowDiagStatCalc : public RigStatisticsCalculator
 {
 public:
-    RigFlowDiagStatCalc( RigFlowDiagResults* flowDiagResults, const RigFlowDiagResultAddress& resVarAddr );
+    RimFlowDiagStatCalc( RimFlowDiagResults* flowDiagResults, const RigFlowDiagResultAddress& resVarAddr );
 
     void   minMaxCellScalarValues( size_t timeStepIndex, double& min, double& max ) override;
     void   posNegClosestToZero( size_t timeStepIndex, double& pos, double& neg ) override;
@@ -48,7 +48,7 @@ public:
     void setCaseCellResultsDataCallback( std::function<RigCaseCellResultsData*()> callback );
 
 private:
-    RigFlowDiagResults*                      m_resultsData;
+    RimFlowDiagResults*                      m_resultsData;
     RigFlowDiagResultAddress                 m_resVarAddr;
     std::function<RigCaseCellResultsData*()> m_caseCellResultsDataCallback;
 };

@@ -17,22 +17,22 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RigFlowDiagStatCalc.h"
+#include "RimFlowDiagStatCalc.h"
 
 #include "RiaResultNames.h"
 
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseResultAddress.h"
-#include "RigFlowDiagResults.h"
 #include "RigStatisticsMath.h"
 #include "RigWeightedMeanCalc.h"
+#include "RimFlowDiagResults.h"
 
 #include <cmath>
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigFlowDiagStatCalc::RigFlowDiagStatCalc( RigFlowDiagResults* flowDiagResults, const RigFlowDiagResultAddress& resVarAddr )
+RimFlowDiagStatCalc::RimFlowDiagStatCalc( RimFlowDiagResults* flowDiagResults, const RigFlowDiagResultAddress& resVarAddr )
     : m_resVarAddr( resVarAddr )
 {
     m_resultsData = flowDiagResults;
@@ -41,7 +41,7 @@ RigFlowDiagStatCalc::RigFlowDiagStatCalc( RigFlowDiagResults* flowDiagResults, c
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFlowDiagStatCalc::minMaxCellScalarValues( size_t timeStepIndex, double& min, double& max )
+void RimFlowDiagStatCalc::minMaxCellScalarValues( size_t timeStepIndex, double& min, double& max )
 {
     MinMaxAccumulator          minMaxCalc( min, max );
     const std::vector<double>* vals = m_resultsData->resultValues( m_resVarAddr, timeStepIndex );
@@ -55,7 +55,7 @@ void RigFlowDiagStatCalc::minMaxCellScalarValues( size_t timeStepIndex, double& 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFlowDiagStatCalc::posNegClosestToZero( size_t timeStepIndex, double& pos, double& neg )
+void RimFlowDiagStatCalc::posNegClosestToZero( size_t timeStepIndex, double& pos, double& neg )
 {
     PosNegAccumulator          posNegCalc( pos, neg );
     const std::vector<double>* vals = m_resultsData->resultValues( m_resVarAddr, timeStepIndex );
@@ -69,7 +69,7 @@ void RigFlowDiagStatCalc::posNegClosestToZero( size_t timeStepIndex, double& pos
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFlowDiagStatCalc::valueSumAndSampleCount( size_t timeStepIndex, double& valueSum, size_t& sampleCount )
+void RimFlowDiagStatCalc::valueSumAndSampleCount( size_t timeStepIndex, double& valueSum, size_t& sampleCount )
 {
     SumCountAccumulator        sumCountCalc( valueSum, sampleCount );
     const std::vector<double>* vals = m_resultsData->resultValues( m_resVarAddr, timeStepIndex );
@@ -83,7 +83,7 @@ void RigFlowDiagStatCalc::valueSumAndSampleCount( size_t timeStepIndex, double& 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFlowDiagStatCalc::addDataToHistogramCalculator( size_t timeStepIndex, RigHistogramCalculator& histogramCalculator )
+void RimFlowDiagStatCalc::addDataToHistogramCalculator( size_t timeStepIndex, RigHistogramCalculator& histogramCalculator )
 {
     const std::vector<double>* vals = m_resultsData->resultValues( m_resVarAddr, timeStepIndex );
 
@@ -93,7 +93,7 @@ void RigFlowDiagStatCalc::addDataToHistogramCalculator( size_t timeStepIndex, Ri
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFlowDiagStatCalc::uniqueValues( size_t timeStepIndex, std::set<int>& uniqueValues )
+void RimFlowDiagStatCalc::uniqueValues( size_t timeStepIndex, std::set<int>& uniqueValues )
 {
     const std::vector<double>* vals = m_resultsData->resultValues( m_resVarAddr, timeStepIndex );
 
@@ -105,7 +105,7 @@ void RigFlowDiagStatCalc::uniqueValues( size_t timeStepIndex, std::set<int>& uni
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-size_t RigFlowDiagStatCalc::timeStepCount()
+size_t RimFlowDiagStatCalc::timeStepCount()
 {
     return m_resultsData->timeStepCount();
 }
@@ -113,7 +113,7 @@ size_t RigFlowDiagStatCalc::timeStepCount()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFlowDiagStatCalc::setCaseCellResultsDataCallback( std::function<RigCaseCellResultsData*()> callback )
+void RimFlowDiagStatCalc::setCaseCellResultsDataCallback( std::function<RigCaseCellResultsData*()> callback )
 {
     m_caseCellResultsDataCallback = std::move( callback );
 }
@@ -121,7 +121,7 @@ void RigFlowDiagStatCalc::setCaseCellResultsDataCallback( std::function<RigCaseC
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFlowDiagStatCalc::mobileVolumeWeightedMean( size_t timeStepIndex, double& mean )
+void RimFlowDiagStatCalc::mobileVolumeWeightedMean( size_t timeStepIndex, double& mean )
 {
     if ( !m_caseCellResultsDataCallback ) return;
 

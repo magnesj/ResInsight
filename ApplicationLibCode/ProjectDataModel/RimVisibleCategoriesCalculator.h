@@ -22,7 +22,7 @@
 #include <set>
 
 class RimEclipseView;
-class RigFlowDiagResults;
+class RimFlowDiagResults;
 class RigFlowDiagResultAddress;
 class RimEclipseResultDefinition;
 
@@ -33,7 +33,7 @@ class RimVisibleCategoriesCalculator
 {
 public:
     static std::set<int> visibleFlowDiagCategories( RimEclipseView&                 eclView,
-                                                    RigFlowDiagResults&             flowDiagResults,
+                                                    RimFlowDiagResults&             flowDiagResults,
                                                     const RigFlowDiagResultAddress& resVarAddr,
                                                     size_t                          timeStepIndex );
 

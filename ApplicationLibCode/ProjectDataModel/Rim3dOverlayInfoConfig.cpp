@@ -34,7 +34,7 @@
 #include "RigFemPartCollection.h"
 #include "RigFemPartResultsCollection.h"
 #include "RigFemResultAddress.h"
-#include "RigFlowDiagResults.h"
+#include "RimFlowDiagResults.h"
 #include "RigGeoMechCaseData.h"
 #include "RigMainGrid.h"
 

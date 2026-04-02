@@ -27,7 +27,7 @@
 #include "RigEclipseCaseData.h"
 #include "RigEclipseCaseDataTools.h"
 #include "RigFlowDiagResultAddress.h"
-#include "RigFlowDiagResults.h"
+#include "RimFlowDiagResults.h"
 #include "Well/RigAccWellFlowCalculator.h"
 #include "Well/RigSimWellData.h"
 #include "Well/RigSimulationWellCenterLineCalculator.h"

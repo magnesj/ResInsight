@@ -28,7 +28,7 @@
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
 #include "RigEclipseResultAddress.h"
-#include "RigFlowDiagResults.h"
+#include "RimFlowDiagResults.h"
 #include "RigFormationNames.h"
 
 #include "RimEclipseCase.h"
@@ -500,7 +500,7 @@ void RimEclipsePropertyFilter::computeResultValueRange()
         RigFlowDiagResultAddress resAddr = m_resultDefinition->flowDiagResAddress();
         if ( m_resultDefinition->flowDiagSolution() )
         {
-            RigFlowDiagResults* results = m_resultDefinition->flowDiagSolution()->flowDiagResults();
+            RimFlowDiagResults* results = m_resultDefinition->flowDiagSolution()->flowDiagResults();
             results->minMaxScalarValues( resAddr, timeStep, &min, &max );
 
             if ( m_resultDefinition->hasCategoryResult() )
@@ -603,7 +603,7 @@ void RimEclipsePropertyFilter::updateFromCurrentTimeStep()
     RigFlowDiagResultAddress resAddr  = m_resultDefinition->flowDiagResAddress();
     if ( m_resultDefinition->flowDiagSolution() )
     {
-        RigFlowDiagResults* results = m_resultDefinition->flowDiagSolution()->flowDiagResults();
+        RimFlowDiagResults* results = m_resultDefinition->flowDiagSolution()->flowDiagResults();
         results->minMaxScalarValues( resAddr, timeStep, &min, &max );
 
         if ( m_resultDefinition->hasCategoryResult() )

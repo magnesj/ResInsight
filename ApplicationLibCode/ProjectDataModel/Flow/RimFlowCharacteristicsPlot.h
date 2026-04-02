@@ -20,7 +20,7 @@
 
 #include "RimViewWindow.h"
 
-#include "RigFlowDiagResults.h"
+#include "RimFlowDiagResults.h"
 
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
@@ -105,7 +105,7 @@ private:
     caf::PdmField<bool>                            m_showLegend;
     caf::PdmField<double>                          m_maxPvFraction;
 
-    caf::PdmField<RigFlowDiagResults::CellFilterEnum> m_cellFilter;
+    caf::PdmField<RimFlowDiagResults::CellFilterEnum> m_cellFilter;
     caf::PdmPtrField<RimEclipseView*>                 m_cellFilterView;
     caf::PdmField<QString>                            m_tracerFilter;
     caf::PdmField<std::vector<QString>>               m_selectedTracerNames;

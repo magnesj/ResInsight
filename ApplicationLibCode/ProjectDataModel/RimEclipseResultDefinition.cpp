@@ -32,7 +32,7 @@
 #include "RigEclipseCaseData.h"
 #include "RigEclipseResultInfo.h"
 #include "RigFlowDiagResultAddress.h"
-#include "RigFlowDiagResults.h"
+#include "RimFlowDiagResults.h"
 #include "RigFormationNames.h"
 #include "RigMainGrid.h"
 

@@ -26,7 +26,7 @@
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
 #include "RigFlowDiagResultAddress.h"
-#include "RigFlowDiagResults.h"
+#include "RimFlowDiagResults.h"
 #include "RigResultAccessor.h"
 #include "RigResultAccessorFactory.h"
 
@@ -58,7 +58,7 @@ RimTofWellDistributionCalculator::RimTofWellDistributionCalculator( RimEclipseRe
     RimFlowDiagSolution* flowDiagSolution = caseToApply->defaultFlowDiagSolution();
     CVF_ASSERT( flowDiagSolution );
 
-    RigFlowDiagResults* flowDiagResults = flowDiagSolution->flowDiagResults();
+    RimFlowDiagResults* flowDiagResults = flowDiagSolution->flowDiagResults();
     CVF_ASSERT( flowDiagResults );
 
     const std::vector<double>* porvResults = eclipseCaseData->resultValues( RiaDefines::PorosityModelType::MATRIX_MODEL,

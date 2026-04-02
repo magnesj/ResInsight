@@ -23,7 +23,7 @@
 #include "RigEclipseCaseData.h"
 #include "RigEclipseNativeVisibleCellsStatCalc.h"
 #include "RigFault.h"
-#include "RigFlowDiagResults.h"
+#include "RimFlowDiagResults.h"
 #include "RigMainGrid.h"
 #include "RigNNCData.h"
 #include "RimEclipseResultDefinitionTools.h"
@@ -53,7 +53,7 @@
 ///
 //--------------------------------------------------------------------------------------------------
 std::set<int> RimVisibleCategoriesCalculator::visibleFlowDiagCategories( RimEclipseView&                 eclView,
-                                                                         RigFlowDiagResults&             flowDiagResults,
+                                                                         RimFlowDiagResults&             flowDiagResults,
                                                                          const RigFlowDiagResultAddress& resVarAddr,
                                                                          size_t                          timeStepIndex )
 {

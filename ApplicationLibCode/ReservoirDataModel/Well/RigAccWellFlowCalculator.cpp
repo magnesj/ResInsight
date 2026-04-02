@@ -21,7 +21,7 @@
 #include "RiaWellFlowDefines.h"
 
 #include "RigActiveCellInfo.h"
-#include "RigFlowDiagResults.h"
+#include "RigFlowDiagDefines.h"
 #include "RigMainGrid.h"
 #include "RigSimWellData.h"
 #include "RigSimulationWellCoordsAndMD.h"

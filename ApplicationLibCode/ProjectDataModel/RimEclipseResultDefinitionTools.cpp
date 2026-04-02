@@ -28,7 +28,7 @@
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
 #include "RigEclipseResultAddress.h"
-#include "RigFlowDiagResults.h"
+#include "RimFlowDiagResults.h"
 #include "RigGridBase.h"
 #include "RigResultAccessor.h"
 #include "RigResultAccessorFactory.h"
@@ -416,7 +416,7 @@ void RimEclipseResultDefinitionTools::updateLegendForFlowDiagnostics( const RimE
     auto flowDiagSolution = resultDefinition->flowDiagSolution();
     if ( !flowDiagSolution ) return;
 
-    RigFlowDiagResults* flowResultsData = flowDiagSolution->flowDiagResults();
+    RimFlowDiagResults* flowResultsData = flowDiagSolution->flowDiagResults();
     if ( !flowResultsData ) return;
 
     RigFlowDiagResultAddress resAddr = resultDefinition->flowDiagResAddress();

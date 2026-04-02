@@ -26,7 +26,7 @@
 
 #include "RigActiveCellInfo.h"
 #include "RigEclipseCaseData.h"
-#include "RigFlowDiagResults.h"
+#include "RimFlowDiagResults.h"
 #include "RigMainGrid.h"
 #include "Well/RigSimWellData.h"
 #include "Well/RigWellResultFrame.h"
@@ -78,7 +78,7 @@ void RivWellConnectionsPartMgr::appendDynamicGeometryPartsToModel( cvf::ModelBas
     double                               characteristicCellSize;
     double                               mainArrowZHeight;
     cvf::ref<caf::DisplayCoordTransform> displayCordXf;
-    RigFlowDiagResults*                  flowResults;
+    RimFlowDiagResults*                  flowResults;
 
     std::string injectorName;
     std::string producerName;

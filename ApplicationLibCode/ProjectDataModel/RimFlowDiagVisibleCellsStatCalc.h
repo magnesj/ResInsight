@@ -24,18 +24,18 @@
 //==================================================================================================
 #include "RigActiveCellInfo.h"
 #include "RigFlowDiagResultAddress.h"
-#include "RigFlowDiagResults.h"
+#include "RimFlowDiagResults.h"
 #include "RigStatisticsCalculator.h"
 
 #include "cvfArray.h"
 
-class RigFlowDiagResults;
+class RimFlowDiagResults;
 class RigActiveCellInfo;
 
 class RimFlowDiagVisibleCellsStatCalc : public RigStatisticsCalculator
 {
 public:
-    RimFlowDiagVisibleCellsStatCalc( RigFlowDiagResults*             resultsData,
+    RimFlowDiagVisibleCellsStatCalc( RimFlowDiagResults*             resultsData,
                                      const RigFlowDiagResultAddress& resVarAddr,
                                      const cvf::UByteArray*          cellVisibilities );
 
@@ -48,7 +48,7 @@ public:
     void   mobileVolumeWeightedMean( size_t timeStepIndex, double& result ) override;
 
 private:
-    RigFlowDiagResults*        m_resultsData;
+    RimFlowDiagResults*        m_resultsData;
     RigFlowDiagResultAddress   m_resVarAddr;
     cvf::cref<cvf::UByteArray> m_cellVisibilities;
 

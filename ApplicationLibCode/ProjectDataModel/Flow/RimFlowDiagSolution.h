@@ -26,7 +26,7 @@
 #include "cvfColor3.h"
 #include "cvfObject.h"
 
-class RigFlowDiagResults;
+class RimFlowDiagResults;
 
 //==================================================================================================
 ///
@@ -41,8 +41,8 @@ public:
     ~RimFlowDiagSolution() override;
 
     QString                   userDescription() const;
-    RigFlowDiagResults*       flowDiagResults();
-    const RigFlowDiagResults* flowDiagResults() const;
+    RimFlowDiagResults*       flowDiagResults();
+    const RimFlowDiagResults* flowDiagResults() const;
     std::vector<QString>      tracerNames() const;
 
     std::map<std::string, std::vector<int>> allInjectorTracerActiveCellIndices( size_t timeStepIndex ) const;
@@ -64,5 +64,5 @@ private:
     caf::PdmFieldHandle*   userDescriptionField() override;
     caf::PdmField<QString> m_userDescription;
 
-    std::unique_ptr<RigFlowDiagResults> m_flowDiagResults;
+    std::unique_ptr<RimFlowDiagResults> m_flowDiagResults;
 };

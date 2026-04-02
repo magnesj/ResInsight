@@ -22,7 +22,7 @@
 
 #include "RicWellLogTools.h"
 
-#include "RigFlowDiagResults.h"
+#include "RimFlowDiagResults.h"
 #include "Rim3dView.h"
 #include "RimEclipseResultCase.h"
 #include "RimEclipseView.h"

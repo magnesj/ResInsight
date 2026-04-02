@@ -25,7 +25,7 @@
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
 #include "RigFlowDiagResultAddress.h"
-#include "RigFlowDiagResults.h"
+#include "RimFlowDiagResults.h"
 #include "RigResultAccessor.h"
 #include "RigResultAccessorFactory.h"
 
