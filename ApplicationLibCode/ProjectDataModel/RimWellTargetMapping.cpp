@@ -372,9 +372,9 @@ void RimWellTargetMapping::generateCandidates( RimEclipseCase* eclipseCase, bool
 
     auto resultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
     if ( !resultsData ) return;
-    auto mainGrid = eclipseCase->mainGrid();
     auto caseData = eclipseCase->eclipseCaseData();
     if ( !caseData ) return;
+    auto mainGrid = caseData->mainGrid();
 
     RigWellTargetMapping::ClusteringLimits limits = getClusteringLimits();
     RigFloodingSettings floodingSettings( m_oilFloodingType(), m_userDefinedFloodingOil(), m_gasFloodingType(), m_userDefinedFloodingGas() );
@@ -428,9 +428,9 @@ void RimWellTargetMapping::generateEnsembleStatistics()
         if ( !eclipseCase->ensureReservoirCaseIsOpen() ) continue;
         auto caseResultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
         if ( !caseResultsData ) continue;
-        auto caseMainGrid = eclipseCase->mainGrid();
-        auto caseData     = eclipseCase->eclipseCaseData();
+        auto caseData = eclipseCase->eclipseCaseData();
         if ( !caseData ) continue;
+        auto caseMainGrid = caseData->mainGrid();
         casePairs.push_back( { caseResultsData, caseMainGrid } );
         RigWellTargetMapping::generateCandidates( caseResultsData,
                                                   caseMainGrid,
@@ -456,9 +456,10 @@ void RimWellTargetMapping::generateEnsembleStatistics()
     regularGridCase->createModel();
 
     {
-        auto task       = progInfo.task( "Accumulating results.", 1 );
-        auto targetData = regularGridCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
-        auto targetGrid = regularGridCase->mainGrid();
+        auto task           = progInfo.task( "Accumulating results.", 1 );
+        auto targetData     = regularGridCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+        auto targetCaseData = regularGridCase->eclipseCaseData();
+        auto targetGrid     = targetCaseData ? targetCaseData->mainGrid() : nullptr;
         RigWellTargetMapping::aggregateEnsembleResults( casePairs, targetData, targetGrid, m_timeStep() );
     }
 
