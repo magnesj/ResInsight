@@ -24,14 +24,16 @@
 
 #include "cafAppEnum.h"
 
+#include <functional>
 #include <map>
 #include <string>
 #include <vector>
 
-class RigFlowDiagResultFrames;
-class RigStatisticsDataCache;
 class RigActiveCellInfo;
+class RigCaseCellResultsData;
+class RigFlowDiagResultFrames;
 class RigFlowDiagSolverInterface;
+class RigStatisticsDataCache;
 class RimFlowDiagSolution;
 
 class RigFlowDiagResults
@@ -93,6 +95,15 @@ public:
 
     RimFlowDiagSolution* flowDiagSolution();
 
+    void setActiveCellInfoCallback( std::function<const RigActiveCellInfo*()> callback );
+    void setSolverInterfaceCallback( std::function<RigFlowDiagSolverInterface*()> callback );
+    void setCaseResultsDataCallback( std::function<RigCaseCellResultsData*()> callback );
+    void setTracerNamesCallback( std::function<std::vector<QString>()> callback );
+    void setTracerStatusCallback( std::function<RigFlowDiagDefines::TracerStatusType( const QString&, size_t )> callback );
+    void setAllInjectorTracerActiveCellIndicesCallback( std::function<std::map<std::string, std::vector<int>>( size_t )> callback );
+    void setAllProducerTracerActiveCellIndicesCallback( std::function<std::map<std::string, std::vector<int>>( size_t )> callback );
+    void setNumFloodedPVCallback( std::function<std::vector<std::vector<double>>( const std::vector<QString>& )> callback );
+
     void setStatisticsDataCacheNumBins( const RigFlowDiagResultAddress& resVarAddr, size_t numBins );
 
 private:
@@ -139,6 +150,15 @@ private:
 
     size_t               m_timeStepCount;
     RimFlowDiagSolution* m_flowDiagSolution = nullptr;
+
+    std::function<const RigActiveCellInfo*()>                                      m_activeCellInfoCallback;
+    std::function<RigFlowDiagSolverInterface*()>                                   m_solverInterfaceCallback;
+    std::function<RigCaseCellResultsData*()>                                       m_caseResultsDataCallback;
+    std::function<std::vector<QString>()>                                          m_tracerNamesCallback;
+    std::function<RigFlowDiagDefines::TracerStatusType( const QString&, size_t )>  m_tracerStatusCallback;
+    std::function<std::map<std::string, std::vector<int>>( size_t )>               m_allInjectorTracerActiveCellIndicesCallback;
+    std::function<std::map<std::string, std::vector<int>>( size_t )>               m_allProducerTracerActiveCellIndicesCallback;
+    std::function<std::vector<std::vector<double>>( const std::vector<QString>& )> m_numFloodedPVCallback;
 
     std::vector<std::map<RigFlowDiagResultAddress::PhaseSelection, bool>> m_hasAtemptedNativeResults;
 

@@ -27,11 +27,7 @@
 #include "RigMainGrid.h"
 
 #include "RigFlowDiagResultFrames.h"
-#include "RigNumberOfFloodedPoreVolumesCalculator.h"
 #include "RigStatisticsDataCache.h"
-#include "RimEclipseCase.h"
-#include "RimEclipseResultCase.h"
-#include "RimFlowDiagSolution.h"
 
 #include <cmath> // Needed for HUGE_VAL on Linux
 
@@ -75,10 +71,7 @@ const std::vector<double>* RigFlowDiagResults::resultValues( const RigFlowDiagRe
 //--------------------------------------------------------------------------------------------------
 const RigActiveCellInfo* RigFlowDiagResults::activeCellInfo( const RigFlowDiagResultAddress& resVarAddr )
 {
-    auto eclCase = m_flowDiagSolution->firstAncestorOrThisOfType<RimEclipseResultCase>();
-
-    return eclCase->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL ); // Todo: base on
-                                                                                                      // resVarAddr member
+    return m_activeCellInfoCallback ? m_activeCellInfoCallback() : nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -117,8 +110,12 @@ void RigFlowDiagResults::calculateNativeResultsIfNotPreviouslyAttempted( size_t 
         RigFlowDiagTimeStepResult nativeTimestepResults =
             solverInterface()->calculate( timeStepIndex,
                                           phaseSelection,
-                                          m_flowDiagSolution->allInjectorTracerActiveCellIndices( timeStepIndex ),
-                                          m_flowDiagSolution->allProducerTracerActiveCellIndices( timeStepIndex ) );
+                                          m_allInjectorTracerActiveCellIndicesCallback
+                                              ? m_allInjectorTracerActiveCellIndicesCallback( timeStepIndex )
+                                              : std::map<std::string, std::vector<int>>{},
+                                          m_allProducerTracerActiveCellIndicesCallback
+                                              ? m_allProducerTracerActiveCellIndicesCallback( timeStepIndex )
+                                              : std::map<std::string, std::vector<int>>{} );
 
         std::map<RigFlowDiagResultAddress, std::vector<double>>& nativeResults = nativeTimestepResults.nativeResults();
 
@@ -156,9 +153,7 @@ std::vector<double>* RigFlowDiagResults::findScalarResultFrame( const RigFlowDia
 //--------------------------------------------------------------------------------------------------
 RigFlowDiagSolverInterface* RigFlowDiagResults::solverInterface()
 {
-    auto eclCase = m_flowDiagSolution->firstAncestorOrThisOfType<RimEclipseResultCase>();
-
-    return eclCase->flowDiagSolverInterface();
+    return m_solverInterfaceCallback ? m_solverInterfaceCallback() : nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -341,7 +336,7 @@ std::vector<double>* RigFlowDiagResults::calculateTracerWithMaxFractionResult( c
     {
         resultTracerIdxToGlobalTracerIdx.resize( fractions.size(), -1 );
 
-        std::vector<QString> allTracerNames = m_flowDiagSolution->tracerNames();
+        std::vector<QString> allTracerNames = m_tracerNamesCallback ? m_tracerNamesCallback() : std::vector<QString>{};
         int                  selTracerIdx   = 0;
         for ( const auto& trNameFractionPair : fractions )
         {
@@ -433,20 +428,20 @@ std::vector<double>* RigFlowDiagResults::calculateCommunicationResult( const Rig
 //--------------------------------------------------------------------------------------------------
 void RigFlowDiagResults::calculateNumFloodedPV( const RigFlowDiagResultAddress& resVarAddr )
 {
-    auto                 eclipseCase = m_flowDiagSolution->firstAncestorOrThisOfTypeAsserted<RimEclipseCase>();
+    if ( !m_numFloodedPVCallback ) return;
+
     std::vector<QString> tracerNames;
     for ( const std::string& tracerName : resVarAddr.selectedTracerNames )
     {
         tracerNames.push_back( QString::fromUtf8( tracerName.c_str() ) );
     }
-    RigNumberOfFloodedPoreVolumesCalculator calc( eclipseCase, tracerNames );
+
+    std::vector<std::vector<double>> allFrames = m_numFloodedPVCallback( tracerNames );
 
     RigFlowDiagResultFrames* frames = createScalarResult( resVarAddr );
-    for ( size_t frameIdx = 0; frameIdx < m_timeStepCount; ++frameIdx )
+    for ( size_t frameIdx = 0; frameIdx < m_timeStepCount && frameIdx < allFrames.size(); ++frameIdx )
     {
-        std::vector<double>& frame = frames->frameData( frameIdx );
-
-        frame.swap( calc.numberOfFloodedPorevolumes()[frameIdx] );
+        frames->frameData( frameIdx ).swap( allFrames[frameIdx] );
     }
 }
 
@@ -462,8 +457,9 @@ std::vector<const std::vector<double>*> RigFlowDiagResults::findResultsForSelect
 
     for ( const std::string& tracerName : resVarAddr.selectedTracerNames )
     {
-        RigFlowDiagDefines::TracerStatusType tracerType =
-            m_flowDiagSolution->tracerStatusInTimeStep( QString::fromStdString( tracerName ), timeStepIndex );
+        RigFlowDiagDefines::TracerStatusType tracerType = m_tracerStatusCallback
+                                                              ? m_tracerStatusCallback( QString::fromStdString( tracerName ), timeStepIndex )
+                                                              : RigFlowDiagDefines::TracerStatusType::CLOSED;
 
         if ( tracerType != RigFlowDiagDefines::TracerStatusType::CLOSED &&
              ( tracerType == wantedTracerType || wantedTracerType == RigFlowDiagDefines::TracerStatusType::UNDEFINED ) )
@@ -489,8 +485,9 @@ std::vector<std::pair<std::string, const std::vector<double>*>>
 
     for ( const std::string& tracerName : resVarAddr.selectedTracerNames )
     {
-        RigFlowDiagDefines::TracerStatusType tracerType =
-            m_flowDiagSolution->tracerStatusInTimeStep( QString::fromStdString( tracerName ), timeStepIndex );
+        RigFlowDiagDefines::TracerStatusType tracerType = m_tracerStatusCallback
+                                                              ? m_tracerStatusCallback( QString::fromStdString( tracerName ), timeStepIndex )
+                                                              : RigFlowDiagDefines::TracerStatusType::CLOSED;
 
         if ( tracerType != RigFlowDiagDefines::TracerStatusType::CLOSED &&
              ( tracerType == wantedTracerType || wantedTracerType == RigFlowDiagDefines::TracerStatusType::UNDEFINED ) )
@@ -514,13 +511,8 @@ RigStatisticsDataCache* RigFlowDiagResults::statistics( const RigFlowDiagResultA
     if ( it != m_resultStatistics.end() ) return it->second.get();
 
     RigFlowDiagStatCalc* calculator = new RigFlowDiagStatCalc( this, resVarAddr );
-    calculator->setCaseCellResultsDataCallback(
-        [this]() -> RigCaseCellResultsData*
-        {
-            auto eclCase = m_flowDiagSolution->firstAncestorOrThisOfType<RimEclipseResultCase>();
-            if ( !eclCase ) return nullptr;
-            return eclCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
-        } );
+    calculator->setCaseCellResultsDataCallback( [this]() -> RigCaseCellResultsData*
+                                                { return m_caseResultsDataCallback ? m_caseResultsDataCallback() : nullptr; } );
     m_resultStatistics[resVarAddr] = std::make_unique<RigStatisticsDataCache>( calculator );
     return m_resultStatistics[resVarAddr].get();
 }
@@ -763,7 +755,8 @@ RigFlowDiagDefines::FlowCharacteristicsResultFrame RigFlowDiagResults::flowChara
 
     for ( const QString& tracerName : tracerNames )
     {
-        RigFlowDiagDefines::TracerStatusType status = m_flowDiagSolution->tracerStatusInTimeStep( tracerName, timeStepIndex );
+        RigFlowDiagDefines::TracerStatusType status = m_tracerStatusCallback ? m_tracerStatusCallback( tracerName, timeStepIndex )
+                                                                             : RigFlowDiagDefines::TracerStatusType::CLOSED;
         if ( status == RigFlowDiagDefines::TracerStatusType::INJECTOR )
         {
             injectorNames.insert( tracerName.toStdString() );
@@ -873,14 +866,15 @@ RigFlowDiagDefines::FlowCharacteristicsResultFrame RigFlowDiagResults::flowChara
 RigFlowDiagDefines::FlowCharacteristicsResultFrame
     RigFlowDiagResults::flowCharacteristicsResults( int timeStepIndex, const std::vector<char>& visibleActiveCells, double max_pv_fraction )
 {
-    std::vector<QString> tracerNames = m_flowDiagSolution->tracerNames();
+    std::vector<QString> tracerNames = m_tracerNamesCallback ? m_tracerNamesCallback() : std::vector<QString>{};
 
     std::set<std::string> injectorNames;
     std::set<std::string> producerNames;
 
     for ( const QString& tracerName : tracerNames )
     {
-        RigFlowDiagDefines::TracerStatusType status = m_flowDiagSolution->tracerStatusInTimeStep( tracerName, timeStepIndex );
+        RigFlowDiagDefines::TracerStatusType status = m_tracerStatusCallback ? m_tracerStatusCallback( tracerName, timeStepIndex )
+                                                                             : RigFlowDiagDefines::TracerStatusType::CLOSED;
         if ( status == RigFlowDiagDefines::TracerStatusType::INJECTOR )
         {
             injectorNames.insert( tracerName.toStdString() );
@@ -916,6 +910,70 @@ RigFlowDiagDefines::FlowCharacteristicsResultFrame
     }
 
     return solverInterface()->calculateFlowCharacteristics( &injectorResults, &producerResults, selectedCellIndices, max_pv_fraction );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigFlowDiagResults::setActiveCellInfoCallback( std::function<const RigActiveCellInfo*()> callback )
+{
+    m_activeCellInfoCallback = std::move( callback );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigFlowDiagResults::setSolverInterfaceCallback( std::function<RigFlowDiagSolverInterface*()> callback )
+{
+    m_solverInterfaceCallback = std::move( callback );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigFlowDiagResults::setCaseResultsDataCallback( std::function<RigCaseCellResultsData*()> callback )
+{
+    m_caseResultsDataCallback = std::move( callback );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigFlowDiagResults::setTracerNamesCallback( std::function<std::vector<QString>()> callback )
+{
+    m_tracerNamesCallback = std::move( callback );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigFlowDiagResults::setTracerStatusCallback( std::function<RigFlowDiagDefines::TracerStatusType( const QString&, size_t )> callback )
+{
+    m_tracerStatusCallback = std::move( callback );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigFlowDiagResults::setAllInjectorTracerActiveCellIndicesCallback( std::function<std::map<std::string, std::vector<int>>( size_t )> callback )
+{
+    m_allInjectorTracerActiveCellIndicesCallback = std::move( callback );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigFlowDiagResults::setAllProducerTracerActiveCellIndicesCallback( std::function<std::map<std::string, std::vector<int>>( size_t )> callback )
+{
+    m_allProducerTracerActiveCellIndicesCallback = std::move( callback );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigFlowDiagResults::setNumFloodedPVCallback( std::function<std::vector<std::vector<double>>( const std::vector<QString>& )> callback )
+{
+    m_numFloodedPVCallback = std::move( callback );
 }
 
 //--------------------------------------------------------------------------------------------------
