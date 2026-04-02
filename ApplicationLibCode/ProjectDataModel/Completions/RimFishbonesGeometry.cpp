@@ -18,7 +18,7 @@
 
 #include "RimFishbonesGeometry.h"
 
-#include "RigWellPath.h"
+#include "Well/RigWellPath.h"
 
 #include "RimFishbones.h"
 #include "RimWellPath.h"
