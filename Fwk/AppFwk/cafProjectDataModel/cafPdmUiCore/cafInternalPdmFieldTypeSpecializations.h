@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cafInternalPdmValueFieldSpecializations.h"
+#include "cafPdmFieldTraits.h"
 #include "cafPdmObjectHandle.h"
 #include "cafPdmPointer.h"
 
@@ -20,16 +20,21 @@ class AppEnum;
 template <typename T>
 struct PdmUiFieldSpecializationForValueSpec : public PdmUiFieldSpecializationDefaults
 {
-    static QVariant convert( const T& value ) { return PdmValueFieldSpecialization<T>::convert( value ); }
+    static QVariant convert( const T& value )
+    {
+        using caf::pdmToVariant;
+        return pdmToVariant( value );
+    }
 
     static void setFromVariant( const QVariant& variantValue, T& value )
     {
-        PdmValueFieldSpecialization<T>::setFromVariant( variantValue, value );
+        using caf::pdmFromVariant;
+        pdmFromVariant( variantValue, value );
     }
 
     static bool isDataElementEqual( const QVariant& variantValue, const QVariant& variantValue2 )
     {
-        return PdmValueFieldSpecialization<T>::isEqual( variantValue, variantValue2 );
+        return caf::pdmVariantEqual<T>( variantValue, variantValue2 );
     }
 };
 
@@ -107,7 +112,7 @@ public:
 
     static bool isDataElementEqual( const QVariant& variantValue, const QVariant& variantValue2 )
     {
-        return PdmValueFieldSpecialization<T>::isEqual( variantValue, variantValue2 );
+        return caf::pdmVariantEqual<T>( variantValue, variantValue2 );
     }
 };
 
@@ -121,17 +126,19 @@ class PdmUiFieldSpecialization<std::vector<T>> : public PdmUiFieldSpecialization
 public:
     static QVariant convert( const std::vector<T>& value )
     {
-        return PdmValueFieldSpecialization<std::vector<T>>::convert( value );
+        using caf::pdmToVariant;
+        return pdmToVariant( value );
     }
 
     static void setFromVariant( const QVariant& variantValue, std::vector<T>& value )
     {
-        return PdmValueFieldSpecialization<std::vector<T>>::setFromVariant( variantValue, value );
+        using caf::pdmFromVariant;
+        pdmFromVariant( variantValue, value );
     }
 
     static bool isDataElementEqual( const QVariant& variantValue, const QVariant& variantValue2 )
     {
-        return PdmValueFieldSpecialization<T>::isEqual( variantValue, variantValue2 );
+        return caf::pdmVariantEqual<T>( variantValue, variantValue2 );
     }
 };
 
@@ -187,12 +194,14 @@ class PdmUiFieldSpecialization<std::pair<T, U>> : public PdmUiFieldSpecializatio
 public:
     static QVariant convert( const std::pair<T, U>& value )
     {
-        return PdmValueFieldSpecialization<std::pair<T, U>>::convert( value );
+        using caf::pdmToVariant;
+        return pdmToVariant( value );
     }
 
     static void setFromVariant( const QVariant& variantValue, std::pair<T, U>& value )
     {
-        PdmValueFieldSpecialization<std::pair<T, U>>::setFromVariant( variantValue, value );
+        using caf::pdmFromVariant;
+        pdmFromVariant( variantValue, value );
     }
 };
 
@@ -208,7 +217,8 @@ public:
     {
         if ( value.has_value() )
         {
-            return PdmValueFieldSpecialization<T>::convert( value.value() );
+            using caf::pdmToVariant;
+            return pdmToVariant( value.value() );
         }
 
         return QVariant();
@@ -227,7 +237,8 @@ public:
         }
 
         T valueOfType;
-        PdmValueFieldSpecialization<T>::setFromVariant( variantValue, valueOfType );
+        using caf::pdmFromVariant;
+        pdmFromVariant( variantValue, valueOfType );
         value = valueOfType;
     }
 };
