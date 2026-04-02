@@ -67,7 +67,7 @@ void PdmUiValueRangeEditor::configureAndUpdateUi( const QString& uiConfigName )
         uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &m_attributes );
     }
 
-    // A pair is represented as a list of QVariant in PdmValueFieldSpecialization<std::pair<T, U>>
+    // A pair is represented as a list of QVariant by pdmToVariant(const std::pair<T,U>&)
     auto getTwoDoublesFromVariant = [this]() -> std::pair<double, double>
     {
         double firstValue  = 0.0;

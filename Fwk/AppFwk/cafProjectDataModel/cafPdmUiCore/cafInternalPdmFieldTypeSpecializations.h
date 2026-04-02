@@ -14,7 +14,7 @@ template <typename T>
 class AppEnum;
 
 //==================================================================================================
-/// Helper base class for types that delegate all operations to PdmValueFieldSpecialization.
+/// Helper base class for types that delegate all operations to pdmToVariant/pdmFromVariant/pdmVariantEqual.
 /// Inherit from this to avoid repeating the delegation boilerplate.
 //==================================================================================================
 template <typename T>
@@ -39,8 +39,8 @@ struct PdmUiFieldSpecializationForValueSpec : public PdmUiFieldSpecializationDef
 };
 
 //==================================================================================================
-/// Primary template - delegates to PdmValueFieldSpecialization<T>.
-/// Types with custom PdmValueFieldSpecialization will automatically get correct behavior.
+/// Primary template - delegates to pdmToVariant/pdmFromVariant/pdmVariantEqual.
+/// Types with custom overloads of those functions will automatically get correct behavior.
 //==================================================================================================
 template <typename T>
 class PdmUiFieldSpecialization : public PdmUiFieldSpecializationForValueSpec<T>
