@@ -229,7 +229,7 @@ void PdmUiValueRangeEditor::writeValues( double valueMin, double valueMax )
 {
     auto pairValue = std::make_pair( valueMin, valueMax );
 
-    QVariant v = caf::PdmValueFieldSpecialization<std::pair<double, double>>::convert( pairValue );
+    QVariant v = caf::pdmToVariant( pairValue );
     setValueToField( v );
 }
 

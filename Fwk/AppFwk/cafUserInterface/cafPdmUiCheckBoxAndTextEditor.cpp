@@ -155,7 +155,7 @@ void PdmUiCheckBoxAndTextEditor::slotSetValueToField()
     auto text      = m_lineEdit->text();
     auto pairValue = std::make_pair( isChecked, text );
 
-    QVariant v = caf::PdmValueFieldSpecialization<std::pair<bool, QString>>::convert( pairValue );
+    QVariant v = caf::pdmToVariant( pairValue );
 
     this->setValueToField( v );
 }
