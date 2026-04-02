@@ -37,8 +37,6 @@
 #include "RigStatisticsMath.h"
 #include "RigStatisticsTools.h"
 
-#include "RimEclipseCase.h"
-
 #include "cafAssert.h"
 #include "cafVecIjk.h"
 #include "cvfMath.h"
@@ -202,14 +200,12 @@ void RigWellTargetMappingTools::createDynamicResultEntry( RigCaseCellResultsData
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigWellTargetMappingTools::createResultVector( RimEclipseCase&         eclipseCase,
+void RigWellTargetMappingTools::createResultVector( RigCaseCellResultsData* resultsData,
                                                     const QString&          resultName,
                                                     const std::vector<int>& clusterIds,
                                                     size_t                  timeStepIdx )
 {
     RigEclipseResultAddress resultAddress( RiaDefines::ResultCatType::GENERATED, RiaDefines::ResultDataType::INTEGER, resultName );
-
-    auto resultsData = eclipseCase.results( RiaDefines::PorosityModelType::MATRIX_MODEL );
 
     createDynamicResultEntry( resultsData, resultAddress );
 
@@ -234,14 +230,12 @@ void RigWellTargetMappingTools::createResultVector( RimEclipseCase&         ecli
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigWellTargetMappingTools::createResultVector( RimEclipseCase&            eclipseCase,
+void RigWellTargetMappingTools::createResultVector( RigCaseCellResultsData*    resultsData,
                                                     const QString&             resultName,
                                                     const std::vector<double>& values,
                                                     size_t                     timeStepIdx )
 {
     RigEclipseResultAddress resultAddress( RiaDefines::ResultCatType::GENERATED, resultName );
-
-    auto resultsData = eclipseCase.results( RiaDefines::PorosityModelType::MATRIX_MODEL );
 
     createDynamicResultEntry( resultsData, resultAddress );
 
@@ -255,11 +249,11 @@ void RigWellTargetMappingTools::createResultVector( RimEclipseCase&            e
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigWellTargetMappingTools::createStaticResultVector( RimEclipseCase& eclipseCase, const QString& resultName, const std::vector<int>& intValues )
+void RigWellTargetMappingTools::createStaticResultVector( RigCaseCellResultsData* resultsData,
+                                                          const QString&          resultName,
+                                                          const std::vector<int>& intValues )
 {
     RigEclipseResultAddress resultAddress( RiaDefines::ResultCatType::GENERATED, resultName );
-
-    auto resultsData = eclipseCase.results( RiaDefines::PorosityModelType::MATRIX_MODEL );
 
     resultsData->addStaticScalarResult( RiaDefines::ResultCatType::GENERATED, resultName, false, intValues.size() );
 
@@ -282,11 +276,11 @@ void RigWellTargetMappingTools::createStaticResultVector( RimEclipseCase& eclips
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigWellTargetMappingTools::createStaticResultVector( RimEclipseCase& eclipseCase, const QString& resultName, const std::vector<double>& values )
+void RigWellTargetMappingTools::createStaticResultVector( RigCaseCellResultsData*    resultsData,
+                                                          const QString&             resultName,
+                                                          const std::vector<double>& values )
 {
     RigEclipseResultAddress resultAddress( RiaDefines::ResultCatType::GENERATED, resultName );
-
-    auto resultsData = eclipseCase.results( RiaDefines::PorosityModelType::MATRIX_MODEL );
 
     resultsData->addStaticScalarResult( RiaDefines::ResultCatType::GENERATED, resultName, false, values.size() );
 
@@ -301,7 +295,7 @@ void RigWellTargetMappingTools::createStaticResultVector( RimEclipseCase& eclips
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigWellTargetMappingTools::createResultVectorIfDefined( RimEclipseCase&            eclipseCase,
+void RigWellTargetMappingTools::createResultVectorIfDefined( RigCaseCellResultsData*    resultsData,
                                                              const QString&             resultName,
                                                              const std::vector<double>& values,
                                                              int                        timeStepIdx )
@@ -311,18 +305,19 @@ void RigWellTargetMappingTools::createResultVectorIfDefined( RimEclipseCase&    
 
     if ( timeStepIdx < 0 )
     {
-        createStaticResultVector( eclipseCase, resultName, values );
+        createStaticResultVector( resultsData, resultName, values );
     }
     else
     {
-        createResultVector( eclipseCase, resultName, values, timeStepIdx );
+        createResultVector( resultsData, resultName, values, timeStepIdx );
     }
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::optional<caf::VecIjk0> RigWellTargetMappingTools::findStartCell( RimEclipseCase*            eclipseCase,
+std::optional<caf::VecIjk0> RigWellTargetMappingTools::findStartCell( RigCaseCellResultsData*    resultsData,
+                                                                      RigMainGrid*               mainGrid,
                                                                       size_t                     timeStepIdx,
                                                                       VolumeType                 volumeType,
                                                                       const ClusteringLimits&    limits,
@@ -330,7 +325,6 @@ std::optional<caf::VecIjk0> RigWellTargetMappingTools::findStartCell( RimEclipse
                                                                       const std::vector<double>& filterVector,
                                                                       const std::vector<int>&    clusters )
 {
-    auto resultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
     if ( !resultsData )
     {
         RiaLogging::error( "No results data found for eclipse case" );
@@ -365,13 +359,14 @@ std::optional<caf::VecIjk0> RigWellTargetMappingTools::findStartCell( RimEclipse
 
     if ( !startCell ) return {};
 
-    return eclipseCase->mainGrid()->ijkFromCellIndex( startCell->value() );
+    return mainGrid->ijkFromCellIndex( startCell->value() );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigWellTargetMappingTools::growCluster( RimEclipseCase*            eclipseCase,
+void RigWellTargetMappingTools::growCluster( RigCaseCellResultsData*    resultsData,
+                                             RigMainGrid*               mainGrid,
                                              const caf::VecIjk0&        startCell,
                                              VolumeType                 volumeType,
                                              const ClusteringLimits&    limits,
@@ -382,16 +377,14 @@ void RigWellTargetMappingTools::growCluster( RimEclipseCase*            eclipseC
                                              size_t                     timeStepIdx,
                                              int                        maxIterations )
 {
-    auto resultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
-
     // Initially only the start cell is found
-    ReservoirCellIndex reservoirCellIdx( eclipseCase->mainGrid()->cellIndexFromIJK( startCell.i(), startCell.j(), startCell.k() ) );
+    ReservoirCellIndex              reservoirCellIdx( mainGrid->cellIndexFromIJK( startCell.i(), startCell.j(), startCell.k() ) );
     std::vector<ReservoirCellIndex> foundCells = { reservoirCellIdx };
     assignClusterIdToCells( *resultsData->activeCellInfo(), foundCells, clusters, clusterId );
 
     for ( int i = 0; i < maxIterations; i++ )
     {
-        foundCells = findCandidates( eclipseCase, foundCells, volumeType, limits, data, filterVector, clusters );
+        foundCells = findCandidates( resultsData, mainGrid, foundCells, volumeType, limits, data, filterVector, clusters );
         if ( foundCells.empty() ) break;
         assignClusterIdToCells( *resultsData->activeCellInfo(), foundCells, clusters, clusterId );
     }
@@ -400,7 +393,8 @@ void RigWellTargetMappingTools::growCluster( RimEclipseCase*            eclipseC
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<ReservoirCellIndex> RigWellTargetMappingTools::findCandidates( RimEclipseCase*                        eclipseCase,
+std::vector<ReservoirCellIndex> RigWellTargetMappingTools::findCandidates( RigCaseCellResultsData*                resultsData,
+                                                                           RigMainGrid*                           mainGrid,
                                                                            const std::vector<ReservoirCellIndex>& previousCells,
                                                                            VolumeType                             volumeType,
                                                                            const ClusteringLimits&                limits,
@@ -409,8 +403,6 @@ std::vector<ReservoirCellIndex> RigWellTargetMappingTools::findCandidates( RimEc
                                                                            std::vector<int>&                      clusters )
 {
     std::vector<ReservoirCellIndex> candidates;
-    auto                            resultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
-    auto                            mainGrid    = eclipseCase->eclipseCaseData()->mainGrid();
 
     const std::vector<CellFaceType> faces = {
         cvf::StructGridInterface::FaceType::POS_I,
@@ -498,9 +490,8 @@ std::vector<ReservoirCellIndex> RigWellTargetMappingTools::findCandidates( RimEc
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::optional<size_t> RigWellTargetMappingTools::getActiveCellCount( RimEclipseCase* eclipseCase )
+std::optional<size_t> RigWellTargetMappingTools::getActiveCellCount( RigCaseCellResultsData* resultsData )
 {
-    auto resultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
     if ( !resultsData ) return {};
 
     return resultsData->activeCellInfo()->reservoirActiveCellCount();
@@ -626,7 +617,7 @@ std::vector<double> RigWellTargetMappingTools::loadGasVectorByName( RigCaseCellR
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RigWellTargetMappingTools::ClusterStatistics> RigWellTargetMappingTools::generateStatistics( RimEclipseCase* eclipseCase,
+std::vector<RigWellTargetMappingTools::ClusterStatistics> RigWellTargetMappingTools::generateStatistics( RigCaseCellResultsData* resultsData,
                                                                                                          const std::vector<double>& pressure,
                                                                                                          const std::vector<double>& permeabilityX,
                                                                                                          int            numClustersFound,
@@ -635,7 +626,6 @@ std::vector<RigWellTargetMappingTools::ClusterStatistics> RigWellTargetMappingTo
 {
     std::vector<ClusterStatistics> statistics( numClustersFound );
 
-    auto resultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
     if ( !resultsData ) return statistics;
 
     auto loadData = []( RigCaseCellResultsData* resultsData, RiaDefines::ResultCatType categoryType, const QString& name, size_t timeStepIdx )
@@ -723,11 +713,11 @@ std::vector<RigWellTargetMappingTools::ClusterStatistics> RigWellTargetMappingTo
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigWellTargetMappingTools::computeStatisticsAndCreateVectors( RimEclipseCase&                         targetCase,
+void RigWellTargetMappingTools::computeStatisticsAndCreateVectors( RigCaseCellResultsData*                 resultsData,
                                                                    const QString&                          resultName,
                                                                    const std::vector<std::vector<double>>& vec )
 {
-    const RigCaseCellResultsData* targetResultsData = targetCase.results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+    const RigCaseCellResultsData* targetResultsData = resultsData;
     if ( !targetResultsData ) return;
 
     const RigActiveCellInfo* targetActiveCellInfo = targetResultsData->activeCellInfo();
@@ -766,31 +756,29 @@ void RigWellTargetMappingTools::computeStatisticsAndCreateVectors( RimEclipseCas
         if ( RigStatisticsTools::isValidNumber( maxValue ) && maxValue > -std::numeric_limits<double>::max() ) maxResults[i] = maxValue;
     }
 
-    createResultVectorIfDefined( targetCase, resultName + "_P10", p10Results );
-    createResultVectorIfDefined( targetCase, resultName + "_P50", p50Results );
-    createResultVectorIfDefined( targetCase, resultName + "_P90", p90Results );
-    createResultVectorIfDefined( targetCase, resultName + "_MEAN", meanResults );
-    createResultVectorIfDefined( targetCase, resultName + "_MIN", minResults );
-    createResultVectorIfDefined( targetCase, resultName + "_MAX", maxResults );
+    createResultVectorIfDefined( resultsData, resultName + "_P10", p10Results );
+    createResultVectorIfDefined( resultsData, resultName + "_P50", p50Results );
+    createResultVectorIfDefined( resultsData, resultName + "_P90", p90Results );
+    createResultVectorIfDefined( resultsData, resultName + "_MEAN", meanResults );
+    createResultVectorIfDefined( resultsData, resultName + "_MIN", minResults );
+    createResultVectorIfDefined( resultsData, resultName + "_MAX", maxResults );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigWellTargetMappingTools::accumulateResultsForSingleCase( RimEclipseCase&                                      eclipseCase,
-                                                                RimEclipseCase&                                      targetCase,
+void RigWellTargetMappingTools::accumulateResultsForSingleCase( RigCaseCellResultsData*                              resultsData,
+                                                                RigMainGrid*                                         mainGrid,
+                                                                RigCaseCellResultsData*                              targetResultsData,
+                                                                RigMainGrid*                                         targetMainGrid,
                                                                 std::map<QString, std::vector<std::vector<double>>>& resultNamesAndSamples,
                                                                 std::vector<int>&                                    occupancy,
                                                                 size_t                                               timeStepIdx )
 {
-    RigCaseCellResultsData* resultsData = eclipseCase.results( RiaDefines::PorosityModelType::MATRIX_MODEL );
     if ( !resultsData ) return;
-    const RigMainGrid* mainGrid = eclipseCase.mainGrid();
     if ( !mainGrid ) return;
     const RigActiveCellInfo* activeCellInfo = resultsData->activeCellInfo();
     if ( !activeCellInfo ) return;
-
-    const RigCaseCellResultsData* targetResultsData = targetCase.results( RiaDefines::PorosityModelType::MATRIX_MODEL );
 
     const RigActiveCellInfo* targetActiveCellInfo = targetResultsData->activeCellInfo();
 
@@ -821,7 +809,7 @@ void RigWellTargetMappingTools::accumulateResultsForSingleCase( RimEclipseCase& 
 
     for ( ReservoirCellIndex targetCellIdx( 0 ); targetCellIdx.value() < targetNumReservoirCells; ++targetCellIdx )
     {
-        const RigCell& nativeCell = targetCase.mainGrid()->cell( targetCellIdx.value() );
+        const RigCell& nativeCell = targetMainGrid->cell( targetCellIdx.value() );
         cvf::Vec3d     cellCenter = nativeCell.center();
 
         ActiveCellIndex targetResultIndex = targetActiveCellInfo->cellResultIndex( targetCellIdx );
@@ -851,11 +839,11 @@ void RigWellTargetMappingTools::accumulateResultsForSingleCase( RimEclipseCase& 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::BoundingBox
-    RigWellTargetMappingTools::computeBoundingBoxForResult( RimEclipseCase& eclipseCase, const QString& resultName, size_t timeStepIndex )
+cvf::BoundingBox RigWellTargetMappingTools::computeBoundingBoxForResult( RigCaseCellResultsData* resultsData,
+                                                                         RigMainGrid*            mainGrid,
+                                                                         const QString&          resultName,
+                                                                         size_t                  timeStepIndex )
 {
-    RigCaseCellResultsData*  resultsData       = eclipseCase.results( RiaDefines::PorosityModelType::MATRIX_MODEL );
-    const RigMainGrid*       mainGrid          = eclipseCase.mainGrid();
     const RigActiveCellInfo* activeCellInfo    = resultsData->activeCellInfo();
     const size_t             numReservoirCells = activeCellInfo->reservoirCellCount();
 

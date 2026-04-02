@@ -70,15 +70,15 @@ void RigWellTargetMapping::generateCandidates( RimEclipseCase*            eclips
 {
     if ( !eclipseCase->ensureReservoirCaseIsOpen() ) return;
 
-    auto activeCellCount = RigWellTargetMappingTools::getActiveCellCount( eclipseCase );
+    auto resultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+    if ( !resultsData ) return;
+
+    auto activeCellCount = RigWellTargetMappingTools::getActiveCellCount( resultsData );
     if ( !activeCellCount )
     {
         RiaLogging::error( "No active cells found" );
         return;
     }
-
-    auto resultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
-    if ( !resultsData ) return;
 
     auto caseData = eclipseCase->eclipseCaseData();
     if ( !caseData ) return;
@@ -171,7 +171,7 @@ void RigWellTargetMapping::generateCandidates( RimEclipseCase*            eclips
     for ( int clusterId = 1; clusterId <= numClusters; clusterId++ )
     {
         std::optional<caf::VecIjk0> startCell =
-            RigWellTargetMappingTools::findStartCell( eclipseCase, timeStepIdx, volumeType, limits, data, filterVector, clusters );
+            RigWellTargetMappingTools::findStartCell( resultsData, mainGrid, timeStepIdx, volumeType, limits, data, filterVector, clusters );
 
         if ( startCell.has_value() )
         {
@@ -182,7 +182,8 @@ void RigWellTargetMapping::generateCandidates( RimEclipseCase*            eclips
                                   .arg( startCell->k() + 1 ),
                               logKeyword );
 
-            RigWellTargetMappingTools::growCluster( eclipseCase,
+            RigWellTargetMappingTools::growCluster( resultsData,
+                                                    mainGrid,
                                                     startCell.value(),
                                                     volumeType,
                                                     limits,
@@ -209,10 +210,10 @@ void RigWellTargetMapping::generateCandidates( RimEclipseCase*            eclips
     RiaLogging::info( QString( "Time spent: %1 ms" ).arg( milliseconds.count() ), logKeyword );
 
     QString resultName = RigWellTargetMapping::wellTargetResultName();
-    RigWellTargetMappingTools::createResultVector( *eclipseCase, resultName, clusters, timeStepIdx );
+    RigWellTargetMappingTools::createResultVector( resultsData, resultName, clusters, timeStepIdx );
 
     std::vector<RigWellTargetMappingTools::ClusterStatistics> statistics =
-        RigWellTargetMappingTools::generateStatistics( eclipseCase, data.pressure, data.permeabilityX, numClustersFound, timeStepIdx, resultName );
+        RigWellTargetMappingTools::generateStatistics( resultsData, data.pressure, data.permeabilityX, numClustersFound, timeStepIdx, resultName );
     std::vector<double> totalPorvSoil( clusters.size(), std::numeric_limits<double>::infinity() );
     std::vector<double> totalPorvSgas( clusters.size(), std::numeric_limits<double>::infinity() );
     std::vector<double> totalPorvSoilAndSgas( clusters.size(), std::numeric_limits<double>::infinity() );
@@ -271,27 +272,27 @@ void RigWellTargetMapping::generateCandidates( RimEclipseCase*            eclips
     if ( skipUndefinedResults )
     {
         const int ts = (int)timeStepIdx;
-        RigWellTargetMappingTools::createResultVectorIfDefined( *eclipseCase, "TOTAL_PORV_SOIL", totalPorvSoil, ts );
-        RigWellTargetMappingTools::createResultVectorIfDefined( *eclipseCase, "TOTAL_PORV_SGAS", totalPorvSgas, ts );
-        RigWellTargetMappingTools::createResultVectorIfDefined( *eclipseCase, "TOTAL_PORV_SOIL_SGAS", totalPorvSoilAndSgas, ts );
-        RigWellTargetMappingTools::createResultVectorIfDefined( *eclipseCase, "TOTAL_FIPOIL", totalFipOil, ts );
-        RigWellTargetMappingTools::createResultVectorIfDefined( *eclipseCase, "TOTAL_FIPGAS", totalFipGas, ts );
-        RigWellTargetMappingTools::createResultVectorIfDefined( *eclipseCase, "TOTAL_RFIPOIL", totalRfipOil, ts );
-        RigWellTargetMappingTools::createResultVectorIfDefined( *eclipseCase, "TOTAL_RFIPGAS", totalRfipGas, ts );
-        RigWellTargetMappingTools::createResultVectorIfDefined( *eclipseCase, "TOTAL_SFIPOIL", totalSfipOil, ts );
-        RigWellTargetMappingTools::createResultVectorIfDefined( *eclipseCase, "TOTAL_SFIPGAS", totalSfipGas, ts );
+        RigWellTargetMappingTools::createResultVectorIfDefined( resultsData, "TOTAL_PORV_SOIL", totalPorvSoil, ts );
+        RigWellTargetMappingTools::createResultVectorIfDefined( resultsData, "TOTAL_PORV_SGAS", totalPorvSgas, ts );
+        RigWellTargetMappingTools::createResultVectorIfDefined( resultsData, "TOTAL_PORV_SOIL_SGAS", totalPorvSoilAndSgas, ts );
+        RigWellTargetMappingTools::createResultVectorIfDefined( resultsData, "TOTAL_FIPOIL", totalFipOil, ts );
+        RigWellTargetMappingTools::createResultVectorIfDefined( resultsData, "TOTAL_FIPGAS", totalFipGas, ts );
+        RigWellTargetMappingTools::createResultVectorIfDefined( resultsData, "TOTAL_RFIPOIL", totalRfipOil, ts );
+        RigWellTargetMappingTools::createResultVectorIfDefined( resultsData, "TOTAL_RFIPGAS", totalRfipGas, ts );
+        RigWellTargetMappingTools::createResultVectorIfDefined( resultsData, "TOTAL_SFIPOIL", totalSfipOil, ts );
+        RigWellTargetMappingTools::createResultVectorIfDefined( resultsData, "TOTAL_SFIPGAS", totalSfipGas, ts );
     }
     else
     {
-        RigWellTargetMappingTools::createResultVector( *eclipseCase, "TOTAL_PORV_SOIL", totalPorvSoil, timeStepIdx );
-        RigWellTargetMappingTools::createResultVector( *eclipseCase, "TOTAL_PORV_SGAS", totalPorvSgas, timeStepIdx );
-        RigWellTargetMappingTools::createResultVector( *eclipseCase, "TOTAL_PORV_SOIL_SGAS", totalPorvSoilAndSgas, timeStepIdx );
-        RigWellTargetMappingTools::createResultVector( *eclipseCase, "TOTAL_FIPOIL", totalFipOil, timeStepIdx );
-        RigWellTargetMappingTools::createResultVector( *eclipseCase, "TOTAL_FIPGAS", totalFipGas, timeStepIdx );
-        RigWellTargetMappingTools::createResultVector( *eclipseCase, "TOTAL_RFIPOIL", totalRfipOil, timeStepIdx );
-        RigWellTargetMappingTools::createResultVector( *eclipseCase, "TOTAL_RFIPGAS", totalRfipGas, timeStepIdx );
-        RigWellTargetMappingTools::createResultVector( *eclipseCase, "TOTAL_SFIPOIL", totalSfipOil, timeStepIdx );
-        RigWellTargetMappingTools::createResultVector( *eclipseCase, "TOTAL_SFIPGAS", totalSfipGas, timeStepIdx );
+        RigWellTargetMappingTools::createResultVector( resultsData, "TOTAL_PORV_SOIL", totalPorvSoil, timeStepIdx );
+        RigWellTargetMappingTools::createResultVector( resultsData, "TOTAL_PORV_SGAS", totalPorvSgas, timeStepIdx );
+        RigWellTargetMappingTools::createResultVector( resultsData, "TOTAL_PORV_SOIL_SGAS", totalPorvSoilAndSgas, timeStepIdx );
+        RigWellTargetMappingTools::createResultVector( resultsData, "TOTAL_FIPOIL", totalFipOil, timeStepIdx );
+        RigWellTargetMappingTools::createResultVector( resultsData, "TOTAL_FIPGAS", totalFipGas, timeStepIdx );
+        RigWellTargetMappingTools::createResultVector( resultsData, "TOTAL_RFIPOIL", totalRfipOil, timeStepIdx );
+        RigWellTargetMappingTools::createResultVector( resultsData, "TOTAL_RFIPGAS", totalRfipGas, timeStepIdx );
+        RigWellTargetMappingTools::createResultVector( resultsData, "TOTAL_SFIPOIL", totalSfipOil, timeStepIdx );
+        RigWellTargetMappingTools::createResultVector( resultsData, "TOTAL_SFIPGAS", totalSfipGas, timeStepIdx );
     }
     eclipseCase->updateResultAddressCollection();
 
@@ -378,8 +379,12 @@ RimRegularGridCase* RigWellTargetMapping::generateEnsembleCandidates( const std:
     cvf::BoundingBox boundingBox;
     for ( auto eclipseCase : cases )
     {
-        cvf::BoundingBox bb =
-            RigWellTargetMappingTools::computeBoundingBoxForResult( *eclipseCase, RigWellTargetMapping::wellTargetResultName(), timeStepIdx );
+        auto             caseResultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+        auto             caseMainGrid    = eclipseCase->mainGrid();
+        cvf::BoundingBox bb              = RigWellTargetMappingTools::computeBoundingBoxForResult( caseResultsData,
+                                                                                      caseMainGrid,
+                                                                                      RigWellTargetMapping::wellTargetResultName(),
+                                                                                      timeStepIdx );
         boundingBox.add( bb );
     }
 
@@ -406,11 +411,21 @@ RimRegularGridCase* RigWellTargetMapping::generateEnsembleCandidates( const std:
     resultNamesAndSamples["TOTAL_SFIPOIL"]        = {};
     resultNamesAndSamples["TOTAL_SFIPGAS"]        = {};
 
+    auto targetResultsData = targetCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+    auto targetMainGrid    = targetCase->mainGrid();
+
     for ( auto eclipseCase : cases )
     {
-        auto task = progInfo.task( "Accumulating results.", 1 );
-
-        RigWellTargetMappingTools::accumulateResultsForSingleCase( *eclipseCase, *targetCase, resultNamesAndSamples, occurrence, timeStepIdx );
+        auto task            = progInfo.task( "Accumulating results.", 1 );
+        auto caseResultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+        auto caseMainGrid    = eclipseCase->mainGrid();
+        RigWellTargetMappingTools::accumulateResultsForSingleCase( caseResultsData,
+                                                                   caseMainGrid,
+                                                                   targetResultsData,
+                                                                   targetMainGrid,
+                                                                   resultNamesAndSamples,
+                                                                   occurrence,
+                                                                   timeStepIdx );
     }
 
     auto createFractionVector = []( const std::vector<int>& occurrence, int maxRealizationCount ) -> std::vector<double>
@@ -424,13 +439,13 @@ RimRegularGridCase* RigWellTargetMapping::generateEnsembleCandidates( const std:
         return fractions;
     };
 
-    RigWellTargetMappingTools::createStaticResultVector( *targetCase, "OCCURRENCE", occurrence );
+    RigWellTargetMappingTools::createStaticResultVector( targetResultsData, "OCCURRENCE", occurrence );
     std::vector<double> probability = createFractionVector( occurrence, static_cast<int>( cases.size() ) );
-    RigWellTargetMappingTools::createStaticResultVector( *targetCase, "PROBABILITY", probability );
+    RigWellTargetMappingTools::createStaticResultVector( targetResultsData, "PROBABILITY", probability );
 
     for ( auto [resultName, vec] : resultNamesAndSamples )
     {
-        RigWellTargetMappingTools::computeStatisticsAndCreateVectors( *targetCase, resultName, vec );
+        RigWellTargetMappingTools::computeStatisticsAndCreateVectors( targetResultsData, resultName, vec );
     }
 
     return targetCase;
