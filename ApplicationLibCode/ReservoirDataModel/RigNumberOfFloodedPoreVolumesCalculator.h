@@ -23,9 +23,12 @@
 #include <QString>
 #include <cstddef>
 #include <deque>
+#include <functional>
 #include <vector>
 
-class RimEclipseCase;
+class RigActiveCellInfo;
+class RigCaseCellResultsData;
+class RigEclipseCaseData;
 class RigMainGrid;
 
 //==================================================================================================
@@ -35,7 +38,10 @@ class RigMainGrid;
 class RigNumberOfFloodedPoreVolumesCalculator
 {
 public:
-    explicit RigNumberOfFloodedPoreVolumesCalculator( RimEclipseCase* caseToApply, const std::vector<QString>& tracerNames );
+    explicit RigNumberOfFloodedPoreVolumesCalculator( RigEclipseCaseData*             eclipseCaseData,
+                                                      RigCaseCellResultsData*         gridCellResults,
+                                                      std::function<size_t( size_t )> uiToNativeTimeStepIndex,
+                                                      const std::vector<QString>&     tracerNames );
 
     // Used to "steal" the data from this one using swap
 
@@ -43,7 +49,7 @@ public:
 
 private:
     void calculate( RigMainGrid*                            mainGrid,
-                    RimEclipseCase*                         caseToApply,
+                    RigActiveCellInfo*                      actCellInfo,
                     std::vector<double>                     daysSinceSimulationStart,
                     const std::vector<double>*              porvResults,
                     const std::vector<double>*              scwrResults,
@@ -55,13 +61,13 @@ private:
                     std::vector<std::vector<double>>        summedTracersAtAllTimesteps );
 
     void distributeNNCflow( const RigConnectionContainer& connections,
-                            RimEclipseCase*               caseToApply,
+                            RigActiveCellInfo*            actCellInfo,
                             const std::vector<double>&    summedTracerValues,
                             const std::vector<double>*    flowrateNNC,
                             std::vector<double>&          flowrateIntoCell );
 
     void distributeNeighbourCellFlow( RigMainGrid*               mainGrid,
-                                      RimEclipseCase*            caseToApply,
+                                      RigActiveCellInfo*         actCellInfo,
                                       const std::vector<double>& summedTracerValues,
                                       const std::vector<double>* flrWatResultI,
                                       const std::vector<double>* flrWatResultJ,
