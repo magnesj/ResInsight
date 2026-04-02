@@ -37,10 +37,10 @@ TEST( VariantTest, PdmCoreVec3d )
 
     cvf::Vec3d myVector( a, b, c );
 
-    QVariant myVariant = caf::PdmValueFieldSpecialization<cvf::Vec3d>::convert( myVector );
+    QVariant myVariant = caf::pdmToVariant( myVector );
 
     cvf::Vec3d decoded;
-    caf::PdmValueFieldSpecialization<cvf::Vec3d>::setFromVariant( myVariant, decoded );
+    caf::pdmFromVariant( myVariant, decoded );
 
     EXPECT_TRUE( decoded.equals( myVector ) );
 }

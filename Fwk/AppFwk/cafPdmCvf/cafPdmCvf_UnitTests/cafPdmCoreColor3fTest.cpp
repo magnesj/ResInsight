@@ -33,10 +33,10 @@ TEST( VariantTest, PdmCoreColor3f )
     float        b = 0.18f;
     cvf::Color3f myColor( r, g, b );
 
-    QVariant myVariant = caf::PdmValueFieldSpecialization<cvf::Color3f>::convert( myColor );
+    QVariant myVariant = caf::pdmToVariant( myColor );
 
     cvf::Color3f decoded;
-    caf::PdmValueFieldSpecialization<cvf::Color3f>::setFromVariant( myVariant, decoded );
+    caf::pdmFromVariant( myVariant, decoded );
 
     EXPECT_FLOAT_EQ( myColor.r(), decoded.r() );
     EXPECT_FLOAT_EQ( myColor.g(), decoded.g() );
