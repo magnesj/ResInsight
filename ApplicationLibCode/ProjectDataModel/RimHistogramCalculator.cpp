@@ -26,8 +26,8 @@
 #include "RigFemNativeVisibleCellsStatCalc.h"
 #include "RigFemPartResultsCollection.h"
 #include "RigFemResultAddress.h"
-#include "RimFlowDiagResults.h"
 #include "RigGeoMechCaseData.h"
+#include "RimFlowDiagResults.h"
 #include "RimFlowDiagVisibleCellsStatCalc.h"
 
 #include "ContourMap/RimEclipseContourMapProjection.h"

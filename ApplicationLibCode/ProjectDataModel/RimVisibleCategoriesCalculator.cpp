@@ -23,10 +23,10 @@
 #include "RigEclipseCaseData.h"
 #include "RigEclipseNativeVisibleCellsStatCalc.h"
 #include "RigFault.h"
-#include "RimFlowDiagResults.h"
 #include "RigMainGrid.h"
 #include "RigNNCData.h"
 #include "RimEclipseResultDefinitionTools.h"
+#include "RimFlowDiagResults.h"
 #include "RimFlowDiagVisibleCellsStatCalc.h"
 
 #include "RimBoxIntersection.h"

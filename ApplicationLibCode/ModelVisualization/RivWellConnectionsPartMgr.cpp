@@ -26,8 +26,8 @@
 
 #include "RigActiveCellInfo.h"
 #include "RigEclipseCaseData.h"
-#include "RimFlowDiagResults.h"
 #include "RigMainGrid.h"
+#include "RimFlowDiagResults.h"
 #include "Well/RigSimWellData.h"
 #include "Well/RigWellResultFrame.h"
 

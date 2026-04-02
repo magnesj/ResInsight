@@ -22,11 +22,11 @@
 
 #include "RicWellLogTools.h"
 
-#include "RimFlowDiagResults.h"
 #include "Rim3dView.h"
 #include "RimEclipseResultCase.h"
 #include "RimEclipseView.h"
 #include "RimFlowCharacteristicsPlot.h"
+#include "RimFlowDiagResults.h"
 #include "RimFlowDiagSolution.h"
 #include "RimFlowPlotCollection.h"
 #include "RimMainPlotCollection.h"

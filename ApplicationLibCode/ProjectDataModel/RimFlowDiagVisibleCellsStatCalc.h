@@ -24,8 +24,8 @@
 //==================================================================================================
 #include "RigActiveCellInfo.h"
 #include "RigFlowDiagResultAddress.h"
-#include "RimFlowDiagResults.h"
 #include "RigStatisticsCalculator.h"
+#include "RimFlowDiagResults.h"
 
 #include "cvfArray.h"
 

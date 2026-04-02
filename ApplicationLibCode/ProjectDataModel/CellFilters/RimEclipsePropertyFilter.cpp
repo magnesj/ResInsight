@@ -28,8 +28,8 @@
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
 #include "RigEclipseResultAddress.h"
-#include "RimFlowDiagResults.h"
 #include "RigFormationNames.h"
+#include "RimFlowDiagResults.h"
 
 #include "RimEclipseCase.h"
 #include "RimEclipsePropertyFilterCollection.h"

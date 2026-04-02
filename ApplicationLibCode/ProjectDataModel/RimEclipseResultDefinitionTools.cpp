@@ -28,10 +28,10 @@
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
 #include "RigEclipseResultAddress.h"
-#include "RimFlowDiagResults.h"
 #include "RigGridBase.h"
 #include "RigResultAccessor.h"
 #include "RigResultAccessorFactory.h"
+#include "RimFlowDiagResults.h"
 #include "RimVisibleCategoriesCalculator.h"
 
 #include "RimColorLegend.h"
