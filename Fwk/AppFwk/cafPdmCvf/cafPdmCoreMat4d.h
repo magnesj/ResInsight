@@ -50,7 +50,7 @@ namespace caf
 
 inline QVariant pdmToVariant( const cvf::Mat4d& value )
 {
-    QString str;
+    QString     str;
     QTextStream textStream( &str );
     textStream << value;
     return QVariant( str );
@@ -58,7 +58,7 @@ inline QVariant pdmToVariant( const cvf::Mat4d& value )
 
 inline void pdmFromVariant( const QVariant& v, cvf::Mat4d& out )
 {
-    QString str = v.toString();
+    QString     str = v.toString();
     QTextStream textStream( &str );
     textStream >> out;
 }
