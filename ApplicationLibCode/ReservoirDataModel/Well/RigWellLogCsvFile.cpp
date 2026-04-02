@@ -28,9 +28,6 @@
 #include "RiaLogging.h"
 #include "RiaStringEncodingTools.h"
 
-#include "RimWellLogCurve.h"
-#include "RimWellPath.h"
-
 #include <QFileInfo>
 #include <QString>
 
