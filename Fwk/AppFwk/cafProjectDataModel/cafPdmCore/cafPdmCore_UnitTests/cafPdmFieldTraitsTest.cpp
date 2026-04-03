@@ -48,9 +48,9 @@ class TraitTestObject : public caf::PdmObjectHandle
 
 TEST( PdmFieldTraits, RoundTrip_Int )
 {
-    int original = 42;
-    QVariant v   = caf::pdmToVariant( original );
-    int      out = 0;
+    int      original = 42;
+    QVariant v        = caf::pdmToVariant( original );
+    int      out      = 0;
     caf::pdmFromVariant( v, out );
     EXPECT_EQ( original, out );
 }
@@ -302,10 +302,10 @@ TEST( PdmFieldTraits, VariantEqual_Vector_DifferentValues )
 
 TEST( PdmFieldTraits, VariantEqual_Vector_Double_UsesEpsilon )
 {
-    double           epsilon = 1e-8;
-    std::vector<double> v1  = { 1.0, 2.0 };
-    std::vector<double> v2  = { 1.0 + epsilon * 0.5, 2.0 + epsilon * 0.5 }; // within epsilon
-    std::vector<double> v3  = { 1.0 + epsilon * 2.0, 2.0 };                 // outside epsilon
+    double              epsilon = 1e-8;
+    std::vector<double> v1      = { 1.0, 2.0 };
+    std::vector<double> v2      = { 1.0 + epsilon * 0.5, 2.0 + epsilon * 0.5 }; // within epsilon
+    std::vector<double> v3      = { 1.0 + epsilon * 2.0, 2.0 }; // outside epsilon
 
     QVariant a = caf::pdmToVariant( v1 );
     QVariant b = caf::pdmToVariant( v2 );
@@ -352,10 +352,10 @@ TEST( PdmFieldTraits, VariantEqual_Pair_SecondDiffers )
 
 TEST( PdmFieldTraits, VariantEqual_Pair_Double_UsesEpsilon )
 {
-    double epsilon = 1e-8;
-    QVariant a     = caf::pdmToVariant( std::make_pair( true, 1.0 ) );
-    QVariant b     = caf::pdmToVariant( std::make_pair( true, 1.0 + epsilon * 0.5 ) ); // within
-    QVariant c     = caf::pdmToVariant( std::make_pair( true, 1.0 + epsilon * 2.0 ) ); // outside
+    double   epsilon = 1e-8;
+    QVariant a       = caf::pdmToVariant( std::make_pair( true, 1.0 ) );
+    QVariant b       = caf::pdmToVariant( std::make_pair( true, 1.0 + epsilon * 0.5 ) ); // within
+    QVariant c       = caf::pdmToVariant( std::make_pair( true, 1.0 + epsilon * 2.0 ) ); // outside
 
     EXPECT_TRUE( ( caf::pdmVariantEqual<std::pair<bool, double>>( a, b ) ) );
     EXPECT_FALSE( ( caf::pdmVariantEqual<std::pair<bool, double>>( a, c ) ) );
@@ -435,7 +435,7 @@ TEST( PdmFieldTraits, RoundTrip_Optional_Double_Nullopt )
 TEST( PdmFieldTraits, RoundTrip_Optional_QString_HasValue )
 {
     std::optional<QString> orig = QString( "hello" );
-    QVariant               v   = caf::pdmToVariant( orig );
+    QVariant               v    = caf::pdmToVariant( orig );
 
     std::optional<QString> decoded;
     caf::pdmFromVariant( v, decoded );

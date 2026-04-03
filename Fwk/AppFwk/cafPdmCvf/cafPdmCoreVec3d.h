@@ -52,7 +52,7 @@ namespace caf
 
 inline QVariant pdmToVariant( const cvf::Vec3d& value )
 {
-    QString str;
+    QString     str;
     QTextStream textStream( &str );
     textStream << value;
     return QVariant( str );
@@ -60,7 +60,7 @@ inline QVariant pdmToVariant( const cvf::Vec3d& value )
 
 inline void pdmFromVariant( const QVariant& v, cvf::Vec3d& out )
 {
-    QString str = v.toString();
+    QString     str = v.toString();
     QTextStream textStream( &str );
     textStream >> out;
 }
