@@ -997,6 +997,7 @@ if(RESINSIGHT_INCLUDE_APPFWK_TESTS)
   add_subdirectory(Fwk/AppFwk/cafProjectDataModel/cafPdmXml/cafPdmXml_UnitTests)
   add_subdirectory(Fwk/AppFwk/cafPdmScripting/cafPdmScripting_UnitTests)
   add_subdirectory(Fwk/AppFwk/cafUserInterface/cafUserInterface_UnitTests)
+  add_subdirectory(Fwk/AppFwk/cafPdmCvf/cafPdmCvf_UnitTests)
 
   # Executables
   add_subdirectory(Fwk/AppFwk/cafTests/cafTestApplication)
@@ -1010,6 +1011,7 @@ if(RESINSIGHT_INCLUDE_APPFWK_TESTS)
     cafPdmXml_UnitTests
     cafPdmScripting_UnitTests
     cafUserInterface_UnitTests
+    cafPdmCvf_UnitTests
     cafTestApplication
     cafTestCvfApplication
   )
