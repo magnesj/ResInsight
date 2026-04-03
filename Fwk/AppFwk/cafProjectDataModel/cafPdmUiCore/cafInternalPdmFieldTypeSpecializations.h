@@ -9,10 +9,6 @@ namespace caf
 {
 template <typename T>
 class PdmDataValueField;
-template <typename T>
-class PdmPointer;
-template <typename T>
-class AppEnum;
 
 //==================================================================================================
 /// Helper base class for types that delegate all operations to pdmToVariant/pdmFromVariant/pdmVariantEqual.
@@ -85,11 +81,11 @@ class PdmUiFieldSpecialization<std::list<T>> : public PdmUiFieldSpecializationDe
 public:
     static QVariant convert( const std::list<T>& value )
     {
-        QList<QVariant>                       returnList;
-        typename std::list<T>::const_iterator it;
-        for ( it = value.begin(); it != value.end(); ++it )
+        QList<QVariant> returnList;
+        for ( const auto& item : value )
         {
-            returnList.push_back( QVariant( *it ) );
+            using caf::pdmToVariant;
+            returnList.push_back( pdmToVariant( item ) );
         }
         return returnList;
     }
@@ -99,11 +95,13 @@ public:
         if ( variantValue.canConvert<QList<QVariant>>() )
         {
             value.clear();
-            QList<QVariant> lst = variantValue.toList();
-            int             i;
-            for ( i = 0; i < lst.size(); ++i )
+            const QList<QVariant> lst = variantValue.toList();
+            for ( const auto& item : lst )
             {
-                value.push_back( lst[i].value<T>() );
+                T element;
+                using caf::pdmFromVariant;
+                pdmFromVariant( item, element );
+                value.push_back( element );
             }
         }
     }

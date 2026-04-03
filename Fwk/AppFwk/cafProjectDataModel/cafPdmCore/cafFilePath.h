@@ -37,8 +37,6 @@ Q_DECLARE_METATYPE( caf::FilePath );
 
 #include "cafPdmFieldTraits.h"
 
-#include <QVariant>
-
 namespace caf
 {
 

@@ -168,8 +168,9 @@ struct PdmVariantEqualImpl<std::optional<T>>
 {
     static bool equal( const QVariant& a, const QVariant& b )
     {
-        const bool aEmpty = !a.isValid() || a.toString().remove( '"' ).isEmpty();
-        const bool bEmpty = !b.isValid() || b.toString().remove( '"' ).isEmpty();
+        // pdmToVariant(nullopt) always produces an invalid QVariant()
+        const bool aEmpty = !a.isValid();
+        const bool bEmpty = !b.isValid();
         if ( aEmpty && bEmpty ) return true;
         if ( aEmpty != bEmpty ) return false;
         return PdmVariantEqualImpl<T>::equal( a, b );

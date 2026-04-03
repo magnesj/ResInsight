@@ -403,8 +403,6 @@ std::map<QString, std::vector<T>> AppEnum<T>::m_enumSubset;
 
 #include "cafPdmFieldTraits.h"
 
-#include <QVariant>
-
 namespace caf
 {
 
