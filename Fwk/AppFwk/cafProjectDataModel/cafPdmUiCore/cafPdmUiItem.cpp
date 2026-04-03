@@ -35,6 +35,8 @@
 //##################################################################################################
 
 #include "cafPdmUiItem.h"
+
+#include <QIcon>
 #include "cafPdmLogging.h"
 #include "cafPdmOptionItemInfo.h"
 #include "cafPdmUiEditorHandle.h"

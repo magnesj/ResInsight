@@ -4,6 +4,7 @@
 #include "cafPdmFieldHandle.h"
 #include "cafPdmUiEditorHandle.h"
 #include "cafPdmUiModelChangeDetector.h"
+#include "cafPdmObjectHandle.h"
 #include "cafPdmUiObjectHandle.h"
 
 namespace caf
