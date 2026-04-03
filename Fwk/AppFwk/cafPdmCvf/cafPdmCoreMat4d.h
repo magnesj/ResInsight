@@ -64,9 +64,9 @@ inline void pdmFromVariant( const QVariant& v, cvf::Mat4d& out )
 }
 
 template <>
-inline bool pdmVariantEqual<cvf::Mat4d>( const QVariant& a, const QVariant& b )
+struct PdmVariantEqualImpl<cvf::Mat4d>
 {
-    return a.toString() == b.toString();
-}
+    static bool equal( const QVariant& a, const QVariant& b ) { return a.toString() == b.toString(); }
+};
 
 } // end namespace caf

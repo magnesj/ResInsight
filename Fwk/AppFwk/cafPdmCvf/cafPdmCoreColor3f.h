@@ -61,9 +61,9 @@ inline void pdmFromVariant( const QVariant& v, cvf::Color3f& out )
 }
 
 template <>
-inline bool pdmVariantEqual<cvf::Color3f>( const QVariant& a, const QVariant& b )
+struct PdmVariantEqualImpl<cvf::Color3f>
 {
-    return a.value<QColor>() == b.value<QColor>();
-}
+    static bool equal( const QVariant& a, const QVariant& b ) { return a.value<QColor>() == b.value<QColor>(); }
+};
 
 } // end namespace caf

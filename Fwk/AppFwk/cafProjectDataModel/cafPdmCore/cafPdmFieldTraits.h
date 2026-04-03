@@ -1,10 +1,5 @@
 #pragma once
 
-#include "cafAppEnum.h"
-#include "cafFilePath.h"
-#include "cafPdmObjectHandle.h"
-#include "cafPdmPointer.h"
-
 #include <QVariant>
 
 #include <optional>
@@ -16,60 +11,11 @@ namespace caf
 {
 
 //==================================================================================================
-/// Type traits used for dispatch in pdmVariantEqual
-//==================================================================================================
-
-template <typename T>
-struct is_std_vector : std::false_type
-{
-};
-template <typename T, typename A>
-struct is_std_vector<std::vector<T, A>> : std::true_type
-{
-};
-
-template <typename T>
-struct is_std_pair : std::false_type
-{
-};
-template <typename T, typename U>
-struct is_std_pair<std::pair<T, U>> : std::true_type
-{
-};
-
-template <typename T>
-struct is_pdm_pointer : std::false_type
-{
-};
-template <typename T>
-struct is_pdm_pointer<PdmPointer<T>> : std::true_type
-{
-};
-
-template <typename T>
-struct is_app_enum : std::false_type
-{
-};
-template <typename T>
-struct is_app_enum<AppEnum<T>> : std::true_type
-{
-};
-
-template <typename T>
-struct is_std_optional : std::false_type
-{
-};
-template <typename T>
-struct is_std_optional<std::optional<T>> : std::true_type
-{
-};
-
-//==================================================================================================
 /// pdmToVariant / pdmFromVariant
 ///
 /// ADL-based customization points for converting field values to/from QVariant.
 /// The default implementations work for any Qt-metatype-registered type.
-/// Add overloads in the caf namespace to support additional types.
+/// Add overloads in the caf namespace (or the type's own namespace) to support additional types.
 //==================================================================================================
 
 template <typename T>
@@ -95,6 +41,7 @@ QVariant pdmToVariant( const std::vector<T>& value )
     list.reserve( static_cast<int>( value.size() ) );
     for ( const auto& element : value )
     {
+        using caf::pdmToVariant;
         list.push_back( pdmToVariant( element ) );
     }
     return list;
@@ -110,6 +57,7 @@ void pdmFromVariant( const QVariant& v, std::vector<T>& out )
         for ( const auto& item : list )
         {
             T element;
+            using caf::pdmFromVariant;
             pdmFromVariant( item, element );
             out.push_back( element );
         }
@@ -123,6 +71,7 @@ void pdmFromVariant( const QVariant& v, std::vector<T>& out )
 template <typename T, typename U>
 QVariant pdmToVariant( const std::pair<T, U>& value )
 {
+    using caf::pdmToVariant;
     QList<QVariant> list;
     list.push_back( pdmToVariant( value.first ) );
     list.push_back( pdmToVariant( value.second ) );
@@ -137,6 +86,7 @@ void pdmFromVariant( const QVariant& v, std::pair<T, U>& out )
         const QList<QVariant> list = v.toList();
         if ( list.size() == 2 )
         {
+            using caf::pdmFromVariant;
             pdmFromVariant( list[0], out.first );
             pdmFromVariant( list[1], out.second );
         }
@@ -144,56 +94,8 @@ void pdmFromVariant( const QVariant& v, std::pair<T, U>& out )
 }
 
 //==================================================================================================
-/// PdmPointer overloads
-/// Stores as PdmPointer<PdmObjectHandle> to avoid Q_DECLARE_METATYPE for each pointed-to type.
-//==================================================================================================
-
-template <typename T>
-QVariant pdmToVariant( const PdmPointer<T>& value )
-{
-    return QVariant::fromValue( PdmPointer<PdmObjectHandle>( value.rawPtr() ) );
-}
-
-template <typename T>
-void pdmFromVariant( const QVariant& v, PdmPointer<T>& out )
-{
-    out.setRawPtr( v.value<PdmPointer<PdmObjectHandle>>().rawPtr() );
-}
-
-//==================================================================================================
-/// AppEnum overloads
-/// Stores as int to support enum class without Q_DECLARE_METATYPE.
-//==================================================================================================
-
-template <typename T>
-QVariant pdmToVariant( const AppEnum<T>& value )
-{
-    return QVariant( static_cast<int>( static_cast<T>( value ) ) );
-}
-
-template <typename T>
-void pdmFromVariant( const QVariant& v, AppEnum<T>& out )
-{
-    out = static_cast<T>( v.toInt() );
-}
-
-//==================================================================================================
-/// FilePath overloads — stores the path string directly in the QVariant
-//==================================================================================================
-
-inline QVariant pdmToVariant( const FilePath& value )
-{
-    return QVariant( value.path() );
-}
-
-inline void pdmFromVariant( const QVariant& v, FilePath& out )
-{
-    out.setPath( v.toString() );
-}
-
-//==================================================================================================
 /// std::optional overloads
-/// Convention (matching the UI layer): nullopt → invalid QVariant(); has value → pdmToVariant(*val)
+/// Convention: nullopt -> invalid QVariant(); has value -> pdmToVariant(*val)
 //==================================================================================================
 
 template <typename T>
@@ -221,83 +123,89 @@ void pdmFromVariant( const QVariant& v, std::optional<T>& out )
 }
 
 //==================================================================================================
-/// pdmVariantEqual<T>
+/// PdmVariantEqualImpl<T>
 ///
-/// Compares two QVariants that carry a field value of type T.
-/// Uses if constexpr to handle container and pointer types.
-/// Full specializations below handle FilePath, float, and double.
-/// Additional full specializations (e.g. for cvf types) can be provided in type-specific headers
-/// after including this header.
+/// Class template used for comparing two QVariants carrying a field value of type T.
+/// Partial specializations handle containers and composites.
+/// Full specializations (e.g. for float, double, FilePath, cvf types) provide type-specific logic.
+/// Extend by specializing PdmVariantEqualImpl<YourType> in the header that defines YourType.
 //==================================================================================================
 
 template <typename T>
-bool pdmVariantEqual( const QVariant& a, const QVariant& b )
+struct PdmVariantEqualImpl
 {
-    if constexpr ( is_pdm_pointer<T>::value )
-    {
-        return a.value<PdmPointer<PdmObjectHandle>>() == b.value<PdmPointer<PdmObjectHandle>>();
-    }
-    else if constexpr ( is_std_vector<T>::value )
-    {
-        using ElementType = typename T::value_type;
+    static bool equal( const QVariant& a, const QVariant& b ) { return a.value<T>() == b.value<T>(); }
+};
 
+template <typename T>
+struct PdmVariantEqualImpl<std::vector<T>>
+{
+    static bool equal( const QVariant& a, const QVariant& b )
+    {
         const QList<QVariant> la = a.toList();
         const QList<QVariant> lb = b.toList();
         if ( la.size() != lb.size() ) return false;
-
         for ( int i = 0; i < la.size(); ++i )
-        {
-            if ( !pdmVariantEqual<ElementType>( la[i], lb[i] ) ) return false;
-        }
+            if ( !PdmVariantEqualImpl<T>::equal( la[i], lb[i] ) ) return false;
         return true;
     }
-    else if constexpr ( is_std_pair<T>::value )
+};
+
+template <typename T, typename U>
+struct PdmVariantEqualImpl<std::pair<T, U>>
+{
+    static bool equal( const QVariant& a, const QVariant& b )
     {
         const QList<QVariant> la = a.toList();
         const QList<QVariant> lb = b.toList();
         if ( la.size() != 2 || lb.size() != 2 ) return false;
+        return PdmVariantEqualImpl<T>::equal( la[0], lb[0] ) && PdmVariantEqualImpl<U>::equal( la[1], lb[1] );
+    }
+};
 
-        return pdmVariantEqual<typename T::first_type>( la[0], lb[0] ) &&
-               pdmVariantEqual<typename T::second_type>( la[1], lb[1] );
-    }
-    else if constexpr ( is_app_enum<T>::value )
-    {
-        return a.toInt() == b.toInt();
-    }
-    else if constexpr ( is_std_optional<T>::value )
+template <typename T>
+struct PdmVariantEqualImpl<std::optional<T>>
+{
+    static bool equal( const QVariant& a, const QVariant& b )
     {
         const bool aEmpty = !a.isValid() || a.toString().remove( '"' ).isEmpty();
         const bool bEmpty = !b.isValid() || b.toString().remove( '"' ).isEmpty();
         if ( aEmpty && bEmpty ) return true;
         if ( aEmpty != bEmpty ) return false;
-        return pdmVariantEqual<typename T::value_type>( a, b );
+        return PdmVariantEqualImpl<T>::equal( a, b );
     }
-    else
+};
+
+template <>
+struct PdmVariantEqualImpl<float>
+{
+    static bool equal( const QVariant& a, const QVariant& b )
     {
-        return a.value<T>() == b.value<T>();
+        // See PdmFieldWriter::writeFieldData for the precision used when writing float values
+        const float epsilon = 1e-6f;
+        return qAbs( a.value<float>() - b.value<float>() ) < epsilon;
     }
-}
+};
 
 template <>
-inline bool pdmVariantEqual<FilePath>( const QVariant& a, const QVariant& b )
+struct PdmVariantEqualImpl<double>
 {
-    return a.toString() == b.toString();
-}
+    static bool equal( const QVariant& a, const QVariant& b )
+    {
+        // See PdmFieldWriter::writeFieldData for the precision used when writing double values
+        const double epsilon = 1e-8;
+        return qAbs( a.value<double>() - b.value<double>() ) < epsilon;
+    }
+};
 
-template <>
-inline bool pdmVariantEqual<float>( const QVariant& a, const QVariant& b )
-{
-    // See PdmFieldWriter::writeFieldData for the precision used when writing float values
-    const float epsilon = 1e-6f;
-    return qAbs( a.value<float>() - b.value<float>() ) < epsilon;
-}
+//==================================================================================================
+/// pdmVariantEqual<T> — public API, delegates to PdmVariantEqualImpl<T>
+//==================================================================================================
 
-template <>
-inline bool pdmVariantEqual<double>( const QVariant& a, const QVariant& b )
+template <typename T>
+bool pdmVariantEqual( const QVariant& a, const QVariant& b )
 {
-    // See PdmFieldWriter::writeFieldData for the precision used when writing double values
-    const double epsilon = 1e-8;
-    return qAbs( a.value<double>() - b.value<double>() ) < epsilon;
+    return PdmVariantEqualImpl<T>::equal( a, b );
 }
 
 } // namespace caf
