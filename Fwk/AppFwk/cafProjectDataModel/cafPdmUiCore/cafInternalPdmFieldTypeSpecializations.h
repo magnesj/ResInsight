@@ -209,34 +209,21 @@ template <typename T>
 class PdmUiFieldSpecialization<std::optional<T>> : public PdmUiFieldSpecializationDefaults
 {
 public:
-    /// Convert the field value into a QVariant
     static QVariant convert( const std::optional<T>& value )
     {
-        if ( value.has_value() )
-        {
-            using caf::pdmToVariant;
-            return pdmToVariant( value.value() );
-        }
-
-        return QVariant();
+        using caf::pdmToVariant;
+        return pdmToVariant( value );
     }
 
-    /// Set the field value from a QVariant
     static void setFromVariant( const QVariant& variantValue, std::optional<T>& value )
     {
-        // An empty QVariant means no value, and we should set the optional to std::nullopt
-        auto stringText = variantValue.toString();
-        stringText.remove( '"' );
-        if ( stringText.isEmpty() )
-        {
-            value.reset();
-            return;
-        }
-
-        T valueOfType;
         using caf::pdmFromVariant;
-        pdmFromVariant( variantValue, valueOfType );
-        value = valueOfType;
+        pdmFromVariant( variantValue, value );
+    }
+
+    static bool isDataElementEqual( const QVariant& variantValue, const QVariant& variantValue2 )
+    {
+        return caf::pdmVariantEqual<std::optional<T>>( variantValue, variantValue2 );
     }
 };
 

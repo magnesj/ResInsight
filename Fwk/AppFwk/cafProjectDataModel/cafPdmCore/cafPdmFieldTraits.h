@@ -7,6 +7,7 @@
 
 #include <QVariant>
 
+#include <optional>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -51,6 +52,15 @@ struct is_app_enum : std::false_type
 };
 template <typename T>
 struct is_app_enum<AppEnum<T>> : std::true_type
+{
+};
+
+template <typename T>
+struct is_std_optional : std::false_type
+{
+};
+template <typename T>
+struct is_std_optional<std::optional<T>> : std::true_type
 {
 };
 
@@ -182,6 +192,35 @@ inline void pdmFromVariant( const QVariant& v, FilePath& out )
 }
 
 //==================================================================================================
+/// std::optional overloads
+/// Convention (matching the UI layer): nullopt → invalid QVariant(); has value → pdmToVariant(*val)
+//==================================================================================================
+
+template <typename T>
+QVariant pdmToVariant( const std::optional<T>& value )
+{
+    if ( !value.has_value() ) return QVariant();
+    using caf::pdmToVariant;
+    return pdmToVariant( *value );
+}
+
+template <typename T>
+void pdmFromVariant( const QVariant& v, std::optional<T>& out )
+{
+    auto text = v.toString();
+    text.remove( '"' );
+    if ( text.isEmpty() )
+    {
+        out.reset();
+        return;
+    }
+    T underlying;
+    using caf::pdmFromVariant;
+    pdmFromVariant( v, underlying );
+    out = underlying;
+}
+
+//==================================================================================================
 /// pdmVariantEqual<T>
 ///
 /// Compares two QVariants that carry a field value of type T.
@@ -224,6 +263,14 @@ bool pdmVariantEqual( const QVariant& a, const QVariant& b )
     else if constexpr ( is_app_enum<T>::value )
     {
         return a.toInt() == b.toInt();
+    }
+    else if constexpr ( is_std_optional<T>::value )
+    {
+        const bool aEmpty = !a.isValid() || a.toString().remove( '"' ).isEmpty();
+        const bool bEmpty = !b.isValid() || b.toString().remove( '"' ).isEmpty();
+        if ( aEmpty && bEmpty ) return true;
+        if ( aEmpty != bEmpty ) return false;
+        return pdmVariantEqual<typename T::value_type>( a, b );
     }
     else
     {

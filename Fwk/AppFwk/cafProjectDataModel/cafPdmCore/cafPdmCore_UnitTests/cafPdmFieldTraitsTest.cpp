@@ -404,3 +404,87 @@ TEST( PdmFieldTraits, VariantEqual_PdmPointer_DifferentObjects )
 
     EXPECT_FALSE( ( caf::pdmVariantEqual<caf::PdmPointer<TraitTestObject>>( a, b ) ) );
 }
+
+// ------------------------------------------------------------------------------------------------
+// std::optional round-trip tests
+// ------------------------------------------------------------------------------------------------
+
+TEST( PdmFieldTraits, RoundTrip_Optional_Double_HasValue )
+{
+    std::optional<double> orig = 3.14;
+    QVariant              v    = caf::pdmToVariant( orig );
+
+    std::optional<double> decoded;
+    caf::pdmFromVariant( v, decoded );
+
+    ASSERT_TRUE( decoded.has_value() );
+    EXPECT_DOUBLE_EQ( *orig, *decoded );
+}
+
+TEST( PdmFieldTraits, RoundTrip_Optional_Double_Nullopt )
+{
+    std::optional<double> orig;
+    QVariant              v = caf::pdmToVariant( orig );
+
+    std::optional<double> decoded = 99.0;
+    caf::pdmFromVariant( v, decoded );
+
+    EXPECT_FALSE( decoded.has_value() );
+}
+
+TEST( PdmFieldTraits, RoundTrip_Optional_QString_HasValue )
+{
+    std::optional<QString> orig = QString( "hello" );
+    QVariant               v   = caf::pdmToVariant( orig );
+
+    std::optional<QString> decoded;
+    caf::pdmFromVariant( v, decoded );
+
+    ASSERT_TRUE( decoded.has_value() );
+    EXPECT_EQ( *orig, *decoded );
+}
+
+// ------------------------------------------------------------------------------------------------
+// std::optional equality tests
+// ------------------------------------------------------------------------------------------------
+
+TEST( PdmFieldTraits, VariantEqual_Optional_BothNullopt )
+{
+    std::optional<double> a;
+    std::optional<double> b;
+    QVariant              va = caf::pdmToVariant( a );
+    QVariant              vb = caf::pdmToVariant( b );
+
+    EXPECT_TRUE( ( caf::pdmVariantEqual<std::optional<double>>( va, vb ) ) );
+}
+
+TEST( PdmFieldTraits, VariantEqual_Optional_NulloptVsValue )
+{
+    std::optional<double> a;
+    std::optional<double> b  = 1.0;
+    QVariant              va = caf::pdmToVariant( a );
+    QVariant              vb = caf::pdmToVariant( b );
+
+    EXPECT_FALSE( ( caf::pdmVariantEqual<std::optional<double>>( va, vb ) ) );
+    EXPECT_FALSE( ( caf::pdmVariantEqual<std::optional<double>>( vb, va ) ) );
+}
+
+TEST( PdmFieldTraits, VariantEqual_Optional_SameValue )
+{
+    std::optional<double> a  = 2.5;
+    std::optional<double> b  = 2.5;
+    QVariant              va = caf::pdmToVariant( a );
+    QVariant              vb = caf::pdmToVariant( b );
+
+    EXPECT_TRUE( ( caf::pdmVariantEqual<std::optional<double>>( va, vb ) ) );
+}
+
+TEST( PdmFieldTraits, VariantEqual_Optional_DifferentValues )
+{
+    std::optional<double> a  = 2.5;
+    std::optional<double> b  = 3.5;
+    QVariant              va = caf::pdmToVariant( a );
+    QVariant              vb = caf::pdmToVariant( b );
+
+    EXPECT_FALSE( ( caf::pdmVariantEqual<std::optional<double>>( va, vb ) ) );
+}
