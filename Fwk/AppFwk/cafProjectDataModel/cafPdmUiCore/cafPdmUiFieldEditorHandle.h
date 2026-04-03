@@ -39,6 +39,8 @@
 #include "cafFactory.h"
 #include "cafPdmUiEditorHandle.h"
 
+#include <QPoint>
+
 class QAction;
 class QLabel;
 
