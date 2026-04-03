@@ -2,7 +2,6 @@
 
 #include "cafAppEnum.h"
 #include "cafPdmFieldTraits.h"
-#include "cafPdmObjectHandle.h"
 #include "cafPdmPointer.h"
 
 namespace caf
@@ -42,33 +41,6 @@ struct PdmUiFieldSpecializationForValueSpec : public PdmUiFieldSpecializationDef
 template <typename T>
 class PdmUiFieldSpecialization : public PdmUiFieldSpecializationForValueSpec<T>
 {
-};
-
-//==================================================================================================
-/// Partial specialization for PdmField< PdmPointer<T> >
-///
-/// Will package the PdmPointer<T> into QVariant as PdmPointer<PdmObject>
-/// Needed to support arbitrary types in PdmPointer without
-/// havning to declare everything Q_DECLARE_METATYPE()
-/// Also introduces the need for a isEqual() method, as this was the first
-/// custom type embedded in QVariant
-//==================================================================================================
-
-template <typename T>
-class PdmUiFieldSpecialization<PdmPointer<T>> : public PdmUiFieldSpecializationDefaults
-{
-public:
-    static QVariant convert( const PdmPointer<T>& value ) { return caf::pdmToVariant( value ); }
-
-    static void setFromVariant( const QVariant& variantValue, PdmPointer<T>& value )
-    {
-        caf::pdmFromVariant( variantValue, value );
-    }
-
-    static bool isDataElementEqual( const QVariant& variantValue, const QVariant& variantValue2 )
-    {
-        return caf::pdmVariantEqual<PdmPointer<T>>( variantValue, variantValue2 );
-    }
 };
 
 //==================================================================================================
@@ -192,31 +164,6 @@ public:
     {
         using caf::pdmFromVariant;
         pdmFromVariant( variantValue, value );
-    }
-};
-
-//==================================================================================================
-/// Partial specialization for PdmField<std::optional<T>>>
-//==================================================================================================
-template <typename T>
-class PdmUiFieldSpecialization<std::optional<T>> : public PdmUiFieldSpecializationDefaults
-{
-public:
-    static QVariant convert( const std::optional<T>& value )
-    {
-        using caf::pdmToVariant;
-        return pdmToVariant( value );
-    }
-
-    static void setFromVariant( const QVariant& variantValue, std::optional<T>& value )
-    {
-        using caf::pdmFromVariant;
-        pdmFromVariant( variantValue, value );
-    }
-
-    static bool isDataElementEqual( const QVariant& variantValue, const QVariant& variantValue2 )
-    {
-        return caf::pdmVariantEqual<std::optional<T>>( variantValue, variantValue2 );
     }
 };
 
