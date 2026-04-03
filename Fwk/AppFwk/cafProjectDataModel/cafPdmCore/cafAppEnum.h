@@ -37,7 +37,6 @@
 #pragma once
 
 #include "cafAssert.h"
-#include "cafPdmFieldHandle.h"
 
 #include <QString>
 #include <QStringList>
@@ -47,6 +46,11 @@
 
 namespace caf
 {
+class PdmFieldHandle; // forward declaration — full definition in cafPdmFieldHandle.h
+
+// Non-template helper; defined in cafAppEnum.cpp so cafPdmFieldHandle.h stays out of this header.
+QString appEnumCreateSubsetKey( PdmFieldHandle* fieldHandle );
+
 //==================================================================================================
 /// An enum class to make it easier to handle IO and UI based on the enum.
 /// Usage:
@@ -132,28 +136,14 @@ public:
     static void setEnumSubset( caf::PdmFieldHandle* fieldHandle, std::vector<T> subset )
     {
         if ( !fieldHandle ) return;
-        QString key       = createEnumSubsetKey( fieldHandle );
-        m_enumSubset[key] = subset;
+        m_enumSubset[appEnumCreateSubsetKey( fieldHandle )] = subset;
     }
     static std::vector<T> enumSubset( caf::PdmFieldHandle* fieldHandle )
     {
         if ( !fieldHandle ) return {};
-        QString key = createEnumSubsetKey( fieldHandle );
-        auto    it  = m_enumSubset.find( key );
+        auto it = m_enumSubset.find( appEnumCreateSubsetKey( fieldHandle ) );
         if ( it != m_enumSubset.end() ) return it->second;
-
         return {};
-    }
-
-private:
-    static QString createEnumSubsetKey( caf::PdmFieldHandle* fieldHandle )
-    {
-        if ( !fieldHandle ) return QString();
-
-        // Create a unique key by combining the owner class name with the field keyword
-        // This prevents collisions when different object types use the same field keyword
-        QString ownerClass = fieldHandle->ownerClass();
-        return ownerClass + "::" + fieldHandle->keyword();
     }
 
 public:
@@ -401,10 +391,15 @@ std::map<QString, std::vector<T>> AppEnum<T>::m_enumSubset;
 
 } // namespace caf
 
-#include "cafPdmFieldTraits.h"
+#include <QVariant>
 
 namespace caf
 {
+
+// Forward-declare the primary template so the partial specialization below can be written.
+// The full definition of PdmVariantEqualImpl<T> lives in cafPdmFieldTraits.h.
+template <typename T>
+struct PdmVariantEqualImpl;
 
 template <typename T>
 QVariant pdmToVariant( const AppEnum<T>& value )
