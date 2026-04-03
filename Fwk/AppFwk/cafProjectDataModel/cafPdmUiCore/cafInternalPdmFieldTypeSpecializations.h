@@ -61,10 +61,7 @@ template <typename T>
 class PdmUiFieldSpecialization<PdmPointer<T>> : public PdmUiFieldSpecializationDefaults
 {
 public:
-    static QVariant convert( const PdmPointer<T>& value )
-    {
-        return caf::pdmToVariant( value );
-    }
+    static QVariant convert( const PdmPointer<T>& value ) { return caf::pdmToVariant( value ); }
 
     static void setFromVariant( const QVariant& variantValue, PdmPointer<T>& value )
     {
@@ -149,10 +146,7 @@ template <typename T>
 class PdmUiFieldSpecialization<caf::AppEnum<T>> : public PdmUiFieldSpecializationDefaults
 {
 public:
-    static QVariant convert( const caf::AppEnum<T>& value )
-    {
-        return caf::pdmToVariant( value );
-    }
+    static QVariant convert( const caf::AppEnum<T>& value ) { return caf::pdmToVariant( value ); }
 
     static void setFromVariant( const QVariant& variantValue, caf::AppEnum<T>& value )
     {
