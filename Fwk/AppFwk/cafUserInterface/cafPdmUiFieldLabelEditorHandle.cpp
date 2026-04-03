@@ -36,6 +36,7 @@
 
 #include "cafPdmUiFieldLabelEditorHandle.h"
 #include "cafPdmAbstractFieldScriptingCapability.h"
+#include "cafPdmFieldHandle.h"
 #include "cafPdmPythonGenerator.h"
 #include "cafPdmUiFieldHandle.h"
 #include "cafQShortenedLabel.h"

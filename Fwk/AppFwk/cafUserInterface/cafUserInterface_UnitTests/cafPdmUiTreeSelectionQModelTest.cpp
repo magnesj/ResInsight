@@ -1,6 +1,7 @@
 
 #include "gtest/gtest.h"
 
+#include "cafPdmOptionItemInfo.h"
 #include "cafPdmUiTreeSelectionQModel.h"
 
 QList<caf::PdmOptionItemInfo> createOptions()
