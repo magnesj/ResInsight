@@ -3,9 +3,9 @@
 
 #include "Parent.h"
 
+#include "cafFilePath.h"
 #include "cafPdmChildArrayField.h"
 #include "cafPdmChildField.h"
-#include "cafFilePath.h"
 #include "cafPdmDataValueField.h"
 #include "cafPdmObjectHandle.h"
 #include "cafPdmProxyValueField.h"
