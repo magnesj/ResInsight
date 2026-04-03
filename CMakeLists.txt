@@ -989,6 +989,9 @@ option(RESINSIGHT_INCLUDE_APPFWK_TESTS "Enable AppFwk Tests" OFF)
 mark_as_advanced(FORCE RESINSIGHT_INCLUDE_APPFWK_TESTS)
 
 if(RESINSIGHT_INCLUDE_APPFWK_TESTS)
+  # Compile-time benchmark
+  add_subdirectory(Fwk/AppFwk/cafProjectDataModel/cafPdm_CompileBench)
+
   # Unit Tests
   add_subdirectory(Fwk/AppFwk/cafProjectDataModel/cafProjectDataModel_UnitTests)
   add_subdirectory(
