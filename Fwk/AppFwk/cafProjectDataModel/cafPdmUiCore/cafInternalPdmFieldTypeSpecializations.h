@@ -2,7 +2,6 @@
 
 #include "cafAppEnum.h"
 #include "cafPdmFieldTraits.h"
-#include "cafPdmPointer.h"
 
 namespace caf
 {
@@ -124,7 +123,7 @@ public:
         caf::pdmFromVariant( variantValue, value );
     }
 
-    static QList<PdmOptionItemInfo> valueOptions( PdmFieldHandle* fieldHandle, const caf::AppEnum<T>& appEnum )
+    static QList<PdmOptionItemInfo> valueOptions( PdmFieldHandle* fieldHandle, const caf::AppEnum<T>& )
     {
         QList<PdmOptionItemInfo> optionList;
 
