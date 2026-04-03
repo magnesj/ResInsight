@@ -82,6 +82,7 @@ template <typename T>
 QVariant pdmToVariant( const std::vector<T>& value )
 {
     QList<QVariant> list;
+    list.reserve( static_cast<int>( value.size() ) );
     for ( const auto& element : value )
     {
         list.push_back( pdmToVariant( element ) );

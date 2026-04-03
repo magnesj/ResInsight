@@ -63,17 +63,17 @@ class PdmUiFieldSpecialization<PdmPointer<T>> : public PdmUiFieldSpecializationD
 public:
     static QVariant convert( const PdmPointer<T>& value )
     {
-        return QVariant::fromValue( PdmPointer<PdmObjectHandle>( value.rawPtr() ) );
+        return caf::pdmToVariant( value );
     }
 
     static void setFromVariant( const QVariant& variantValue, PdmPointer<T>& value )
     {
-        value.setRawPtr( variantValue.value<PdmPointer<PdmObjectHandle>>().rawPtr() );
+        caf::pdmFromVariant( variantValue, value );
     }
 
     static bool isDataElementEqual( const QVariant& variantValue, const QVariant& variantValue2 )
     {
-        return variantValue.value<PdmPointer<PdmObjectHandle>>() == variantValue2.value<PdmPointer<PdmObjectHandle>>();
+        return caf::pdmVariantEqual<PdmPointer<T>>( variantValue, variantValue2 );
     }
 };
 
@@ -151,15 +151,12 @@ class PdmUiFieldSpecialization<caf::AppEnum<T>> : public PdmUiFieldSpecializatio
 public:
     static QVariant convert( const caf::AppEnum<T>& value )
     {
-        T enumVal = value;
-
-        // Explicit cast to an int for storage in a QVariant. This allows the use of enum class instead of enum
-        return QVariant( static_cast<int>( enumVal ) );
+        return caf::pdmToVariant( value );
     }
 
     static void setFromVariant( const QVariant& variantValue, caf::AppEnum<T>& value )
     {
-        value = static_cast<T>( variantValue.toInt() );
+        caf::pdmFromVariant( variantValue, value );
     }
 
     static QList<PdmOptionItemInfo> valueOptions( PdmFieldHandle* fieldHandle, const caf::AppEnum<T>& appEnum )
