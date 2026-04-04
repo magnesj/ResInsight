@@ -109,9 +109,7 @@ QVariant pdmToVariant( const std::optional<T>& value )
 template <typename T>
 void pdmFromVariant( const QVariant& v, std::optional<T>& out )
 {
-    auto text = v.toString();
-    text.remove( '"' );
-    if ( text.isEmpty() )
+    if ( !v.isValid() )
     {
         out.reset();
         return;
