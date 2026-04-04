@@ -77,6 +77,7 @@ public:                                     \
                            QString,                                                                                            \
                            qStringTypeName( caf::PdmProxyValueField<TypeName> ) )
 
+class PdmFieldHandle;
 class PdmUiGroup;
 class PdmUiFieldHandle;
 

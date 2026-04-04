@@ -37,6 +37,7 @@
 #pragma once
 
 #include "cafIconProvider.h"
+#include "cafPdmOptionItemInfo.h"
 #include "cafPdmUiItemInfo.h"
 
 #include <list>
