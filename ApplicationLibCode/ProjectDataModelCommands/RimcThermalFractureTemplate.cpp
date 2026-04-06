@@ -47,7 +47,7 @@ std::expected<caf::PdmObjectHandle*, QString> RimcThermalFractureTemplate_export
 {
     RimThermalFractureTemplate* thermalFracture = self<RimThermalFractureTemplate>();
     if ( thermalFracture && thermalFracture->fractureDefinition() )
-        RifThermalFractureTemplateSurfaceExporter::writeToFile( thermalFracture, m_timeStep(), m_filePath() );
+        RifThermalFractureTemplateSurfaceExporter::writeToFile( *thermalFracture->fractureDefinition(), m_timeStep(), m_filePath() );
     return nullptr;
 }
 

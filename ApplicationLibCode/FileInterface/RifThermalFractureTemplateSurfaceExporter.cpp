@@ -19,7 +19,6 @@
 #include "RifThermalFractureTemplateSurfaceExporter.h"
 
 #include "RigThermalFractureDefinition.h"
-#include "RimThermalFractureTemplate.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -27,12 +26,11 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifThermalFractureTemplateSurfaceExporter::writeToFile( gsl::not_null<RimThermalFractureTemplate*> thermalFractureTemplate,
-                                                             int                                        timeStepIndex,
-                                                             const QString&                             filePath )
+bool RifThermalFractureTemplateSurfaceExporter::writeToFile( const RigThermalFractureDefinition& fractureDefinition,
+                                                             int                                 timeStepIndex,
+                                                             const QString&                      filePath )
 {
-    auto fractureData = thermalFractureTemplate->fractureDefinition();
-    CAF_ASSERT( fractureData );
+    const RigThermalFractureDefinition* fractureData = &fractureDefinition;
 
     auto numNodes     = fractureData->numNodes();
     auto numTimeSteps = fractureData->numTimeSteps();
