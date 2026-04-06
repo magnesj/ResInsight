@@ -138,8 +138,7 @@ void RimWellRftEnsembleCurveSet::clearEnsembleStatistics()
     {
         for ( auto summaryCase : m_ensemble()->allSummaryCases() )
         {
-            if ( auto reader = summaryCase->rftReader() )
-                rftReaders.push_back( reader );
+            if ( auto reader = summaryCase->rftReader() ) rftReaders.push_back( reader );
         }
     }
     m_statisticsEclipseRftReader = std::make_unique<RifReaderEnsembleStatisticsRft>( std::move( rftReaders ), m_eclipseCase() );

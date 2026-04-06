@@ -34,11 +34,11 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifStimPlanModelPerfsFrkExporter::writeToFile( bool              isTransverse,
-                                                    double            perforationLength,
-                                                    const cvf::Vec3d& anchorPosition,
+bool RifStimPlanModelPerfsFrkExporter::writeToFile( bool               isTransverse,
+                                                    double             perforationLength,
+                                                    const cvf::Vec3d&  anchorPosition,
                                                     const RigWellPath* wellPath,
-                                                    const QString&    filepath )
+                                                    const QString&     filepath )
 {
     if ( !wellPath )
     {
@@ -109,7 +109,6 @@ void RifStimPlanModelPerfsFrkExporter::appendFooterToStream( QTextStream& stream
 //--------------------------------------------------------------------------------------------------
 double RifStimPlanModelPerfsFrkExporter::computeMeasuredDepthForPosition( const RigWellPath* wellPath, const cvf::Vec3d& position )
 {
-
     const std::vector<double>& mdValuesOfWellPath  = wellPath->measuredDepths();
     const std::vector<double>& tvdValuesOfWellPath = wellPath->trueVerticalDepths();
     const double               targetTvd           = -position.z();
