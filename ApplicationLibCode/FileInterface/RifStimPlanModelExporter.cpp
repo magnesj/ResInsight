@@ -24,14 +24,30 @@
 #include "RifStimPlanModelPerfsFrkExporter.h"
 
 #include "RimStimPlanModel.h"
+#include "RimWellPath.h"
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 bool RifStimPlanModelExporter::writeToDirectory( RimStimPlanModel* stimPlanModel, bool useDetailedFluidLoss, const QString& directoryPath )
 {
+    RimWellPath* wellPath = stimPlanModel->wellPath();
+
+    bool isTransverse = ( stimPlanModel->fractureOrientation() == RimStimPlanModel::FractureOrientation::TRANSVERSE_WELL_PATH ||
+                          stimPlanModel->fractureOrientation() == RimStimPlanModel::FractureOrientation::AZIMUTH );
+
     return RifStimPlanModelGeologicalFrkExporter::writeToFile( stimPlanModel, useDetailedFluidLoss, directoryPath + "/Geological.frk" ) &&
-           RifStimPlanModelDeviationFrkExporter::writeToFile( stimPlanModel, directoryPath + "/Deviation.frk" ) &&
-           RifStimPlanModelPerfsFrkExporter::writeToFile( stimPlanModel, directoryPath + "/Perfs.frk" ) &&
-           RifStimPlanModelAsymmetricFrkExporter::writeToFile( stimPlanModel, directoryPath + "/Asymmetric.frk" );
+           RifStimPlanModelDeviationFrkExporter::writeToFile( wellPath ? wellPath->wellPathGeometry() : nullptr,
+                                                              directoryPath + "/Deviation.frk" ) &&
+           RifStimPlanModelPerfsFrkExporter::writeToFile( isTransverse,
+                                                          stimPlanModel->perforationLength(),
+                                                          stimPlanModel->anchorPosition(),
+                                                          wellPath ? wellPath->wellPathGeometry() : nullptr,
+                                                          directoryPath + "/Perfs.frk" ) &&
+           RifStimPlanModelAsymmetricFrkExporter::writeToFile( stimPlanModel->formationDip(),
+                                                               stimPlanModel->hasBarrier(),
+                                                               stimPlanModel->distanceToBarrier(),
+                                                               stimPlanModel->barrierDip(),
+                                                               stimPlanModel->wellPenetrationLayer(),
+                                                               directoryPath + "/Asymmetric.frk" );
 }

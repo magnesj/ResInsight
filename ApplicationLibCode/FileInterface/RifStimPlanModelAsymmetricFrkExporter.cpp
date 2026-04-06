@@ -20,15 +20,18 @@
 
 #include "RiaEclipseUnitTools.h"
 
-#include "RimStimPlanModel.h"
-
 #include <QFile>
 #include <QTextStream>
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifStimPlanModelAsymmetricFrkExporter::writeToFile( RimStimPlanModel* stimPlanModel, const QString& filepath )
+bool RifStimPlanModelAsymmetricFrkExporter::writeToFile( double         formationDip,
+                                                         bool           hasBarrier,
+                                                         double         distanceToBarrier,
+                                                         double         barrierDip,
+                                                         int            wellPenetrationLayer,
+                                                         const QString& filepath )
 {
     QFile data( filepath );
     if ( !data.open( QFile::WriteOnly | QFile::Truncate ) )
@@ -39,13 +42,7 @@ bool RifStimPlanModelAsymmetricFrkExporter::writeToFile( RimStimPlanModel* stimP
     QTextStream stream( &data );
     appendHeaderToStream( stream );
 
-    double bedDipDeg            = stimPlanModel->formationDip();
-    bool   hasBarrier           = stimPlanModel->hasBarrier();
-    double distanceToBarrier    = stimPlanModel->distanceToBarrier();
-    double barrierDip           = stimPlanModel->barrierDip();
-    int    wellPenetrationLayer = stimPlanModel->wellPenetrationLayer();
-
-    appendBarrierDataToStream( stream, bedDipDeg, hasBarrier, RiaEclipseUnitTools::meterToFeet( distanceToBarrier ), barrierDip, wellPenetrationLayer );
+    appendBarrierDataToStream( stream, formationDip, hasBarrier, RiaEclipseUnitTools::meterToFeet( distanceToBarrier ), barrierDip, wellPenetrationLayer );
 
     appendFooterToStream( stream );
 

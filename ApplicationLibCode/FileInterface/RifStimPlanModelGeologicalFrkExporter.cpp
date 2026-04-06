@@ -28,6 +28,7 @@
 
 #include "RimStimPlanModel.h"
 #include "RimStimPlanModelCalculator.h"
+#include "RimWellPath.h"
 
 #include "caf.h"
 
@@ -156,7 +157,9 @@ bool RifStimPlanModelGeologicalFrkExporter::writeToFile( RimStimPlanModel* stimP
     values["dpthend"]           = depthEnd;
 
     auto [perforationTop, perforationBottom] =
-        RifStimPlanModelPerfsFrkExporter::calculateTopAndBottomMeasuredDepth( stimPlanModel, stimPlanModel->wellPath() );
+        RifStimPlanModelPerfsFrkExporter::calculateTopAndBottomMeasuredDepth( stimPlanModel->wellPath()->wellPathGeometry(),
+                                                                              stimPlanModel->perforationLength(),
+                                                                              stimPlanModel->anchorPosition() );
 
     values["perfs"] = createPerforationValues( depthStart,
                                                depthEnd,

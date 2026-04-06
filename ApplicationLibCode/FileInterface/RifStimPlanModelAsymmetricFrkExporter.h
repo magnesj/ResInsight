@@ -18,8 +18,6 @@
 
 #pragma once
 
-class RimStimPlanModel;
-
 class QString;
 class QTextStream;
 
@@ -29,7 +27,12 @@ class QTextStream;
 class RifStimPlanModelAsymmetricFrkExporter
 {
 public:
-    static bool writeToFile( RimStimPlanModel* stimPlanModel, const QString& filepath );
+    static bool writeToFile( double         formationDip,
+                             bool           hasBarrier,
+                             double         distanceToBarrier,
+                             double         barrierDip,
+                             int            wellPenetrationLayer,
+                             const QString& filepath );
 
 private:
     static void appendHeaderToStream( QTextStream& stream );
