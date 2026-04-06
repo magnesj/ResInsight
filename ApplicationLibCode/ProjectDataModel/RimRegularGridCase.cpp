@@ -18,6 +18,8 @@
 
 #include "RimRegularGridCase.h"
 
+#include "RiaDefines.h"
+
 #include "RifReaderRegularGridModel.h"
 
 #include "RigCaseCellResultsData.h"
@@ -113,7 +115,7 @@ void RimRegularGridCase::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
 void RimRegularGridCase::setupBeforeSave()
 {
     auto fileName = cacheFileName();
-    RifReaderRegularGridModel::writeCache( fileName, this );
+    RifReaderRegularGridModel::writeCache( fileName, results( RiaDefines::PorosityModelType::MATRIX_MODEL ), eclipseCaseData() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -137,7 +139,7 @@ bool RimRegularGridCase::openEclipseGridFile()
     }
 
     auto fileName = cacheFileName();
-    RifReaderRegularGridModel::ensureDataIsReadFromCache( fileName, this );
+    RifReaderRegularGridModel::ensureDataIsReadFromCache( fileName, results( RiaDefines::PorosityModelType::MATRIX_MODEL ) );
 
     return true;
 }
