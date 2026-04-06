@@ -87,28 +87,42 @@ void RimReloadCaseTools::reloadEclipseData( RimEclipseCase* eclipseCase, bool re
     // Use a set of affected cases to propagate recalculation through dependent calculations.
     // Start with the reloaded case, and expand as calculations are recalculated, so that
     // calculations depending transitively on the reloaded case are also recalculated.
-    std::set<RimEclipseCase*> affectedCases;
-    affectedCases.insert( eclipseCase );
+    // Multiple passes are required to correctly handle chains of dependent calculations
+    // regardless of sort order, since the comparator used in sortedGridCalculations() only
+    // checks direct dependencies and does not guarantee a valid topological ordering for
+    // chains of three or more calculations.
+    std::set<RimEclipseCase*>     affectedCases = { eclipseCase };
+    std::set<RimGridCalculation*> recalculatedCalculations;
 
-    for ( auto gridCalculation : gridCalculations )
+    bool anyRecalculated = true;
+    while ( anyRecalculated )
     {
-        bool recalculate = false;
-        for ( auto inputCase : gridCalculation->inputCases() )
-        {
-            if ( affectedCases.count( inputCase ) )
-            {
-                recalculate = true;
-                break;
-            }
-        }
+        anyRecalculated = false;
 
-        if ( recalculate )
+        for ( auto gridCalculation : gridCalculations )
         {
-            if ( gridCalculation->calculate() )
+            if ( recalculatedCalculations.count( gridCalculation ) ) continue;
+
+            bool recalculate = false;
+            for ( auto inputCase : gridCalculation->inputCases() )
             {
-                for ( auto outputCase : gridCalculation->outputEclipseCases() )
+                if ( affectedCases.count( inputCase ) )
                 {
-                    affectedCases.insert( outputCase );
+                    recalculate = true;
+                    break;
+                }
+            }
+
+            if ( recalculate )
+            {
+                if ( gridCalculation->calculate() )
+                {
+                    for ( auto outputCase : gridCalculation->outputEclipseCases() )
+                    {
+                        affectedCases.insert( outputCase );
+                    }
+                    recalculatedCalculations.insert( gridCalculation );
+                    anyRecalculated = true;
                 }
             }
         }
