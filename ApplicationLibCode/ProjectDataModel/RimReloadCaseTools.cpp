@@ -50,6 +50,8 @@
 
 #include <QFileInfo>
 
+#include <set>
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -82,15 +84,32 @@ void RimReloadCaseTools::reloadEclipseData( RimEclipseCase* eclipseCase, bool re
 
     std::vector<RimGridCalculation*> gridCalculations = RimProject::current()->gridCalculationCollection()->sortedGridCalculations();
 
+    // Use a set of affected cases to propagate recalculation through dependent calculations.
+    // Start with the reloaded case, and expand as calculations are recalculated, so that
+    // calculations depending transitively on the reloaded case are also recalculated.
+    std::set<RimEclipseCase*> affectedCases;
+    affectedCases.insert( eclipseCase );
+
     for ( auto gridCalculation : gridCalculations )
     {
         bool recalculate = false;
         for ( auto inputCase : gridCalculation->inputCases() )
         {
-            if ( inputCase == eclipseCase ) recalculate = true;
+            if ( affectedCases.count( inputCase ) )
+            {
+                recalculate = true;
+                break;
+            }
         }
 
-        if ( recalculate ) gridCalculation->calculate();
+        if ( recalculate )
+        {
+            for ( auto outputCase : gridCalculation->outputEclipseCases() )
+            {
+                affectedCases.insert( outputCase );
+            }
+            gridCalculation->calculate();
+        }
     }
 
     updateAll3dViews( eclipseCase );
