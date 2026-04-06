@@ -52,6 +52,8 @@ public:
     virtual std::string                   unitName( const RifEclipseSummaryAddress& resultAddress ) const = 0;
     virtual RiaDefines::EclipseUnitSystem unitSystem() const                                              = 0;
 
+    virtual bool isCalculated() const { return false; }
+
     virtual void createAndSetAddresses();
     void         createAddressesIfRequired();
 
