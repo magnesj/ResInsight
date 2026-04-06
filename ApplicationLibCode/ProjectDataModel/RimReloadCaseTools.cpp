@@ -104,11 +104,13 @@ void RimReloadCaseTools::reloadEclipseData( RimEclipseCase* eclipseCase, bool re
 
         if ( recalculate )
         {
-            for ( auto outputCase : gridCalculation->outputEclipseCases() )
+            if ( gridCalculation->calculate() )
             {
-                affectedCases.insert( outputCase );
+                for ( auto outputCase : gridCalculation->outputEclipseCases() )
+                {
+                    affectedCases.insert( outputCase );
+                }
             }
-            gridCalculation->calculate();
         }
     }
 
