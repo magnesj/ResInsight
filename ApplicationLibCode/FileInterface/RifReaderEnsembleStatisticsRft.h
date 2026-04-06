@@ -23,14 +23,16 @@
 #include "RiaCurveMerger.h"
 #include "RiaWeightedMeanCalculator.h"
 
-class RimSummaryEnsemble;
+#include <vector>
+
+class RifReaderRftInterface;
 class RimEclipseCase;
 class RigWellPath;
 
 class RifReaderEnsembleStatisticsRft : public RifReaderRftInterface
 {
 public:
-    RifReaderEnsembleStatisticsRft( const RimSummaryEnsemble* summaryCaseCollection, RimEclipseCase* eclipseCase );
+    RifReaderEnsembleStatisticsRft( std::vector<RifReaderRftInterface*> rftReaders, RimEclipseCase* eclipseCase );
 
     std::set<RifEclipseRftAddress> eclipseRftAddresses() override;
     void                           values( const RifEclipseRftAddress& rftAddress, std::vector<double>* values ) override;
@@ -56,8 +58,8 @@ private:
     void clearCache( const QString& wellName, const QDateTime& timeStep );
 
 private:
-    const RimSummaryEnsemble* m_summaryCaseCollection;
-    RimEclipseCase*           m_eclipseCase;
+    std::vector<RifReaderRftInterface*> m_rftReaders;
+    RimEclipseCase*                     m_eclipseCase;
 
     std::map<RifEclipseRftAddress, std::vector<double>> m_cachedValues;
 };
