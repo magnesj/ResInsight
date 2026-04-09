@@ -171,6 +171,25 @@ RimParameterRftCrossPlot* RimRftCorrelationReportPlot::crossPlot() const
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Replace the owned RimWellRftPlot with a copy of source and initialize its data sources.
+/// This mirrors what RicCreateRftPlotsFeature does so the embedded plot shows data immediately.
+//--------------------------------------------------------------------------------------------------
+void RimRftCorrelationReportPlot::initializeFromSourcePlot( RimWellRftPlot* source )
+{
+    if ( !source ) return;
+
+    auto* copiedPlot = source->copyObject<RimWellRftPlot>();
+    if ( !copiedPlot ) return;
+
+    // Replace the blank child plot with the copy
+    delete m_wellRftPlot();
+    m_wellRftPlot = copiedPlot;
+
+    copiedPlot->resolveReferencesRecursively();
+    copiedPlot->initializeDataSources( source );
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 QString RimRftCorrelationReportPlot::createDescription() const

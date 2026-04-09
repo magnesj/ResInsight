@@ -188,6 +188,8 @@ RimRftCorrelationReportPlot* RimCorrelationPlotCollection::createRftCorrelationR
 
     if ( source )
     {
+        report->initializeFromSourcePlot( source );
+
         const auto ensembles = source->selectedEnsembles();
         if ( !ensembles.empty() )
         {
