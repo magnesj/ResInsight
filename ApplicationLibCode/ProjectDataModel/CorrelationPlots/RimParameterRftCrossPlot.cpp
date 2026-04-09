@@ -357,7 +357,7 @@ void RimParameterRftCrossPlot::doRenderWindowContent( QPaintDevice* paintDevice 
     if ( m_plotWidget ) m_plotWidget->render( paintDevice );
 }
 
-namespace internal
+namespace
 {
 class CurveTracker : public QwtPlotPicker
 {
@@ -464,7 +464,7 @@ private:
     QwtPlot*                                  m_plot      = nullptr;
     caf::PdmPointer<RimParameterRftCrossPlot> m_crossPlot = nullptr;
 };
-} // namespace internal
+} // anonymous namespace
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -480,8 +480,8 @@ RiuPlotWidget* RimParameterRftCrossPlot::doCreatePlotViewWidget( QWidget* parent
 
     if ( m_plotWidget )
     {
-        new internal::CurveTracker( m_plotWidget->qwtPlot() );
-        new internal::CurveSelectorFilter( m_plotWidget->qwtPlot(), this );
+        new CurveTracker( m_plotWidget->qwtPlot() );
+        new CurveSelectorFilter( m_plotWidget->qwtPlot(), this );
     }
 
     return m_plotWidget;
