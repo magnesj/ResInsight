@@ -351,7 +351,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif()
 
 target_link_libraries(
-  ApplicationLibCode PUBLIC ${LINK_LIBRARIES} ${EXTERNAL_LINK_LIBRARIES}
+  ApplicationLibCode PUBLIC ${LINK_LIBRARIES} ${EXTERNAL_LINK_LIBRARIES} Tools
 )
 target_link_libraries(ApplicationLibCode PRIVATE ResInsightCommonSettings)
 

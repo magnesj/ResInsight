@@ -1121,6 +1121,7 @@ endif()
 # ##############################################################################
 # Application
 # ##############################################################################
+add_subdirectory(ApplicationLibCode/Tools)
 add_subdirectory(ApplicationLibCode)
 add_subdirectory(ApplicationLibCode/Commands)
 add_subdirectory(ApplicationLibCode/ResultStatisticsCache)

@@ -4,8 +4,6 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaColorTables.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaColorTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaEclipseUnitTools.h
-    ${CMAKE_CURRENT_LIST_DIR}/RiaImageCompareReporter.h
-    ${CMAKE_CURRENT_LIST_DIR}/RiaImageFileCompare.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaImageTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaLogging.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaProjectModifier.h
@@ -17,7 +15,6 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaInterpolationTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaSimWellBranchTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaProjectFileTools.h
-    ${CMAKE_CURRENT_LIST_DIR}/RiaStringEncodingTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaTextStringTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaTextFileCompare.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaRegressionTestRunner.h
@@ -30,11 +27,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaWellLogCurveMerger.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaTimeHistoryCurveResampler.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaOffshoreSphericalCoords.h
-    ${CMAKE_CURRENT_LIST_DIR}/RiaWeightedMeanCalculator.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaMedianCalculator.h
-    ${CMAKE_CURRENT_LIST_DIR}/RiaWeightedMeanCalculator.inl
-    ${CMAKE_CURRENT_LIST_DIR}/RiaWeightedGeometricMeanCalculator.h
-    ${CMAKE_CURRENT_LIST_DIR}/RiaWeightedHarmonicMeanCalculator.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaOptionItemFactory.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaGitDiff.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaWslTools.h
@@ -43,19 +36,15 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaBoundingBoxTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaWellLogUnitTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaWellLogUnitTools.inl
-    ${CMAKE_CURRENT_LIST_DIR}/RiaTimeTTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaValidRegExpValidator.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaVec3Tools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaEnsembleNameTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaNetworkTools.h
-    ${CMAKE_CURRENT_LIST_DIR}/RiaOpenMPTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaNumericalTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaPhaseTools.h
-    ${CMAKE_CURRENT_LIST_DIR}/RiaRegressionTextTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaFileLogger.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaProjectBackupTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaQuantityInfoTools.h
-    ${CMAKE_CURRENT_LIST_DIR}/RiaHashTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaAngleUtils.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaAngleUtils.inl
     ${CMAKE_CURRENT_LIST_DIR}/RiaToCafLogging.h
@@ -67,8 +56,6 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaColorTables.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaColorTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaEclipseUnitTools.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RiaImageCompareReporter.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RiaImageFileCompare.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaImageTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaLogging.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaProjectModifier.cpp
@@ -80,7 +67,6 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaInterpolationTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaSimWellBranchTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaProjectFileTools.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RiaStringEncodingTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaTextStringTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaTextFileCompare.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaRegressionTestRunner.cpp
@@ -91,23 +77,18 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaCurveDataTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaWellLogCurveMerger.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaTimeHistoryCurveResampler.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RiaWeightedGeometricMeanCalculator.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RiaWeightedHarmonicMeanCalculator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaOptionItemFactory.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaGitDiff.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaWslTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaCellDividingTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaFieldHandleTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaBoundingBoxTools.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RiaTimeTTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaValidRegExpValidator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaEnsembleNameTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaVec3Tools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaNetworkTools.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RiaOpenMPTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaNumericalTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaPhaseTools.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RiaRegressionTextTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaFileLogger.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaProjectBackupTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaQuantityInfoTools.cpp
