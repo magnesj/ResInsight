@@ -101,6 +101,10 @@ public:
 
     void initializeDataSources( RimWellRftPlot* source );
 
+    // Called by owning composite plots before the underlying QwtPlot is destroyed
+    // so that legend curve raw pointers are cleaned up before QwtPlot auto-deletes them.
+    void cleanupLegendCurves();
+
     std::vector<RimSummaryEnsemble*> selectedEnsembles() const;
 
 private:
