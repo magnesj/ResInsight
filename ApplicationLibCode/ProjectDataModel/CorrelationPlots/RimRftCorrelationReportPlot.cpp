@@ -118,7 +118,9 @@ RimRftCorrelationReportPlot::RimRftCorrelationReportPlot()
     m_showWindow      = true;
     m_showPlotLegends = false;
 
-    m_wellRftPlot           = new RimWellRftPlot;
+    m_wellRftPlot = new RimWellRftPlot;
+    m_wellRftPlot->revokeMdiWindowStatus();
+
     m_parameterRftCrossPlot = new RimParameterRftCrossPlot;
 }
 
