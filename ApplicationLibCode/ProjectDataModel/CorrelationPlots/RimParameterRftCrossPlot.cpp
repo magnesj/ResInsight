@@ -39,18 +39,24 @@
 #include "RimWellPath.h"
 
 #include "RiuContextMenuLauncher.h"
+#include "RiuDockWidgetTools.h"
 #include "RiuPlotCurve.h"
 #include "RiuQwtPlotCurve.h"
 #include "RiuQwtPlotWidget.h"
 #include "RiuQwtSymbol.h"
 
+#include "cafPdmPointer.h"
 #include "cafPdmUiComboBoxEditor.h"
 
 #include "qwt_plot.h"
 #include "qwt_plot_curve.h"
 #include "qwt_plot_marker.h"
+#include "qwt_picker_machine.h"
+#include "qwt_plot_picker.h"
+#include "qwt_scale_map.h"
 #include "qwt_text.h"
 
+#include <QMouseEvent>
 #include <QPaintDevice>
 
 #include <limits>
@@ -351,6 +357,115 @@ void RimParameterRftCrossPlot::doRenderWindowContent( QPaintDevice* paintDevice 
     if ( m_plotWidget ) m_plotWidget->render( paintDevice );
 }
 
+namespace internal
+{
+class CurveTracker : public QwtPlotPicker
+{
+public:
+    CurveTracker( QwtPlot* plot )
+        : QwtPlotPicker( plot->canvas() )
+    {
+        setStateMachine( new QwtPickerTrackerMachine() );
+        setRubberBand( QwtPicker::NoRubberBand );
+        setTrackerMode( QwtPicker::AlwaysOn );
+    }
+
+protected:
+    QwtText trackerText( const QPoint& pos ) const override
+    {
+        double  minDistance = std::numeric_limits<double>::max();
+        QString closestCurveLabel;
+
+        for ( QwtPlotItem* item : plot()->itemList() )
+        {
+            if ( item->rtti() == QwtPlotItem::Rtti_PlotCurve )
+            {
+                auto   curve    = static_cast<QwtPlotCurve*>( item );
+                double distance = std::numeric_limits<double>::max();
+                curve->closestPoint( pos, &distance );
+
+                if ( distance < minDistance )
+                {
+                    minDistance       = distance;
+                    closestCurveLabel = curve->title().text();
+                }
+            }
+        }
+
+        if ( minDistance < 20.0 )
+        {
+            QwtText text( closestCurveLabel );
+            text.setBackgroundBrush( QBrush( Qt::white ) );
+            text.setColor( Qt::black );
+            return text;
+        }
+        return QwtText();
+    }
+};
+
+class CurveSelectorFilter : public QObject
+{
+public:
+    CurveSelectorFilter( QwtPlot* plot, RimParameterRftCrossPlot* crossPlot )
+        : QObject( plot->canvas() )
+        , m_plot( plot )
+        , m_crossPlot( crossPlot )
+    {
+        plot->canvas()->installEventFilter( this );
+    }
+
+protected:
+    bool eventFilter( QObject*, QEvent* event ) override
+    {
+        if ( !m_crossPlot ) return false;
+        if ( event->type() == QEvent::MouseButtonPress )
+        {
+            auto* mouseEvent = static_cast<QMouseEvent*>( event );
+            if ( mouseEvent->button() == Qt::LeftButton ) selectClosestCase( mouseEvent->pos() );
+        }
+        return false;
+    }
+
+private:
+    void selectClosestCase( const QPoint& pixelPos )
+    {
+        const auto xMap = m_plot->canvasMap( QwtAxis::XBottom );
+        const auto yMap = m_plot->canvasMap( QwtAxis::YLeft );
+
+        const double clickX = xMap.invTransform( pixelPos.x() );
+        const double clickY = yMap.invTransform( pixelPos.y() );
+
+        const double xRange = std::abs( xMap.s2() - xMap.s1() );
+        const double yRange = std::abs( yMap.s2() - yMap.s1() );
+        if ( xRange == 0.0 || yRange == 0.0 ) return;
+
+        double          minDist     = std::numeric_limits<double>::max();
+        RimSummaryCase* closestCase = nullptr;
+
+        for ( const auto& [paramValue, pressureValue, summaryCase] : m_crossPlot->createCaseData() )
+        {
+            const double dx   = ( paramValue - clickX ) / xRange;
+            const double dy   = ( pressureValue - clickY ) / yRange;
+            const double dist = dx * dx + dy * dy;
+            if ( dist < minDist )
+            {
+                minDist     = dist;
+                closestCase = summaryCase;
+            }
+        }
+
+        if ( closestCase && minDist < 0.03 * 0.03 )
+        {
+            RiuDockWidgetTools::selectItemInTreeView( RiuDockWidgetTools::plotMainWindowDataSourceTreeName(),
+                                                      { closestCase } );
+        }
+    }
+
+    QwtPlot*                                  m_plot      = nullptr;
+    caf::PdmPointer<RimParameterRftCrossPlot> m_crossPlot = nullptr;
+};
+} // namespace internal
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -362,6 +477,13 @@ RiuPlotWidget* RimParameterRftCrossPlot::doCreatePlotViewWidget( QWidget* parent
         updatePlotTitle();
         new RiuContextMenuLauncher( m_plotWidget, { "RicShowPlotDataFeature" } );
     }
+
+    if ( m_plotWidget )
+    {
+        new internal::CurveTracker( m_plotWidget->qwtPlot() );
+        new internal::CurveSelectorFilter( m_plotWidget->qwtPlot(), this );
+    }
+
     return m_plotWidget;
 }
 
@@ -491,6 +613,7 @@ QList<caf::PdmOptionItemInfo> RimParameterRftCrossPlot::calculateValueOptions( c
     }
     else if ( fieldNeedingOptions == &m_eclipseCase )
     {
+        options.push_back( caf::PdmOptionItemInfo( "None", static_cast<RimEclipseResultCase*>( nullptr ) ) );
         for ( RimEclipseCase* c : RimProject::current()->eclipseCases() )
         {
             if ( auto* rc = dynamic_cast<RimEclipseResultCase*>( c ) )
