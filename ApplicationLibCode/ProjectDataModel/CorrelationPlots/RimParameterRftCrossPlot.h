@@ -63,9 +63,9 @@ public:
     void setDepthRange( double minMd, double maxMd );
     void setEnsembleParameter( const QString& paramName );
 
-    QString   ensembleParameter() const;
-    QString   wellName() const;
-    QDateTime selectedTimeStep() const;
+    QString             ensembleParameter() const;
+    QString             wellName() const;
+    QDateTime           selectedTimeStep() const;
     RimSummaryEnsemble* ensemble() const;
 
     RiuQwtPlotWidget* viewer();
@@ -105,11 +105,11 @@ private:
 private:
     caf::PdmPtrField<RimSummaryEnsemble*>   m_ensemble;
     caf::PdmField<QString>                  m_wellName;
-    caf::PdmField<QDateTime>               m_selectedTimeStep;
+    caf::PdmField<QDateTime>                m_selectedTimeStep;
     caf::PdmPtrField<RimEclipseResultCase*> m_eclipseCase;
-    caf::PdmField<double>                 m_depthRangeMin;
-    caf::PdmField<double>                 m_depthRangeMax;
-    caf::PdmField<QString>                m_ensembleParameter;
+    caf::PdmField<double>                   m_depthRangeMin;
+    caf::PdmField<double>                   m_depthRangeMax;
+    caf::PdmField<QString>                  m_ensembleParameter;
 
     caf::PdmField<bool>    m_useAutoPlotTitle;
     caf::PdmField<QString> m_description;
@@ -119,8 +119,6 @@ private:
 
     QPointer<RiuQwtPlotWidget> m_plotWidget;
 
-    std::pair<double, double> m_xValueRange{ std::numeric_limits<double>::infinity(),
-                                             -std::numeric_limits<double>::infinity() };
-    std::pair<double, double> m_yValueRange{ std::numeric_limits<double>::infinity(),
-                                             -std::numeric_limits<double>::infinity() };
+    std::pair<double, double> m_xValueRange{ std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity() };
+    std::pair<double, double> m_yValueRange{ std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity() };
 };

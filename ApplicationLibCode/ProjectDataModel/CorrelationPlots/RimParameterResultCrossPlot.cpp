@@ -662,8 +662,8 @@ private:
         }
     }
 
-    QwtPlot*                                       m_plot      = nullptr;
-    caf::PdmPointer<RimParameterResultCrossPlot>   m_crossPlot = nullptr;
+    QwtPlot*                                     m_plot      = nullptr;
+    caf::PdmPointer<RimParameterResultCrossPlot> m_crossPlot = nullptr;
 };
 } // namespace internal
 

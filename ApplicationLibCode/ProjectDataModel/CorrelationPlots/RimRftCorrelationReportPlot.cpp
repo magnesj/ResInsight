@@ -241,7 +241,7 @@ void RimRftCorrelationReportPlot::recreatePlotWidgets()
         return dock;
     };
 
-    m_rftDockWidget      = makeDockWidget( "RFT Plot", m_wellRftPlot(), m_wellRftPlot->viewWidget() );
+    m_rftDockWidget       = makeDockWidget( "RFT Plot", m_wellRftPlot(), m_wellRftPlot->viewWidget() );
     m_crossPlotDockWidget = makeDockWidget( "Cross Plot", m_parameterRftCrossPlot(), m_parameterRftCrossPlot->viewer() );
 
     // Restore saved dock state or apply hard-coded default layout
@@ -328,9 +328,9 @@ void RimRftCorrelationReportPlot::doRenderWindowContent( QPaintDevice* paintDevi
 //--------------------------------------------------------------------------------------------------
 QWidget* RimRftCorrelationReportPlot::createViewWidget( QWidget* mainWindowParent )
 {
-    auto* wrapper  = new RiuRftCorrelationReportPlotWidget( this, mainWindowParent );
-    m_viewWidget   = wrapper;
-    m_dockManager  = new ads::CDockManager( wrapper );
+    auto* wrapper = new RiuRftCorrelationReportPlotWidget( this, mainWindowParent );
+    m_viewWidget  = wrapper;
+    m_dockManager = new ads::CDockManager( wrapper );
     m_dockManager->setStyleSheet( "ads--CDockSplitter::handle { width: 1px; height: 1px; }" );
     wrapper->layout()->addWidget( m_dockManager );
     recreatePlotWidgets();
@@ -389,9 +389,7 @@ void RimRftCorrelationReportPlot::defineUiTreeOrdering( caf::PdmUiTreeOrdering& 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimRftCorrelationReportPlot::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
-                                                     const QVariant&            oldValue,
-                                                     const QVariant&            newValue )
+void RimRftCorrelationReportPlot::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     if ( changedField == &m_showDockTitleBars )
     {
@@ -424,14 +422,12 @@ void RimRftCorrelationReportPlot::syncCrossPlotSelectionToRftPlot()
 {
     if ( !m_wellRftPlot() || !m_parameterRftCrossPlot() ) return;
 
-    const QString   wellName  = m_parameterRftCrossPlot->wellName();
-    const QDateTime timeStep  = m_parameterRftCrossPlot->selectedTimeStep();
+    const QString   wellName = m_parameterRftCrossPlot->wellName();
+    const QDateTime timeStep = m_parameterRftCrossPlot->selectedTimeStep();
 
-    if ( !wellName.isEmpty() )
-        m_wellRftPlot->setSimWellOrWellPathName( wellName );
+    if ( !wellName.isEmpty() ) m_wellRftPlot->setSimWellOrWellPathName( wellName );
 
-    if ( timeStep.isValid() )
-        m_wellRftPlot->setSelectedTimeSteps( { timeStep } );
+    if ( timeStep.isValid() ) m_wellRftPlot->setSelectedTimeSteps( { timeStep } );
 }
 
 //--------------------------------------------------------------------------------------------------
