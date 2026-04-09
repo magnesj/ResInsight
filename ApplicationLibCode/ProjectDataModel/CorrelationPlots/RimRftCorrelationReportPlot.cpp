@@ -120,6 +120,7 @@ RimRftCorrelationReportPlot::RimRftCorrelationReportPlot()
 
     m_wellRftPlot = new RimWellRftPlot;
     m_wellRftPlot->revokeMdiWindowStatus();
+    m_wellRftPlot->setShowWindow( true );
 
     m_parameterRftCrossPlot = new RimParameterRftCrossPlot;
 }
