@@ -196,6 +196,9 @@ RimRftCorrelationReportPlot* RimCorrelationPlotCollection::createRftCorrelationR
             report->crossPlot()->setEnsemble( ensembles.front() );
         }
         report->crossPlot()->setWellName( source->simWellOrWellPathName() );
+
+        const auto timeSteps = source->selectedTimeSteps();
+        if ( !timeSteps.empty() ) report->crossPlot()->setTimeStep( timeSteps.front() );
     }
 
     m_rftCorrelationReports.push_back( report );

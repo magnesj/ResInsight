@@ -76,6 +76,7 @@ private:
     void     doUpdateLayout() override {}
 
     void updateDockTitleBarsVisibility();
+    void syncCrossPlotSelectionToRftPlot();
 
 private:
     caf::PdmProxyValueField<QString> m_name;
