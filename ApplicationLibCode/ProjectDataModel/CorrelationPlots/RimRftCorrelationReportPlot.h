@@ -54,8 +54,10 @@ public:
 
     caf::PdmFieldHandle* userDescriptionField() override;
 
-    RimWellRftPlot*          wellRftPlot() const;
+    RimWellRftPlot*           wellRftPlot() const;
     RimParameterRftCrossPlot* crossPlot() const;
+
+    void initializeFromSourcePlot( RimWellRftPlot* source );
 
 private:
     QString createDescription() const;
