@@ -581,8 +581,8 @@ private:
         }
     }
 
-    QwtPlot*                          m_plot    = nullptr;
-    caf::PdmPointer<RimWellRftPlot>   m_rftPlot = nullptr;
+    QwtPlot*                        m_plot    = nullptr;
+    caf::PdmPointer<RimWellRftPlot> m_rftPlot = nullptr;
 };
 } // anonymous namespace
 
