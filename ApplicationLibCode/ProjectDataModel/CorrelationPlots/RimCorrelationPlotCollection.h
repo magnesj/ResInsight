@@ -96,7 +96,7 @@ private:
                                                 std::time_t                 timeStep );
 
 private:
-    caf::PdmChildArrayField<RimAbstractCorrelationPlot*> m_correlationPlots;
-    caf::PdmChildArrayField<RimCorrelationReportPlot*>   m_correlationReports;
+    caf::PdmChildArrayField<RimAbstractCorrelationPlot*>  m_correlationPlots;
+    caf::PdmChildArrayField<RimCorrelationReportPlot*>    m_correlationReports;
     caf::PdmChildArrayField<RimRftCorrelationReportPlot*> m_rftCorrelationReports;
 };

@@ -81,15 +81,15 @@ private:
 private:
     caf::PdmProxyValueField<QString> m_name;
 
-    caf::PdmChildField<RimWellRftPlot*>          m_wellRftPlot;
+    caf::PdmChildField<RimWellRftPlot*>           m_wellRftPlot;
     caf::PdmChildField<RimParameterRftCrossPlot*> m_parameterRftCrossPlot;
 
     caf::PdmField<bool>    m_showDockTitleBars;
     caf::PdmField<QString> m_dockState;
 
-    QWidget*           m_viewWidget        = nullptr;
-    QObject*           m_contextMenuFilter = nullptr;
-    ads::CDockManager* m_dockManager       = nullptr;
-    ads::CDockWidget*  m_rftDockWidget     = nullptr;
+    QWidget*           m_viewWidget          = nullptr;
+    QObject*           m_contextMenuFilter   = nullptr;
+    ads::CDockManager* m_dockManager         = nullptr;
+    ads::CDockWidget*  m_rftDockWidget       = nullptr;
     ads::CDockWidget*  m_crossPlotDockWidget = nullptr;
 };
