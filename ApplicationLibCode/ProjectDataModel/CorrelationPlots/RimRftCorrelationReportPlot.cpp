@@ -171,22 +171,16 @@ RimParameterRftCrossPlot* RimRftCorrelationReportPlot::crossPlot() const
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Replace the owned RimWellRftPlot with a copy of source and initialize its data sources.
-/// This mirrors what RicCreateRftPlotsFeature does so the embedded plot shows data immediately.
+/// Initialize the owned RimWellRftPlot from the source plot's selected data sources.
+/// We keep the fresh (curve-free) child plot and call initializeDataSources(source) so
+/// syncCurvesFromUiSelection builds curves from scratch without touching unresolved copies.
 //--------------------------------------------------------------------------------------------------
 void RimRftCorrelationReportPlot::initializeFromSourcePlot( RimWellRftPlot* source )
 {
     if ( !source ) return;
 
-    auto* copiedPlot = source->copyObject<RimWellRftPlot>();
-    if ( !copiedPlot ) return;
-
-    // Replace the blank child plot with the copy
-    delete m_wellRftPlot();
-    m_wellRftPlot = copiedPlot;
-
-    copiedPlot->resolveReferencesRecursively();
-    copiedPlot->initializeDataSources( source );
+    m_wellRftPlot->setSimWellOrWellPathName( source->simWellOrWellPathName() );
+    m_wellRftPlot->initializeDataSources( source );
 }
 
 //--------------------------------------------------------------------------------------------------
