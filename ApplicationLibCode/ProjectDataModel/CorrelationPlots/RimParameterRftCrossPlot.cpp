@@ -26,8 +26,17 @@
 
 #include "RigEnsembleParameter.h"
 
+#include "RiaExtractionTools.h"
+
+#include "Well/RigEclipseWellLogExtractor.h"
+
+#include "RimEclipseCase.h"
+#include "RimEclipseResultCase.h"
+#include "RimProject.h"
 #include "RimSummaryCase.h"
 #include "RimSummaryEnsemble.h"
+#include "RimSummaryEnsembleTools.h"
+#include "RimWellPath.h"
 
 #include "RiuContextMenuLauncher.h"
 #include "RiuPlotCurve.h"
@@ -58,7 +67,10 @@ RimParameterRftCrossPlot::RimParameterRftCrossPlot()
 
     CAF_PDM_InitFieldNoDefault( &m_ensemble, "Ensemble", "Ensemble" );
     CAF_PDM_InitField( &m_wellName, "WellName", QString(), "Well Name" );
+    m_wellName.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
     CAF_PDM_InitFieldNoDefault( &m_selectedTimeStep, "TimeStep", "Time Step" );
+    m_selectedTimeStep.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
+    CAF_PDM_InitFieldNoDefault( &m_eclipseCase, "EclipseCase", "Eclipse Case (MD fallback)" );
     CAF_PDM_InitField( &m_depthRangeMin, "DepthRangeMin", 0.0, "Min Depth (MD)" );
     CAF_PDM_InitField( &m_depthRangeMax, "DepthRangeMax", 5000.0, "Max Depth (MD)" );
     CAF_PDM_InitField( &m_ensembleParameter, "EnsembleParameter", QString(), "Ensemble Parameter" );
@@ -144,6 +156,22 @@ QString RimParameterRftCrossPlot::wellName() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+QDateTime RimParameterRftCrossPlot::selectedTimeStep() const
+{
+    return m_selectedTimeStep;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimSummaryEnsemble* RimParameterRftCrossPlot::ensemble() const
+{
+    return m_ensemble();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RiuQwtPlotWidget* RimParameterRftCrossPlot::viewer()
 {
     return m_plotWidget;
@@ -162,6 +190,15 @@ std::vector<RimParameterRftCrossPlot::CaseData> RimParameterRftCrossPlot::create
     RigEnsembleParameter parameter = m_ensemble->ensembleParameter( m_ensembleParameter );
     if ( !parameter.isNumeric() || !parameter.isValid() ) return {};
 
+    // Build an extractor once for MD fallback (requires an eclipse case with a 3D grid)
+    RigEclipseWellLogExtractor* extractor = nullptr;
+    if ( m_eclipseCase() )
+    {
+        RimWellPath* wellPath = RimProject::current()->wellPathFromSimWellName( m_wellName() );
+        extractor             = RiaExtractionTools::findOrCreateWellLogExtractor( wellPath, m_eclipseCase() );
+        if ( !extractor ) extractor = RiaExtractionTools::findOrCreateSimWellExtractor( m_eclipseCase(), m_wellName(), false, 0 );
+    }
+
     const auto& allCases = m_ensemble->allSummaryCases();
 
     std::vector<CaseData> result;
@@ -175,26 +212,36 @@ std::vector<RimParameterRftCrossPlot::CaseData> RimParameterRftCrossPlot::create
         RifReaderRftInterface* reader = summaryCase->rftReader();
         if ( !reader ) continue;
 
-        auto mdAddress =
-            RifEclipseRftAddress::createAddress( m_wellName(), m_selectedTimeStep(), RifEclipseRftAddress::RftWellLogChannelType::MD );
         auto pressureAddress =
             RifEclipseRftAddress::createAddress( m_wellName(), m_selectedTimeStep(), RifEclipseRftAddress::RftWellLogChannelType::PRESSURE );
 
-        std::vector<double> depths;
         std::vector<double> pressures;
-        reader->values( mdAddress, &depths );
         reader->values( pressureAddress, &pressures );
+        if ( pressures.empty() ) continue;
 
-        if ( depths.empty() || pressures.empty() || depths.size() != pressures.size() ) continue;
+        // 1. Try MD directly from the RFT reader
+        auto mdAddress =
+            RifEclipseRftAddress::createAddress( m_wellName(), m_selectedTimeStep(), RifEclipseRftAddress::RftWellLogChannelType::MD );
+        std::vector<double> depths;
+        reader->values( mdAddress, &depths );
 
-        // Collect pressure samples within [depthRangeMin, depthRangeMax]
+        // 2. Fallback: compute MD from 3D grid intersections via the well log extractor
+        if ( depths.empty() && extractor ) depths = reader->computeMeasuredDepth( m_wellName(), m_selectedTimeStep(), extractor );
+
+        // Collect pressure samples within the user-specified depth range.
+        // If no MD is available at all, include every pressure sample.
         std::vector<double> samplesInRange;
-        for ( size_t i = 0; i < depths.size(); ++i )
+        if ( depths.size() == pressures.size() )
         {
-            if ( depths[i] >= m_depthRangeMin() && depths[i] <= m_depthRangeMax() )
+            for ( size_t i = 0; i < depths.size(); ++i )
             {
-                samplesInRange.push_back( pressures[i] );
+                if ( depths[i] >= m_depthRangeMin() && depths[i] <= m_depthRangeMax() ) samplesInRange.push_back( pressures[i] );
             }
+        }
+        else
+        {
+            // No usable depth data — aggregate all pressure values
+            samplesInRange = pressures;
         }
 
         if ( samplesInRange.empty() ) continue;
@@ -203,9 +250,8 @@ std::vector<RimParameterRftCrossPlot::CaseData> RimParameterRftCrossPlot::create
 
         if ( caseIdx < static_cast<size_t>( parameter.values.size() ) )
         {
-            result.push_back( { .parameterValue = parameter.values[caseIdx].toDouble(),
-                                .pressureValue  = meanPressure,
-                                .summaryCase    = summaryCase } );
+            result.push_back(
+                { .parameterValue = parameter.values[caseIdx].toDouble(), .pressureValue = meanPressure, .summaryCase = summaryCase } );
         }
     }
 
@@ -341,10 +387,11 @@ void RimParameterRftCrossPlot::onLoadDataAndUpdate()
 //--------------------------------------------------------------------------------------------------
 void RimParameterRftCrossPlot::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
-    auto* dataGroup = uiOrdering.addNewGroup( "Data" );
+    auto* dataGroup = uiOrdering.addNewGroup( "Data Source" );
     dataGroup->add( &m_ensemble );
     dataGroup->add( &m_wellName );
     dataGroup->add( &m_selectedTimeStep );
+    dataGroup->add( &m_eclipseCase );
 
     auto* depthGroup = uiOrdering.addNewGroup( "Depth Range" );
     depthGroup->add( &m_depthRangeMin );
@@ -368,10 +415,27 @@ void RimParameterRftCrossPlot::defineUiOrdering( QString uiConfigName, caf::PdmU
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimParameterRftCrossPlot::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
-                                                  const QVariant&            oldValue,
-                                                  const QVariant&            newValue )
+void RimParameterRftCrossPlot::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
+    if ( changedField == &m_ensemble || changedField == &m_wellName )
+    {
+        // Reset time step to the first available one for the new ensemble/well combination
+        std::set<QDateTime> timeSteps;
+        if ( m_ensemble() && !m_wellName().isEmpty() )
+        {
+            for ( RimSummaryCase* summaryCase : m_ensemble->allSummaryCases() )
+            {
+                RifReaderRftInterface* reader = summaryCase->rftReader();
+                if ( reader )
+                {
+                    for ( const QDateTime& dt : reader->availableTimeSteps( m_wellName() ) )
+                        timeSteps.insert( dt );
+                }
+            }
+        }
+        m_selectedTimeStep = timeSteps.empty() ? QDateTime() : *timeSteps.begin();
+    }
+
     RimPlot::fieldChangedByUi( changedField, oldValue, newValue );
     loadDataAndUpdate();
 }
@@ -382,11 +446,62 @@ void RimParameterRftCrossPlot::fieldChangedByUi( const caf::PdmFieldHandle* chan
 QList<caf::PdmOptionItemInfo> RimParameterRftCrossPlot::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
 {
     QList<caf::PdmOptionItemInfo> options;
-    if ( fieldNeedingOptions == &m_ensembleParameter )
+    if ( fieldNeedingOptions == &m_ensemble )
+    {
+        for ( RimSummaryEnsemble* ensemble : RimProject::current()->summaryEnsembles() )
+        {
+            if ( ensemble->isEnsemble() ) options.push_back( caf::PdmOptionItemInfo( ensemble->name(), ensemble ) );
+        }
+    }
+    else if ( fieldNeedingOptions == &m_wellName )
+    {
+        std::set<QString> wellNames;
+        if ( m_ensemble() )
+        {
+            for ( RimSummaryCase* summaryCase : m_ensemble->allSummaryCases() )
+            {
+                RifReaderRftInterface* reader = summaryCase->rftReader();
+                if ( reader )
+                {
+                    for ( const QString& name : reader->wellNames() )
+                        wellNames.insert( name );
+                }
+            }
+        }
+        for ( const QString& name : wellNames )
+            options.push_back( caf::PdmOptionItemInfo( name, name ) );
+    }
+    else if ( fieldNeedingOptions == &m_selectedTimeStep )
+    {
+        std::set<QDateTime> timeSteps;
+        if ( m_ensemble() && !m_wellName().isEmpty() )
+        {
+            for ( RimSummaryCase* summaryCase : m_ensemble->allSummaryCases() )
+            {
+                RifReaderRftInterface* reader = summaryCase->rftReader();
+                if ( reader )
+                {
+                    for ( const QDateTime& dt : reader->availableTimeSteps( m_wellName() ) )
+                        timeSteps.insert( dt );
+                }
+            }
+        }
+        for ( const QDateTime& dt : timeSteps )
+            options.push_back( caf::PdmOptionItemInfo( dt.toString( "yyyy-MM-dd" ), dt ) );
+    }
+    else if ( fieldNeedingOptions == &m_eclipseCase )
+    {
+        for ( RimEclipseCase* c : RimProject::current()->eclipseCases() )
+        {
+            if ( auto* rc = dynamic_cast<RimEclipseResultCase*>( c ) )
+                options.push_back( caf::PdmOptionItemInfo( rc->caseUserDescription(), rc ) );
+        }
+    }
+    else if ( fieldNeedingOptions == &m_ensembleParameter )
     {
         if ( m_ensemble() )
         {
-            for ( const auto& param : m_ensemble->variationSortedEnsembleParameters() )
+            for ( const auto& param : RimSummaryEnsembleTools::alphabeticEnsembleParameters( m_ensemble->allSummaryCases() ) )
             {
                 if ( param.isNumeric() )
                 {

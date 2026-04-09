@@ -1752,6 +1752,22 @@ void RimWellRftPlot::rebuildCurves()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::vector<QDateTime> RimWellRftPlot::selectedTimeSteps() const
+{
+    return m_selectedTimeSteps();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimWellRftPlot::setSelectedTimeSteps( const std::vector<QDateTime>& timeSteps )
+{
+    m_selectedTimeSteps = timeSteps;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimWellRftPlot::initializeDataSources( RimWellRftPlot* source )
 {
     for ( auto curveSet : m_ensembleCurveSets )

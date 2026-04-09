@@ -409,9 +409,29 @@ void RimRftCorrelationReportPlot::childFieldChangedByUi( const caf::PdmFieldHand
     if ( m_rftDockWidget && changedChildField == &m_wellRftPlot )
         m_rftDockWidget->toggleView( m_wellRftPlot->showWindow() );
     else if ( m_crossPlotDockWidget && changedChildField == &m_parameterRftCrossPlot )
+    {
         m_crossPlotDockWidget->toggleView( m_parameterRftCrossPlot->showWindow() );
+        syncCrossPlotSelectionToRftPlot();
+    }
 
     loadDataAndUpdate();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimRftCorrelationReportPlot::syncCrossPlotSelectionToRftPlot()
+{
+    if ( !m_wellRftPlot() || !m_parameterRftCrossPlot() ) return;
+
+    const QString   wellName  = m_parameterRftCrossPlot->wellName();
+    const QDateTime timeStep  = m_parameterRftCrossPlot->selectedTimeStep();
+
+    if ( !wellName.isEmpty() )
+        m_wellRftPlot->setSimWellOrWellPathName( wellName );
+
+    if ( timeStep.isValid() )
+        m_wellRftPlot->setSelectedTimeSteps( { timeStep } );
 }
 
 //--------------------------------------------------------------------------------------------------
