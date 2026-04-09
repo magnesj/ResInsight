@@ -48,10 +48,10 @@
 #include "cafPdmPointer.h"
 #include "cafPdmUiComboBoxEditor.h"
 
+#include "qwt_picker_machine.h"
 #include "qwt_plot.h"
 #include "qwt_plot_curve.h"
 #include "qwt_plot_marker.h"
-#include "qwt_picker_machine.h"
 #include "qwt_plot_picker.h"
 #include "qwt_scale_map.h"
 #include "qwt_text.h"
@@ -456,8 +456,7 @@ private:
 
         if ( closestCase && minDist < 0.03 * 0.03 )
         {
-            RiuDockWidgetTools::selectItemInTreeView( RiuDockWidgetTools::plotMainWindowDataSourceTreeName(),
-                                                      { closestCase } );
+            RiuDockWidgetTools::selectItemsInTreeView( RiuDockWidgetTools::plotMainWindowDataSourceTreeName(), { closestCase } );
         }
     }
 
