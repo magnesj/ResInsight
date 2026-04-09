@@ -19,6 +19,7 @@
 #include "RimRftCorrelationReportPlot.h"
 
 #include "RimParameterRftCrossPlot.h"
+#include "RimWellLogTrack.h"
 #include "RimWellRftPlot.h"
 
 #include "RiuInterfaceToViewWindow.h"
@@ -180,6 +181,12 @@ void RimRftCorrelationReportPlot::initializeFromSourcePlot( RimWellRftPlot* sour
     if ( !source ) return;
 
     m_wellRftPlot->setSimWellOrWellPathName( source->simWellOrWellPathName() );
+
+    // A fresh RimWellRftPlot has no tracks; syncCurvesFromUiSelection exits early without one
+    auto* track = new RimWellLogTrack();
+    m_wellRftPlot->addPlot( track );
+    track->setDescription( QString( "Track %1" ).arg( m_wellRftPlot->plotCount() ) );
+
     m_wellRftPlot->initializeDataSources( source );
 }
 
