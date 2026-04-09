@@ -280,6 +280,10 @@ void RimRftCorrelationReportPlot::recreatePlotWidgets()
 //--------------------------------------------------------------------------------------------------
 void RimRftCorrelationReportPlot::cleanupBeforeClose()
 {
+    // Detach and delete legend curves before the QwtPlot inside the track widget is destroyed.
+    // QwtPlot has autoDelete=true, so any curves still attached when it is deleted are freed by QWT
+    // — leaving m_legendPlotCurves with dangling pointers on the next loadDataAndUpdate().
+    if ( m_wellRftPlot() ) m_wellRftPlot->cleanupLegendCurves();
     if ( m_parameterRftCrossPlot() ) m_parameterRftCrossPlot->detachAllCurves();
 
     m_rftDockWidget       = nullptr;
