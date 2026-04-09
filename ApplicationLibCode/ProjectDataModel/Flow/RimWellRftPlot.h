@@ -101,6 +101,8 @@ public:
 
     void initializeDataSources( RimWellRftPlot* source );
 
+    std::vector<RimSummaryEnsemble*> selectedEnsembles() const;
+
 private:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName ) override;
@@ -154,8 +156,7 @@ private:
     cvf::Color3f findCurveColor( RimWellLogCurve* curve );
     void         defineCurveColorsAndSymbols( const std::set<RiaRftPltCurveDefinition>& allCurveDefs );
 
-    std::vector<RimSummaryEnsemble*> selectedEnsembles() const;
-    void                             createEnsembleCurveSets();
+    void createEnsembleCurveSets();
 
     void detachAndDeleteLegendCurves();
 

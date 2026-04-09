@@ -188,10 +188,10 @@ RimRftCorrelationReportPlot* RimCorrelationPlotCollection::createRftCorrelationR
 
     if ( source )
     {
-        auto dataSource = source->dataSource();
-        if ( auto* ensemble = std::get_if<RimSummaryEnsemble*>( &dataSource ) )
+        const auto ensembles = source->selectedEnsembles();
+        if ( !ensembles.empty() )
         {
-            report->crossPlot()->setEnsemble( *ensemble );
+            report->crossPlot()->setEnsemble( ensembles.front() );
         }
         report->crossPlot()->setWellName( source->simWellOrWellPathName() );
     }
