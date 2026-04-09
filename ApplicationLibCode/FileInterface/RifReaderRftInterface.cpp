@@ -69,8 +69,7 @@ std::vector<double>
     auto cellIjk = cellIndices( wellName, timeStep );
     for ( const caf::VecIjk0& ijk : cellIjk )
     {
-        if ( ijk.i() >= mainGrid->cellCountI() || ijk.j() >= mainGrid->cellCountJ() || ijk.k() >= mainGrid->cellCountK() )
-            continue;
+        if ( ijk.i() >= mainGrid->cellCountI() || ijk.j() >= mainGrid->cellCountJ() || ijk.k() >= mainGrid->cellCountK() ) continue;
 
         auto globalCellIndex = mainGrid->cellIndexFromIJK( ijk.i(), ijk.j(), ijk.k() );
         if ( globalCellIndex >= mainGrid->cellCount() ) continue;
