@@ -38,6 +38,7 @@
 #include "RiuQwtPlotWidget.h"
 #include "RiuQwtSymbol.h"
 
+#include "cafPdmPointer.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiTextEditor.h"
 #include "cafPdmUiValueRangeEditor.h"
@@ -613,6 +614,7 @@ public:
 protected:
     bool eventFilter( QObject*, QEvent* event ) override
     {
+        if ( !m_crossPlot ) return false;
         if ( event->type() == QEvent::MouseButtonPress )
         {
             auto* mouseEvent = static_cast<QMouseEvent*>( event );
@@ -660,8 +662,8 @@ private:
         }
     }
 
-    QwtPlot*                     m_plot      = nullptr;
-    RimParameterResultCrossPlot* m_crossPlot = nullptr;
+    QwtPlot*                                       m_plot      = nullptr;
+    caf::PdmPointer<RimParameterResultCrossPlot>   m_crossPlot = nullptr;
 };
 } // namespace internal
 

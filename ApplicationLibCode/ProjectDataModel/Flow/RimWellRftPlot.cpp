@@ -836,6 +836,7 @@ void RimWellRftPlot::setSimWellOrWellPathName( const QString& currWellName )
     {
         m_wellPathNameOrSimWellName = "None";
     }
+    m_nameConfig->setCustomName( QString( plotNameFormatString() ).arg( m_wellPathNameOrSimWellName ) );
 }
 
 //--------------------------------------------------------------------------------------------------
