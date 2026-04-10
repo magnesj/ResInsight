@@ -39,8 +39,8 @@
 #include "RimWellPath.h"
 
 #include "RiuContextMenuLauncher.h"
-#include "RiuDockWidgetTools.h"
 #include "RiuPlotCurve.h"
+#include "RiuQwtCurveSelectorFilter.h"
 #include "RiuQwtPlotCurve.h"
 #include "RiuQwtPlotWidget.h"
 #include "RiuQwtSymbol.h"
@@ -403,66 +403,6 @@ protected:
     }
 };
 
-class CurveSelectorFilter : public QObject
-{
-public:
-    CurveSelectorFilter( QwtPlot* plot, RimParameterRftCrossPlot* crossPlot )
-        : QObject( plot->canvas() )
-        , m_plot( plot )
-        , m_crossPlot( crossPlot )
-    {
-        plot->canvas()->installEventFilter( this );
-    }
-
-protected:
-    bool eventFilter( QObject*, QEvent* event ) override
-    {
-        if ( !m_crossPlot ) return false;
-        if ( event->type() == QEvent::MouseButtonPress )
-        {
-            auto* mouseEvent = static_cast<QMouseEvent*>( event );
-            if ( mouseEvent->button() == Qt::LeftButton ) selectClosestCase( mouseEvent->pos() );
-        }
-        return false;
-    }
-
-private:
-    void selectClosestCase( const QPoint& pixelPos )
-    {
-        const auto xMap = m_plot->canvasMap( QwtAxis::XBottom );
-        const auto yMap = m_plot->canvasMap( QwtAxis::YLeft );
-
-        const double clickX = xMap.invTransform( pixelPos.x() );
-        const double clickY = yMap.invTransform( pixelPos.y() );
-
-        const double xRange = std::abs( xMap.s2() - xMap.s1() );
-        const double yRange = std::abs( yMap.s2() - yMap.s1() );
-        if ( xRange == 0.0 || yRange == 0.0 ) return;
-
-        double          minDist     = std::numeric_limits<double>::max();
-        RimSummaryCase* closestCase = nullptr;
-
-        for ( const auto& [paramValue, pressureValue, summaryCase] : m_crossPlot->createCaseData() )
-        {
-            const double dx   = ( paramValue - clickX ) / xRange;
-            const double dy   = ( pressureValue - clickY ) / yRange;
-            const double dist = dx * dx + dy * dy;
-            if ( dist < minDist )
-            {
-                minDist     = dist;
-                closestCase = summaryCase;
-            }
-        }
-
-        if ( closestCase && minDist < 0.03 * 0.03 )
-        {
-            RiuDockWidgetTools::selectItemsInTreeView( RiuDockWidgetTools::plotMainWindowDataSourceTreeName(), { closestCase } );
-        }
-    }
-
-    QwtPlot*                                  m_plot      = nullptr;
-    caf::PdmPointer<RimParameterRftCrossPlot> m_crossPlot = nullptr;
-};
 } // anonymous namespace
 
 //--------------------------------------------------------------------------------------------------
@@ -480,7 +420,11 @@ RiuPlotWidget* RimParameterRftCrossPlot::doCreatePlotViewWidget( QWidget* parent
     if ( m_plotWidget )
     {
         new CurveTracker( m_plotWidget->qwtPlot() );
-        new CurveSelectorFilter( m_plotWidget->qwtPlot(), this );
+
+        caf::PdmPointer<RimParameterRftCrossPlot> self( this );
+        new RiuQwtCurveSelectorFilter( m_plotWidget->qwtPlot(),
+                                       [self]( const QPoint& pos ) -> const caf::PdmUiItem*
+                                       { return self ? self->findClosestCase( pos ) : nullptr; } );
     }
 
     return m_plotWidget;
@@ -710,6 +654,22 @@ void RimParameterRftCrossPlot::updateValueRanges()
 
     m_xValueRange = { xMin - xRange * 0.1, xMax + xRange * 0.1 };
     m_yValueRange = { yMin - yRange * 0.1, yMax + yRange * 0.1 };
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimSummaryCase* RimParameterRftCrossPlot::findClosestCase( const QPoint& canvasPos )
+{
+    auto caseData = createCaseData();
+
+    std::vector<std::pair<double, double>> points;
+    points.reserve( caseData.size() );
+    for ( const auto& d : caseData )
+        points.push_back( { d.parameterValue, d.pressureValue } );
+
+    int idx = RiuQwtCurveSelectorFilter::closestPointIndex( m_plotWidget->qwtPlot(), canvasPos, points );
+    return idx >= 0 ? caseData[idx].summaryCase : nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------

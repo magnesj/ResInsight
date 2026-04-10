@@ -152,7 +152,8 @@ private:
     void                        onSelectionManagerSelectionChanged( const std::set<int>& changedSelectionLevels ) override;
     RimWellRftEnsembleCurveSet* selectedEnsembleCurveSet() const;
 
-    void onLegendItemClicked( std::shared_ptr<RiuPlotItem> plotItem, bool toggle, int sampleIndex );
+    void            onLegendItemClicked( std::shared_ptr<RiuPlotItem> plotItem, bool toggle, int sampleIndex );
+    RimSummaryCase* findClosestRealization( const QPoint& canvasPos );
 
     void    updateFormationsOnPlot() const;
     QString associatedSimWellName() const;

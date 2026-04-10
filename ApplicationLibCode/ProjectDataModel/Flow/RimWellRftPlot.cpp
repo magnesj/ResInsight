@@ -57,8 +57,9 @@
 #include "RimWellRftEnsembleCurveSet.h"
 
 #include "RiuAbstractLegendFrame.h"
-#include "RiuDockWidgetTools.h"
 #include "RiuDraggableOverlayFrame.h"
+#include "RiuQwtCurveSelectorFilter.h"
+
 #include "RiuPlotCurve.h"
 #include "RiuPlotItem.h"
 #include "RiuPlotMainWindowTools.h"
@@ -66,17 +67,12 @@
 #include "RiuQwtPlotCurveDefines.h"
 #include "RiuQwtPlotItem.h"
 #include "RiuQwtPlotWidget.h"
+#include "qwt_plot.h"
 
 #include "cafPdmPointer.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 #include "cafSelectionManager.h"
-
-#include "qwt_plot.h"
-#include "qwt_plot_curve.h"
-#include "qwt_scale_map.h"
-
-#include <QMouseEvent>
 
 #include <algorithm>
 #include <iterator>
@@ -522,70 +518,6 @@ std::set<RiaRftPltCurveDefinition> RimWellRftPlot::curveDefsFromCurves() const
     return curveDefs;
 }
 
-namespace
-{
-class EnsembleCurveSelectorFilter : public QObject
-{
-public:
-    EnsembleCurveSelectorFilter( QwtPlot* plot, RimWellRftPlot* rftPlot )
-        : QObject( plot->canvas() )
-        , m_plot( plot )
-        , m_rftPlot( rftPlot )
-    {
-        setObjectName( "EnsembleCurveSelectorFilter" );
-        plot->canvas()->installEventFilter( this );
-    }
-
-protected:
-    bool eventFilter( QObject*, QEvent* event ) override
-    {
-        if ( !m_rftPlot ) return false;
-        if ( event->type() == QEvent::MouseButtonPress )
-        {
-            auto* mouseEvent = static_cast<QMouseEvent*>( event );
-            if ( mouseEvent->button() == Qt::LeftButton ) selectClosestRealization( mouseEvent->pos() );
-        }
-        return false;
-    }
-
-private:
-    void selectClosestRealization( const QPoint& pixelPos )
-    {
-        RimWellLogTrack* track = dynamic_cast<RimWellLogTrack*>( m_rftPlot->plotByIndex( 0 ) );
-        if ( !track ) return;
-
-        double          minDist     = 15.0; // pixel threshold
-        RimSummaryCase* closestCase = nullptr;
-
-        for ( RimWellLogCurve* curve : track->curves() )
-        {
-            auto* rftCurve = dynamic_cast<RimWellLogRftCurve*>( curve );
-            if ( !rftCurve || !rftCurve->summaryCase() ) continue;
-
-            auto* qwtCurve = dynamic_cast<RiuQwtPlotCurve*>( rftCurve->plotCurve() );
-            if ( !qwtCurve ) continue;
-
-            double dist = std::numeric_limits<double>::max();
-            qwtCurve->closestPoint( pixelPos, &dist );
-
-            if ( dist < minDist )
-            {
-                minDist     = dist;
-                closestCase = rftCurve->summaryCase();
-            }
-        }
-
-        if ( closestCase )
-        {
-            RiuDockWidgetTools::selectItemsInTreeView( RiuDockWidgetTools::plotMainWindowDataSourceTreeName(), { closestCase } );
-        }
-    }
-
-    QwtPlot*                          m_plot    = nullptr;
-    caf::PdmPointer<RimWellRftPlot>   m_rftPlot = nullptr;
-};
-} // anonymous namespace
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -806,11 +738,16 @@ void RimWellRftPlot::updateCurvesInPlot( const std::set<RiaRftPltCurveDefinition
 
     if ( auto qwtWidget = dynamic_cast<RiuQwtPlotWidget*>( plotTrack->plotWidget() ) )
     {
-        // Install click-to-select filter once (identified by object name to avoid duplicates)
-        auto* canvas = qwtWidget->qwtPlot()->canvas();
-        if ( !canvas->findChild<QObject*>( "EnsembleCurveSelectorFilter" ) )
+        // Install click-to-select filter once (guard against repeated calls to updateCurvesInPlot)
+        auto*       canvas         = qwtWidget->qwtPlot()->canvas();
+        const char* filterPropName = "rftCurveSelectorInstalled";
+        if ( !canvas->property( filterPropName ).toBool() )
         {
-            new EnsembleCurveSelectorFilter( qwtWidget->qwtPlot(), this );
+            caf::PdmPointer<RimWellRftPlot> self( this );
+            new RiuQwtCurveSelectorFilter( qwtWidget->qwtPlot(),
+                                           [self]( const QPoint& pos ) -> const caf::PdmUiItem*
+                                           { return self ? self->findClosestRealization( pos ) : nullptr; } );
+            canvas->setProperty( filterPropName, true );
         }
 
         // Connect legend item clicks to select the corresponding ensemble curve set in the project tree.
@@ -1782,6 +1719,33 @@ void RimWellRftPlot::onSelectionManagerSelectionChanged( const std::set<int>& /*
         m_highlightedCurveSet = newSelection;
         loadDataAndUpdate();
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimSummaryCase* RimWellRftPlot::findClosestRealization( const QPoint& canvasPos )
+{
+    auto* track = dynamic_cast<RimWellLogTrack*>( plotByIndex( 0 ) );
+    if ( !track ) return nullptr;
+
+    double          minDist     = 15.0; // pixel threshold
+    RimSummaryCase* closestCase = nullptr;
+    for ( RimWellLogCurve* curve : track->curves() )
+    {
+        auto* rftCurve = dynamic_cast<RimWellLogRftCurve*>( curve );
+        if ( !rftCurve || !rftCurve->summaryCase() ) continue;
+        auto* qwtCurve = dynamic_cast<RiuQwtPlotCurve*>( rftCurve->plotCurve() );
+        if ( !qwtCurve ) continue;
+        double dist = std::numeric_limits<double>::max();
+        qwtCurve->closestPoint( canvasPos, &dist );
+        if ( dist < minDist )
+        {
+            minDist     = dist;
+            closestCase = rftCurve->summaryCase();
+        }
+    }
+    return closestCase;
 }
 
 //--------------------------------------------------------------------------------------------------

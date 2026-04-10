@@ -97,10 +97,11 @@ private:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
 
-    void createPoints();
-    void updatePlotTitle();
-    void updateValueRanges();
-    void cleanupBeforeClose();
+    void            createPoints();
+    void            updatePlotTitle();
+    void            updateValueRanges();
+    void            cleanupBeforeClose();
+    RimSummaryCase* findClosestCase( const QPoint& canvasPos );
 
 private:
     caf::PdmPtrField<RimSummaryEnsemble*>   m_ensemble;
