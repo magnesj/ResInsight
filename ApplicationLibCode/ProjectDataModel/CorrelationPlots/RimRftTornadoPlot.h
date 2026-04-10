@@ -119,8 +119,8 @@ private:
     RimFontSizeField m_axisTitleFontSize;
     RimFontSizeField m_axisValueFontSize;
 
-    QString                    m_selectedParameter;
-    mutable std::map<QString, double>  m_lastCorrelations; // param.name -> pearson value, filled during addDataToChartBuilder
+    QString                           m_selectedParameter;
+    mutable std::map<QString, double> m_lastCorrelations; // param.name -> pearson value, filled during addDataToChartBuilder
 
     QPointer<RiuQwtPlotWidget> m_plotWidget;
 };

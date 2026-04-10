@@ -249,9 +249,9 @@ void RimRftCorrelationReportPlot::recreatePlotWidgets()
         return dock;
     };
 
-    m_rftDockWidget          = makeDockWidget( "RFT Plot", m_wellRftPlot(), m_wellRftPlot->viewWidget() );
-    m_correlationDockWidget  = makeDockWidget( "Tornado Plot", m_correlationPlot(), m_correlationPlot->viewer() );
-    m_crossPlotDockWidget    = makeDockWidget( "Cross Plot", m_parameterRftCrossPlot(), m_parameterRftCrossPlot->viewer() );
+    m_rftDockWidget         = makeDockWidget( "RFT Plot", m_wellRftPlot(), m_wellRftPlot->viewWidget() );
+    m_correlationDockWidget = makeDockWidget( "Tornado Plot", m_correlationPlot(), m_correlationPlot->viewer() );
+    m_crossPlotDockWidget   = makeDockWidget( "Cross Plot", m_parameterRftCrossPlot(), m_parameterRftCrossPlot->viewer() );
 
     // Restore saved dock state or apply hard-coded default layout
     QByteArray stateToRestore;
@@ -496,4 +496,3 @@ void RimRftCorrelationReportPlot::updateDockTitleBarsVisibility()
     for ( auto* area : m_dockManager->openedDockAreas() )
         area->titleBar()->setVisible( m_showDockTitleBars() );
 }
-

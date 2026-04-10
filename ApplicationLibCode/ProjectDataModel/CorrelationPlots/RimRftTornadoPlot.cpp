@@ -308,7 +308,6 @@ void RimRftTornadoPlot::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
     settingsGroup->add( &m_showOnlyTopNCorrelations );
     if ( m_showOnlyTopNCorrelations() ) settingsGroup->add( &m_topNFilterCount );
 
-
     auto* colorGroup = uiOrdering.addNewGroup( "Colors" );
     colorGroup->setCollapsedByDefault();
     colorGroup->add( &m_barColor );
@@ -360,14 +359,13 @@ void RimRftTornadoPlot::addDataToChartBuilder( RiuGroupedBarChartBuilder& chartB
     const auto& allCases = m_ensemble->allSummaryCases();
 
     // Build pressure vector per case (indices match allCases order)
-    const std::vector<double> pressurePerCase =
-        RimParameterRftCrossPlot::computeMeanPressurePerCase( m_ensemble(),
-                                                              m_wellName(),
-                                                              m_selectedTimeStep(),
-                                                              m_eclipseCase(),
-                                                              m_useDepthRange(),
-                                                              m_depthRangeMin(),
-                                                              m_depthRangeMax() );
+    const std::vector<double> pressurePerCase = RimParameterRftCrossPlot::computeMeanPressurePerCase( m_ensemble(),
+                                                                                                      m_wellName(),
+                                                                                                      m_selectedTimeStep(),
+                                                                                                      m_eclipseCase(),
+                                                                                                      m_useDepthRange(),
+                                                                                                      m_depthRangeMin(),
+                                                                                                      m_depthRangeMax() );
 
     // For each numeric parameter, compute Pearson correlation against pressurePerCase
     for ( const auto& param : RimSummaryEnsembleTools::alphabeticEnsembleParameters( allCases ) )
@@ -394,11 +392,11 @@ void RimRftTornadoPlot::addDataToChartBuilder( RiuGroupedBarChartBuilder& chartB
 
         m_lastCorrelations[param.name] = pearson;
 
-        double  value      = m_showAbsoluteValues() ? std::abs( pearson ) : pearson;
-        double  sortValue  = m_sortByAbsoluteValues() ? std::abs( value ) : value;
+        double value     = m_showAbsoluteValues() ? std::abs( pearson ) : pearson;
+        double sortValue = m_sortByAbsoluteValues() ? std::abs( value ) : value;
         // legendText becomes barChart->title() and is used for click-to-select; must equal param.name.
         // barText is shown on the axis label and can include the correlation value.
-        QString axisLabel  = QString( "%1 (%2)" ).arg( param.name ).arg( pearson, 5, 'f', 2 );
+        QString axisLabel = QString( "%1 (%2)" ).arg( param.name ).arg( pearson, 5, 'f', 2 );
         chartBuilder.addBarEntry( "", "", "", sortValue, param.name, axisLabel, value );
     }
 }
@@ -429,9 +427,9 @@ void RimRftTornadoPlot::highlightSelectedParameterBar()
         }
         else
         {
-            auto it = m_lastCorrelations.find( paramName );
+            auto it         = m_lastCorrelations.find( paramName );
             bool isNegative = ( it != m_lastCorrelations.end() ) && ( it->second < 0.0 );
-            color = isNegative ? negativeColor : positiveColor;
+            color           = isNegative ? negativeColor : positiveColor;
         }
 
         QPalette palette = symbol->palette();
@@ -450,10 +448,9 @@ void RimRftTornadoPlot::updatePlotTitle()
 
     if ( m_useAutoPlotTitle() && m_ensemble() )
     {
-        const QString rangeStr = m_useDepthRange()
-                                     ? QString( " [MD %1 - %2 m]" ).arg( m_depthRangeMin() ).arg( m_depthRangeMax() )
-                                     : QString();
-        m_description           = QString( "Parameter Correlation vs RFT Pressure%1, %2" ).arg( rangeStr ).arg( m_ensemble->name() );
+        const QString rangeStr = m_useDepthRange() ? QString( " [MD %1 - %2 m]" ).arg( m_depthRangeMin() ).arg( m_depthRangeMax() )
+                                                   : QString();
+        m_description          = QString( "Parameter Correlation vs RFT Pressure%1, %2" ).arg( rangeStr ).arg( m_ensemble->name() );
     }
 
     m_plotWidget->setPlotTitle( m_description() );
