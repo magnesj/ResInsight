@@ -248,11 +248,11 @@ void RivFemPartGeometryGenerator::setElementVisibility( const cvf::UByteArray* c
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::ref<cvf::DrawableGeo> RivFemPartGeometryGenerator::createMeshDrawableFromSingleElement( const RigFemPart*              part,
-                                                                                             size_t                         elmIdx,
-                                                                                             const cvf::Vec3d&              displayModelOffset,
+cvf::ref<cvf::DrawableGeo> RivFemPartGeometryGenerator::createMeshDrawableFromSingleElement( const RigFemPart* part,
+                                                                                             size_t            elmIdx,
+                                                                                             const cvf::Vec3d& displayModelOffset,
                                                                                              const std::vector<cvf::Vec3f>& displacements,
-                                                                                             double                         displacementScaleFactor )
+                                                                                             double displacementScaleFactor )
 {
     cvf::ref<cvf::Vec3fArray> quadVertices;
 
