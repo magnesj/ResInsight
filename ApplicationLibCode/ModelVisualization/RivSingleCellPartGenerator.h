@@ -56,12 +56,12 @@ private:
     cvf::ref<cvf::DrawableGeo> createMeshDrawableFromLgrGridCells();
 
 private:
-    RigEclipseCaseData* m_rigCaseData;
-    RimGeoMechCase*     m_geoMechCase;
-    size_t              m_gridIndex;
-    size_t              m_cellIndex;
-    cvf::Vec3d          m_displayModelOffset;
-    bool                m_showLgrMeshLines{ false };
-    double              m_displacementScaleFactor{ 1.0 };
+    RigEclipseCaseData*     m_rigCaseData;
+    RimGeoMechCase*         m_geoMechCase;
+    size_t                  m_gridIndex;
+    size_t                  m_cellIndex;
+    cvf::Vec3d              m_displayModelOffset;
+    bool                    m_showLgrMeshLines{ false };
+    double                  m_displacementScaleFactor{ 1.0 };
     std::vector<cvf::Vec3f> m_displacements;
 };

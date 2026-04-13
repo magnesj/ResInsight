@@ -248,7 +248,11 @@ cvf::ref<cvf::DrawableGeo> RivSingleCellPartGenerator::createMeshDrawable()
         RigFemPart* femPart = m_geoMechCase->geoMechData()->femParts()->part( m_gridIndex );
         CVF_ASSERT( femPart );
 
-        return RivFemPartGeometryGenerator::createMeshDrawableFromSingleElement( femPart, m_cellIndex, m_displayModelOffset, m_displacements, m_displacementScaleFactor );
+        return RivFemPartGeometryGenerator::createMeshDrawableFromSingleElement( femPart,
+                                                                                 m_cellIndex,
+                                                                                 m_displayModelOffset,
+                                                                                 m_displacements,
+                                                                                 m_displacementScaleFactor );
     }
 
     return nullptr;
