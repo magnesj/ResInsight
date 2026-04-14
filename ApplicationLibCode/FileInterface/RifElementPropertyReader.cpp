@@ -120,9 +120,9 @@ std::map<std::string, std::vector<float>> RifElementPropertyReader::readAllEleme
                 const std::vector<float>& currentColumn = table.data[i];
                 std::vector<float>        tempResult( currentColumn.size(), 0 );
 
-                for ( float resultItem : currentColumn )
+                for ( size_t j = 0; j < currentColumn.size(); j++ )
                 {
-                    tempResult[i] = resultItem * 0.000000001;
+                    tempResult[j] = currentColumn[j] * 0.000000001;
                 }
 
                 fieldAndData[currentFieldFromFile].swap( tempResult );
