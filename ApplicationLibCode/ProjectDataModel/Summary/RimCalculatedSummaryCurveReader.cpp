@@ -29,7 +29,7 @@
 ///
 //--------------------------------------------------------------------------------------------------
 RifCalculatedSummaryCurveReader::RifCalculatedSummaryCurveReader( RimSummaryCase* summaryCase )
-    : m_calculationCollection( RimProject::current()->calculationCollection() )
+    : m_calculationCollection( RimProject::current() ? RimProject::current()->calculationCollection() : nullptr )
     , m_summaryCase( summaryCase )
 {
     CAF_ASSERT( summaryCase );
