@@ -19,8 +19,6 @@
 #include "RifElementPropertyReader.h"
 #include "RiaLogging.h"
 
-#include "cvfAssert.h"
-
 #include <cmath>
 
 #include <QString>
@@ -100,11 +98,19 @@ std::map<std::string, std::vector<float>> RifElementPropertyReader::readAllEleme
     RifElementPropertyTable table;
     RifElementPropertyTableReader::readData( &m_fieldsMetaData[fieldName], &table );
 
-    CVF_ASSERT( m_fieldsMetaData[fieldName].dataColumns.size() == table.data.size() );
+    if ( m_fieldsMetaData[fieldName].dataColumns.size() != table.data.size() )
+    {
+        RifElementPropertyReader::outputWarningAboutWrongFileData();
+        return fieldAndData;
+    }
 
     for ( size_t i = 0; i < table.data.size(); i++ )
     {
-        CVF_ASSERT( table.data[i].size() == table.elementIds.size() );
+        if ( table.data[i].size() != table.elementIds.size() )
+        {
+            RifElementPropertyReader::outputWarningAboutWrongFileData();
+            return fieldAndData;
+        }
     }
 
     const std::vector<int>& elementIdsFromFile = table.elementIds;
@@ -120,9 +126,9 @@ std::map<std::string, std::vector<float>> RifElementPropertyReader::readAllEleme
                 const std::vector<float>& currentColumn = table.data[i];
                 std::vector<float>        tempResult( currentColumn.size(), 0 );
 
-                for ( float resultItem : currentColumn )
+                for ( size_t j = 0; j < currentColumn.size(); j++ )
                 {
-                    tempResult[i] = resultItem * 0.000000001;
+                    tempResult[j] = currentColumn[j] * 0.000000001;
                 }
 
                 fieldAndData[currentFieldFromFile].swap( tempResult );
