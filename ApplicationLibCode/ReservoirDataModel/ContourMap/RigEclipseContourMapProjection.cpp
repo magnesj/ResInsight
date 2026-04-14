@@ -179,7 +179,10 @@ std::vector<double> RigEclipseContourMapProjection::calculateColumnResult( RigCa
     const std::vector<double>& dzResults =
         resultData.cellScalarResults( RigEclipseResultAddress( RiaDefines::ResultCatType::STATIC_NATIVE, "DZ" ), 0 );
 
-    CVF_ASSERT( poroResults.size() == ntgResults.size() && ntgResults.size() == dzResults.size() );
+    if ( poroResults.empty() || poroResults.size() != ntgResults.size() || poroResults.size() != dzResults.size() )
+    {
+        return {};
+    }
 
     const auto nSamples = poroResults.size();
 
@@ -206,6 +209,7 @@ std::vector<double> RigEclipseContourMapProjection::calculateColumnResult( RigCa
         const std::vector<double>& soilResults =
             resultData.cellScalarResults( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::soil() ),
                                           timeStep );
+        if ( soilResults.size() != nSamples || residualOil.size() != nSamples ) return {};
         for ( size_t n = 0; n < nSamples; n++ )
         {
             resultValues[n] = std::max( soilResults[n] - residualOil[n], 0.0 );
@@ -219,6 +223,7 @@ std::vector<double> RigEclipseContourMapProjection::calculateColumnResult( RigCa
         const std::vector<double>& sgasResults =
             resultData.cellScalarResults( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::sgas() ),
                                           timeStep );
+        if ( sgasResults.size() != nSamples || residualGas.size() != nSamples ) return {};
         for ( size_t n = 0; n < nSamples; n++ )
         {
             resultValues[n] += std::max( sgasResults[n] - residualGas[n], 0.0 );
