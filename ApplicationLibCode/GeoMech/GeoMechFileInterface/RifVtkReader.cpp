@@ -395,7 +395,23 @@ std::map<std::string, std::vector<std::string>> RifVtkReader::scalarElementField
 
     for ( auto& entry : m_propertyPartDataElements )
     {
-        retVal[entry.first] = {};
+        // Skip internal SA/EA component keys (stored as "SA__S11", "EA__S22", etc.)
+        const std::string& key = entry.first;
+        if ( key.size() > 4 && ( key.substr( 0, 4 ) == "SA__" || key.substr( 0, 4 ) == "EA__" ) ) continue;
+
+        retVal[key] = {};
+    }
+
+    // Add SA field with components if any SA component data was loaded
+    if ( m_propertyPartDataElements.count( "SA__S11" ) > 0 )
+    {
+        retVal["SA"] = { "S11", "S22", "S33", "S12", "S13", "S23" };
+    }
+
+    // Add EA field with components if any EA component data was loaded
+    if ( m_propertyPartDataElements.count( "EA__S11" ) > 0 )
+    {
+        retVal["EA"] = { "S11", "S22", "S33", "S12", "S13", "S23" };
     }
 
     return retVal;
@@ -507,6 +523,20 @@ void RifVtkReader::readElementField( const std::string&                fieldName
                                      int                               frameIndex,
                                      std::vector<std::vector<float>*>* resultValues )
 {
+    // SA and EA fields have 6 components (S11, S22, S33, S12, S13, S23) stored as individual
+    // internal keys with "__" separator (e.g. "SA__S11")
+    if ( fieldName == "SA" || fieldName == "EA" )
+    {
+        static const std::vector<std::string> components = { "S11", "S22", "S33", "S12", "S13", "S23" };
+        for ( int i = 0; i < static_cast<int>( components.size() ) && i < static_cast<int>( resultValues->size() ); i++ )
+        {
+            std::string                      internalKey = fieldName + "__" + components[i];
+            std::vector<std::vector<float>*> singleComp  = { ( *resultValues )[i] };
+            readField( RigFemResultPosEnum::RIG_ELEMENT, internalKey, partIndex, stepIndex, &singleComp );
+        }
+        return;
+    }
+
     readField( RigFemResultPosEnum::RIG_ELEMENT, fieldName, partIndex, stepIndex, resultValues );
 }
 
@@ -591,6 +621,57 @@ void RifVtkReader::readScalarData( RigFemPartCollection*                        
                             }
 
                             ( *map )[propertyName][stepId][partId] = valuesAsDouble;
+                        }
+                    }
+                    else if ( values.size() == 3 * numElements )
+                    {
+                        // Multi-component element results: stress[0/1] -> SA, strain[0/1] -> EA
+                        // Each VTK array contains 3 components per element.
+                        // Mapping:
+                        //   stress[0]: SA.S11 (index 0), SA.S22 (index 1), SA.S33 (index 2)
+                        //   stress[1]: SA.S12 (index 0), SA.S13 (index 1), SA.S23 (index 2)
+                        //   strain[0]: EA.S11 (index 0), EA.S22 (index 1), EA.S33 (index 2)
+                        //   strain[1]: EA.S12 (index 0), EA.S13 (index 1), EA.S23 (index 2)
+                        struct StressStrainMapping
+                        {
+                            std::string                 vtkName;
+                            std::string                 fieldName;
+                            std::array<std::string, 3>  componentNames;
+                        };
+
+                        static const std::vector<StressStrainMapping> mappings = {
+                            { "stress[0]", "SA", { "S11", "S22", "S33" } },
+                            { "stress[1]", "SA", { "S12", "S13", "S23" } },
+                            { "strain[0]", "EA", { "S11", "S22", "S33" } },
+                            { "strain[1]", "EA", { "S12", "S13", "S23" } },
+                        };
+
+                        for ( const auto& mapping : mappings )
+                        {
+                            if ( propertyName != mapping.vtkName ) continue;
+
+                            auto map = propertyDataMap( RigFemResultPosEnum::RIG_ELEMENT );
+                            if ( map == nullptr ) break;
+
+                            for ( int compIdx = 0; compIdx < 3; compIdx++ )
+                            {
+                                std::string internalKey = mapping.fieldName + "__" + mapping.componentNames[compIdx];
+
+                                if ( map->count( internalKey ) == 0 ) ( *map )[internalKey] = {};
+                                if ( ( *map )[internalKey].count( stepId ) == 0 ) ( *map )[internalKey][stepId] = {};
+
+                                for ( int pId = 0; pId < femParts->partCount(); pId++ )
+                                {
+                                    size_t              dataSize = femParts->part( pId )->elementCount();
+                                    std::vector<double> compValues( dataSize, 0.0 );
+                                    for ( size_t i = 0; i < dataSize; i++ )
+                                    {
+                                        compValues[i] = values[i * 3 + compIdx];
+                                    }
+                                    ( *map )[internalKey][stepId][pId] = compValues;
+                                }
+                            }
+                            break;
                         }
                     }
                 }
