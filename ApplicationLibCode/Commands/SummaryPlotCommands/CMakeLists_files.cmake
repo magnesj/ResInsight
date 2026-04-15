@@ -50,6 +50,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RicCreateCrossPlotFeature.h
     ${CMAKE_CURRENT_LIST_DIR}/RicReplaceSummaryEnsembleFeature.h
     ${CMAKE_CURRENT_LIST_DIR}/RicReplaceSummaryCaseFeature.h
+    ${CMAKE_CURRENT_LIST_DIR}/RicCreateEnsembleParameterCsvReportFeature.h
 )
 
 set(SOURCE_GROUP_SOURCE_FILES
@@ -104,6 +105,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RicCreateCrossPlotFeature.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicReplaceSummaryEnsembleFeature.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicReplaceSummaryCaseFeature.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RicCreateEnsembleParameterCsvReportFeature.cpp
 )
 
 list(APPEND COMMAND_CODE_HEADER_FILES ${SOURCE_GROUP_HEADER_FILES})
