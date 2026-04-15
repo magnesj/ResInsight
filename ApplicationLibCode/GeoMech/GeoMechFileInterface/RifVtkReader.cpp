@@ -397,7 +397,7 @@ std::map<std::string, std::vector<std::string>> RifVtkReader::scalarElementField
     {
         // Skip internal SA/EA component keys (stored as "SA__S11", "EA__S22", etc.)
         const std::string& key = entry.first;
-        if ( key.size() > 4 && ( key.substr( 0, 4 ) == "SA__" || key.substr( 0, 4 ) == "EA__" ) ) continue;
+        if ( key.starts_with( "SA__" ) || key.starts_with( "EA__" ) ) continue;
 
         retVal[key] = {};
     }
@@ -528,7 +528,8 @@ void RifVtkReader::readElementField( const std::string&                fieldName
     if ( fieldName == "SA" || fieldName == "EA" )
     {
         static const std::vector<std::string> components = { "S11", "S22", "S33", "S12", "S13", "S23" };
-        for ( int i = 0; i < static_cast<int>( components.size() ) && i < static_cast<int>( resultValues->size() ); i++ )
+        size_t                                count       = std::min( components.size(), resultValues->size() );
+        for ( size_t i = 0; i < count; i++ )
         {
             std::string                      internalKey = fieldName + "__" + components[i];
             std::vector<std::vector<float>*> singleComp  = { ( *resultValues )[i] };
@@ -660,15 +661,15 @@ void RifVtkReader::readScalarData( RigFemPartCollection*                        
                                 if ( map->count( internalKey ) == 0 ) ( *map )[internalKey] = {};
                                 if ( ( *map )[internalKey].count( stepId ) == 0 ) ( *map )[internalKey][stepId] = {};
 
-                                for ( int pId = 0; pId < femParts->partCount(); pId++ )
+                                for ( int partIdx = 0; partIdx < femParts->partCount(); partIdx++ )
                                 {
-                                    size_t              dataSize = femParts->part( pId )->elementCount();
+                                    size_t              dataSize = femParts->part( partIdx )->elementCount();
                                     std::vector<double> compValues( dataSize, 0.0 );
                                     for ( size_t i = 0; i < dataSize; i++ )
                                     {
                                         compValues[i] = values[i * 3 + compIdx];
                                     }
-                                    ( *map )[internalKey][stepId][pId] = compValues;
+                                    ( *map )[internalKey][stepId][partIdx] = compValues;
                                 }
                             }
                             break;
