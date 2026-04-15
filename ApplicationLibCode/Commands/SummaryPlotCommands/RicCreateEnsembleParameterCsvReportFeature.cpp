@@ -30,6 +30,8 @@
 
 #include <QAction>
 
+#include <set>
+
 CAF_CMD_SOURCE_INIT( RicCreateEnsembleParameterCsvReportFeature, "RicCreateEnsembleParameterCsvReportFeature" );
 
 //--------------------------------------------------------------------------------------------------
@@ -82,8 +84,8 @@ QString RicCreateEnsembleParameterCsvReportFeature::createCsvText( RimSummaryEns
 
     std::vector<RimSummaryCase*> cases = ensemble->allSummaryCases();
 
-    // Collect sorted parameter names from first case that has parameters
-    std::vector<QString> paramNames;
+    // Collect all unique parameter names from all cases
+    std::set<QString> paramNameSet;
     for ( auto summaryCase : cases )
     {
         auto crlParams = summaryCase->caseRealizationParameters();
@@ -91,10 +93,11 @@ QString RicCreateEnsembleParameterCsvReportFeature::createCsvText( RimSummaryEns
 
         for ( const auto& paramPair : crlParams->parameters() )
         {
-            paramNames.push_back( paramPair.first );
+            paramNameSet.insert( paramPair.first );
         }
-        break;
     }
+
+    std::vector<QString> paramNames( paramNameSet.begin(), paramNameSet.end() );
 
     if ( paramNames.empty() ) return {};
 
