@@ -32,9 +32,9 @@
 #include "RigEclipseCaseData.h"
 #include "RigEclipseResultInfo.h"
 #include "RigFlowDiagResultAddress.h"
-#include "RigFlowDiagResults.h"
 #include "RigFormationNames.h"
 #include "RigMainGrid.h"
+#include "RimFlowDiagResults.h"
 
 #include "ContourMap/RimContourMapProjection.h"
 #include "ContourMap/RimEclipseContourMapProjection.h"

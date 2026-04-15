@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "RimFaultReactivationEnums.h"
+#include "RigFaultReactivationEnums.h"
 
 #include "cvfMatrix4.h"
 #include "cvfObject.h"
@@ -40,8 +40,8 @@ class RigActiveCellInfo;
 //==================================================================================================
 class RigGriddedPart3d : public cvf::Object
 {
-    using ElementSets = RimFaultReactivation::ElementSets;
-    using Boundary    = RimFaultReactivation::Boundary;
+    using ElementSets = RigFaultReactivation::ElementSets;
+    using Boundary    = RigFaultReactivation::Boundary;
 
 public:
     RigGriddedPart3d();
@@ -76,7 +76,7 @@ public:
     const std::vector<cvf::Vec3d>& dataNodes() const;
 
     const std::vector<std::vector<unsigned int>>&                                   elementIndices() const;
-    const std::map<RimFaultReactivation::BorderSurface, std::vector<unsigned int>>& borderSurfaceElements() const;
+    const std::map<RigFaultReactivation::BorderSurface, std::vector<unsigned int>>& borderSurfaceElements() const;
 
     const std::vector<std::vector<cvf::Vec3d>>&             meshLines() const;
     const std::map<Boundary, std::vector<unsigned int>>&    boundaryElements() const;
@@ -129,7 +129,7 @@ private:
     std::vector<cvf::Vec3d>                                                  m_dataNodes;
     std::vector<cvf::Vec3d>                                                  m_localNodes;
     std::vector<std::vector<unsigned int>>                                   m_elementIndices;
-    std::map<RimFaultReactivation::BorderSurface, std::vector<unsigned int>> m_borderSurfaceElements;
+    std::map<RigFaultReactivation::BorderSurface, std::vector<unsigned int>> m_borderSurfaceElements;
     std::vector<std::vector<cvf::Vec3d>>                                     m_meshLines;
     std::map<Boundary, std::vector<unsigned int>>                            m_boundaryElements;
     std::map<Boundary, std::vector<unsigned int>>                            m_boundaryNodes;

@@ -37,6 +37,7 @@
 #include "RigGeoMechCaseData.h"
 #include "RigResultAccessorFactory.h"
 #include "RigStatisticsCalculator.h"
+#include "RimEclipseResultDefinitionTools.h"
 #include "Well/RigEclipseWellLogExtractor.h"
 #include "Well/RigGeoMechWellLogExtractor.h"
 #include "Well/RigSimWellData.h"
@@ -2778,7 +2779,7 @@ void RimWellLogTrack::updateResultPropertyNamesOnPlot()
 
     size_t                      m_timeStep = 0;
     cvf::ref<RigResultAccessor> resultAccessor =
-        RigResultAccessorFactory::createFromResultDefinition( eclipseCase->eclipseCaseData(), 0, m_timeStep, m_resultDefinition );
+        RimEclipseResultDefinitionTools::createResultAccessor( eclipseCase->eclipseCaseData(), 0, m_timeStep, m_resultDefinition );
     if ( !resultAccessor.notNull() )
     {
         QString resultTypeStr = caf::AppEnum<RiaDefines::ResultCatType>( m_resultDefinition->resultType() ).uiText();

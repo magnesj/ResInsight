@@ -25,6 +25,7 @@
 #include "RigGridBase.h"
 #include "RigResultAccessor.h"
 #include "RigResultAccessorFactory.h"
+#include "RimEclipseResultDefinitionTools.h"
 
 #include "RimCellEdgeColors.h"
 #include "RimEclipseCase.h"
@@ -344,7 +345,7 @@ cvf::ref<RigResultAccessor> RivCellEdgeGeometryUtils::createCellCenterResultAcce
     if ( cellResultColors->hasResult() )
     {
         resultAccessor =
-            RigResultAccessorFactory::createFromResultDefinition( eclipseCase, grid->gridIndex(), timeStepIndex, cellResultColors );
+            RimEclipseResultDefinitionTools::createResultAccessor( eclipseCase, grid->gridIndex(), timeStepIndex, cellResultColors );
     }
 
     if ( resultAccessor.isNull() )

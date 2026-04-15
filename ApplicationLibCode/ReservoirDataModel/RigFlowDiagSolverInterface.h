@@ -20,15 +20,12 @@
 #include "RigFlowDiagDefines.h"
 #include "RigFlowDiagTimeStepResult.h"
 
-#include "cafPdmPointer.h"
+#include <QString>
 
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
-
-class RimEclipseResultCase;
-class RimFlowDiagSolution;
 
 class RigEclipseCaseData;
 class RigOpmFlowDiagStaticData;
@@ -36,7 +33,7 @@ class RigOpmFlowDiagStaticData;
 class RigFlowDiagSolverInterface
 {
 public:
-    explicit RigFlowDiagSolverInterface( RimEclipseResultCase* eclipseCase );
+    explicit RigFlowDiagSolverInterface( RigEclipseCaseData* eclipseCaseData, const QString& gridFileName );
     virtual ~RigFlowDiagSolverInterface();
 
     RigFlowDiagTimeStepResult calculate( size_t                                   timeStepIdx,
@@ -62,7 +59,8 @@ private:
     void         reportRelPermCurveError( const QString& message );
     void         reportPvtCurveError( const QString& message );
 
-    RimEclipseResultCase*                     m_eclipseCase;
+    RigEclipseCaseData*                       m_eclipseCaseData;
+    QString                                   m_gridFileName;
     std::unique_ptr<RigOpmFlowDiagStaticData> m_opmFlowDiagStaticData;
 
     int m_pvtCurveErrorCount;

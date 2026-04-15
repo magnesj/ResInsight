@@ -18,39 +18,15 @@
 
 #pragma once
 
+#include "RigFaultReactivationEnums.h"
+
 namespace RimFaultReactivation
 {
 
-enum class GridPart
-{
-    FW, // footwall
-    HW // hanging wall
-};
-
-enum class BorderSurface
-{
-    UpperSurface,
-    FaultSurface,
-    LowerSurface,
-    Seabed
-};
-
-enum class Boundary
-{
-    FarSide,
-    Bottom,
-    Fault,
-    Reservoir
-};
-
-enum class ElementSets
-{
-    OverBurden,
-    UnderBurden,
-    Reservoir,
-    IntraReservoir,
-    FaultZone
-};
+using GridPart      = RigFaultReactivation::GridPart;
+using BorderSurface = RigFaultReactivation::BorderSurface;
+using Boundary      = RigFaultReactivation::Boundary;
+using ElementSets   = RigFaultReactivation::ElementSets;
 
 enum class StressSource
 {

@@ -26,10 +26,10 @@
 #include "RifOpmDeckTools.h"
 
 #include "CompletionsMsw/RigMswTableData.h"
-#include "RigEclipseResultTools.h"
 #include "RigFault.h"
 #include "RigMainGrid.h"
-#include "RigSimulationInputTool.h"
+#include "RimEclipseResultTools.h"
+#include "RimSimulationInputTool.h"
 
 #include "RimEclipseCase.h"
 #include "RimWellPath.h"
@@ -561,7 +561,7 @@ Opm::DeckKeyword faultsKeyword( const RigMainGrid* mainGrid, const cvf::Vec3st& 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-Opm::DeckKeyword bcconKeyword( const std::vector<RigEclipseResultTools::BorderCellFace>& borderCellFaces )
+Opm::DeckKeyword bcconKeyword( const std::vector<RimEclipseResultTools::BorderCellFace>& borderCellFaces )
 {
     if ( borderCellFaces.empty() )
     {
@@ -626,7 +626,7 @@ Opm::DeckKeyword bcconKeyword( const std::vector<RigEclipseResultTools::BorderCe
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-Opm::DeckKeyword bcpropKeyword( const std::vector<RigEclipseResultTools::BorderCellFace>& boundaryConditions,
+Opm::DeckKeyword bcpropKeyword( const std::vector<RimEclipseResultTools::BorderCellFace>& boundaryConditions,
                                 const std::vector<Opm::DeckRecord>&                       boundaryConditionProperties )
 {
     if ( boundaryConditions.empty() )
@@ -705,7 +705,7 @@ Opm::DeckKeyword operaterKeyword( std::string          targetProperty,
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-Opm::DeckKeyword editnncKeyword( const std::vector<RigSimulationInputTool::TransformedNNCConnection>& connections )
+Opm::DeckKeyword editnncKeyword( const std::vector<RimSimulationInputTool::TransformedNNCConnection>& connections )
 {
     using E = Opm::ParserKeywords::EDITNNC;
 

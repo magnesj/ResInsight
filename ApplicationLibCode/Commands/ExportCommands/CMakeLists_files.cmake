@@ -4,6 +4,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RicExportCarfinUi.h
     ${CMAKE_CURRENT_LIST_DIR}/RicExportFaultsFeature.h
     ${CMAKE_CURRENT_LIST_DIR}/RicAdvancedSnapshotExportFeature.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimLasFileExporter.h
     ${CMAKE_CURRENT_LIST_DIR}/RicExportToLasFileFeature.h
     ${CMAKE_CURRENT_LIST_DIR}/RicExportToLasFileResampleUi.h
     ${CMAKE_CURRENT_LIST_DIR}/RicSaveEclipseInputPropertyFeature.h
@@ -41,6 +42,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RicExportCarfinUi.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicExportFaultsFeature.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicAdvancedSnapshotExportFeature.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimLasFileExporter.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicExportToLasFileFeature.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicExportToLasFileResampleUi.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicSaveEclipseInputPropertyFeature.cpp

@@ -26,7 +26,7 @@
 #include "RifTextDataTableFormatter.h"
 
 #include "Well/RigWellPath.h"
-#include "Well/RigWellPathGeometryExporter.h"
+#include "WellPath/RimWellPathGeometryExporter.h"
 
 #include "RimDialogData.h"
 #include "RimModeledWellPath.h"
@@ -66,7 +66,7 @@ void RicExportSelectedWellPathsFeature::exportWellPath( gsl::not_null<const RimW
     std::vector<double> mdValues;
 
     bool showTextMdRkb = false;
-    RigWellPathGeometryExporter::computeWellPathDataForExport( wellPath, mdStepSize, xValues, yValues, tvdValues, mdValues, showTextMdRkb );
+    RimWellPathGeometryExporter::computeWellPathDataForExport( wellPath, mdStepSize, xValues, yValues, tvdValues, mdValues, showTextMdRkb );
 
     writeWellPathGeometryToStream( *stream, wellPath->name(), xValues, yValues, tvdValues, mdValues, showTextMdRkb, writeProjectInfo );
     filePtr->close();
@@ -90,7 +90,7 @@ void RicExportSelectedWellPathsFeature::writeWellPathGeometryToStream( QTextStre
     std::vector<double> tvdValues;
     std::vector<double> mdValues;
 
-    RigWellPathGeometryExporter::computeWellPathDataForExport( wellPathGeom, mdStepSize, rkbOffset, xValues, yValues, tvdValues, mdValues );
+    RimWellPathGeometryExporter::computeWellPathDataForExport( wellPathGeom, mdStepSize, rkbOffset, xValues, yValues, tvdValues, mdValues );
     writeWellPathGeometryToStream( stream, exportName, xValues, yValues, tvdValues, mdValues, showTextMdRkb, writeProjectInfo );
 }
 

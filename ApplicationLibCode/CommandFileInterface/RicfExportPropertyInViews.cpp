@@ -26,7 +26,7 @@
 #include "RicfCommandFileExecutor.h"
 #include "RicfExportPropertyInViews.h"
 
-#include "RigResultAccessorFactory.h"
+#include "RimEclipseResultDefinitionTools.h"
 
 #include "RimEclipseCase.h"
 #include "RimEclipseCellColors.h"
@@ -118,10 +118,10 @@ caf::PdmScriptResponse RicfExportPropertyInViews::execute()
         {
             const int mainGridIndex = 0;
 
-            resultAccessor = RigResultAccessorFactory::createFromResultDefinition( eclipseCase->eclipseCaseData(),
-                                                                                   mainGridIndex,
-                                                                                   view->currentTimeStep(),
-                                                                                   view->cellResult() );
+            resultAccessor = RimEclipseResultDefinitionTools::createResultAccessor( eclipseCase->eclipseCaseData(),
+                                                                                    mainGridIndex,
+                                                                                    view->currentTimeStep(),
+                                                                                    view->cellResult() );
         }
 
         const QString propertyName = view->cellResult()->resultVariableUiShortName();

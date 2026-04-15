@@ -17,8 +17,8 @@
 /////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "RigEclipseCrossPlotDataExtractor.h"
 #include "RigGridCrossPlotCurveGrouping.h"
+#include "RimEclipseCrossPlotDataExtractor.h"
 
 #include "RimCheckableNamedObject.h"
 #include "RimNameConfig.h"
@@ -150,12 +150,12 @@ protected:
     void initAfterRead() override;
     void onLoadDataAndUpdate( bool updateParentPlot );
 
-    void    assignCurveDataGroups( const RigEclipseCrossPlotResult& result );
-    void    createCurves( const RigEclipseCrossPlotResult& result );
-    void    fillCurveDataInExistingCurves( const RigEclipseCrossPlotResult& result );
+    void    assignCurveDataGroups( const RimEclipseCrossPlotResult& result );
+    void    createCurves( const RimEclipseCrossPlotResult& result );
+    void    fillCurveDataInExistingCurves( const RimEclipseCrossPlotResult& result );
     QString createGroupName( size_t curveIndex ) const;
-    void    createRegressionCurves( const RigEclipseCrossPlotResult& result );
-    void    fillCurveDataInExistingRegressionCurves( const RigEclipseCrossPlotResult& result );
+    void    createRegressionCurves( const RimEclipseCrossPlotResult& result );
+    void    fillCurveDataInExistingRegressionCurves( const RimEclipseCrossPlotResult& result );
 
     std::map<int, cvf::UByteArray> calculateCellVisibility( RimEclipseCase* eclipseCase ) const;
 
@@ -173,7 +173,7 @@ protected:
     void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) override;
 
     bool hasMultipleTimeSteps() const;
-    void filterInvalidCurveValues( RigEclipseCrossPlotResult* result );
+    void filterInvalidCurveValues( RimEclipseCrossPlotResult* result );
 
     cvf::Color3f createCurveColor( bool useCustomColor, int colorIndex ) const;
     cvf::Color3f createCurveColor( const std::vector<double>& tickValues, int groupIndex ) const;
@@ -194,7 +194,7 @@ private:
     caf::PdmChildArrayField<RimGridCrossPlotCurve*>           m_crossPlotCurves;
     caf::PdmChildArrayField<RimGridCrossPlotRegressionCurve*> m_crossPlotRegressionCurves;
 
-    std::map<int, RigEclipseCrossPlotResult> m_groupedResults;
+    std::map<int, RimEclipseCrossPlotResult> m_groupedResults;
 
     caf::PdmField<bool>                              m_useCustomColor;
     caf::PdmField<cvf::Color3f>                      m_customColor;

@@ -27,7 +27,7 @@
 
 class RimEclipseResultCase;
 class RimFlowDiagSolution;
-class RigTofWellDistributionCalculator;
+class RimTofWellDistributionCalculator;
 class RiuQwtPlotWidget;
 
 //==================================================================================================
@@ -78,7 +78,7 @@ private:
     RiuPlotWidget* doCreatePlotViewWidget( QWidget* mainWindowParent ) override;
 
     void        fixupDependentFieldsAfterCaseChange();
-    static void populatePlotWidgetWithCurveData( const RigTofWellDistributionCalculator& calculator,
+    static void populatePlotWidgetWithCurveData( const RimTofWellDistributionCalculator& calculator,
                                                  const RimFlowDiagSolution&              flowDiagSolution,
                                                  RiuQwtPlotWidget*                       plotWidget,
                                                  double                                  maximumTof );

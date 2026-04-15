@@ -28,6 +28,10 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimBinaryExportSettings.h
     ${CMAKE_CURRENT_LIST_DIR}/Rim3dOverlayInfoConfig.h
     ${CMAKE_CURRENT_LIST_DIR}/RimHistogramCalculator.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimVisibleCategoriesCalculator.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimReservoirGridTools.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimCaseToCaseRangeFilterMapper.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimFlowDiagVisibleCellsStatCalc.h
     ${CMAKE_CURRENT_LIST_DIR}/RimTensorResults.h
     ${CMAKE_CURRENT_LIST_DIR}/RimReservoirCellResultsStorage.h
     ${CMAKE_CURRENT_LIST_DIR}/RimEclipseStatisticsCaseEvaluator.h
@@ -131,6 +135,8 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimCornerPointCase.h
     ${CMAKE_CURRENT_LIST_DIR}/RimReservoirGridEnsemble.h
     ${CMAKE_CURRENT_LIST_DIR}/RimReservoirGridEnsembleBase.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimEclipseResultTools.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimSimulationInputTool.h
 )
 
 set(SOURCE_GROUP_SOURCE_FILES
@@ -160,6 +166,10 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimBinaryExportSettings.cpp
     ${CMAKE_CURRENT_LIST_DIR}/Rim3dOverlayInfoConfig.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimHistogramCalculator.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimVisibleCategoriesCalculator.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimReservoirGridTools.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimCaseToCaseRangeFilterMapper.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimFlowDiagVisibleCellsStatCalc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimTensorResults.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimReservoirCellResultsStorage.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimEclipseStatisticsCaseEvaluator.cpp
@@ -260,6 +270,8 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimCornerPointCase.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimReservoirGridEnsemble.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimReservoirGridEnsembleBase.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimEclipseResultTools.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimSimulationInputTool.cpp
 )
 
 list(APPEND CODE_HEADER_FILES ${SOURCE_GROUP_HEADER_FILES})

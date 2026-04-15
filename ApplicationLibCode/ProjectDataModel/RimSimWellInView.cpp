@@ -35,6 +35,7 @@
 #include "Rim2dIntersectionView.h"
 #include "RimCellFilterCollection.h"
 #include "RimEclipseCase.h"
+#include "RimEclipseResultCase.h"
 #include "RimEclipseView.h"
 #include "RimExtrudedCurveIntersection.h"
 #include "RimIntersectionCollection.h"
@@ -184,10 +185,34 @@ std::vector<SimulationWellCellBranch> RimSimWellInView::wellBranchesForVisualiza
 
     if ( simWellData && simWellData->isMultiSegmentWell() )
     {
-        return RigMswCenterLineCalculator::calculateMswWellPipeGeometry( this );
+        auto eclipseView = firstAncestorOrThisOfTypeAsserted<RimEclipseView>();
+        if ( eclipseView->eclipseCase() && eclipseView->eclipseCase()->eclipseCaseData() )
+        {
+            auto eclipseCaseData = eclipseView->eclipseCase()->eclipseCaseData();
+            int  timeStepIndex   = eclipseView->currentTimeStep();
+
+            int shortBranchMergeThreshold = 4;
+            if ( auto eclipseResultCase = dynamic_cast<RimEclipseResultCase*>( eclipseView->eclipseCase() ) )
+            {
+                shortBranchMergeThreshold = eclipseResultCase->mswMergeThreshold();
+            }
+
+            return RigMswCenterLineCalculator::calculateMswWellPipeGeometry( eclipseCaseData, simWellData, timeStepIndex, shortBranchMergeThreshold );
+        }
+
+        return {};
     }
 
-    return RigSimulationWellCenterLineCalculator::calculateWellPipeStaticCenterline( this );
+    auto eclipseView = firstAncestorOrThisOfTypeAsserted<RimEclipseView>();
+    if ( eclipseView->eclipseCase() && eclipseView->eclipseCase()->eclipseCaseData() )
+    {
+        return RigSimulationWellCenterLineCalculator::calculateWellPipeStaticCenterline( eclipseView->eclipseCase()->eclipseCaseData(),
+                                                                                         simWellData,
+                                                                                         eclipseView->wellCollection()->isAutoDetectingBranches(),
+                                                                                         isUsingCellCenterForPipe() );
+    }
+
+    return {};
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -780,8 +805,18 @@ void RimSimWellInView::scaleDisk( double minValue, double maxValue )
 //--------------------------------------------------------------------------------------------------
 cvf::BoundingBox RimSimWellInView::boundingBoxInDomainCoords() const
 {
-    auto noConst         = const_cast<RimSimWellInView*>( this );
-    auto simWellBranches = RigSimulationWellCenterLineCalculator::calculateWellPipeStaticCenterline( noConst );
+    const RigSimWellData* simWellData = this->simWellData();
+    auto                  eclipseView = firstAncestorOrThisOfTypeAsserted<RimEclipseView>();
+
+    std::vector<SimulationWellCellBranch> simWellBranches;
+    if ( simWellData && eclipseView->eclipseCase() && eclipseView->eclipseCase()->eclipseCaseData() )
+    {
+        simWellBranches =
+            RigSimulationWellCenterLineCalculator::calculateWellPipeStaticCenterline( eclipseView->eclipseCase()->eclipseCaseData(),
+                                                                                      simWellData,
+                                                                                      eclipseView->wellCollection()->isAutoDetectingBranches(),
+                                                                                      isUsingCellCenterForPipe() );
+    }
 
     cvf::BoundingBox bb;
     for ( const auto& [coords, wellCells] : simWellBranches )

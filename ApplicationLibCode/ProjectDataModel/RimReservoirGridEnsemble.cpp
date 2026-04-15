@@ -920,9 +920,17 @@ void RimReservoirGridEnsemble::loadGridsInSharedMode()
             eclipseCase->eclipseCaseData()->setMainGrid( m_mainGrid );
         }
 
+        std::vector<RigCaseCellResultsData*> destinationResults;
+        for ( auto* rimCase : allCases )
+        {
+            if ( auto* resultCase = dynamic_cast<RimEclipseResultCase*>( rimCase ) )
+            {
+                destinationResults.push_back( resultCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL ) );
+            }
+        }
         RigCaseCellResultsData::copyResultsMetaDataFromMainCase( firstCase->eclipseCaseData(),
                                                                  RiaDefines::PorosityModelType::MATRIX_MODEL,
-                                                                 allCases );
+                                                                 destinationResults );
 
         computeUnionOfActiveCells();
     }

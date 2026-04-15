@@ -20,7 +20,7 @@
 
 #include "RiaDefines.h"
 
-#include "RigFlowDiagResults.h"
+#include "RimFlowDiagResults.h"
 #include "Well/RigSimWellData.h"
 
 #include "RimFlowDiagSolution.h"

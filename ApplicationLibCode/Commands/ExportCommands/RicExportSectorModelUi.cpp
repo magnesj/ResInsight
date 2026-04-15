@@ -25,9 +25,9 @@
 
 #include "RigActiveCellInfo.h"
 #include "RigEclipseCaseData.h"
-#include "RigEclipseResultTools.h"
 #include "RigMainGrid.h"
 #include "RigModelPaddingSettings.h"
+#include "RimEclipseResultTools.h"
 
 #include "Jobs/RimKeywordBcprop.h"
 #include "RimEclipseCase.h"
@@ -339,7 +339,7 @@ void RicExportSectorModelUi::setEclipseView( RimEclipseView* view )
     applyBoundaryDefaults();
 
     // Initialize BCPROP keywords based on max BCCON value in the grid
-    int maxBccon = RigEclipseResultTools::findMaxBcconValue( m_eclipseCase() );
+    int maxBccon = RimEclipseResultTools::findMaxBcconValue( m_eclipseCase() );
 
     // Clear existing keywords
     m_bcpropKeywords.deleteChildren();

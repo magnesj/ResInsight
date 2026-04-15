@@ -1,0 +1,942 @@
+/////////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright (C) 2016-     Statoil ASA
+//
+//  ResInsight is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  ResInsight is distributed in the hope that it will be useful, but WITHOUT ANY
+//  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+//  FITNESS FOR A PARTICULAR PURPOSE.
+//
+//  See the GNU General Public License at <http://www.gnu.org/licenses/gpl.html>
+//  for more details.
+//
+/////////////////////////////////////////////////////////////////////////////////
+
+#include "RimFlowDiagResults.h"
+
+#include "RigActiveCellInfo.h"
+#include "RigCaseCellResultsData.h"
+#include "RigEclipseCaseData.h"
+#include "RigFlowDiagSolverInterface.h"
+#include "RigFlowDiagTimeStepResult.h"
+#include "RigMainGrid.h"
+#include "RimFlowDiagStatCalc.h"
+
+#include "RigFlowDiagResultFrames.h"
+#include "RigNumberOfFloodedPoreVolumesCalculator.h"
+#include "RigStatisticsDataCache.h"
+#include "RimEclipseResultCase.h"
+#include "RimFlowDiagSolution.h"
+
+#include <cmath> // Needed for HUGE_VAL on Linux
+
+namespace caf
+{
+template <>
+void RimFlowDiagResults::CellFilterEnum::setUp()
+{
+    addItem( RimFlowDiagResults::CELLS_ACTIVE, "CELLS_ACTIVE", "All Active Cells" );
+    addItem( RimFlowDiagResults::CELLS_VISIBLE, "CELLS_VISIBLE", "Visible Cells" );
+    addItem( RimFlowDiagResults::CELLS_COMMUNICATION, "CELLS_COMMUNICATION", "Injector Producer Communication" );
+    addItem( RimFlowDiagResults::CELLS_FLOODED, "CELLS_FLOODED", "Flooded by Injector" );
+    addItem( RimFlowDiagResults::CELLS_DRAINED, "CELLS_DRAINED", "Drained by Producer" );
+    setDefault( RimFlowDiagResults::CELLS_ACTIVE );
+}
+} // namespace caf
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimFlowDiagResults::RimFlowDiagResults( RimFlowDiagSolution* flowSolution, size_t timeStepCount )
+    : m_flowDiagSolution( flowSolution )
+{
+    m_timeStepCount = timeStepCount;
+    m_hasAtemptedNativeResults.resize( timeStepCount );
+    m_injProdPairFluxCommunicationTimesteps.resize( timeStepCount );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+const std::vector<double>* RimFlowDiagResults::resultValues( const RigFlowDiagResultAddress& resVarAddr, size_t timeStepIndex )
+{
+    CVF_ASSERT( m_timeStepCount != cvf::UNDEFINED_SIZE_T ); // Forgotten to call init
+
+    return findOrCalculateResult( resVarAddr, timeStepIndex );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+const RigActiveCellInfo* RimFlowDiagResults::activeCellInfo( const RigFlowDiagResultAddress& resVarAddr )
+{
+    auto eclCase = m_flowDiagSolution->firstAncestorOrThisOfType<RimEclipseResultCase>();
+
+    return eclCase->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL ); // Todo: base on
+                                                                                                      // resVarAddr member
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+const std::vector<double>* RimFlowDiagResults::findOrCalculateResult( const RigFlowDiagResultAddress& resVarAddr, size_t timeStepIndex )
+{
+    std::vector<double>* frameData = findScalarResultFrame( resVarAddr, timeStepIndex );
+
+    if ( frameData ) return frameData;
+
+    frameData = calculateDerivedResult( resVarAddr, timeStepIndex );
+
+    if ( frameData ) return frameData;
+
+    // We need to access the native data from the opm solver
+
+    if ( !solverInterface() ) return nullptr;
+
+    calculateNativeResultsIfNotPreviouslyAttempted( timeStepIndex, resVarAddr.phaseSelection );
+
+    return findScalarResultFrame( resVarAddr, timeStepIndex );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFlowDiagResults::calculateNativeResultsIfNotPreviouslyAttempted( size_t                                   timeStepIndex,
+                                                                         RigFlowDiagResultAddress::PhaseSelection phaseSelection )
+{
+    if ( timeStepIndex >= m_hasAtemptedNativeResults.size() ) return;
+
+    auto it = m_hasAtemptedNativeResults[timeStepIndex].find( phaseSelection );
+    if ( it == m_hasAtemptedNativeResults[timeStepIndex].end() || !it->second )
+    {
+        RigFlowDiagTimeStepResult nativeTimestepResults =
+            solverInterface()->calculate( timeStepIndex,
+                                          phaseSelection,
+                                          m_flowDiagSolution->allInjectorTracerActiveCellIndices( timeStepIndex ),
+                                          m_flowDiagSolution->allProducerTracerActiveCellIndices( timeStepIndex ) );
+
+        std::map<RigFlowDiagResultAddress, std::vector<double>>& nativeResults = nativeTimestepResults.nativeResults();
+
+        for ( auto& resIt : nativeResults )
+        {
+            RigFlowDiagResultFrames* nativeResFrames = findScalarResult( resIt.first );
+            if ( !nativeResFrames ) nativeResFrames = createScalarResult( resIt.first );
+
+            nativeResFrames->frameData( timeStepIndex ).swap( resIt.second );
+        }
+
+        m_injProdPairFluxCommunicationTimesteps[timeStepIndex][phaseSelection].swap( nativeTimestepResults.injProdWellPairFluxes() );
+
+        m_hasAtemptedNativeResults[timeStepIndex][phaseSelection] = true;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<double>* RimFlowDiagResults::findScalarResultFrame( const RigFlowDiagResultAddress& resVarAddr, size_t timeStepIndex )
+{
+    RigFlowDiagResultFrames* resFrames = findScalarResult( resVarAddr );
+
+    if ( resFrames )
+    {
+        std::vector<double>& frame = resFrames->frameData( timeStepIndex );
+        if ( !frame.empty() ) return ( &frame );
+    }
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RigFlowDiagSolverInterface* RimFlowDiagResults::solverInterface()
+{
+    auto eclCase = m_flowDiagSolution->firstAncestorOrThisOfType<RimEclipseResultCase>();
+
+    return eclCase->flowDiagSolverInterface();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RigFlowDiagResultFrames* RimFlowDiagResults::createScalarResult( const RigFlowDiagResultAddress& resVarAddr )
+{
+    m_resultSets[resVarAddr] = std::make_unique<RigFlowDiagResultFrames>( m_timeStepCount );
+
+    return m_resultSets[resVarAddr].get();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RigFlowDiagResultFrames* RimFlowDiagResults::findScalarResult( const RigFlowDiagResultAddress& resVarAddr )
+{
+    auto it = m_resultSets.find( resVarAddr );
+
+    if ( it == m_resultSets.end() ) return nullptr;
+
+    return it->second.get();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<double>* RimFlowDiagResults::calculateDerivedResult( const RigFlowDiagResultAddress& resVarAddr, size_t timeStepIndex )
+{
+    if ( resVarAddr.isNativeResult() ) return nullptr;
+
+    auto variableName = QString::fromStdString( resVarAddr.variableName );
+
+    if ( variableName == RigFlowDiagDefines::tofResultName() )
+    {
+        return calculateAverageTOFResult( resVarAddr, timeStepIndex );
+    }
+    else if ( variableName == RigFlowDiagDefines::cellFractionResultName() )
+    {
+        return calculateSumOfFractionsResult( resVarAddr, timeStepIndex );
+    }
+    else if ( variableName == RigFlowDiagDefines::communicationResultName() )
+    {
+        return calculateCommunicationResult( resVarAddr, timeStepIndex );
+    }
+    else if ( variableName == RigFlowDiagDefines::maxFractionTracerResultName() )
+    {
+        return calculateTracerWithMaxFractionResult( resVarAddr, timeStepIndex );
+    }
+    else if ( variableName == RigFlowDiagDefines::numFloodedPv() )
+    {
+        calculateNumFloodedPV( resVarAddr );
+        return findScalarResultFrame( resVarAddr, timeStepIndex );
+    }
+
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<double>* RimFlowDiagResults::calculateAverageTOFResult( const RigFlowDiagResultAddress& resVarAddr, size_t timeStepIndex )
+{
+    std::vector<const std::vector<double>*> injectorTOFs = findResultsForSelectedTracers( resVarAddr,
+                                                                                          timeStepIndex,
+                                                                                          RigFlowDiagDefines::tofResultName().toStdString(),
+                                                                                          RigFlowDiagDefines::TracerStatusType::INJECTOR );
+    std::vector<const std::vector<double>*> injectorFractions =
+        findResultsForSelectedTracers( resVarAddr,
+                                       timeStepIndex,
+                                       RigFlowDiagDefines::cellFractionResultName().toStdString(),
+                                       RigFlowDiagDefines::TracerStatusType::INJECTOR );
+
+    std::vector<const std::vector<double>*> producerTOFs = findResultsForSelectedTracers( resVarAddr,
+                                                                                          timeStepIndex,
+                                                                                          RigFlowDiagDefines::tofResultName().toStdString(),
+                                                                                          RigFlowDiagDefines::TracerStatusType::PRODUCER );
+    std::vector<const std::vector<double>*> producerFractions =
+        findResultsForSelectedTracers( resVarAddr,
+                                       timeStepIndex,
+                                       RigFlowDiagDefines::cellFractionResultName().toStdString(),
+                                       RigFlowDiagDefines::TracerStatusType::PRODUCER );
+    size_t activeCellCount = activeCellInfo( resVarAddr )->reservoirActiveCellCount();
+
+    std::vector<double> injectorTotalFractions;
+    std::vector<double> injectorFractMultTof;
+    calculateSumOfFractionAndFractionMultTOF( activeCellCount, injectorFractions, injectorTOFs, &injectorTotalFractions, &injectorFractMultTof );
+
+    std::vector<double> producerTotalFractions;
+    std::vector<double> producerFractMultTof;
+    calculateSumOfFractionAndFractionMultTOF( activeCellCount, producerFractions, producerTOFs, &producerTotalFractions, &producerFractMultTof );
+
+    RigFlowDiagResultFrames* averageTofFrames = createScalarResult( resVarAddr );
+    std::vector<double>&     averageTof       = averageTofFrames->frameData( timeStepIndex );
+    averageTof.resize( activeCellCount, HUGE_VAL );
+
+    for ( size_t acIdx = 0; acIdx < activeCellCount; ++acIdx )
+    {
+        if ( injectorTotalFractions[acIdx] == 0.0 && producerTotalFractions[acIdx] == 0.0 )
+        {
+            averageTof[acIdx] = HUGE_VAL;
+        }
+        else
+        {
+            double retVal = 0.0;
+            if ( injectorTotalFractions[acIdx] != 0.0 ) retVal += ( 1.0 / injectorTotalFractions[acIdx] ) * injectorFractMultTof[acIdx];
+            if ( producerTotalFractions[acIdx] != 0.0 ) retVal += ( 1.0 / producerTotalFractions[acIdx] ) * producerFractMultTof[acIdx];
+            averageTof[acIdx] = retVal;
+        }
+    }
+
+    /// Test to remove all averaging
+    // if (injectorTOFs.size()) averageTof = (*injectorTOFs[0]);
+
+    return &averageTof;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFlowDiagResults::calculateSumOfFractionAndFractionMultTOF( size_t                                         activeCellCount,
+                                                                   const std::vector<const std::vector<double>*>& fractions,
+                                                                   const std::vector<const std::vector<double>*>& TOFs,
+                                                                   std::vector<double>*                           sumOfFractions,
+                                                                   std::vector<double>*                           fractionMultTOF )
+{
+    sumOfFractions->resize( activeCellCount, 0.0 );
+    fractionMultTOF->resize( activeCellCount, 0.0 );
+
+    for ( size_t iIdx = 0; iIdx < fractions.size(); ++iIdx )
+    {
+        const std::vector<double>* frInj  = fractions[iIdx];
+        const std::vector<double>* tofInj = TOFs[iIdx];
+
+        if ( !( frInj && tofInj ) ) continue;
+
+        for ( size_t acIdx = 0; acIdx < activeCellCount; ++acIdx )
+        {
+            if ( ( *frInj )[acIdx] == HUGE_VAL ) continue;
+
+            ( *sumOfFractions )[acIdx] += ( *frInj )[acIdx];
+            ( *fractionMultTOF )[acIdx] += ( *frInj )[acIdx] * ( *tofInj )[acIdx];
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<double>* RimFlowDiagResults::calculateSumOfFractionsResult( const RigFlowDiagResultAddress& resVarAddr, size_t timeStepIndex )
+{
+    std::vector<const std::vector<double>*> fractions =
+        findResultsForSelectedTracers( resVarAddr,
+                                       timeStepIndex,
+                                       RigFlowDiagDefines::cellFractionResultName().toStdString(),
+                                       RigFlowDiagDefines::TracerStatusType::UNDEFINED );
+
+    RigFlowDiagResultFrames* sumOfFractionsFrames = createScalarResult( resVarAddr );
+    std::vector<double>&     sumOfFractions       = sumOfFractionsFrames->frameData( timeStepIndex );
+
+    size_t activeCellCount = activeCellInfo( resVarAddr )->reservoirActiveCellCount();
+
+    calculateSumOfFractions( fractions, activeCellCount, &sumOfFractions );
+
+    return &sumOfFractions;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<double>* RimFlowDiagResults::calculateTracerWithMaxFractionResult( const RigFlowDiagResultAddress& resVarAddr, size_t timeStepIndex )
+{
+    std::vector<std::pair<std::string, const std::vector<double>*>> fractions =
+        findNamedResultsForSelectedTracers( resVarAddr,
+                                            timeStepIndex,
+                                            RigFlowDiagDefines::cellFractionResultName().toStdString(),
+                                            RigFlowDiagDefines::TracerStatusType::UNDEFINED );
+
+    std::vector<int> resultTracerIdxToGlobalTracerIdx;
+    {
+        resultTracerIdxToGlobalTracerIdx.resize( fractions.size(), -1 );
+
+        std::vector<QString> allTracerNames = m_flowDiagSolution->tracerNames();
+        int                  selTracerIdx   = 0;
+        for ( const auto& trNameFractionPair : fractions )
+        {
+            for ( size_t globIdx = 0; globIdx < allTracerNames.size(); ++globIdx )
+            {
+                if ( allTracerNames[globIdx].toStdString() == trNameFractionPair.first )
+                {
+                    resultTracerIdxToGlobalTracerIdx[selTracerIdx] = static_cast<int>( globIdx );
+                    break;
+                }
+            }
+
+            ++selTracerIdx;
+        }
+    }
+
+    size_t activeCellCount = activeCellInfo( resVarAddr )->reservoirActiveCellCount();
+
+    RigFlowDiagResultFrames* maxFractionTracerIdxFrames = createScalarResult( resVarAddr );
+    std::vector<double>&     maxFractionTracerIdx       = maxFractionTracerIdxFrames->frameData( timeStepIndex );
+    {
+        maxFractionTracerIdx.resize( activeCellCount, HUGE_VAL );
+
+        std::vector<double> maxFraction;
+        maxFraction.resize( activeCellCount, -HUGE_VAL );
+
+        for ( size_t frIdx = 0; frIdx < fractions.size(); ++frIdx )
+        {
+            const std::vector<double>* fr = fractions[frIdx].second;
+
+            if ( !fr ) continue;
+
+            for ( size_t acIdx = 0; acIdx < activeCellCount; ++acIdx )
+            {
+                if ( ( *fr )[acIdx] == HUGE_VAL ) continue;
+
+                if ( maxFraction[acIdx] < ( *fr )[acIdx] )
+                {
+                    maxFraction[acIdx]          = ( *fr )[acIdx];
+                    maxFractionTracerIdx[acIdx] = resultTracerIdxToGlobalTracerIdx[frIdx];
+                }
+            }
+        }
+    }
+
+    return &maxFractionTracerIdx;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<double>* RimFlowDiagResults::calculateCommunicationResult( const RigFlowDiagResultAddress& resVarAddr, size_t timeStepIndex )
+{
+    std::vector<const std::vector<double>*> injectorFractions =
+        findResultsForSelectedTracers( resVarAddr,
+                                       timeStepIndex,
+                                       RigFlowDiagDefines::cellFractionResultName().toStdString(),
+                                       RigFlowDiagDefines::TracerStatusType::INJECTOR );
+    std::vector<const std::vector<double>*> producerFractions =
+        findResultsForSelectedTracers( resVarAddr,
+                                       timeStepIndex,
+                                       RigFlowDiagDefines::cellFractionResultName().toStdString(),
+                                       RigFlowDiagDefines::TracerStatusType::PRODUCER );
+    size_t activeCellCount = activeCellInfo( resVarAddr )->reservoirActiveCellCount();
+
+    std::vector<double> sumOfInjectorFractions;
+    calculateSumOfFractions( injectorFractions, activeCellCount, &sumOfInjectorFractions );
+
+    std::vector<double> sumOfProducerFractions;
+    calculateSumOfFractions( producerFractions, activeCellCount, &sumOfProducerFractions );
+
+    RigFlowDiagResultFrames* commFrames = createScalarResult( resVarAddr );
+    std::vector<double>&     commPI     = commFrames->frameData( timeStepIndex );
+    commPI.resize( activeCellCount, HUGE_VAL );
+
+    for ( size_t acIdx = 0; acIdx < activeCellCount; ++acIdx )
+    {
+        if ( ( sumOfInjectorFractions )[acIdx] == HUGE_VAL ) continue;
+        if ( ( sumOfProducerFractions )[acIdx] == HUGE_VAL ) continue;
+
+        ( commPI )[acIdx] = ( sumOfInjectorFractions )[acIdx] * ( sumOfProducerFractions )[acIdx];
+    }
+
+    return &commPI;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFlowDiagResults::calculateNumFloodedPV( const RigFlowDiagResultAddress& resVarAddr )
+{
+    auto eclCase = m_flowDiagSolution->firstAncestorOrThisOfType<RimEclipseResultCase>();
+    if ( !eclCase ) return;
+
+    std::vector<QString> tracerNames;
+    for ( const std::string& tracerName : resVarAddr.selectedTracerNames )
+    {
+        tracerNames.push_back( QString::fromUtf8( tracerName.c_str() ) );
+    }
+    RigNumberOfFloodedPoreVolumesCalculator calc(
+        eclCase->eclipseCaseData(),
+        eclCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL ),
+        [eclCase]( size_t idx ) { return eclCase->uiToNativeTimeStepIndex( idx ); },
+        tracerNames );
+
+    RigFlowDiagResultFrames* frames = createScalarResult( resVarAddr );
+    for ( size_t frameIdx = 0; frameIdx < m_timeStepCount; ++frameIdx )
+    {
+        std::vector<double>& frame = frames->frameData( frameIdx );
+
+        frame.swap( calc.numberOfFloodedPorevolumes()[frameIdx] );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<const std::vector<double>*> RimFlowDiagResults::findResultsForSelectedTracers( const RigFlowDiagResultAddress& resVarAddr,
+                                                                                           size_t                          timeStepIndex,
+                                                                                           const std::string&              nativeResultName,
+                                                                                           RigFlowDiagDefines::TracerStatusType wantedTracerType )
+{
+    std::vector<const std::vector<double>*> selectedTracersResults;
+
+    for ( const std::string& tracerName : resVarAddr.selectedTracerNames )
+    {
+        RigFlowDiagDefines::TracerStatusType tracerType =
+            m_flowDiagSolution->tracerStatusInTimeStep( QString::fromStdString( tracerName ), timeStepIndex );
+
+        if ( tracerType != RigFlowDiagDefines::TracerStatusType::CLOSED &&
+             ( tracerType == wantedTracerType || wantedTracerType == RigFlowDiagDefines::TracerStatusType::UNDEFINED ) )
+        {
+            selectedTracersResults.push_back(
+                findOrCalculateResult( RigFlowDiagResultAddress( nativeResultName, resVarAddr.phaseSelection, tracerName ), timeStepIndex ) );
+        }
+    }
+
+    return selectedTracersResults;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<std::pair<std::string, const std::vector<double>*>>
+    RimFlowDiagResults::findNamedResultsForSelectedTracers( const RigFlowDiagResultAddress&      resVarAddr,
+                                                            size_t                               timeStepIndex,
+                                                            const std::string&                   nativeResultName,
+                                                            RigFlowDiagDefines::TracerStatusType wantedTracerType )
+{
+    std::vector<std::pair<std::string, const std::vector<double>*>> selectedTracersResults;
+
+    for ( const std::string& tracerName : resVarAddr.selectedTracerNames )
+    {
+        RigFlowDiagDefines::TracerStatusType tracerType =
+            m_flowDiagSolution->tracerStatusInTimeStep( QString::fromStdString( tracerName ), timeStepIndex );
+
+        if ( tracerType != RigFlowDiagDefines::TracerStatusType::CLOSED &&
+             ( tracerType == wantedTracerType || wantedTracerType == RigFlowDiagDefines::TracerStatusType::UNDEFINED ) )
+        {
+            selectedTracersResults.push_back(
+                std::make_pair( tracerName,
+                                findOrCalculateResult( RigFlowDiagResultAddress( nativeResultName, resVarAddr.phaseSelection, tracerName ),
+                                                       timeStepIndex ) ) );
+        }
+    }
+
+    return selectedTracersResults;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RigStatisticsDataCache* RimFlowDiagResults::statistics( const RigFlowDiagResultAddress& resVarAddr )
+{
+    auto it = m_resultStatistics.find( resVarAddr );
+    if ( it != m_resultStatistics.end() ) return it->second.get();
+
+    RimFlowDiagStatCalc* calculator = new RimFlowDiagStatCalc( this, resVarAddr );
+    calculator->setCaseCellResultsDataCallback(
+        [this]() -> RigCaseCellResultsData*
+        {
+            auto eclCase = m_flowDiagSolution->firstAncestorOrThisOfType<RimEclipseResultCase>();
+            if ( !eclCase ) return nullptr;
+            return eclCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+        } );
+    m_resultStatistics[resVarAddr] = std::make_unique<RigStatisticsDataCache>( calculator );
+    return m_resultStatistics[resVarAddr].get();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFlowDiagResults::calculateSumOfFractions( const std::vector<const std::vector<double>*>& fractions,
+                                                  size_t                                         activeCellCount,
+                                                  std::vector<double>*                           sumOfFractions )
+{
+    sumOfFractions->resize( activeCellCount, HUGE_VAL );
+
+    for ( size_t iIdx = 0; iIdx < fractions.size(); ++iIdx )
+    {
+        const std::vector<double>* fraction = fractions[iIdx];
+
+        if ( !( fraction ) ) continue;
+
+        for ( size_t acIdx = 0; acIdx < activeCellCount; ++acIdx )
+        {
+            if ( ( *fraction )[acIdx] == HUGE_VAL ) continue;
+
+            if ( ( *sumOfFractions )[acIdx] == HUGE_VAL ) ( *sumOfFractions )[acIdx] = 0.0;
+
+            ( *sumOfFractions )[acIdx] += ( *fraction )[acIdx];
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFlowDiagResults::minMaxScalarValues( const RigFlowDiagResultAddress& resVarAddr, int timeStepIndex, double* localMin, double* localMax )
+{
+    statistics( resVarAddr )->minMaxCellScalarValues( timeStepIndex, *localMin, *localMax );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFlowDiagResults::minMaxScalarValues( const RigFlowDiagResultAddress& resVarAddr, double* globalMin, double* globalMax )
+{
+    statistics( resVarAddr )->minMaxCellScalarValues( *globalMin, *globalMax );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFlowDiagResults::posNegClosestToZero( const RigFlowDiagResultAddress& resVarAddr,
+                                              int                             timeStepIndex,
+                                              double*                         localPosClosestToZero,
+                                              double*                         localNegClosestToZero )
+{
+    statistics( resVarAddr )->posNegClosestToZero( timeStepIndex, *localPosClosestToZero, *localNegClosestToZero );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFlowDiagResults::posNegClosestToZero( const RigFlowDiagResultAddress& resVarAddr,
+                                              double*                         globalPosClosestToZero,
+                                              double*                         globalNegClosestToZero )
+{
+    statistics( resVarAddr )->posNegClosestToZero( *globalPosClosestToZero, *globalNegClosestToZero );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFlowDiagResults::meanScalarValue( const RigFlowDiagResultAddress& resVarAddr, double* meanValue )
+{
+    CVF_ASSERT( meanValue );
+
+    statistics( resVarAddr )->meanCellScalarValues( *meanValue );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFlowDiagResults::meanScalarValue( const RigFlowDiagResultAddress& resVarAddr, int timeStepIndex, double* meanValue )
+{
+    statistics( resVarAddr )->meanCellScalarValues( timeStepIndex, *meanValue );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFlowDiagResults::p10p90ScalarValues( const RigFlowDiagResultAddress& resVarAddr, double* p10, double* p90 )
+{
+    statistics( resVarAddr )->p10p90CellScalarValues( *p10, *p90 );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFlowDiagResults::p10p90ScalarValues( const RigFlowDiagResultAddress& resVarAddr, int timeStepIndex, double* p10, double* p90 )
+{
+    statistics( resVarAddr )->p10p90CellScalarValues( timeStepIndex, *p10, *p90 );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFlowDiagResults::sumScalarValue( const RigFlowDiagResultAddress& resVarAddr, double* sum )
+{
+    CVF_ASSERT( sum );
+
+    statistics( resVarAddr )->sumCellScalarValues( *sum );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFlowDiagResults::sumScalarValue( const RigFlowDiagResultAddress& resVarAddr, int timeStepIndex, double* sum )
+{
+    CVF_ASSERT( sum );
+
+    statistics( resVarAddr )->sumCellScalarValues( timeStepIndex, *sum );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+const std::vector<size_t>& RimFlowDiagResults::scalarValuesHistogram( const RigFlowDiagResultAddress& resVarAddr )
+{
+    return statistics( resVarAddr )->cellScalarValuesHistogram();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+const std::vector<size_t>& RimFlowDiagResults::scalarValuesHistogram( const RigFlowDiagResultAddress& resVarAddr, int timeStepIndex )
+{
+    return statistics( resVarAddr )->cellScalarValuesHistogram( timeStepIndex );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+const std::vector<int>& RimFlowDiagResults::uniqueCellScalarValues( const RigFlowDiagResultAddress& resVarAddr )
+{
+    return statistics( resVarAddr )->uniqueCellScalarValues();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+const std::vector<int>& RimFlowDiagResults::uniqueCellScalarValues( const RigFlowDiagResultAddress& resVarAddr, int timeStepIndex )
+{
+    return statistics( resVarAddr )->uniqueCellScalarValues( timeStepIndex );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFlowDiagResults::mobileVolumeWeightedMean( const RigFlowDiagResultAddress& resVarAddr, int timeStepIndex, double* mean )
+{
+    statistics( resVarAddr )->mobileVolumeWeightedMean( timeStepIndex, *mean );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFlowDiagResults::mobileVolumeWeightedMean( const RigFlowDiagResultAddress& resVarAddr, double* mean )
+{
+    statistics( resVarAddr )->mobileVolumeWeightedMean( *mean );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::pair<double, double>
+    RimFlowDiagResults::injectorProducerPairFluxes( const std::string& injTracername, const std::string& prodTracerName, int timeStepIndex )
+{
+    calculateNativeResultsIfNotPreviouslyAttempted( timeStepIndex, RigFlowDiagResultAddress::PHASE_ALL );
+
+    auto commPair = m_injProdPairFluxCommunicationTimesteps[timeStepIndex][RigFlowDiagResultAddress::PHASE_ALL].find(
+        std::make_pair( injTracername, prodTracerName ) );
+    if ( commPair != m_injProdPairFluxCommunicationTimesteps[timeStepIndex][RigFlowDiagResultAddress::PHASE_ALL].end() )
+    {
+        return commPair->second;
+    }
+    else
+    {
+        return std::make_pair( 0.0, 0.0 );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+double RimFlowDiagResults::maxAbsPairFlux( int timeStepIndex )
+{
+    calculateNativeResultsIfNotPreviouslyAttempted( timeStepIndex, RigFlowDiagResultAddress::PHASE_ALL );
+    double maxFlux = 0.0;
+
+    if ( (size_t)timeStepIndex < m_injProdPairFluxCommunicationTimesteps.size() )
+    {
+        for ( const auto& commPair : m_injProdPairFluxCommunicationTimesteps[timeStepIndex][RigFlowDiagResultAddress::PHASE_ALL] )
+        {
+            if ( fabs( commPair.second.first ) > maxFlux ) maxFlux = fabs( commPair.second.first );
+            if ( fabs( commPair.second.second ) > maxFlux ) maxFlux = fabs( commPair.second.second );
+        }
+    }
+
+    return maxFlux;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<int> RimFlowDiagResults::calculatedTimeSteps( RigFlowDiagResultAddress::PhaseSelection phaseSelection )
+{
+    std::vector<int> timestepIndices;
+    for ( size_t tsIdx = 0; tsIdx < m_timeStepCount; ++tsIdx )
+    {
+        auto it = m_hasAtemptedNativeResults[tsIdx].find( phaseSelection );
+        if ( it != m_hasAtemptedNativeResults[tsIdx].end() && it->second )
+        {
+            timestepIndices.push_back( static_cast<int>( tsIdx ) );
+        }
+    }
+
+    return timestepIndices;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RigFlowDiagDefines::FlowCharacteristicsResultFrame RimFlowDiagResults::flowCharacteristicsResults( int        timeStepIndex,
+                                                                                                   CellFilter cellSelection,
+                                                                                                   const std::vector<QString>& tracerNames,
+                                                                                                   double max_pv_fraction,
+                                                                                                   double minCommunication,
+                                                                                                   int    maxTof )
+{
+    std::set<std::string> injectorNames;
+    std::set<std::string> producerNames;
+
+    for ( const QString& tracerName : tracerNames )
+    {
+        RigFlowDiagDefines::TracerStatusType status = m_flowDiagSolution->tracerStatusInTimeStep( tracerName, timeStepIndex );
+        if ( status == RigFlowDiagDefines::TracerStatusType::INJECTOR )
+        {
+            injectorNames.insert( tracerName.toStdString() );
+        }
+        else if ( status == RigFlowDiagDefines::TracerStatusType::PRODUCER )
+        {
+            producerNames.insert( tracerName.toStdString() );
+        }
+    }
+
+    RigFlowDiagResultAddress injectorAddress( RigFlowDiagDefines::tofResultName().toStdString(),
+                                              RigFlowDiagResultAddress::PHASE_ALL,
+                                              injectorNames );
+    RigFlowDiagResultAddress producerAddress( RigFlowDiagDefines::tofResultName().toStdString(),
+                                              RigFlowDiagResultAddress::PHASE_ALL,
+                                              producerNames );
+
+    const std::vector<double>* allInjectorResults = resultValues( injectorAddress, timeStepIndex );
+    const std::vector<double>* allProducerResults = resultValues( producerAddress, timeStepIndex );
+
+    std::vector<double> injectorResults;
+    std::vector<double> producerResults;
+    std::vector<size_t> selectedCellIndices;
+
+    if ( cellSelection == CELLS_COMMUNICATION )
+    {
+        std::set<std::string> allTracers;
+        allTracers.insert( injectorNames.begin(), injectorNames.end() );
+        allTracers.insert( producerNames.begin(), producerNames.end() );
+
+        RigFlowDiagResultAddress   communicationAddress( RigFlowDiagDefines::communicationResultName().toStdString(),
+                                                       RigFlowDiagResultAddress::PHASE_ALL,
+                                                       allTracers );
+        const std::vector<double>* communicationResult = resultValues( communicationAddress, timeStepIndex );
+
+        for ( size_t i = 0; i < communicationResult->size(); ++i )
+        {
+            if ( communicationResult->at( i ) != HUGE_VAL && communicationResult->at( i ) >= minCommunication )
+            {
+                selectedCellIndices.push_back( i );
+                if ( allInjectorResults != nullptr ) injectorResults.push_back( allInjectorResults->at( i ) );
+                if ( allProducerResults != nullptr ) producerResults.push_back( allProducerResults->at( i ) );
+            }
+        }
+    }
+    else if ( cellSelection == CELLS_FLOODED )
+    {
+        if ( allInjectorResults != nullptr )
+        {
+            for ( size_t i = 0; i < allInjectorResults->size(); ++i )
+            {
+                if ( allInjectorResults->at( i ) != HUGE_VAL && allInjectorResults->at( i ) <= maxTof )
+                {
+                    selectedCellIndices.push_back( i );
+                    injectorResults.push_back( allInjectorResults->at( i ) );
+                    if ( allProducerResults != nullptr )
+                    {
+                        producerResults.push_back( allProducerResults->at( i ) );
+                    }
+                    else
+                    {
+                        producerResults.push_back( 0 );
+                    }
+                }
+            }
+        }
+    }
+    else if ( cellSelection == CELLS_DRAINED )
+    {
+        if ( allProducerResults != nullptr )
+        {
+            for ( size_t i = 0; i < allProducerResults->size(); ++i )
+            {
+                if ( allProducerResults->at( i ) != HUGE_VAL && allProducerResults->at( i ) <= maxTof )
+                {
+                    selectedCellIndices.push_back( i );
+                    producerResults.push_back( allProducerResults->at( i ) );
+                    if ( allInjectorResults != nullptr )
+                    {
+                        injectorResults.push_back( allInjectorResults->at( i ) );
+                    }
+                    else
+                    {
+                        injectorResults.push_back( 0 );
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        if ( allInjectorResults != nullptr ) injectorResults = *allInjectorResults;
+        if ( allProducerResults != nullptr ) producerResults = *allProducerResults;
+
+        for ( size_t i = 0; i < injectorResults.size(); ++i )
+        {
+            selectedCellIndices.push_back( i );
+        }
+    }
+
+    return solverInterface()->calculateFlowCharacteristics( &injectorResults, &producerResults, selectedCellIndices, max_pv_fraction );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RigFlowDiagDefines::FlowCharacteristicsResultFrame
+    RimFlowDiagResults::flowCharacteristicsResults( int timeStepIndex, const std::vector<char>& visibleActiveCells, double max_pv_fraction )
+{
+    std::vector<QString> tracerNames = m_flowDiagSolution->tracerNames();
+
+    std::set<std::string> injectorNames;
+    std::set<std::string> producerNames;
+
+    for ( const QString& tracerName : tracerNames )
+    {
+        RigFlowDiagDefines::TracerStatusType status = m_flowDiagSolution->tracerStatusInTimeStep( tracerName, timeStepIndex );
+        if ( status == RigFlowDiagDefines::TracerStatusType::INJECTOR )
+        {
+            injectorNames.insert( tracerName.toStdString() );
+        }
+        else if ( status == RigFlowDiagDefines::TracerStatusType::PRODUCER )
+        {
+            producerNames.insert( tracerName.toStdString() );
+        }
+    }
+
+    RigFlowDiagResultAddress injectorAddress( RigFlowDiagDefines::tofResultName().toStdString(),
+                                              RigFlowDiagResultAddress::PHASE_ALL,
+                                              injectorNames );
+    RigFlowDiagResultAddress producerAddress( RigFlowDiagDefines::tofResultName().toStdString(),
+                                              RigFlowDiagResultAddress::PHASE_ALL,
+                                              producerNames );
+
+    const std::vector<double>* allInjectorResults = resultValues( injectorAddress, timeStepIndex );
+    const std::vector<double>* allProducerResults = resultValues( producerAddress, timeStepIndex );
+
+    std::vector<size_t> selectedCellIndices;
+    std::vector<double> injectorResults;
+    std::vector<double> producerResults;
+
+    for ( size_t i = 0; i < visibleActiveCells.size(); ++i )
+    {
+        if ( visibleActiveCells[i] )
+        {
+            selectedCellIndices.push_back( i );
+            injectorResults.push_back( allInjectorResults->at( i ) );
+            producerResults.push_back( allProducerResults->at( i ) );
+        }
+    }
+
+    return solverInterface()->calculateFlowCharacteristics( &injectorResults, &producerResults, selectedCellIndices, max_pv_fraction );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimFlowDiagSolution* RimFlowDiagResults::flowDiagSolution()
+{
+    {
+        return m_flowDiagSolution;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFlowDiagResults::setStatisticsDataCacheNumBins( const RigFlowDiagResultAddress& resVarAddr, size_t numBins )
+{
+    statistics( resVarAddr )->setNumBins( numBins );
+}

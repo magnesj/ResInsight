@@ -24,7 +24,7 @@
 
 #include "RigActiveCellInfo.h"
 #include "RigEclipseCaseData.h"
-#include "RigReservoirGridTools.h"
+#include "RimReservoirGridTools.h"
 
 #include "RimCase.h"
 #include "RimEclipseCase.h"
@@ -99,7 +99,7 @@ QString RicCellRangeUi::gridName() const
 {
     if ( m_gridIndex() == 0 ) return "";
 
-    return RigReservoirGridTools::gridName( m_case, m_gridIndex() );
+    return RimReservoirGridTools::gridName( m_case, m_gridIndex() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -113,7 +113,7 @@ void RicCellRangeUi::defineEditorAttribute( const caf::PdmFieldHandle* field, QS
         return;
     }
 
-    const cvf::StructGridInterface* grid = RigReservoirGridTools::gridByIndex( m_case, m_gridIndex() );
+    const cvf::StructGridInterface* grid = RimReservoirGridTools::gridByIndex( m_case, m_gridIndex() );
     if ( grid )
     {
         if ( field == &m_startIndexI || field == &m_cellCountI )
@@ -143,11 +143,11 @@ QList<caf::PdmOptionItemInfo> RicCellRangeUi::calculateValueOptions( const caf::
 
     if ( &m_gridIndex == fieldNeedingOptions )
     {
-        for ( int gIdx = 0; gIdx < RigReservoirGridTools::gridCount( m_case ); ++gIdx )
+        for ( int gIdx = 0; gIdx < RimReservoirGridTools::gridCount( m_case ); ++gIdx )
         {
             QString gridName;
 
-            gridName += RigReservoirGridTools::gridName( m_case, gIdx );
+            gridName += RimReservoirGridTools::gridName( m_case, gIdx );
             if ( gIdx == 0 )
             {
                 if ( gridName.isEmpty() )
@@ -191,7 +191,7 @@ void RicCellRangeUi::clampValues()
 {
     if ( !m_case ) return;
 
-    const cvf::StructGridInterface* grid = RigReservoirGridTools::gridByIndex( m_case, m_gridIndex() );
+    const cvf::StructGridInterface* grid = RimReservoirGridTools::gridByIndex( m_case, m_gridIndex() );
     if ( !grid ) return;
 
     m_cellCountI  = cvf::Math::clamp( m_cellCountI.v(), 1, static_cast<int>( grid->cellCountI() ) );
@@ -209,12 +209,12 @@ void RicCellRangeUi::clampValues()
 //--------------------------------------------------------------------------------------------------
 void RicCellRangeUi::setDefaultValues()
 {
-    const cvf::StructGridInterface* grid = RigReservoirGridTools::gridByIndex( m_case, m_gridIndex() );
+    const cvf::StructGridInterface* grid = RimReservoirGridTools::gridByIndex( m_case, m_gridIndex() );
     if ( !grid ) return;
 
     RigActiveCellInfo* actCellInfo = activeCellInfo();
 
-    const cvf::StructGridInterface* mainGrid = RigReservoirGridTools::mainGrid( m_case );
+    const cvf::StructGridInterface* mainGrid = RimReservoirGridTools::mainGrid( m_case );
 
     if ( grid == mainGrid && actCellInfo )
     {
@@ -261,8 +261,8 @@ RigActiveCellInfo* RicCellRangeUi::activeCellInfo() const
 //--------------------------------------------------------------------------------------------------
 void RicCellRangeUi::updateLegendText()
 {
-    const cvf::StructGridInterface* grid        = RigReservoirGridTools::gridByIndex( m_case, m_gridIndex() );
-    const cvf::StructGridInterface* mainGrid    = RigReservoirGridTools::mainGrid( m_case );
+    const cvf::StructGridInterface* grid        = RimReservoirGridTools::gridByIndex( m_case, m_gridIndex() );
+    const cvf::StructGridInterface* mainGrid    = RimReservoirGridTools::mainGrid( m_case );
     RigActiveCellInfo*              actCellInfo = activeCellInfo();
 
     if ( grid == mainGrid && actCellInfo )

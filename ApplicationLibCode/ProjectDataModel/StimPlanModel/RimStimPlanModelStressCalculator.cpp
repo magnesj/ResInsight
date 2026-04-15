@@ -19,9 +19,9 @@
 
 #include "RiaDefines.h"
 #include "RiaEclipseUnitTools.h"
-#include "RiaInterpolationTools.h"
 #include "RiaLogging.h"
 #include "RiaStimPlanModelDefines.h"
+#include "RigInterpolationTools.h"
 
 #include "RigEclipseCaseData.h"
 #include "Well/RigEclipseWellLogExtractor.h"
@@ -134,7 +134,7 @@ bool RimStimPlanModelStressCalculator::calculate( RiaDefines::CurveProperty curv
         measuredDepthValues.clear();
         for ( double tvd : tvDepthValues )
         {
-            double md = RiaInterpolationTools::linear( tvdValuesOfWellPath, mdValuesOfWellPath, tvd );
+            double md = RigInterpolationTools::linear( tvdValuesOfWellPath, mdValuesOfWellPath, tvd );
             measuredDepthValues.push_back( md );
         }
         CVF_ASSERT( measuredDepthValues.size() == tvDepthValues.size() );

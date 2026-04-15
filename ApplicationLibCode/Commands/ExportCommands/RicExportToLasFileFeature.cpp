@@ -25,7 +25,7 @@
 
 #include "RiaApplication.h"
 
-#include "RigLasFileExporter.h"
+#include "RimLasFileExporter.h"
 #include "Well/RigWellLogCurveData.h"
 
 #include "RimWellLogCurve.h"
@@ -66,7 +66,7 @@ std::vector<QString> RicExportToLasFileFeature::exportToLasFiles( const QString&
     std::vector<QString> wellNames;
     std::vector<double>  rkbDiffs;
     {
-        RigLasFileExporter lasExporter( allCurves );
+        RimLasFileExporter lasExporter( allCurves );
         lasExporter.wellPathsAndRkbDiff( &wellNames, &rkbDiffs );
 
         return exportToLasFiles( exportFolder,
@@ -94,7 +94,7 @@ std::vector<QString> RicExportToLasFileFeature::exportToLasFiles( const QString&
                                                                   double                        resampleInterval,
                                                                   bool                          convertCurveUnits )
 {
-    RigLasFileExporter lasExporter( curves );
+    RimLasFileExporter lasExporter( curves );
 
     std::vector<QString> writtenFiles;
 
@@ -140,7 +140,7 @@ void RicExportToLasFileFeature::onActionTriggered( bool isChecked )
 
     QString defaultDir = RiaApplication::instance()->lastUsedDialogDirectoryWithFallbackToProjectFolder( "WELL_LOGS_DIR" );
 
-    RigLasFileExporter           lasExporter( curves );
+    RimLasFileExporter           lasExporter( curves );
     RicExportToLasFileResampleUi featureUi;
     featureUi.exportFolder = defaultDir;
 

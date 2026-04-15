@@ -32,7 +32,7 @@
 class RimEclipseResultCase;
 class RimFlowDiagSolution;
 class RimPlot;
-class RigTofWellDistributionCalculator;
+class RimTofWellDistributionCalculator;
 class RiuMultiPlotPage;
 
 class QTextBrowser;

@@ -22,7 +22,7 @@
 #include "RigFault.h"
 #include "RigHexIntersectionTools.h"
 #include "RigMainGrid.h"
-#include "RigReservoirGridTools.h"
+#include "RimReservoirGridTools.h"
 
 #include "RimEclipseCase.h"
 #include "RimEclipseView.h"
@@ -228,7 +228,7 @@ std::set<size_t> RimFractureContainmentTools::reservoirCellIndicesOpenForFlow( c
             fracture cells
 
                         qDebug() << "FracturedCells - Truncated";
-                        qDebug() << RigReservoirGridTools::globalCellIndicesToOneBasedIJKText(
+                        qDebug() << RimReservoirGridTools::globalCellIndicesToOneBasedIJKText(
                             fracturedCellsContainedByFaults.begin(), fracturedCellsContainedByFaults.end(), mainGrid);
             */
         }

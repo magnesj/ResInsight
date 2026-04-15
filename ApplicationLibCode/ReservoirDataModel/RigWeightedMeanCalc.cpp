@@ -21,7 +21,7 @@
 #include "RiaDefines.h"
 
 #include "RigActiveCellInfo.h"
-#include "RigFlowDiagResults.h"
+#include "RigFlowDiagDefines.h"
 
 #include <cmath> // Needed for HUGE_VAL on Linux
 

@@ -22,7 +22,7 @@
 
 #include "RigActiveCellInfo.h"
 #include "RigCaseCellResultsData.h"
-#include "RigReservoirGridTools.h"
+#include "RimReservoirGridTools.h"
 
 #include "Rim3dView.h"
 #include "RimCase.h"
@@ -185,12 +185,12 @@ void RimAdvancedSnapshotExportDefinition::fieldChangedByUi( const caf::PdmFieldH
 
         if ( view() )
         {
-            actCellInfo = RigReservoirGridTools::activeCellInfo( view() );
+            actCellInfo = RimReservoirGridTools::activeCellInfo( view() );
 
             auto rimCase = view()->ownerCase();
             if ( rimCase )
             {
-                mainGrid = RigReservoirGridTools::mainGrid( rimCase );
+                mainGrid = RimReservoirGridTools::mainGrid( rimCase );
             }
         }
 

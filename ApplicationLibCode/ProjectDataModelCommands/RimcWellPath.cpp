@@ -49,8 +49,8 @@
 #include "RigDoglegTools.h"
 #include "RigStimPlanModelTools.h"
 #include "Well/RigWellPath.h"
-#include "Well/RigWellPathGeometryExporter.h"
 #include "Well/RigWellPathGeometryTools.h"
+#include "WellPath/RimWellPathGeometryExporter.h"
 
 #include "cafPdmAbstractFieldScriptingCapability.h"
 #include "cafPdmFieldScriptingCapability.h"
@@ -348,7 +348,7 @@ std::expected<caf::PdmObjectHandle*, QString> RimcWellPath_extractWellPathProper
     double mdStepSize = m_resamplingInterval();
     CAF_ASSERT( mdStepSize > 0.0 );
     double rkbOffset = 0.0;
-    RigWellPathGeometryExporter::computeWellPathDataForExport( *wellPathGeom, mdStepSize, rkbOffset, xValues, yValues, tvdValues, mdValues );
+    RimWellPathGeometryExporter::computeWellPathDataForExport( *wellPathGeom, mdStepSize, rkbOffset, xValues, yValues, tvdValues, mdValues );
 
     auto convertToCharViaFloat = []( const std::vector<double>& doubles ) -> std::vector<char>
     {

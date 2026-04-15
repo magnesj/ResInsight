@@ -19,19 +19,18 @@
 
 #pragma once
 
+#include "RigResultAccessor.h"
+
 #include <QString>
+#include <functional>
 #include <vector>
 
 class RigEclipseCaseData;
-class RimEclipseResultDefinition;
 
 class RigTimeHistoryResultAccessor
 {
 public:
-    static QString             geometrySelectionText( RigEclipseCaseData* eclipseCaseData, size_t m_gridIndex, size_t m_cellIndex );
-    static std::vector<double> timeHistoryValues( RigEclipseCaseData*         eclipseCaseData,
-                                                  RimEclipseResultDefinition* resultDefinition,
-                                                  size_t                      gridIndex,
-                                                  size_t                      cellIndex,
-                                                  size_t                      timeStepCount );
+    static QString geometrySelectionText( RigEclipseCaseData* eclipseCaseData, size_t m_gridIndex, size_t m_cellIndex );
+    static std::vector<double>
+        timeHistoryValues( std::function<cvf::ref<RigResultAccessor>( size_t )> accessorFactory, size_t cellIndex, size_t timeStepCount );
 };

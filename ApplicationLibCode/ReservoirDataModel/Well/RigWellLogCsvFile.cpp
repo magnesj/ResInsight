@@ -18,8 +18,8 @@
 
 #include "RigWellLogCsvFile.h"
 
-#include "RiaInterpolationTools.h"
 #include "RifCsvUserDataParser.h"
+#include "RigInterpolationTools.h"
 #include "RigWellLogCurveData.h"
 #include "RigWellPathGeometryTools.h"
 
@@ -27,9 +27,6 @@
 
 #include "RiaLogging.h"
 #include "RiaStringEncodingTools.h"
-
-#include "RimWellLogCurve.h"
-#include "RimWellPath.h"
 
 #include <QFileInfo>
 #include <QString>
@@ -120,7 +117,7 @@ bool RigWellLogCsvFile::open( const QString& fileName, RigWellPath* wellPath, QS
             std::vector<double> values;
             for ( auto tvd : wellPathTvds )
             {
-                double value = RiaInterpolationTools::linear( readTvds, readValues, tvd, RiaInterpolationTools::ExtrapolationMode::TREND );
+                double value = RigInterpolationTools::linear( readTvds, readValues, tvd, RigInterpolationTools::ExtrapolationMode::TREND );
                 values.push_back( value );
             }
 

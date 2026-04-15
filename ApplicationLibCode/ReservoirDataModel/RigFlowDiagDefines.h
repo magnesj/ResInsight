@@ -24,6 +24,15 @@
 
 namespace RigFlowDiagDefines
 {
+enum class TracerStatusType
+{
+    CLOSED,
+    PRODUCER,
+    INJECTOR,
+    VARYING,
+    UNDEFINED
+};
+
 struct RelPermCurve
 {
     enum Ident

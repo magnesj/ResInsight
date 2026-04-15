@@ -26,7 +26,6 @@
 
 #include "RigVirtualPerforationTransmissibilities.h"
 #include "Well/RigEclipseWellLogExtractor.h"
-#include "Well/RigMswCenterLineCalculator.h"
 #include "Well/RigSimulationWellCenterLineCalculator.h"
 #include "Well/RigWellLogExtractor.h"
 #include "Well/RigWellPath.h"

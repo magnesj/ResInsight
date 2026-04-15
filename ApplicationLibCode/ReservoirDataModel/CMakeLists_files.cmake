@@ -20,16 +20,14 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseAllanFaultsStatCalc.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseCaseData.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseCaseDataTools.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigEclipseCrossPlotDataExtractor.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseMultiPropertyStatCalc.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseNativeStatCalc.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseNativeVisibleCellsStatCalc.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultAddress.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultInfo.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RigElasticProperties.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigEnsembleFractureStatisticsCalculator.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEnsembleParameter.h
+    ${CMAKE_CURRENT_LIST_DIR}/RigInterpolationTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEquil.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFault.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFaultReactivationModel.h
@@ -37,11 +35,8 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagInterfaceTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResultAddress.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResultFrames.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResults.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagSolverInterface.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagStatCalc.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagTimeStepResult.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagVisibleCellsStatCalc.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagDefines.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFormationNames.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFractureCell.h
@@ -53,7 +48,6 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigGridManager.h
     ${CMAKE_CURRENT_LIST_DIR}/RigHexIntersectionTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RigHistogramData.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigLasFileExporter.h
     ${CMAKE_CURRENT_LIST_DIR}/RigLocalGrid.h
     ${CMAKE_CURRENT_LIST_DIR}/RigMainGrid.h
     ${CMAKE_CURRENT_LIST_DIR}/RigNncConnection.h
@@ -73,13 +67,10 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigThermalFractureDefinition.h
     ${CMAKE_CURRENT_LIST_DIR}/RigThermalFractureResult.h
     ${CMAKE_CURRENT_LIST_DIR}/RigThermalFractureResultUtil.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigTofAccumulatedPhaseFractionsCalculator.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigTofWellDistributionCalculator.h
     ${CMAKE_CURRENT_LIST_DIR}/RigTracer.h
     ${CMAKE_CURRENT_LIST_DIR}/RigTracerPoint.h
     ${CMAKE_CURRENT_LIST_DIR}/RigTransmissibilityEquations.h
     ${CMAKE_CURRENT_LIST_DIR}/RigVfpTables.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigVisibleCategoriesCalculator.h
     ${CMAKE_CURRENT_LIST_DIR}/RigWbsParameter.h
     ${CMAKE_CURRENT_LIST_DIR}/RigWeightedMeanCalc.h
     ${CMAKE_CURRENT_LIST_DIR}/RigPolygonTools.h
@@ -113,16 +104,14 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseAllanFaultsStatCalc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseCaseData.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseCaseDataTools.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigEclipseCrossPlotDataExtractor.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseMultiPropertyStatCalc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseNativeStatCalc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseNativeVisibleCellsStatCalc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultAddress.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultInfo.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigElasticProperties.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigEnsembleFractureStatisticsCalculator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEnsembleParameter.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigInterpolationTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEquil.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFault.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFaultReactivationModel.cpp
@@ -130,11 +119,8 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagDefines.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResultAddress.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResultFrames.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResults.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagSolverInterface.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagStatCalc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagTimeStepResult.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagVisibleCellsStatCalc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagDefines.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFormationNames.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFractureCell.cpp
@@ -145,7 +131,6 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigGridManager.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigHexIntersectionTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigHistogramData.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigLasFileExporter.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigLocalGrid.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigMainGrid.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigNncConnection.cpp
@@ -164,13 +149,10 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigThermalFractureDefinition.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigThermalFractureResult.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigThermalFractureResultUtil.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigTofAccumulatedPhaseFractionsCalculator.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigTofWellDistributionCalculator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigTracer.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigTracerPoint.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigTransmissibilityEquations.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigVfpTables.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigVisibleCategoriesCalculator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigWbsParameter.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigWeightedMeanCalc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigPolygonTools.cpp

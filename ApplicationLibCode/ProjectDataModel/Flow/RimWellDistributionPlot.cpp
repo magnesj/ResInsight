@@ -24,7 +24,7 @@
 #include "RimTools.h"
 
 #include "RigEclipseCaseData.h"
-#include "RigTofWellDistributionCalculator.h"
+#include "RimTofWellDistributionCalculator.h"
 
 #include "RiaColorTools.h"
 
@@ -296,7 +296,7 @@ void RimWellDistributionPlot::onLoadDataAndUpdate()
     if ( m_case && m_case->ensureReservoirCaseIsOpen() )
     {
         // tim.reportLapTimeMS("about to start calc");
-        RigTofWellDistributionCalculator calc( m_case, m_wellName, m_timeStepIndex, m_phase() );
+        RimTofWellDistributionCalculator calc( m_case, m_wellName, m_timeStepIndex, m_phase() );
         // tim.reportLapTimeMS("calc");
 
         if ( m_groupSmallContributions )
@@ -336,7 +336,7 @@ void RimWellDistributionPlot::onLoadDataAndUpdate()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimWellDistributionPlot::populatePlotWidgetWithCurveData( const RigTofWellDistributionCalculator& calculator,
+void RimWellDistributionPlot::populatePlotWidgetWithCurveData( const RimTofWellDistributionCalculator& calculator,
                                                                const RimFlowDiagSolution&              flowDiagSolution,
                                                                RiuQwtPlotWidget*                       plotWidget,
                                                                double                                  maximumTof )

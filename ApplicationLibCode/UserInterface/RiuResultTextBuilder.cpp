@@ -30,6 +30,7 @@
 #include "RigNNCData.h"
 #include "RigResultAccessor.h"
 #include "RigResultAccessorFactory.h"
+#include "RimEclipseResultDefinitionTools.h"
 #include "Well/RigSimWellData.h"
 #include "Well/RigWellResultFrame.h"
 #include "Well/RigWellResultPoint.h"
@@ -1100,7 +1101,7 @@ std::map<QString, QString> RiuResultTextBuilder::cellResultTextAndValueText( Rim
             }
 
             cvf::ref<RigResultAccessor> resultAccessor =
-                RigResultAccessorFactory::createFromResultDefinition( eclipseCaseData, m_gridIndex, adjustedTimeStep, eclResDef );
+                RimEclipseResultDefinitionTools::createResultAccessor( eclipseCaseData, m_gridIndex, adjustedTimeStep, eclResDef );
             if ( resultAccessor.notNull() )
             {
                 double  scalarValue           = resultAccessor->cellFaceScalar( m_cellIndex, m_face );

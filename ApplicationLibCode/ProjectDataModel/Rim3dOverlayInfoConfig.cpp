@@ -34,9 +34,9 @@
 #include "RigFemPartCollection.h"
 #include "RigFemPartResultsCollection.h"
 #include "RigFemResultAddress.h"
-#include "RigFlowDiagResults.h"
 #include "RigGeoMechCaseData.h"
 #include "RigMainGrid.h"
+#include "RimFlowDiagResults.h"
 
 #include "ContourMap/RimEclipseContourMapProjection.h"
 #include "ContourMap/RimEclipseContourMapView.h"

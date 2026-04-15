@@ -20,14 +20,15 @@
 
 #include "RigEclipseResultAddress.h"
 
+#include "cvfBoundingBox.h"
 #include "cvfVector3.h"
 
+#include <utility>
 #include <vector>
 
 class RigCaseCellResultsData;
-class RimEclipseCase;
-class RimRegularGridCase;
 class RigFloodingSettings;
+class RigMainGrid;
 
 //==================================================================================================
 ///
@@ -70,15 +71,18 @@ public:
         std::vector<double>     filter;
     };
 
-    static void generateCandidates( RimEclipseCase*            eclipseCase,
-                                    size_t                     timeStepIdx,
-                                    VolumeType                 volumeType,
-                                    VolumesType                volumesType,
-                                    VolumeResultType           volumeResultType,
-                                    const RigFloodingSettings& floodingSettings,
-                                    const ClusteringLimits&    limits,
-                                    bool                       skipUndefinedResults,
-                                    bool                       setTimeStepInView );
+    using CasePair = std::pair<RigCaseCellResultsData*, RigMainGrid*>;
+
+    static void generateCandidates( RigCaseCellResultsData*       resultsData,
+                                    RigMainGrid*                  mainGrid,
+                                    size_t                        timeStepIdx,
+                                    VolumeType                    volumeType,
+                                    VolumesType                   volumesType,
+                                    VolumeResultType              volumeResultType,
+                                    const RigFloodingSettings&    floodingSettings,
+                                    const ClusteringLimits&       limits,
+                                    bool                          skipUndefinedResults,
+                                    RiaDefines::EclipseUnitSystem unitsType );
 
     static std::vector<double> getVolumeVector( RigCaseCellResultsData&       resultsData,
                                                 RiaDefines::EclipseUnitSystem unitsType,
@@ -88,14 +92,12 @@ public:
                                                 size_t                        timeStepIdx,
                                                 const RigFloodingSettings&    floodingSettings );
 
-    static RimRegularGridCase* generateEnsembleCandidates( const std::vector<RimEclipseCase*>& cases,
-                                                           size_t                              timeStepIdx,
-                                                           const cvf::Vec3st&                  resultGridCellCount,
-                                                           VolumeType                          volumeType,
-                                                           VolumesType                         volumesType,
-                                                           VolumeResultType                    volumeResultType,
-                                                           const RigFloodingSettings&          floodingSettings,
-                                                           const ClusteringLimits&             limits );
+    static cvf::BoundingBox computeEnsembleBoundingBox( const std::vector<CasePair>& cases, size_t timeStepIdx );
+
+    static void aggregateEnsembleResults( const std::vector<CasePair>& cases,
+                                          RigCaseCellResultsData*      targetResultsData,
+                                          RigMainGrid*                 targetMainGrid,
+                                          size_t                       timeStepIdx );
 
     static QString wellTargetResultName();
 };

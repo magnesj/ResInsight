@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "RigResultAccessor.h"
+
 #include "RimEclipseResultDefinition.h"
 
 #include <QString>
@@ -62,4 +64,9 @@ QList<caf::PdmOptionItemInfo> calcOptionsForVariableUiFieldStandard( RiaDefines:
                                                                      bool                          showDerivedResultsFirst,
                                                                      bool                          addPerCellFaceOptionItems,
                                                                      bool                          enableTernary );
+
+cvf::ref<RigResultAccessor> createResultAccessor( const RigEclipseCaseData*         eclipseCase,
+                                                  size_t                            gridIndex,
+                                                  size_t                            timeStepIndex,
+                                                  const RimEclipseResultDefinition* resultDefinition );
 }; // namespace RimEclipseResultDefinitionTools

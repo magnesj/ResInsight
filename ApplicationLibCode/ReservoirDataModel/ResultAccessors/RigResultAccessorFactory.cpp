@@ -29,51 +29,11 @@
 #include "RigCombTransResultAccessor.h"
 #include "RigEclipseCaseData.h"
 #include "RigEclipseResultAddress.h"
-#include "RigFlowDiagResults.h"
 #include "RigGridBase.h"
 #include "RigMainGrid.h"
 #include "RigResultAccessor.h"
 
-#include "RimEclipseResultDefinition.h"
-#include "RimFlowDiagSolution.h"
-
 #include <cmath>
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-cvf::ref<RigResultAccessor> RigResultAccessorFactory::createFromResultDefinition( const RigEclipseCaseData*         eclipseCase,
-                                                                                  size_t                            gridIndex,
-                                                                                  size_t                            timeStepIndex,
-                                                                                  const RimEclipseResultDefinition* resultDefinition )
-{
-    if ( resultDefinition->isFlowDiagOrInjectionFlooding() )
-    {
-        RimFlowDiagSolution* flowSol = resultDefinition->flowDiagSolution();
-        if ( !flowSol ) return new RigHugeValResultAccessor;
-        ;
-
-        const std::vector<double>* resultValues =
-            flowSol->flowDiagResults()->resultValues( resultDefinition->flowDiagResAddress(), timeStepIndex );
-        if ( !resultValues ) return new RigHugeValResultAccessor;
-
-        const RigGridBase* grid = eclipseCase->grid( gridIndex );
-        if ( !grid ) return new RigHugeValResultAccessor;
-
-        cvf::ref<RigResultAccessor> object =
-            new RigActiveCellsResultAccessor( grid, resultValues, eclipseCase->activeCellInfo( resultDefinition->porosityModel() ) );
-
-        return object;
-    }
-    else
-    {
-        return RigResultAccessorFactory::createFromResultAddress( eclipseCase,
-                                                                  gridIndex,
-                                                                  resultDefinition->porosityModel(),
-                                                                  timeStepIndex,
-                                                                  resultDefinition->eclipseResultAddress() );
-    }
-}
 
 //--------------------------------------------------------------------------------------------------
 ///

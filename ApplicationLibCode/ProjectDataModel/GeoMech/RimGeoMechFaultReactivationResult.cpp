@@ -29,7 +29,7 @@
 
 #include "RigFemPartCollection.h"
 #include "RigGeoMechCaseData.h"
-#include "RigReservoirGridTools.h"
+#include "RimReservoirGridTools.h"
 
 #include "RimFaultReactivationTools.h"
 #include "RimGeoMechCase.h"

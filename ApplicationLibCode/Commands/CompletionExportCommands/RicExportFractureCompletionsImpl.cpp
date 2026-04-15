@@ -47,8 +47,6 @@
 
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
-#include "RigEclipseToStimPlanCalculator.h"
-#include "RigEclipseToStimPlanCellTransmissibilityCalculator.h"
 #include "RigFractureCell.h"
 #include "RigFractureGrid.h"
 #include "RigFractureTransmissibilityEquations.h"
@@ -57,6 +55,8 @@
 #include "RigTransmissibilityCondenser.h"
 #include "RigTransmissibilityEquations.h"
 #include "RigWellPathStimplanIntersector.h"
+#include "RimEclipseToStimPlanCalculator.h"
+#include "RimEclipseToStimPlanCellTransmissibilityCalculator.h"
 #include "Well/RigSimWellData.h"
 #include "Well/RigSimulationWellCoordsAndMD.h"
 #include "Well/RigWellPath.h"
@@ -122,7 +122,7 @@ std::vector<RigCompletionData>
     {
         // Load the data required by computations to be able to use const access only inside OpenMP loop
 
-        std::vector<QString> resultNames = RigEclipseToStimPlanCellTransmissibilityCalculator::requiredResultNames();
+        std::vector<QString> resultNames = RimEclipseToStimPlanCellTransmissibilityCalculator::requiredResultNames();
 
         bool loadingSucceeded = RicExportFractureCompletionsImpl::loadResultsByName( cellResultsData, resultNames );
         if ( !loadingSucceeded )
@@ -150,7 +150,7 @@ std::vector<RigCompletionData>
 
     {
         // Optional results
-        std::vector<QString> resultNames = RigEclipseToStimPlanCellTransmissibilityCalculator::optionalResultNames();
+        std::vector<QString> resultNames = RimEclipseToStimPlanCellTransmissibilityCalculator::optionalResultNames();
         RicExportFractureCompletionsImpl::loadResultsByName( cellResultsData, resultNames );
     }
 
@@ -278,7 +278,7 @@ std::vector<RigCompletionData>
 
         //////
         // Calculate Matrix To Fracture Trans
-        RigEclipseToStimPlanCalculator eclToFractureCalc( caseToApply,
+        RimEclipseToStimPlanCalculator eclToFractureCalc( caseToApply,
                                                           fracture->transformMatrix(),
                                                           fracTemplate->skinFactor(),
                                                           cDarcyInCorrectUnit,
@@ -592,7 +592,11 @@ void RicExportFractureCompletionsImpl::calculateFractureToWellTransmissibilities
             wellPathPoints = computeWellPointsInFracturePlane( fracture, wellPathGeometry );
         }
 
-        RigWellPathStimplanIntersector                                                wellFractureIntersector( wellPathPoints, fracture );
+        RigWellPathStimplanIntersector                                                wellFractureIntersector( wellPathPoints,
+                                                                fracture->transformMatrix(),
+                                                                fracture->wellRadius(),
+                                                                fracture->perforationLength(),
+                                                                fracture->fractureGrid() );
         const std::map<size_t, RigWellPathStimplanIntersector::WellCellIntersection>& fractureWellCells =
             wellFractureIntersector.intersections();
 
@@ -799,7 +803,7 @@ double RicExportFractureCompletionsImpl::sumUpTransmissibilities( const std::vec
 ///
 //--------------------------------------------------------------------------------------------------
 void RicExportFractureCompletionsImpl::calculateAndSetReportItemData( const std::vector<RigCompletionData>& allCompletionsForOneFracture,
-                                                                      const RigEclipseToStimPlanCalculator& eclToFractureCalc,
+                                                                      const RimEclipseToStimPlanCalculator& eclToFractureCalc,
                                                                       RicWellPathFractureReportItem&        reportItem )
 {
     double areaWeightedMatrixPermeability = eclToFractureCalc.areaWeightedMatrixPermeability();

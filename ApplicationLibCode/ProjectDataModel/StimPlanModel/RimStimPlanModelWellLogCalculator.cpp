@@ -18,9 +18,9 @@
 #include "RimStimPlanModelWellLogCalculator.h"
 
 #include "RiaDefines.h"
-#include "RiaInterpolationTools.h"
 #include "RiaLogging.h"
 #include "RiaStimPlanModelDefines.h"
+#include "RigInterpolationTools.h"
 
 #include "RigActiveCellInfo.h"
 #include "RigCaseCellResultsData.h"
@@ -29,6 +29,7 @@
 #include "RigMainGrid.h"
 #include "RigResultAccessor.h"
 #include "RigResultAccessorFactory.h"
+#include "RimEclipseResultDefinitionTools.h"
 #include "Well/RigEclipseWellLogExtractor.h"
 #include "Well/RigWellLogCurveData.h"
 #include "Well/RigWellPath.h"
@@ -141,7 +142,7 @@ bool RimStimPlanModelWellLogCalculator::calculate( RiaDefines::CurveProperty cur
         }
         else if ( strategy == RimStimPlanModel::MissingValueStrategy::LINEAR_INTERPOLATION )
         {
-            RiaInterpolationTools::interpolateMissingValues( measuredDepthValues, values );
+            RigInterpolationTools::interpolateMissingValues( measuredDepthValues, values );
         }
         else if ( strategy == RimStimPlanModel::MissingValueStrategy::OTHER_CURVE_PROPERTY )
         {
@@ -550,7 +551,7 @@ bool RimStimPlanModelWellLogCalculator::extractValuesForProperty( RiaDefines::Cu
     }
 
     cvf::ref<RigResultAccessor> resAcc =
-        RigResultAccessorFactory::createFromResultDefinition( eclipseCaseData, 0, timeStep, &eclipseResultDefinition );
+        RimEclipseResultDefinitionTools::createResultAccessor( eclipseCaseData, 0, timeStep, &eclipseResultDefinition );
 
     if ( resAcc.notNull() )
     {

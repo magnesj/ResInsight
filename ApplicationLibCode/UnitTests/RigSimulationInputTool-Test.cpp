@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 
-#include "RigSimulationInputTool.h"
+#include "RimSimulationInputTool.h"
 
 #include "RiaTestDataDirectory.h"
 #include "RifOpmDeckTools.h"
@@ -104,7 +104,7 @@ TEST( RigSimulationInputTool, ProcessEqualsRecord_NoOverlap )
     // Sector J is [15-29], so no overlap in J dimension
     auto record = createEqualsRecord( "FIPNUM", 1, 1, 20, 1, 14, 1, 10 );
 
-    auto result = RigSimulationInputTool::processEqualsRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processEqualsRecord( record, sectorMin, sectorMax, refinement );
 
     EXPECT_FALSE( result.has_value() );
     EXPECT_TRUE( result.error().contains( "does not overlap" ) );
@@ -126,7 +126,7 @@ TEST( RigSimulationInputTool, ProcessEqualsRecord_PartialOverlapWithClamping )
     // Intersection (clamped): I[0-19], J[15-29], K[0-9]
     auto record = createEqualsRecord( "FIPNUM", 2, 1, 20, 15, 30, 1, 10 );
 
-    auto result = RigSimulationInputTool::processEqualsRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processEqualsRecord( record, sectorMin, sectorMax, refinement );
 
     ASSERT_TRUE( result.has_value() );
 
@@ -162,7 +162,7 @@ TEST( RigSimulationInputTool, ProcessEqualsRecord_CompletelyInside )
     // Converts to 0-based: I[4-14], J[4-14], K[1-7]
     auto record = createEqualsRecord( "FIPNUM", 3, 5, 15, 5, 15, 2, 8 );
 
-    auto result = RigSimulationInputTool::processEqualsRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processEqualsRecord( record, sectorMin, sectorMax, refinement );
 
     ASSERT_TRUE( result.has_value() );
 
@@ -193,7 +193,7 @@ TEST( RigSimulationInputTool, ProcessEqualsRecord_CompletelyOutside )
     // No overlap with sector
     auto record = createEqualsRecord( "FIPNUM", 4, 20, 30, 20, 30, 1, 10 );
 
-    auto result = RigSimulationInputTool::processEqualsRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processEqualsRecord( record, sectorMin, sectorMax, refinement );
 
     EXPECT_FALSE( result.has_value() );
     EXPECT_TRUE( result.error().contains( "does not overlap" ) );
@@ -215,7 +215,7 @@ TEST( RigSimulationInputTool, ProcessEqualsRecord_InvalidRecord )
 
     Opm::DeckRecord record{ std::move( items ) };
 
-    auto result = RigSimulationInputTool::processEqualsRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processEqualsRecord( record, sectorMin, sectorMax, refinement );
 
     EXPECT_FALSE( result.has_value() );
     EXPECT_TRUE( result.error().contains( "insufficient items" ) );
@@ -237,7 +237,7 @@ TEST( RigSimulationInputTool, ProcessEqualsRecord_NoBoxDefinition )
 
     Opm::DeckRecord record{ std::move( items ) };
 
-    auto result = RigSimulationInputTool::processEqualsRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processEqualsRecord( record, sectorMin, sectorMax, refinement );
 
     EXPECT_TRUE( result.has_value() );
     EXPECT_EQ( result->size(), 2U );
@@ -259,7 +259,7 @@ TEST( RigSimulationInputTool, ProcessEqualsRecord_AtBoundary )
     // Converts to 0-based: I[5-14], J[5-14], K[5-14]
     auto record = createEqualsRecord( "FIPNUM", 5, 6, 15, 6, 15, 6, 15 );
 
-    auto result = RigSimulationInputTool::processEqualsRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processEqualsRecord( record, sectorMin, sectorMax, refinement );
 
     ASSERT_TRUE( result.has_value() );
 
@@ -309,7 +309,7 @@ TEST( RigSimulationInputTool, ProcessAquconRecord_PartialOverlap )
     // Overlap: I[56-56], J[27-35], K[45-57] - all inside, no clamping needed
     auto record = createAquconRecord( 1, 57, 57, 28, 36, 46, 58, "I+" );
 
-    auto result = RigSimulationInputTool::processAquconRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processAquconRecord( record, sectorMin, sectorMax, refinement );
 
     ASSERT_TRUE( result.has_value() );
 
@@ -344,7 +344,7 @@ TEST( RigSimulationInputTool, ProcessAquconRecord_PartialOverlapWithClamping )
     // Sector K is [21-58], so K[4-10] is outside and should be skipped
     auto record = createAquconRecord( 1, 79, 79, 41, 67, 5, 11, "I+" );
 
-    auto result = RigSimulationInputTool::processAquconRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processAquconRecord( record, sectorMin, sectorMax, refinement );
 
     // This should fail because K range [4-10] doesn't overlap with sector K range [21-58]
     EXPECT_FALSE( result.has_value() );
@@ -366,7 +366,7 @@ TEST( RigSimulationInputTool, ProcessAquconRecord_CompletelyInside )
     // However, K[11-16] is outside sector K[21-58], so this should fail
     auto record = createAquconRecord( 1, 61, 61, 48, 72, 12, 17, "I+" );
 
-    auto result = RigSimulationInputTool::processAquconRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processAquconRecord( record, sectorMin, sectorMax, refinement );
 
     EXPECT_FALSE( result.has_value() );
 }
@@ -386,7 +386,7 @@ TEST( RigSimulationInputTool, ProcessAquconRecord_NoBoxDefinition )
 
     Opm::DeckRecord record{ std::move( items ) };
 
-    auto result = RigSimulationInputTool::processAquconRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processAquconRecord( record, sectorMin, sectorMax, refinement );
 
     EXPECT_TRUE( result.has_value() );
     EXPECT_EQ( result->size(), 1U );
@@ -445,7 +445,7 @@ TEST( RigSimulationInputTool, ExportModel5 )
 
     // Export simulation input
     resultCase->setReservoirData( caseData.p() );
-    auto exportResult = RigSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
+    auto exportResult = RimSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
     ASSERT_TRUE( exportResult.has_value() ) << "Export failed: " << exportResult.error().toStdString();
 
     // Verify exported file exists
@@ -538,7 +538,7 @@ TEST( RigSimulationInputTool, ExportModel5WithBcconBcprop )
 
     // Export simulation input
     resultCase->setReservoirData( caseData.p() );
-    auto exportResult = RigSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
+    auto exportResult = RimSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
     ASSERT_TRUE( exportResult.has_value() ) << "Export failed: " << exportResult.error().toStdString();
 
     // Verify exported file exists
@@ -637,7 +637,7 @@ TEST( RigSimulationInputTool, ExportModel5_DataKeywordCropping )
 
     // Export simulation input
     resultCase->setReservoirData( caseData.p() );
-    auto exportResult = RigSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
+    auto exportResult = RimSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
     ASSERT_TRUE( exportResult.has_value() ) << "Export failed: " << exportResult.error().toStdString();
 
     // Verify exported file exists
@@ -746,7 +746,7 @@ TEST( RigSimulationInputTool, ExportModel5_DataKeywordCropping_4EqlnumRegions )
 
     // Export simulation input
     resultCase->setReservoirData( caseData.p() );
-    auto exportResult = RigSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
+    auto exportResult = RimSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
     ASSERT_TRUE( exportResult.has_value() ) << "Export failed: " << exportResult.error().toStdString();
 
     // Verify exported file exists
@@ -849,7 +849,7 @@ TEST( RigSimulationInputTool, ProcessBoxRecord_LargeBox )
     // Converts to 0-based: I[0-45], J[0-111], K[0-21]
     auto record = createBoxRecord( 1, 46, 1, 112, 1, 22 );
 
-    auto result = RigSimulationInputTool::processBoxRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processBoxRecord( record, sectorMin, sectorMax, refinement );
 
     ASSERT_TRUE( result.has_value() );
 
@@ -882,7 +882,7 @@ TEST( RigSimulationInputTool, ProcessBoxRecord_LargeBoxWithRefinement )
     // After clamping to sector: I[19-45], J[59-111], K[0-21]
     auto record = createBoxRecord( 1, 46, 1, 112, 1, 22 );
 
-    auto result = RigSimulationInputTool::processBoxRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processBoxRecord( record, sectorMin, sectorMax, refinement );
 
     ASSERT_TRUE( result.has_value() );
 
@@ -919,7 +919,7 @@ TEST( RigSimulationInputTool, ProcessBoxRecord_PartialOverlapWithClamping )
     // Intersection (clamped): I[10-39], J[20-99], K[5-19]
     auto record = createBoxRecord( 1, 46, 1, 112, 1, 22 );
 
-    auto result = RigSimulationInputTool::processBoxRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processBoxRecord( record, sectorMin, sectorMax, refinement );
 
     ASSERT_TRUE( result.has_value() );
 
@@ -952,7 +952,7 @@ TEST( RigSimulationInputTool, ProcessBoxRecord_CompletelyInside )
     // All inside sector, no clamping needed
     auto record = createBoxRecord( 5, 20, 10, 50, 5, 15 );
 
-    auto result = RigSimulationInputTool::processBoxRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processBoxRecord( record, sectorMin, sectorMax, refinement );
 
     ASSERT_TRUE( result.has_value() );
 
@@ -983,7 +983,7 @@ TEST( RigSimulationInputTool, ProcessBoxRecord_NoOverlap )
     // No overlap in I and J dimensions with sector
     auto record = createBoxRecord( 30, 50, 40, 60, 1, 10 );
 
-    auto result = RigSimulationInputTool::processBoxRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processBoxRecord( record, sectorMin, sectorMax, refinement );
 
     EXPECT_FALSE( result.has_value() );
     EXPECT_TRUE( result.error().contains( "does not overlap" ) );
@@ -1006,7 +1006,7 @@ TEST( RigSimulationInputTool, ProcessBoxRecord_InvalidRecord )
 
     Opm::DeckRecord record{ std::move( items ) };
 
-    auto result = RigSimulationInputTool::processBoxRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processBoxRecord( record, sectorMin, sectorMax, refinement );
 
     EXPECT_FALSE( result.has_value() );
     EXPECT_TRUE( result.error().contains( "insufficient items" ) );
@@ -1026,7 +1026,7 @@ TEST( RigSimulationInputTool, ProcessBoxRecord_AtBoundary )
     // Converts to 0-based: I[5-24], J[10-39], K[3-12]
     auto record = createBoxRecord( 6, 25, 11, 40, 4, 13 );
 
-    auto result = RigSimulationInputTool::processBoxRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processBoxRecord( record, sectorMin, sectorMax, refinement );
 
     ASSERT_TRUE( result.has_value() );
 
@@ -1092,7 +1092,7 @@ TEST( RigSimulationInputTool, ExportModel5WithRefinement )
 
     // Export simulation input
     resultCase->setReservoirData( caseData.p() );
-    auto exportResult = RigSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
+    auto exportResult = RimSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
     ASSERT_TRUE( exportResult.has_value() ) << "Export failed: " << exportResult.error().toStdString();
 
     // Verify exported file exists
@@ -1279,7 +1279,7 @@ TEST( RigSimulationInputTool, ExportModel5WithRefinement_3_5_1 )
 
     // Export simulation input
     resultCase->setReservoirData( caseData.p() );
-    auto exportResult = RigSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
+    auto exportResult = RimSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
     ASSERT_TRUE( exportResult.has_value() ) << "Export failed: " << exportResult.error().toStdString();
 
     // Verify exported file exists
@@ -1452,7 +1452,7 @@ TEST( RigSimulationInputTool, FilterNNCConnections_BothInside )
     RigMainGrid* mainGrid = caseData->mainGrid();
 
     // Create test connections using the real grid
-    std::vector<RigSimulationInputTool::NNCConnection> allConnections;
+    std::vector<RimSimulationInputTool::NNCConnection> allConnections;
 
     // Connection 1: (2,3,4) to (3,3,4) - both inside sector [1,5] x [1,5] x [1,5]
     size_t c1Idx = mainGrid->cellIndexFromIJK( 2, 3, 4 );
@@ -1473,7 +1473,7 @@ TEST( RigSimulationInputTool, FilterNNCConnections_BothInside )
     caf::VecIjk0 sectorMin( 1, 1, 1 );
     caf::VecIjk0 sectorMax( 5, 5, 5 );
 
-    auto filtered = RigSimulationInputTool::filterInternalSectorConnections( allConnections, *mainGrid, sectorMin, sectorMax );
+    auto filtered = RimSimulationInputTool::filterInternalSectorConnections( allConnections, *mainGrid, sectorMin, sectorMax );
 
     // Only connection 1 should remain
     ASSERT_EQ( 1u, filtered.size() );
@@ -1494,13 +1494,13 @@ TEST( RigSimulationInputTool, TransformNNCToSectorCoordinates_NoRefinement )
     size_t c1Idx = mainGrid->cellIndexFromIJK( 10, 15, 5 );
     size_t c2Idx = mainGrid->cellIndexFromIJK( 11, 15, 5 );
 
-    RigSimulationInputTool::NNCConnection connection{ c1Idx, c2Idx, 4.5 };
+    RimSimulationInputTool::NNCConnection connection{ c1Idx, c2Idx, 4.5 };
 
     // Sector starts at (5,10,2), grid is 20x30x10
     caf::VecIjk0 sectorMin( 5, 10, 2 );
     auto         refinement = RigUniformRefinement( cvf::Vec3st( 1, 1, 1 ), cvf::Vec3st( 20, 30, 10 ) );
 
-    auto result = RigSimulationInputTool::transformNNCToSectorCoordinates( connection, *mainGrid, sectorMin, refinement );
+    auto result = RimSimulationInputTool::transformNNCToSectorCoordinates( connection, *mainGrid, sectorMin, refinement );
 
     ASSERT_TRUE( result.has_value() );
 
@@ -1531,12 +1531,12 @@ TEST( RigSimulationInputTool, RefineEDITNNCConnection_CorrespondingSubcells )
     size_t c1Idx = mainGrid->cellIndexFromIJK( 3, 4, 5 );
     size_t c2Idx = mainGrid->cellIndexFromIJK( 6, 8, 7 );
 
-    RigSimulationInputTool::NNCConnection connection{ c1Idx, c2Idx, 2.5 }; // TRAN_MULT = 2.5
+    RimSimulationInputTool::NNCConnection connection{ c1Idx, c2Idx, 2.5 }; // TRAN_MULT = 2.5
 
     caf::VecIjk0 sectorMin( 0, 0, 0 );
     auto refinement = RigUniformRefinement( cvf::Vec3st( 2, 2, 1 ), cvf::Vec3st( 20, 30, 10 ) ); // Refine by 2x2x1, grid is 20x30x10
 
-    auto refined = RigSimulationInputTool::refineEditNncConnection( connection, *mainGrid, sectorMin, refinement );
+    auto refined = RimSimulationInputTool::refineEditNncConnection( connection, *mainGrid, sectorMin, refinement );
 
     // For EDITNNC: creates connections between corresponding subcells
     // Should create 2*2*1 = 4 connections (one per subcell pair at same relative position)
@@ -1635,7 +1635,7 @@ TEST( RigSimulationInputTool, ExportModel5WithPadding )
 
     // Export simulation input
     resultCase->setReservoirData( caseData.p() );
-    auto exportResult = RigSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
+    auto exportResult = RimSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
     ASSERT_TRUE( exportResult.has_value() ) << "Export failed: " << exportResult.error().toStdString();
 
     // Verify exported file exists
@@ -1762,7 +1762,7 @@ TEST( RigSimulationInputTool, ProcessAddRecord_NoBoxIndices )
 
     auto record = createAddRecordNoBox( "PORO", 0.1 );
 
-    auto result = RigSimulationInputTool::processAddRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processAddRecord( record, sectorMin, sectorMax, refinement );
     ASSERT_TRUE( result.has_value() );
 
     // Should have only 2 items (field name and shift value, no box indices)
@@ -1784,7 +1784,7 @@ TEST( RigSimulationInputTool, ProcessAddRecord_WithBoxIndices )
     // ADD record with box fully inside sector (1-based Eclipse coords)
     auto record = createAddRecord( "PORO", 0.05, 1, 20, 16, 30, 1, 10 );
 
-    auto result = RigSimulationInputTool::processAddRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processAddRecord( record, sectorMin, sectorMax, refinement );
     ASSERT_TRUE( result.has_value() );
 
     // Should have 8 items with transformed coordinates
@@ -1811,7 +1811,7 @@ TEST( RigSimulationInputTool, ProcessMultiplyRecord_NoBoxIndices )
 
     auto record = createMultiplyRecordNoBox( "PERMX", 2.0 );
 
-    auto result = RigSimulationInputTool::processMultiplyRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processMultiplyRecord( record, sectorMin, sectorMax, refinement );
     ASSERT_TRUE( result.has_value() );
 
     // Should have only 2 items (field name and factor, no box indices)
@@ -1833,7 +1833,7 @@ TEST( RigSimulationInputTool, ProcessMultiplyRecord_WithBoxIndices )
     // MULTIPLY record with box fully inside sector
     auto record = createMultiplyRecord( "PERMX", 3.0, 1, 20, 16, 30, 1, 10 );
 
-    auto result = RigSimulationInputTool::processMultiplyRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processMultiplyRecord( record, sectorMin, sectorMax, refinement );
     ASSERT_TRUE( result.has_value() );
 
     // Should have 8 items with transformed coordinates
@@ -1893,7 +1893,7 @@ TEST( RigSimulationInputTool, ExpandBoxContext_EqualsInheritsBoxIndices )
     settings.setMax( caf::VecIjk0( 9, 9, 4 ) );
     setSettingsRefinement( settings, cvf::Vec3st( 1, 1, 1 ) );
 
-    RigSimulationInputTool::transformKeywordsInDeckFile( nullptr, settings, deckFile );
+    RimSimulationInputTool::transformKeywordsInDeckFile( nullptr, settings, deckFile );
 
     // Verify EQUALS now has explicit box indices matching the BOX keyword
     auto equalsAfterVec = deckFile.findAllKeywordsWithIndices( "EQUALS" );
@@ -1943,7 +1943,7 @@ TEST( RigSimulationInputTool, ExpandBoxContext_ExplicitIndicesPreserved )
     settings.setMax( caf::VecIjk0( 9, 9, 4 ) );
     setSettingsRefinement( settings, cvf::Vec3st( 1, 1, 1 ) );
 
-    RigSimulationInputTool::transformKeywordsInDeckFile( nullptr, settings, deckFile );
+    RimSimulationInputTool::transformKeywordsInDeckFile( nullptr, settings, deckFile );
 
     auto equalsVec = deckFile.findAllKeywordsWithIndices( "EQUALS" );
     ASSERT_EQ( 1u, equalsVec.size() );
@@ -1990,7 +1990,7 @@ TEST( RigSimulationInputTool, ExpandBoxContext_OutsideBoxNotModified )
     settings.setMax( caf::VecIjk0( 9, 9, 4 ) );
     setSettingsRefinement( settings, cvf::Vec3st( 1, 1, 1 ) );
 
-    RigSimulationInputTool::transformKeywordsInDeckFile( nullptr, settings, deckFile );
+    RimSimulationInputTool::transformKeywordsInDeckFile( nullptr, settings, deckFile );
 
     auto equalsVec = deckFile.findAllKeywordsWithIndices( "EQUALS" );
     ASSERT_EQ( 1u, equalsVec.size() );
@@ -2046,7 +2046,7 @@ TEST( RigSimulationInputTool, CropDataKeywordsInsideBoxContext )
     settings.setMax( caf::VecIjk0( 7, 7, 4 ) );
     setSettingsRefinement( settings, cvf::Vec3st( 1, 1, 1 ) );
 
-    RigSimulationInputTool::transformKeywordsInDeckFile( nullptr, settings, deckFile );
+    RimSimulationInputTool::transformKeywordsInDeckFile( nullptr, settings, deckFile );
 
     // After cropping: should still find two EQLNUM keywords
     auto eqlnumAfter = deckFile.findAllKeywordsWithIndices( "EQLNUM" );
@@ -2107,7 +2107,7 @@ TEST( RigSimulationInputTool, CropDataKeywordsInsideBoxContext_NoIntersection )
     settings.setMax( caf::VecIjk0( 7, 7, 2 ) );
     setSettingsRefinement( settings, cvf::Vec3st( 1, 1, 1 ) );
 
-    RigSimulationInputTool::transformKeywordsInDeckFile( nullptr, settings, deckFile );
+    RimSimulationInputTool::transformKeywordsInDeckFile( nullptr, settings, deckFile );
 
     // Boxed EQLNUM should be removed since box doesn't intersect sector
     auto eqlnumAfter = deckFile.findAllKeywordsWithIndices( "EQLNUM" );
@@ -2172,7 +2172,7 @@ TEST( RigSimulationInputTool, ExportModel5_DataKeywordInsideBox )
 
     // Export simulation input
     resultCase->setReservoirData( caseData.p() );
-    auto exportResult = RigSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
+    auto exportResult = RimSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
     ASSERT_TRUE( exportResult.has_value() ) << "Export failed: " << exportResult.error().toStdString();
 
     // Verify exported file exists
@@ -2228,7 +2228,7 @@ TEST( RigSimulationInputTool, ProcessMultiplyRecord_NoOverlap )
     // Sector J is [15-29], so no overlap in J dimension
     auto record = createMultiplyRecord( "PERMX", 2.0, 1, 20, 1, 14, 1, 10 );
 
-    auto result = RigSimulationInputTool::processMultiplyRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processMultiplyRecord( record, sectorMin, sectorMax, refinement );
 
     EXPECT_FALSE( result.has_value() );
     EXPECT_TRUE( result.error().contains( "does not overlap" ) );
@@ -2248,7 +2248,7 @@ TEST( RigSimulationInputTool, ProcessMultiplyRecord_PartialOverlapWithClamping )
     // Clamped to sector: I[0-19], J[15-29], K[0-9]
     auto record = createMultiplyRecord( "PERMX", 3.5, 1, 20, 15, 30, 1, 10 );
 
-    auto result = RigSimulationInputTool::processMultiplyRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processMultiplyRecord( record, sectorMin, sectorMax, refinement );
 
     ASSERT_TRUE( result.has_value() );
 
@@ -2277,7 +2277,7 @@ TEST( RigSimulationInputTool, ProcessMultiplyRecord_CompletelyInsideSector )
     // Converts to 0-based: I[3-5], J[3-5], K[1-3] — inside sector
     auto record = createMultiplyRecord( "PORV", 0.5, 4, 6, 4, 6, 2, 4 );
 
-    auto result = RigSimulationInputTool::processMultiplyRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processMultiplyRecord( record, sectorMin, sectorMax, refinement );
 
     ASSERT_TRUE( result.has_value() );
 
@@ -2307,7 +2307,7 @@ TEST( RigSimulationInputTool, ProcessAddRecord_NoOverlap )
     // Sector J is [15-29], so no overlap
     auto record = createAddRecord( "PRESSURE", 100.0, 1, 20, 1, 14, 1, 10 );
 
-    auto result = RigSimulationInputTool::processAddRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processAddRecord( record, sectorMin, sectorMax, refinement );
 
     EXPECT_FALSE( result.has_value() );
     EXPECT_TRUE( result.error().contains( "does not overlap" ) );
@@ -2327,7 +2327,7 @@ TEST( RigSimulationInputTool, ProcessAddRecord_PartialOverlapWithClamping )
     // Clamped to sector: I[0-19], J[15-29], K[0-9]
     auto record = createAddRecord( "PRESSURE", -50.0, 1, 20, 15, 30, 1, 10 );
 
-    auto result = RigSimulationInputTool::processAddRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processAddRecord( record, sectorMin, sectorMax, refinement );
 
     ASSERT_TRUE( result.has_value() );
 
@@ -2356,7 +2356,7 @@ TEST( RigSimulationInputTool, ProcessAddRecord_CompletelyInsideSector )
     // Converts to 0-based: I[3-5], J[3-5], K[1-3] — inside sector
     auto record = createAddRecord( "PORO", 0.01, 4, 6, 4, 6, 2, 4 );
 
-    auto result = RigSimulationInputTool::processAddRecord( record, sectorMin, sectorMax, refinement );
+    auto result = RimSimulationInputTool::processAddRecord( record, sectorMin, sectorMax, refinement );
 
     ASSERT_TRUE( result.has_value() );
 
@@ -2406,7 +2406,7 @@ TEST( RigSimulationInputTool, MultiplyInsideBoxContext_NoIntersection )
     settings.setMax( caf::VecIjk0( 7, 7, 2 ) );
     setSettingsRefinement( settings, cvf::Vec3st( 1, 1, 1 ) );
 
-    RigSimulationInputTool::transformKeywordsInDeckFile( nullptr, settings, deckFile );
+    RimSimulationInputTool::transformKeywordsInDeckFile( nullptr, settings, deckFile );
 
     // MULTIPLY record with box K=5 (0-based K=4) outside sector K[0-2] should be removed
     auto multiplyAll = deckFile.findAllKeywordsWithIndices( "MULTIPLY" );
@@ -2451,7 +2451,7 @@ TEST( RigSimulationInputTool, MultiplyInsideBoxContext_WithIntersection )
     settings.setMax( caf::VecIjk0( 7, 7, 4 ) );
     setSettingsRefinement( settings, cvf::Vec3st( 1, 1, 1 ) );
 
-    RigSimulationInputTool::transformKeywordsInDeckFile( nullptr, settings, deckFile );
+    RimSimulationInputTool::transformKeywordsInDeckFile( nullptr, settings, deckFile );
 
     auto multiplyAll = deckFile.findAllKeywordsWithIndices( "MULTIPLY" );
     ASSERT_EQ( 1u, multiplyAll.size() );
@@ -2507,7 +2507,7 @@ TEST( RigSimulationInputTool, AddInsideBoxContext_WithIntersection )
     settings.setMax( caf::VecIjk0( 7, 7, 4 ) );
     setSettingsRefinement( settings, cvf::Vec3st( 1, 1, 1 ) );
 
-    RigSimulationInputTool::transformKeywordsInDeckFile( nullptr, settings, deckFile );
+    RimSimulationInputTool::transformKeywordsInDeckFile( nullptr, settings, deckFile );
 
     auto addAll = deckFile.findAllKeywordsWithIndices( "ADD" );
     ASSERT_EQ( 1u, addAll.size() );
@@ -2564,7 +2564,7 @@ TEST( RigSimulationInputTool, AddInsideBoxContext_NoIntersection )
     settings.setMax( caf::VecIjk0( 7, 7, 2 ) );
     setSettingsRefinement( settings, cvf::Vec3st( 1, 1, 1 ) );
 
-    RigSimulationInputTool::transformKeywordsInDeckFile( nullptr, settings, deckFile );
+    RimSimulationInputTool::transformKeywordsInDeckFile( nullptr, settings, deckFile );
 
     // ADD record with box K=5 (0-based K=4) outside sector K[0-2] should be removed
     auto addAll = deckFile.findAllKeywordsWithIndices( "ADD" );
@@ -2628,7 +2628,7 @@ TEST( RigSimulationInputTool, ExportModel5_FipKeywordCropping )
 
     // Export simulation input
     resultCase->setReservoirData( caseData.p() );
-    auto exportResult = RigSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
+    auto exportResult = RimSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
     ASSERT_TRUE( exportResult.has_value() ) << "Export failed: " << exportResult.error().toStdString();
 
     // Verify exported file exists
@@ -2757,7 +2757,7 @@ TEST( RigSimulationInputTool, ExportModel5WithPadding_FipKeyword )
 
     // Export simulation input
     resultCase->setReservoirData( caseData.p() );
-    auto exportResult = RigSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
+    auto exportResult = RimSimulationInputTool::exportSimulationInput( *resultCase, settings, visibility.p() );
     ASSERT_TRUE( exportResult.has_value() ) << "Export failed: " << exportResult.error().toStdString();
 
     // Verify exported file exists

@@ -25,7 +25,7 @@
 #include "RigEclipseCaseData.h"
 #include "RigFemPartResultsCollection.h"
 #include "RigGeoMechCaseData.h"
-#include "RigResultAccessorFactory.h"
+#include "RimEclipseResultDefinitionTools.h"
 #include "Well/RigEclipseWellLogExtractor.h"
 #include "Well/RigGeoMechWellLogExtractor.h"
 #include "Well/RigWellLogLasFile.h"
@@ -195,7 +195,7 @@ void Rim3dWellLogExtractionCurve::curveValuesAndMdsAtTimeStep( std::vector<doubl
             m_eclipseResultDefinition->loadResult();
 
             cvf::ref<RigResultAccessor> resAcc =
-                RigResultAccessorFactory::createFromResultDefinition( eclipseCase->eclipseCaseData(), 0, timeStep, m_eclipseResultDefinition );
+                RimEclipseResultDefinitionTools::createResultAccessor( eclipseCase->eclipseCaseData(), 0, timeStep, m_eclipseResultDefinition );
             if ( resAcc.notNull() )
             {
                 eclExtractor->curveData( resAcc.p(), values );

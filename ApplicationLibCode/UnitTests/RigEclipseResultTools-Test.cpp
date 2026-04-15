@@ -23,7 +23,7 @@
 #include "RifEclipseInputFileTools.h"
 #include "RifOpmFlowDeckFile.h"
 #include "RifReaderEclipseOutput.h"
-#include "RigEclipseResultTools.h"
+#include "RimEclipseResultTools.h"
 
 #include "ProjectDataModel/Jobs/RimKeywordFactory.h"
 
@@ -32,8 +32,8 @@
 #include "RigGridExportAdapter.h"
 #include "RigMainGrid.h"
 #include "RigNoRefinement.h"
-#include "RigSimulationInputTool.h"
 #include "RimEclipseResultCase.h"
+#include "RimSimulationInputTool.h"
 
 #include "opm/input/eclipse/Deck/DeckKeyword.hpp"
 
@@ -130,19 +130,19 @@ TEST( RigEclipseResultToolsTest, BorderCellBcconGeneration )
                                                            min.z() + i / ( gridAdapter.cellCountI() * gridAdapter.cellCountJ() ) ) );
     }
 
-    auto borderResult = RigEclipseResultTools::generateBorderResult( gridAdapter, refinedVisibility );
+    auto borderResult = RimEclipseResultTools::generateBorderResult( gridAdapter, refinedVisibility );
 
     // Verify border result values
     EXPECT_EQ( borderResult.size(), refinedCells );
 
     // Step 4: Generate BCCON result (takes border result as input, returns vector)
-    auto bcconResult = RigEclipseResultTools::generateBcconResult( gridAdapter, borderResult );
+    auto bcconResult = RimEclipseResultTools::generateBcconResult( gridAdapter, borderResult );
 
     // Verify BCCON values
     EXPECT_EQ( bcconResult.size(), refinedCells );
 
     // Step 5: Generate border cell faces using in-memory results
-    auto borderCellFaces = RigEclipseResultTools::generateBorderCellFaces( gridAdapter, borderResult, bcconResult );
+    auto borderCellFaces = RimEclipseResultTools::generateBorderCellFaces( gridAdapter, borderResult, bcconResult );
 
     // Step 6: Verify results
     EXPECT_GT( borderCellFaces.size(), 0 ) << "No border cell faces generated";
@@ -292,14 +292,14 @@ TEST( RigEclipseResultToolsTest, BcconResultWithFaceNumbering )
     RigGridExportAdapter gridAdapter( caseData.p(), min, max, refinement, customVisibility.p() );
 
     // Create refined visibility (same as original since refinement=1)
-    std::vector<int> refinedVisibility = RigSimulationInputTool::createRefinedVisibility( gridAdapter );
+    std::vector<int> refinedVisibility = RimSimulationInputTool::createRefinedVisibility( gridAdapter );
 
-    auto borderResult = RigEclipseResultTools::generateBorderResult( gridAdapter, refinedVisibility );
+    auto borderResult = RimEclipseResultTools::generateBorderResult( gridAdapter, refinedVisibility );
 
     ASSERT_FALSE( borderResult.empty() ) << "Border result is empty";
 
     // Step 4: Generate BCCON result (returns vector)
-    auto bcconResult = RigEclipseResultTools::generateBcconResult( gridAdapter, borderResult );
+    auto bcconResult = RimEclipseResultTools::generateBcconResult( gridAdapter, borderResult );
 
     ASSERT_FALSE( bcconResult.empty() ) << "BCCON result is empty";
 
@@ -320,7 +320,7 @@ TEST( RigEclipseResultToolsTest, BcconResultWithFaceNumbering )
                 int bcconValue  = bcconResult[refinedIdx];
 
                 // Only check border cells
-                if ( borderValue == RigEclipseResultTools::BorderType::BORDER_CELL )
+                if ( borderValue == RimEclipseResultTools::BorderType::BORDER_CELL )
                 {
                     // Verify BCCON value is in valid range 1-6
                     EXPECT_GE( bcconValue, 1 ) << "BCCON value out of range at refined (" << i << "," << j << "," << k << ")";

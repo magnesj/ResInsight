@@ -27,8 +27,8 @@
 #include "RigEclipseCaseData.h"
 #include "RigEclipseCaseDataTools.h"
 #include "RigEclipseResultAddress.h"
-#include "RigEclipseResultTools.h"
 #include "RigMainGrid.h"
+#include "RimEclipseResultTools.h"
 
 #include "ProjectDataModel/Jobs/RimKeywordBcprop.h"
 #include "RimEclipseCase.h"

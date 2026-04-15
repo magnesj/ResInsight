@@ -23,7 +23,7 @@
 #include "RimStimPlanModel.h"
 #include "RimWellPath.h"
 
-#include "Well/RigWellPathGeometryExporter.h"
+#include "WellPath/RimWellPathGeometryExporter.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -54,7 +54,7 @@ bool RifStimPlanModelDeviationFrkExporter::writeToFile( RimStimPlanModel* stimPl
     std::vector<double> yValues;
     std::vector<double> tvdValues;
     std::vector<double> mdValues;
-    RigWellPathGeometryExporter::computeWellPathDataForExport( wellPath, mdStepSize, xValues, yValues, tvdValues, mdValues, showTextMdRkb );
+    RimWellPathGeometryExporter::computeWellPathDataForExport( wellPath, mdStepSize, xValues, yValues, tvdValues, mdValues, showTextMdRkb );
     convertFromMeterToFeet( mdValues );
     convertFromMeterToFeet( tvdValues );
 

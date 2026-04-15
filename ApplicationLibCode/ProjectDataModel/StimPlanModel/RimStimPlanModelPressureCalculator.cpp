@@ -19,9 +19,9 @@
 
 #include "RiaDefines.h"
 #include "RiaEclipseUnitTools.h"
-#include "RiaInterpolationTools.h"
 #include "RiaLogging.h"
 #include "RiaStimPlanModelDefines.h"
+#include "RigInterpolationTools.h"
 
 #include "RigActiveCellInfo.h"
 #include "RigCaseCellResultsData.h"
@@ -211,7 +211,7 @@ bool RimStimPlanModelPressureCalculator::extractValuesForProperty( RiaDefines::C
             }
 
             // Fill in regions where it was not possible top interpolate with equilibration regions.
-            if ( hasMissingValues( values ) ) RiaInterpolationTools::interpolateMissingValues( measuredDepthValues, values );
+            if ( hasMissingValues( values ) ) RigInterpolationTools::interpolateMissingValues( measuredDepthValues, values );
         }
     }
     else if ( curveProperty == RiaDefines::CurveProperty::PRESSURE_GRADIENT )
@@ -293,7 +293,7 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>>
                 // Interpolate a value for the given md
                 std::vector<double> xs = { sourceMds[startIndex], md, sourceMds[endIndex] };
                 std::vector<double> ys = { prevValue, std::numeric_limits<double>::infinity(), sourceValues[endIndex] };
-                RiaInterpolationTools::interpolateMissingValues( xs, ys );
+                RigInterpolationTools::interpolateMissingValues( xs, ys );
                 value = ys[1];
             }
 
@@ -380,7 +380,7 @@ bool RimStimPlanModelPressureCalculator::extractPressureDataFromTable( RiaDefine
 
     if ( needsExtrapolation )
     {
-        RiaInterpolationTools::interpolateMissingValues( tvDepthValues, values );
+        RigInterpolationTools::interpolateMissingValues( tvDepthValues, values );
     }
 
     // Interpolate MDs from the tvd data from the table and well path geometry
@@ -585,7 +585,7 @@ double RimStimPlanModelPressureCalculator::interpolatePressure( const DepthValue
     // Interpolate a value for the given tvd
     std::vector<double> xs = { startDepth, depth, endDepth };
     std::vector<double> ys = { startValue, std::numeric_limits<double>::infinity(), endValue };
-    RiaInterpolationTools::interpolateMissingValues( xs, ys );
+    RigInterpolationTools::interpolateMissingValues( xs, ys );
     double value = ys[1];
 
     RiaLogging::info( QString( "Interpolating initial pressure from %1 depth/value pairs (EQLNUM: %2, TVD: %3)."

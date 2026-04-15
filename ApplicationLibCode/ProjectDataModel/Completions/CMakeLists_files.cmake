@@ -40,10 +40,15 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimDiameterRoughnessIntervalCollection.h
     ${CMAKE_CURRENT_LIST_DIR}/RimCustomSegmentInterval.h
     ${CMAKE_CURRENT_LIST_DIR}/RimCustomSegmentIntervalCollection.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimEnsembleFractureStatisticsCalculator.h
     ${CMAKE_CURRENT_LIST_DIR}/RimEnsembleFractureStatistics.h
     ${CMAKE_CURRENT_LIST_DIR}/RimEnsembleFractureStatisticsCollection.h
     ${CMAKE_CURRENT_LIST_DIR}/RimMswSegment.h
     ${CMAKE_CURRENT_LIST_DIR}/RimMswSegmentCollection.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimEclipseToStimPlanCellTransmissibilityCalculator.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimEclipseToThermalCellTransmissibilityCalculator.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimEclipseToStimPlanCalculator.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimFishbonesGeometry.h
 )
 
 set(SOURCE_GROUP_SOURCE_FILES
@@ -83,10 +88,15 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimDiameterRoughnessIntervalCollection.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimCustomSegmentInterval.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimCustomSegmentIntervalCollection.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimEnsembleFractureStatisticsCalculator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimEnsembleFractureStatistics.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimEnsembleFractureStatisticsCollection.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimMswSegment.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimMswSegmentCollection.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimEclipseToStimPlanCellTransmissibilityCalculator.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimEclipseToThermalCellTransmissibilityCalculator.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimEclipseToStimPlanCalculator.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimFishbonesGeometry.cpp
 )
 
 list(APPEND CODE_HEADER_FILES ${SOURCE_GROUP_HEADER_FILES})

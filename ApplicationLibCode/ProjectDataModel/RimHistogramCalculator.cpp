@@ -26,9 +26,9 @@
 #include "RigFemNativeVisibleCellsStatCalc.h"
 #include "RigFemPartResultsCollection.h"
 #include "RigFemResultAddress.h"
-#include "RigFlowDiagResults.h"
-#include "RigFlowDiagVisibleCellsStatCalc.h"
 #include "RigGeoMechCaseData.h"
+#include "RimFlowDiagResults.h"
+#include "RimFlowDiagVisibleCellsStatCalc.h"
 
 #include "ContourMap/RimEclipseContourMapProjection.h"
 #include "ContourMap/RimEclipseContourMapView.h"
@@ -187,7 +187,7 @@ RigHistogramData RimHistogramCalculator::histogramData( RimEclipseView*         
         {
             if ( cellRange == StatisticsCellRangeType::ALL_CELLS )
             {
-                RigFlowDiagResults*      fldResults = eclResultDefinition->flowDiagSolution()->flowDiagResults();
+                RimFlowDiagResults*      fldResults = eclResultDefinition->flowDiagSolution()->flowDiagResults();
                 RigFlowDiagResultAddress resAddr    = eclResultDefinition->flowDiagResAddress();
 
                 fldResults->setStatisticsDataCacheNumBins( resAddr, m_numBins );
@@ -219,7 +219,7 @@ RigHistogramData RimHistogramCalculator::histogramData( RimEclipseView*         
         {
             if ( cellRange == StatisticsCellRangeType::ALL_CELLS )
             {
-                RigFlowDiagResults*      fldResults = eclResultDefinition->flowDiagSolution()->flowDiagResults();
+                RimFlowDiagResults*      fldResults = eclResultDefinition->flowDiagSolution()->flowDiagResults();
                 RigFlowDiagResultAddress resAddr    = eclResultDefinition->flowDiagResAddress();
 
                 fldResults->setStatisticsDataCacheNumBins( resAddr, m_numBins );
@@ -413,8 +413,8 @@ void RimHistogramCalculator::updateVisCellStatsIfNeeded( RimEclipseView* eclipse
     if ( eclResultDefinition->isFlowDiagOrInjectionFlooding() )
     {
         RigFlowDiagResultAddress resAddr    = eclResultDefinition->flowDiagResAddress();
-        RigFlowDiagResults*      fldResults = eclResultDefinition->flowDiagSolution()->flowDiagResults();
-        calc = new RigFlowDiagVisibleCellsStatCalc( fldResults, resAddr, eclipseView->currentTotalCellVisibility().p() );
+        RimFlowDiagResults*      fldResults = eclResultDefinition->flowDiagSolution()->flowDiagResults();
+        calc = new RimFlowDiagVisibleCellsStatCalc( fldResults, resAddr, eclipseView->currentTotalCellVisibility().p() );
     }
     else
     {

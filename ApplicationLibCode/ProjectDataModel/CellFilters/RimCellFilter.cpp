@@ -18,11 +18,11 @@
 
 #include "RimCellFilter.h"
 
-#include "RigReservoirGridTools.h"
 #include "Rim3dView.h"
 #include "RimCase.h"
 #include "RimEclipseCase.h"
 #include "RimGeoMechCase.h"
+#include "RimReservoirGridTools.h"
 #include "RimTools.h"
 #include "RimViewController.h"
 
@@ -278,12 +278,12 @@ const cvf::StructGridInterface* RimCellFilter::selectedGrid() const
     if ( !rimCase ) return nullptr;
 
     int clampedIndex = gridIndex();
-    if ( clampedIndex >= RigReservoirGridTools::gridCount( rimCase ) )
+    if ( clampedIndex >= RimReservoirGridTools::gridCount( rimCase ) )
     {
         clampedIndex = 0;
     }
 
-    return RigReservoirGridTools::gridByIndex( rimCase, clampedIndex );
+    return RimReservoirGridTools::gridByIndex( rimCase, clampedIndex );
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -24,7 +24,7 @@
 #include "RigFemPartGrid.h"
 #include "RigGeoMechCaseData.h"
 #include "RigMainGrid.h"
-#include "RigReservoirGridTools.h"
+#include "RimReservoirGridTools.h"
 
 #include "RimCellFilterCollection.h"
 #include "RimEclipseCase.h"
@@ -932,7 +932,7 @@ void RimPolygonFilter::initializeCellList()
 {
     m_cells.clear();
 
-    int gridCount = RigReservoirGridTools::gridCount( m_srcCase() );
+    int gridCount = RimReservoirGridTools::gridCount( m_srcCase() );
     for ( int i = 0; i < gridCount; i++ )
     {
         m_cells.push_back( std::vector<size_t>() );

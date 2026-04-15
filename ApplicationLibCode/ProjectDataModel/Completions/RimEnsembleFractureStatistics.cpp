@@ -25,12 +25,12 @@
 #include "RiaWeightedGeometricMeanCalculator.h"
 #include "RiaWeightedHarmonicMeanCalculator.h"
 
-#include "RigEnsembleFractureStatisticsCalculator.h"
 #include "RigFractureGrid.h"
 #include "RigHistogramData.h"
 #include "RigSlice2D.h"
 #include "RigStatisticsMath.h"
 #include "RigStimPlanFractureDefinition.h"
+#include "RimEnsembleFractureStatisticsCalculator.h"
 
 #include "Histogram/RimEnsembleFractureHistogramDataSource.h"
 #include "RimFractureTemplateCollection.h"
@@ -335,11 +335,11 @@ void RimEnsembleFractureStatistics::loadAndUpdateData()
 
     // Log area and conductivty for each fracture for debugging
     std::vector<double> area =
-        RigEnsembleFractureStatisticsCalculator::calculateProperty( stimPlanFractureDefinitions,
-                                                                    RigEnsembleFractureStatisticsCalculator::PropertyType::AREA );
+        RimEnsembleFractureStatisticsCalculator::calculateProperty( stimPlanFractureDefinitions,
+                                                                    RimEnsembleFractureStatisticsCalculator::PropertyType::AREA );
     std::vector<double> conductivity =
-        RigEnsembleFractureStatisticsCalculator::calculateProperty( stimPlanFractureDefinitions,
-                                                                    RigEnsembleFractureStatisticsCalculator::PropertyType::KFWF );
+        RimEnsembleFractureStatisticsCalculator::calculateProperty( stimPlanFractureDefinitions,
+                                                                    RimEnsembleFractureStatisticsCalculator::PropertyType::KFWF );
 
     CAF_ASSERT( okFilePaths.size() == area.size() );
     CAF_ASSERT( area.size() == conductivity.size() );
@@ -351,7 +351,7 @@ void RimEnsembleFractureStatistics::loadAndUpdateData()
     if ( m_excludeZeroWidthFractures() )
     {
         size_t numBeforeFiltering   = stimPlanFractureDefinitions.size();
-        stimPlanFractureDefinitions = RigEnsembleFractureStatisticsCalculator::removeZeroWidthDefinitions( stimPlanFractureDefinitions );
+        stimPlanFractureDefinitions = RimEnsembleFractureStatisticsCalculator::removeZeroWidthDefinitions( stimPlanFractureDefinitions );
         size_t numRemoved           = numBeforeFiltering - stimPlanFractureDefinitions.size();
         RiaLogging::info( QString( "Excluded %1 zero width fractures." ).arg( numRemoved ) );
     }
@@ -370,7 +370,7 @@ std::vector<QString> RimEnsembleFractureStatistics::computeStatistics()
 
     if ( m_excludeZeroWidthFractures() )
     {
-        stimPlanFractureDefinitions = RigEnsembleFractureStatisticsCalculator::removeZeroWidthDefinitions( stimPlanFractureDefinitions );
+        stimPlanFractureDefinitions = RimEnsembleFractureStatisticsCalculator::removeZeroWidthDefinitions( stimPlanFractureDefinitions );
     }
 
     std::set<std::pair<QString, QString>> availableResults = findAllResultNames( stimPlanFractureDefinitions );
@@ -411,8 +411,8 @@ std::vector<QString> RimEnsembleFractureStatistics::computeStatistics()
 
         double           numBins = 50;
         RigHistogramData areaHistogramData =
-            RigEnsembleFractureStatisticsCalculator::createStatisticsData( stimPlanFractureDefinitions,
-                                                                           RigEnsembleFractureStatisticsCalculator::PropertyType::AREA,
+            RimEnsembleFractureStatisticsCalculator::createStatisticsData( stimPlanFractureDefinitions,
+                                                                           RimEnsembleFractureStatisticsCalculator::PropertyType::AREA,
                                                                            numBins );
 
         std::vector<std::vector<double>> samples( gridXs.size() * gridYs.size() );
@@ -1262,8 +1262,8 @@ std::shared_ptr<RigSlice2D> RimEnsembleFractureStatistics::setCellsToFillTargetA
 QString RimEnsembleFractureStatistics::generateStatisticsTable(
     const std::vector<cvf::ref<RigStimPlanFractureDefinition>>& stimPlanFractureDefinitions ) const
 {
-    std::vector<RigEnsembleFractureStatisticsCalculator::PropertyType> propertyTypes =
-        RigEnsembleFractureStatisticsCalculator::propertyTypes();
+    std::vector<RimEnsembleFractureStatisticsCalculator::PropertyType> propertyTypes =
+        RimEnsembleFractureStatisticsCalculator::propertyTypes();
 
     QString text;
     text += "<table border=1><thead><tr bgcolor=lightblue>";
@@ -1286,12 +1286,12 @@ QString RimEnsembleFractureStatistics::generateStatisticsTable(
 
     for ( auto propertyType : propertyTypes )
     {
-        QString          name    = caf::AppEnum<RigEnsembleFractureStatisticsCalculator::PropertyType>::uiText( propertyType );
+        QString          name    = caf::AppEnum<RimEnsembleFractureStatisticsCalculator::PropertyType>::uiText( propertyType );
         int              numBins = 50;
         RigHistogramData histogramData =
-            RigEnsembleFractureStatisticsCalculator::createStatisticsData( stimPlanFractureDefinitions, propertyType, numBins );
+            RimEnsembleFractureStatisticsCalculator::createStatisticsData( stimPlanFractureDefinitions, propertyType, numBins );
 
-        auto [numberFormat, precision] = RigEnsembleFractureStatisticsCalculator::numberFormatForProperty( propertyType );
+        auto [numberFormat, precision] = RimEnsembleFractureStatisticsCalculator::numberFormatForProperty( propertyType );
         text += QString( "<tr>"
                          "<td>%1</td>"
                          "<td align=right>%2</td>"

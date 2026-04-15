@@ -29,7 +29,7 @@
 #include "RimWellDistributionPlot.h"
 
 #include "RigEclipseCaseData.h"
-#include "RigTofWellDistributionCalculator.h"
+#include "RimTofWellDistributionCalculator.h"
 
 #include "RiuMultiPlotPage.h"
 #include "RiuPlotWidget.h"

@@ -18,7 +18,7 @@
 
 #include "RimFlowDiagnosticsTools.h"
 
-#include "RigFlowDiagResults.h"
+#include "RimFlowDiagResults.h"
 
 //--------------------------------------------------------------------------------------------------
 ///

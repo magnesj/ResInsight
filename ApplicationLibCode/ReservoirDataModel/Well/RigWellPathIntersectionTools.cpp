@@ -28,8 +28,6 @@
 #include "RigWellLogExtractionTools.h"
 #include "RigWellPath.h"
 
-#include "RimEclipseCase.h"
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -45,7 +43,7 @@ std::vector<WellPathCellIntersectionInfo>
 
     cvf::ref<RigWellPath> dummyWellPath = new RigWellPath( pathCoords, pathMds );
 
-    std::string errorIdName = ( wellPathName + " " + caseData->ownerCase()->caseUserDescription() ).toStdString();
+    std::string errorIdName = wellPathName.toStdString();
 
     cvf::ref<RigEclipseWellLogExtractor> extractor = new RigEclipseWellLogExtractor( caseData, dummyWellPath.p(), errorIdName );
 
@@ -62,8 +60,7 @@ std::set<size_t> RigWellPathIntersectionTools::findIntersectedGlobalCellIndicesF
 
     if ( caseData )
     {
-        cvf::ref<RigEclipseWellLogExtractor> extractor =
-            new RigEclipseWellLogExtractor( caseData, wellPath, caseData->ownerCase()->caseUserDescription().toStdString() );
+        cvf::ref<RigEclipseWellLogExtractor> extractor = new RigEclipseWellLogExtractor( caseData, wellPath, "" );
 
         std::vector<WellPathCellIntersectionInfo> intersections = extractor->cellIntersectionInfosAlongWellPath();
         for ( const auto& intersection : intersections )

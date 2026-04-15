@@ -44,7 +44,7 @@
 #include "RigEclipseCaseData.h"
 #include "RigFlowDiagSolverInterface.h"
 #include "RigMainGrid.h"
-#include "RigReservoirGridTools.h"
+#include "RimReservoirGridTools.h"
 
 #include "Formations/RimFormationNames.h"
 #include "Formations/RimFormationTools.h"
@@ -287,7 +287,7 @@ bool RimEclipseResultCase::importGridAndResultMetaData( bool showTimeStepFilter 
         caf::ProgressInfo progInfo( 50, "Reading Eclipse Grid File", false /*do not delay*/ );
         progInfo.setNextProgressIncrement( 49 );
 
-        m_flowDagSolverInterface = std::make_unique<RigFlowDiagSolverInterface>( this );
+        m_flowDagSolverInterface = std::make_unique<RigFlowDiagSolverInterface>( eclipseCaseData(), gridFileName() );
 
         CVF_ASSERT( eclipseCaseData() );
         CVF_ASSERT( readerInterface.notNull() );
@@ -324,7 +324,7 @@ bool RimEclipseResultCase::importGridAndResultMetaData( bool showTimeStepFilter 
     if ( mainGrid() && mainGrid()->isRadial() )
     {
         // This is required to make the generated LGR for radial grids work when loading a project file
-        RigReservoirGridTools::refreshEclipseCaseDataAndViews( this );
+        RimReservoirGridTools::refreshEclipseCaseDataAndViews( this );
     }
 
     return true;

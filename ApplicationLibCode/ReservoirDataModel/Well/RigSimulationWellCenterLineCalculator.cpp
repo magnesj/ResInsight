@@ -28,11 +28,6 @@
 #include "RigSimWellData.h"
 #include "RigWellResultFrame.h"
 
-#include "RimEclipseCase.h"
-#include "RimEclipseView.h"
-#include "RimSimWellInView.h"
-#include "RimSimWellInViewCollection.h"
-
 #include "cvfBoundingBoxTree.h"
 #include "cvfGeometryTools.h"
 #include "cvfRay.h"
@@ -43,23 +38,13 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<SimulationWellCellBranch> RigSimulationWellCenterLineCalculator::calculateWellPipeStaticCenterline( const RimSimWellInView* rimWell )
+std::vector<SimulationWellCellBranch>
+    RigSimulationWellCenterLineCalculator::calculateWellPipeStaticCenterline( const RigEclipseCaseData* eclipseCaseData,
+                                                                              const RigSimWellData*     simWellData,
+                                                                              bool                      isAutoDetectBranches,
+                                                                              bool                      useAllCellCenters )
 {
-    std::vector<std::vector<cvf::Vec3d>>         pipeBranchesCLCoords;
-    std::vector<std::vector<RigWellResultPoint>> pipeBranchesCellIds;
-
-    calculateWellPipeStaticCenterline( rimWell, pipeBranchesCLCoords, pipeBranchesCellIds );
-
-    std::vector<SimulationWellCellBranch> simuationBranches;
-    for ( size_t i = 0; i < pipeBranchesCLCoords.size(); i++ )
-    {
-        if ( i < pipeBranchesCellIds.size() )
-        {
-            simuationBranches.emplace_back( std::make_pair( pipeBranchesCLCoords[i], pipeBranchesCellIds[i] ) );
-        }
-    }
-
-    return simuationBranches;
+    return calculateWellPipeCenterlineForTimeStep( eclipseCaseData, simWellData, -1, isAutoDetectBranches, useAllCellCenters );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -111,80 +96,6 @@ std::pair<std::vector<std::vector<cvf::Vec3d>>, std::vector<std::vector<RigWellR
     }
 
     return { pipeBranchesCLCoords, pipeBranchesCellIds };
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Based on the points and cells, calculate a pipe centerline
-/// The returned CellIds is one less than the number of centerline points,
-/// and are describing the lines between the points, starting with the first line
-//--------------------------------------------------------------------------------------------------
-void RigSimulationWellCenterLineCalculator::calculateWellPipeStaticCenterline( const RimSimWellInView*               rimWell,
-                                                                               std::vector<std::vector<cvf::Vec3d>>& pipeBranchesCLCoords,
-                                                                               std::vector<std::vector<RigWellResultPoint>>& pipeBranchesCellIds )
-{
-    CVF_ASSERT( rimWell );
-
-    const RigSimWellData* simWellData = rimWell->simWellData();
-    if ( !simWellData ) return;
-
-    auto eclipseView = rimWell->firstAncestorOrThisOfTypeAsserted<RimEclipseView>();
-
-    RigEclipseCaseData* eclipseCaseData      = eclipseView->eclipseCase()->eclipseCaseData();
-    bool                isAutoDetectBranches = eclipseView->wellCollection()->isAutoDetectingBranches();
-
-    bool useAllCellCenters = rimWell->isUsingCellCenterForPipe();
-    int  timeStepIndex     = -1;
-
-    calculateWellPipeCenterlineForTimeStep( eclipseCaseData,
-                                            simWellData,
-                                            timeStepIndex,
-                                            isAutoDetectBranches,
-                                            useAllCellCenters,
-                                            pipeBranchesCLCoords,
-                                            pipeBranchesCellIds );
-
-    // DEBUG output, please keep code
-    bool printDebug = false;
-    if ( printDebug )
-    {
-        QString txt;
-
-        for ( size_t idx = 0; idx < pipeBranchesCellIds.size(); idx++ )
-        {
-            const auto& branchCells = pipeBranchesCellIds[idx];
-            for ( const auto& resultPoint : branchCells )
-            {
-                QString myTxt;
-                int     fieldWidth = 3;
-                myTxt += QString( "Ri branch index: %1 " ).arg( idx, fieldWidth );
-                myTxt += QString( "Seg: %1 Branch: %2 " ).arg( resultPoint.segmentId(), fieldWidth ).arg( resultPoint.branchId(), fieldWidth );
-
-                if ( resultPoint.isCell() )
-                {
-                    size_t i = 0, j = 0, k = 0;
-                    auto   grid = eclipseCaseData->grid( resultPoint.gridIndex() );
-                    grid->ijkFromCellIndex( resultPoint.cellIndex(), &i, &j, &k );
-
-                    myTxt += QString( "Grid %1 %2 %3 " ).arg( i + 1, fieldWidth ).arg( j + 1, fieldWidth ).arg( k + 1, fieldWidth );
-                }
-
-                myTxt += QString( "OutSeg: %1 OutBranch: %2 " )
-                             .arg( resultPoint.outletSegmentId(), fieldWidth )
-                             .arg( resultPoint.outletBranchId(), fieldWidth );
-
-                int coordFieldWidth = 12;
-                myTxt += QString( "Bottom pos: %1 %2 %3 " )
-                             .arg( resultPoint.bottomPosition().x(), coordFieldWidth )
-                             .arg( resultPoint.bottomPosition().y(), coordFieldWidth )
-                             .arg( resultPoint.bottomPosition().z(), coordFieldWidth );
-
-                myTxt += "\n";
-                txt += myTxt;
-            }
-        }
-
-        RiaLogging::debug( txt );
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

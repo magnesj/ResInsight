@@ -27,7 +27,7 @@
 
 #include "RigModelPaddingSettings.h"
 #include "RigSimulationInputSettings.h"
-#include "RigSimulationInputTool.h"
+#include "RimSimulationInputTool.h"
 
 #include "Jobs/RimJobCollection.h"
 #include "Jobs/RimKeywordBcprop.h"
@@ -127,7 +127,7 @@ void RicExportSectorModelFeature::doExport( RicExportSectorModelUi* exportSettin
                                                                                                          exportSettings->min(),
                                                                                                          exportSettings->max(),
                                                                                                          exportSettings->wellPadding() );
-    if ( auto result = RigSimulationInputTool::exportSimulationInput( *view->eclipseCase(), settings, cellVisibility.p() ); !result )
+    if ( auto result = RimSimulationInputTool::exportSimulationInput( *view->eclipseCase(), settings, cellVisibility.p() ); !result )
     {
         RiaLogging::error( QString( "Failed to export sector model to DATA file: %1" ).arg( result.error() ) );
     }

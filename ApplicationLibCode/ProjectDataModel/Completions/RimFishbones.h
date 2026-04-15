@@ -36,7 +36,7 @@
 #include <algorithm>
 #include <memory>
 
-class RigFisbonesGeometry;
+class RimFishbonesGeometry;
 class RimFishbonesPipeProperties;
 class RimMultipleValveLocations;
 
@@ -155,8 +155,8 @@ private:
 
     caf::PdmField<uint> m_randomSeed;
 
-    std::unique_ptr<RigFisbonesGeometry> m_rigFishbonesGeometry;
-    std::vector<SubAndLateralIndex>      m_subLateralIndices;
+    std::unique_ptr<RimFishbonesGeometry> m_rigFishbonesGeometry;
+    std::vector<SubAndLateralIndex>       m_subLateralIndices;
 
     // Moved to RimMultipleValveLocations
     caf::PdmField<caf::AppEnum<RimFishbonesDefines::LocationType_OBSOLETE>> m_subsLocationMode_OBSOLETE;

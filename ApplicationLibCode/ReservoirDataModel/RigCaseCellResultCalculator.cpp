@@ -29,18 +29,16 @@
 #include "RigResultModifier.h"
 #include "RigResultModifierFactory.h"
 
-#include "RimEclipseCase.h"
-#include "RimProject.h"
-
 #include "cvfAssert.h"
 
 #include <algorithm>
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RigCaseCellResultCalculator::computeDifference( RigEclipseCaseData*            sourceCase,
-                                                     RiaDefines::PorosityModelType  porosityModel,
-                                                     const RigEclipseResultAddress& address )
+bool RigCaseCellResultCalculator::computeDifference( RigEclipseCaseData*                       sourceCase,
+                                                     RiaDefines::PorosityModelType             porosityModel,
+                                                     const RigEclipseResultAddress&            address,
+                                                     std::function<RigEclipseCaseData*( int )> caseDataLookup )
 {
     CVF_ASSERT( address.isValid() );
     CVF_ASSERT( address.isDeltaCaseActive() || address.isDeltaTimeStepActive() );
@@ -50,15 +48,11 @@ bool RigCaseCellResultCalculator::computeDifference( RigEclipseCaseData*        
 
     RigEclipseCaseData* baseCase = sourceCase;
 
-    if ( address.isDeltaCaseActive() )
+    if ( address.isDeltaCaseActive() && caseDataLookup )
     {
-        auto eclipseCases = RimProject::current()->eclipseCases();
-        for ( RimEclipseCase* c : eclipseCases )
+        if ( auto* found = caseDataLookup( address.deltaCaseId() ) )
         {
-            if ( c && c->caseId() == address.deltaCaseId() && c->eclipseCaseData() )
-            {
-                baseCase = c->eclipseCaseData();
-            }
+            baseCase = found;
         }
     }
 

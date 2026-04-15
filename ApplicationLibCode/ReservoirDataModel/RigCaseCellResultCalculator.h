@@ -20,6 +20,8 @@
 
 #include "RiaPorosityModel.h"
 
+#include <functional>
+
 class RigEclipseCaseData;
 class RigEclipseResultAddress;
 class RigMainGrid;
@@ -30,9 +32,10 @@ class RigMainGrid;
 class RigCaseCellResultCalculator
 {
 public:
-    static bool computeDifference( RigEclipseCaseData*            destination,
-                                   RiaDefines::PorosityModelType  porosityModel,
-                                   const RigEclipseResultAddress& address );
+    static bool computeDifference( RigEclipseCaseData*                       destination,
+                                   RiaDefines::PorosityModelType             porosityModel,
+                                   const RigEclipseResultAddress&            address,
+                                   std::function<RigEclipseCaseData*( int )> caseDataLookup );
 
     static bool computeDivideByCellFaceArea( RigMainGrid*                   mainGrid,
                                              RigEclipseCaseData*            destination,

@@ -37,7 +37,7 @@
 #include "RigFemPartResultsCollection.h"
 #include "RigFemResultAddress.h"
 #include "RigGeoMechCaseData.h"
-#include "RigResultAccessorFactory.h"
+#include "RimEclipseResultDefinitionTools.h"
 
 #include "RivIntersectionGeometryGeneratorInterface.h"
 #include "RivIntersectionVertexWeights.h"
@@ -169,7 +169,7 @@ void RivIntersectionResultsColoringTools::updateEclipseCellResultColors( const R
     if ( !RiaResultNames::isPerCellFaceResult( eclipseResDef->resultVariable() ) )
 
     {
-        resultAccessor = RigResultAccessorFactory::createFromResultDefinition( eclipseCaseData, 0, timeStepIndex, eclipseResDef );
+        resultAccessor = RimEclipseResultDefinitionTools::createResultAccessor( eclipseCaseData, 0, timeStepIndex, eclipseResDef );
     }
 
     if ( resultAccessor.isNull() )

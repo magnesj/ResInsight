@@ -23,12 +23,16 @@
 #include "RiaLogging.h"
 #include "RiaResultNames.h"
 
+#include "RigActiveCellsResultAccessor.h"
 #include "RigAllanDiagramData.h"
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
 #include "RigEclipseResultAddress.h"
-#include "RigFlowDiagResults.h"
-#include "RigVisibleCategoriesCalculator.h"
+#include "RigGridBase.h"
+#include "RigResultAccessor.h"
+#include "RigResultAccessorFactory.h"
+#include "RimFlowDiagResults.h"
+#include "RimVisibleCategoriesCalculator.h"
 
 #include "RimColorLegend.h"
 #include "RimColorLegendItem.h"
@@ -37,6 +41,7 @@
 #include "RimEclipseInputProperty.h"
 #include "RimEclipseInputPropertyCollection.h"
 #include "RimEclipseView.h"
+#include "RimFlowDiagSolution.h"
 #include "RimFlowDiagnosticsTools.h"
 #include "RimRegularLegendConfig.h"
 #include "RimSimWellInView.h"
@@ -411,7 +416,7 @@ void RimEclipseResultDefinitionTools::updateLegendForFlowDiagnostics( const RimE
     auto flowDiagSolution = resultDefinition->flowDiagSolution();
     if ( !flowDiagSolution ) return;
 
-    RigFlowDiagResults* flowResultsData = flowDiagSolution->flowDiagResults();
+    RimFlowDiagResults* flowResultsData = flowDiagSolution->flowDiagResults();
     if ( !flowResultsData ) return;
 
     RigFlowDiagResultAddress resAddr = resultDefinition->flowDiagResAddress();
@@ -471,7 +476,7 @@ void RimEclipseResultDefinitionTools::updateLegendForFlowDiagnostics( const RimE
             if ( resultDefinition->showOnlyVisibleCategoriesInLegend() )
             {
                 std::set<int> visibleTracers =
-                    RigVisibleCategoriesCalculator::visibleFlowDiagCategories( *eclView, *flowResultsData, resAddr, timeStep );
+                    RimVisibleCategoriesCalculator::visibleFlowDiagCategories( *eclView, *flowResultsData, resAddr, timeStep );
                 for ( auto tupIt : categories )
                 {
                     int tracerIndex = std::get<1>( tupIt );
@@ -570,7 +575,7 @@ void RimEclipseResultDefinitionTools::updateCellResultLegend( const RimEclipseRe
                 {
                     auto eclView = resultDefinition->firstAncestorOrThisOfType<RimEclipseView>();
 
-                    visibleAllanCategories = RigVisibleCategoriesCalculator::visibleAllanCategories( eclView );
+                    visibleAllanCategories = RimVisibleCategoriesCalculator::visibleAllanCategories( eclView );
                 }
 
                 for ( auto [formationPair, categoryIndex] : formationCombToCategory )
@@ -650,7 +655,7 @@ void RimEclipseResultDefinitionTools::updateCellResultLegend( const RimEclipseRe
                 if ( cellVisibilityView && cellVisibilityView->showWindow() )
                 {
                     std::set<int> visibleCategorySet =
-                        RigVisibleCategoriesCalculator::visibleCategories( cellVisibilityView, resultDefinition );
+                        RimVisibleCategoriesCalculator::visibleCategories( cellVisibilityView, resultDefinition );
 
                     // If we have a view, use the unique values defined by visible cells in this view
                     visibleCategoryValues.clear();
@@ -812,4 +817,39 @@ QList<caf::PdmOptionItemInfo> RimEclipseResultDefinitionTools::calcOptionsForVar
     optionList.push_front( caf::PdmOptionItemInfo( RiaResultNames::undefinedResultName(), RiaResultNames::undefinedResultName() ) );
 
     return optionList;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+cvf::ref<RigResultAccessor> RimEclipseResultDefinitionTools::createResultAccessor( const RigEclipseCaseData*         eclipseCase,
+                                                                                   size_t                            gridIndex,
+                                                                                   size_t                            timeStepIndex,
+                                                                                   const RimEclipseResultDefinition* resultDefinition )
+{
+    if ( resultDefinition->isFlowDiagOrInjectionFlooding() )
+    {
+        RimFlowDiagSolution* flowSol = resultDefinition->flowDiagSolution();
+        if ( !flowSol ) return new RigHugeValResultAccessor;
+
+        const std::vector<double>* resultValues =
+            flowSol->flowDiagResults()->resultValues( resultDefinition->flowDiagResAddress(), timeStepIndex );
+        if ( !resultValues ) return new RigHugeValResultAccessor;
+
+        const RigGridBase* grid = eclipseCase->grid( gridIndex );
+        if ( !grid ) return new RigHugeValResultAccessor;
+
+        cvf::ref<RigResultAccessor> object =
+            new RigActiveCellsResultAccessor( grid, resultValues, eclipseCase->activeCellInfo( resultDefinition->porosityModel() ) );
+
+        return object;
+    }
+    else
+    {
+        return RigResultAccessorFactory::createFromResultAddress( eclipseCase,
+                                                                  gridIndex,
+                                                                  resultDefinition->porosityModel(),
+                                                                  timeStepIndex,
+                                                                  resultDefinition->eclipseResultAddress() );
+    }
 }

@@ -23,7 +23,7 @@
 #include "cafPdmField.h"
 #include "cafPdmPtrField.h"
 
-#include "RigEnsembleFractureStatisticsCalculator.h"
+#include "RimEnsembleFractureStatisticsCalculator.h"
 
 class RimEnsembleFractureStatistics;
 
@@ -40,7 +40,7 @@ public:
     ~RimEnsembleFractureHistogramDataSource() override;
 
     void setEnsembleFractureStatistics( RimEnsembleFractureStatistics* statistics );
-    void setProperty( RigEnsembleFractureStatisticsCalculator::PropertyType property );
+    void setProperty( RimEnsembleFractureStatisticsCalculator::PropertyType property );
 
     std::string unitNameX() const override;
     std::string unitNameY() const override;
@@ -59,6 +59,6 @@ protected:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
 
     caf::PdmPtrField<RimEnsembleFractureStatistics*>                                   m_ensembleFractureStatistics;
-    caf::PdmField<caf::AppEnum<RigEnsembleFractureStatisticsCalculator::PropertyType>> m_property;
+    caf::PdmField<caf::AppEnum<RimEnsembleFractureStatisticsCalculator::PropertyType>> m_property;
     caf::PdmField<int>                                                                 m_numBins;
 };
