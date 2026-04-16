@@ -317,7 +317,7 @@ RimProject_importSummaryEnsembleSumo::RimProject_importSummaryEnsembleSumo( caf:
 //--------------------------------------------------------------------------------------------------
 std::expected<caf::PdmObjectHandle*, QString> RimProject_importSummaryEnsembleSumo::execute()
 {
-    if ( m_caseId().isEmpty() ) return std::unexpected( "Empty case id not allowed" );
+    if ( m_caseId().isEmpty() ) return std::unexpected( "Empty case ID not allowed" );
     if ( m_ensembleName().isEmpty() ) return std::unexpected( "Empty ensemble name not allowed" );
 
     auto cloudDataSourceCollection = RimCloudDataSourceCollection::instance();
