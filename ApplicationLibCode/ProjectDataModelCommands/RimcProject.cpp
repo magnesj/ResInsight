@@ -28,6 +28,7 @@
 
 #include "RicImportSummaryCasesFeature.h"
 
+#include "Cloud/RimCloudDataSourceCollection.h"
 #include "RimCornerPointCase.h"
 #include "RimEclipseCaseCollection.h"
 #include "RimEclipseCellColors.h"
@@ -41,6 +42,10 @@
 #include "RimTools.h"
 #include "RimValveTemplateCollection.h"
 #include "RimWellPathCollection.h"
+#include "Sumo/RimSummaryEnsembleSumo.h"
+#include "Sumo/RimSummarySumoDataSource.h"
+
+#include "Summary/RiaSummaryTools.h"
 
 #include "RiuMainWindow.h"
 #include "RiuPlotMainWindow.h"
@@ -288,6 +293,67 @@ std::expected<caf::PdmObjectHandle*, QString> RimProject_createGridFromKeyValues
 QString RimProject_createGridFromKeyValues::classKeywordReturnedType() const
 {
     return RimCornerPointCase::classKeywordStatic();
+}
+
+CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimProject, RimProject_importSummaryEnsembleSumo, "importSummaryEnsembleSumo" );
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimProject_importSummaryEnsembleSumo::RimProject_importSummaryEnsembleSumo( caf::PdmObjectHandle* self )
+    : PdmObjectCreationMethod( self )
+{
+    CAF_PDM_InitObject( "Import Summary Ensemble from Sumo", "", "", "Import Summary Ensemble from Sumo" );
+
+    CAF_PDM_InitScriptableFieldNoDefault( &m_caseId, "CaseId", "" );
+    CAF_PDM_InitScriptableFieldNoDefault( &m_caseName, "CaseName", "" );
+    CAF_PDM_InitScriptableFieldNoDefault( &m_ensembleName, "EnsembleName", "" );
+    CAF_PDM_InitScriptableFieldNoDefault( &m_vectorNames, "VectorNames", "" );
+    CAF_PDM_InitScriptableFieldNoDefault( &m_realizationIds, "RealizationIds", "" );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::expected<caf::PdmObjectHandle*, QString> RimProject_importSummaryEnsembleSumo::execute()
+{
+    if ( m_caseId().isEmpty() ) return std::unexpected( "Empty case id not allowed" );
+    if ( m_ensembleName().isEmpty() ) return std::unexpected( "Empty ensemble name not allowed" );
+
+    auto cloudDataSourceCollection = RimCloudDataSourceCollection::instance();
+    if ( !cloudDataSourceCollection ) return std::unexpected( "No cloud data source collection found." );
+
+    auto sumCaseMainColl = RiaSummaryTools::summaryCaseMainCollection();
+    if ( !sumCaseMainColl ) return std::unexpected( "No summary case main collection found." );
+
+    auto dataSource = new RimSummarySumoDataSource();
+    dataSource->setCaseId( SumoCaseId( m_caseId() ) );
+    dataSource->setCaseName( m_caseName() );
+    dataSource->setEnsembleName( m_ensembleName() );
+    dataSource->setRealizationIds( m_realizationIds() );
+    dataSource->setVectorNames( m_vectorNames() );
+    dataSource->updateName();
+
+    cloudDataSourceCollection->addSumoDataSource( dataSource );
+
+    auto ensemble = new RimSummaryEnsembleSumo();
+    ensemble->setUsePathKey1( true );
+    ensemble->setSumoDataSource( dataSource );
+    sumCaseMainColl->addEnsemble( ensemble );
+    ensemble->loadDataAndUpdate();
+
+    RiaSummaryTools::updateSummaryEnsembleNames();
+    sumCaseMainColl->updateAllRequiredEditors();
+
+    return ensemble;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimProject_importSummaryEnsembleSumo::classKeywordReturnedType() const
+{
+    return RimSummaryEnsembleSumo::classKeywordStatic();
 }
 
 CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimProject, RimProject_wellPathCollection, "wellPathCollection" );

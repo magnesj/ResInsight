@@ -104,6 +104,14 @@ void RimCloudDataSourceCollection::createEnsemblesFromSelectedDataSources( const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimCloudDataSourceCollection::addSumoDataSource( RimSummarySumoDataSource* dataSource )
+{
+    m_sumoDataSources.push_back( dataSource );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimCloudDataSourceCollection::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     if ( !m_sumoConnector ) return;

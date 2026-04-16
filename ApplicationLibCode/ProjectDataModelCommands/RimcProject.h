@@ -103,6 +103,27 @@ private:
 //==================================================================================================
 ///
 //==================================================================================================
+class RimProject_importSummaryEnsembleSumo : public caf::PdmObjectCreationMethod
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    RimProject_importSummaryEnsembleSumo( caf::PdmObjectHandle* self );
+
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
+
+private:
+    caf::PdmField<QString>            m_caseId;
+    caf::PdmField<QString>            m_caseName;
+    caf::PdmField<QString>            m_ensembleName;
+    caf::PdmField<std::vector<QString>> m_vectorNames;
+    caf::PdmField<std::vector<QString>> m_realizationIds;
+};
+
+//==================================================================================================
+///
+//==================================================================================================
 class RimProject_wellPathCollection : public caf::PdmObjectMethod
 {
     CAF_PDM_HEADER_INIT;
