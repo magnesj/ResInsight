@@ -106,6 +106,7 @@ void RimCloudDataSourceCollection::createEnsemblesFromSelectedDataSources( const
 //--------------------------------------------------------------------------------------------------
 void RimCloudDataSourceCollection::addSumoDataSource( RimSummarySumoDataSource* dataSource )
 {
+    if ( !dataSource ) return;
     m_sumoDataSources.push_back( dataSource );
 }
 
