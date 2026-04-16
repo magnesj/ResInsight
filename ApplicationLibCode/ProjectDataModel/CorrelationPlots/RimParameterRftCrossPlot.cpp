@@ -694,7 +694,7 @@ void RimParameterRftCrossPlot::createPoints()
         plotCurve->setStyle( QwtPlotCurve::NoCurve );
 
         const bool isSelected = selectedSummaryCases.contains( summaryCase );
-        auto* symbol = new RiuQwtSymbol( isSelected ? RiuPlotCurveSymbol::SYMBOL_XCROSS : RiuPlotCurveSymbol::SYMBOL_ELLIPSE );
+        auto*      symbol     = new RiuQwtSymbol( isSelected ? RiuPlotCurveSymbol::SYMBOL_XCROSS : RiuPlotCurveSymbol::SYMBOL_ELLIPSE );
         symbol->setSize( 8, 8 );
         symbol->setColor( colorTable.cycledQColor( idx++ ) );
         plotCurve->setSymbol( symbol );
