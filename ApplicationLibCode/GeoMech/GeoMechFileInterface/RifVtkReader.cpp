@@ -33,6 +33,27 @@
 
 #include <map>
 
+namespace RifVtkFieldNames
+{
+constexpr const char* S       = "S_VTK";
+constexpr const char* SPrefix = "S__";
+constexpr const char* S11     = "S11";
+constexpr const char* S22     = "S22";
+constexpr const char* S33     = "S33";
+constexpr const char* S12     = "S12";
+constexpr const char* S13     = "S13";
+constexpr const char* S23     = "S23";
+
+constexpr const char* E       = "E_VTK";
+constexpr const char* EPrefix = "E__";
+constexpr const char* E11     = "E11";
+constexpr const char* E22     = "E22";
+constexpr const char* E33     = "E33";
+constexpr const char* E12     = "E12";
+constexpr const char* E13     = "E13";
+constexpr const char* E23     = "E23";
+} // namespace RifVtkFieldNames
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -395,23 +416,24 @@ std::map<std::string, std::vector<std::string>> RifVtkReader::scalarElementField
 
     for ( auto& entry : m_propertyPartDataElements )
     {
-        // Skip internal SA/EA component keys (stored as "SA__S11", "EA__S22", etc.)
+        // Skip internal S/E component keys (stored as "S__S11", "E__E11", etc.)
         const std::string& key = entry.first;
-        if ( key.starts_with( "SA__" ) || key.starts_with( "EA__" ) ) continue;
+        if ( key.starts_with( RifVtkFieldNames::SPrefix ) || key.starts_with( RifVtkFieldNames::EPrefix ) ) continue;
 
         retVal[key] = {};
     }
 
-    // Add SA field with components if any SA component data was loaded
-    if ( m_propertyPartDataElements.count( "SA__S11" ) > 0 )
+    // Add S field with components if any S component data was loaded
+    using namespace RifVtkFieldNames;
+    if ( m_propertyPartDataElements.count( std::string( SPrefix ) + S11 ) > 0 )
     {
-        retVal["SA"] = { "S11", "S22", "S33", "S12", "S13", "S23" };
+        retVal[S] = { S11, S22, S33, S12, S13, S23 };
     }
 
-    // Add EA field with components if any EA component data was loaded
-    if ( m_propertyPartDataElements.count( "EA__S11" ) > 0 )
+    // Add E field with components if any E component data was loaded
+    if ( m_propertyPartDataElements.count( std::string( EPrefix ) + E11 ) > 0 )
     {
-        retVal["EA"] = { "S11", "S22", "S33", "S12", "S13", "S23" };
+        retVal[E] = { E11, E22, E33, E12, E13, E23 };
     }
 
     return retVal;
@@ -523,11 +545,13 @@ void RifVtkReader::readElementField( const std::string&                fieldName
                                      int                               frameIndex,
                                      std::vector<std::vector<float>*>* resultValues )
 {
-    // SA and EA fields have 6 components (S11, S22, S33, S12, S13, S23) stored as individual
-    // internal keys with "__" separator (e.g. "SA__S11")
-    if ( fieldName == "SA" || fieldName == "EA" )
+    // S and E fields have 6 components stored as individual internal keys with "__" separator
+    if ( fieldName == RifVtkFieldNames::S || fieldName == RifVtkFieldNames::E )
     {
-        static const std::vector<std::string> components = { "S11", "S22", "S33", "S12", "S13", "S23" };
+        using namespace RifVtkFieldNames;
+        static const std::vector<std::string> sComponents = { S11, S22, S33, S12, S13, S23 };
+        static const std::vector<std::string> eComponents = { E11, E22, E33, E12, E13, E23 };
+        const auto&                           components  = ( fieldName == "S" ) ? sComponents : eComponents;
         size_t                                count       = std::min( components.size(), resultValues->size() );
         for ( size_t i = 0; i < count; i++ )
         {
@@ -626,25 +650,26 @@ void RifVtkReader::readScalarData( RigFemPartCollection*                        
                     }
                     else if ( values.size() == 3 * numElements )
                     {
-                        // Multi-component element results: stress[0/1] -> SA, strain[0/1] -> EA
+                        // Multi-component element results: stress[0/1] -> S_VTK, strain[0/1] -> E_VTK
                         // Each VTK array contains 3 components per element.
                         // Mapping:
-                        //   stress[0]: SA.S11 (index 0), SA.S22 (index 1), SA.S33 (index 2)
-                        //   stress[1]: SA.S12 (index 0), SA.S13 (index 1), SA.S23 (index 2)
-                        //   strain[0]: EA.S11 (index 0), EA.S22 (index 1), EA.S33 (index 2)
-                        //   strain[1]: EA.S12 (index 0), EA.S13 (index 1), EA.S23 (index 2)
+                        //   stress[0]: S_VTK.S11 (index 0), S_VTK.S22 (index 1), S_VTK.S33 (index 2)
+                        //   stress[1]: S_VTK.S12 (index 0), S_VTK.S13 (index 1), S_VTK.S23 (index 2)
+                        //   strain[0]: E_VTK.E11 (index 0), E_VTK.E22 (index 1), E_VTK.E33 (index 2)
+                        //   strain[1]: E_VTK.E12 (index 0), E_VTK.E13 (index 1), E_VTK.E23 (index 2)
                         struct StressStrainMapping
                         {
-                            std::string                 vtkName;
-                            std::string                 fieldName;
-                            std::array<std::string, 3>  componentNames;
+                            std::string                vtkName;
+                            std::string                fieldName;
+                            std::array<std::string, 3> componentNames;
                         };
 
+                        using namespace RifVtkFieldNames;
                         static const std::vector<StressStrainMapping> mappings = {
-                            { "stress[0]", "SA", { "S11", "S22", "S33" } },
-                            { "stress[1]", "SA", { "S12", "S13", "S23" } },
-                            { "strain[0]", "EA", { "S11", "S22", "S33" } },
-                            { "strain[1]", "EA", { "S12", "S13", "S23" } },
+                            { "stress[0]", S, { S11, S22, S33 } },
+                            { "stress[1]", S, { S12, S13, S23 } },
+                            { "strain[0]", E, { E11, E22, E33 } },
+                            { "strain[1]", E, { E12, E13, E23 } },
                         };
 
                         for ( const auto& mapping : mappings )
