@@ -24,6 +24,4 @@ for i in range(0, grid_cell_count):
     values.append(i % 4)
 
 print("Applying discrete values to main grid")
-case.set_grid_property(
-    values, "STATIC_NATIVE", "MY_REGION", 0, data_type="INTEGER"
-)
+case.set_grid_property(values, "STATIC_NATIVE", "MY_REGION", 0, data_type="INTEGER")
