@@ -98,6 +98,25 @@ def test_10k_PoroPermX(rips_instance, initialize_test):
     checkResults(poro, permx, poroPermX)
 
 
+def test_10k_set_integer_property(rips_instance, initialize_test):
+    casePath = dataroot.PATH + "/TEST10K_FLT_LGR_NNC/TEST10K_FLT_LGR_NNC.EGRID"
+    case = rips_instance.project.load_case(path=casePath)
+
+    results = case.active_cell_property("STATIC_NATIVE", "PORO", 0)
+    integer_values = [int(v * 100) for v in results]
+
+    # A name that does not end with "NUM" - only the data_type flag should
+    # cause this to be treated as a discrete/category property.
+    case.set_active_cell_property(
+        integer_values, "GENERATED", "MY_DISCRETE", 0, data_type="INTEGER"
+    )
+
+    round_trip = case.active_cell_property("GENERATED", "MY_DISCRETE", 0)
+    assert len(round_trip) == len(integer_values)
+    for expected, actual in zip(integer_values, round_trip):
+        assert expected == int(actual)
+
+
 def test_exportPropertyInView(rips_instance, initialize_test):
     case_path = dataroot.PATH + "/TEST10K_FLT_LGR_NNC/TEST10K_FLT_LGR_NNC.EGRID"
     case = rips_instance.project.load_case(case_path)

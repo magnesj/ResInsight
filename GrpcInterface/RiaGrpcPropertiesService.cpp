@@ -104,6 +104,11 @@ public:
 
             m_resultAddress = RigEclipseResultAddress( resultType, QString::fromStdString( request->property_name() ) );
 
+            auto dataType = ( request->data_type() == rips::PropertyDataType::INTEGER )
+                                ? RiaDefines::ResultDataType::INTEGER
+                                : RiaDefines::ResultDataType::FLOAT;
+            m_resultAddress.setDataType( dataType );
+
             if ( resultData->ensureKnownResultLoaded( m_resultAddress ) )
             {
                 if ( timeStep < resultData->timeStepCount( m_resultAddress ) )
