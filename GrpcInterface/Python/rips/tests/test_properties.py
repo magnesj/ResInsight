@@ -98,7 +98,7 @@ def test_10k_PoroPermX(rips_instance, initialize_test):
     checkResults(poro, permx, poroPermX)
 
 
-def test_10k_set_integer_property(rips_instance, initialize_test):
+def test_10k_set_integer_active_cell_property(rips_instance, initialize_test):
     casePath = dataroot.PATH + "/TEST10K_FLT_LGR_NNC/TEST10K_FLT_LGR_NNC.EGRID"
     case = rips_instance.project.load_case(path=casePath)
 
@@ -108,10 +108,28 @@ def test_10k_set_integer_property(rips_instance, initialize_test):
     # A name that does not end with "NUM" - only the data_type flag should
     # cause this to be treated as a discrete/category property.
     case.set_active_cell_property(
-        integer_values, "GENERATED", "MY_DISCRETE", 0, data_type="INTEGER"
+        integer_values, "GENERATED", "MY_DISCRETE_ACTIVE", 0, data_type="INTEGER"
     )
 
-    round_trip = case.active_cell_property("GENERATED", "MY_DISCRETE", 0)
+    round_trip = case.active_cell_property("GENERATED", "MY_DISCRETE_ACTIVE", 0)
+    assert len(round_trip) == len(integer_values)
+    for expected, actual in zip(integer_values, round_trip):
+        assert expected == int(actual)
+
+
+def test_10k_set_integer_grid_property(rips_instance, initialize_test):
+    casePath = dataroot.PATH + "/TEST10K_FLT_LGR_NNC/TEST10K_FLT_LGR_NNC.EGRID"
+    case = rips_instance.project.load_case(path=casePath)
+
+    grid = case.grid()
+    grid_cell_count = grid.cell_count()
+    integer_values = [i % 4 for i in range(grid_cell_count)]
+
+    case.set_grid_property(
+        integer_values, "GENERATED", "MY_DISCRETE_GRID", 0, data_type="INTEGER"
+    )
+
+    round_trip = case.grid_property("GENERATED", "MY_DISCRETE_GRID", 0)
     assert len(round_trip) == len(integer_values)
     for expected, actual in zip(integer_values, round_trip):
         assert expected == int(actual)
