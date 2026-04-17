@@ -2,8 +2,6 @@
 # This script creates a discrete (integer) grid property for all grid
 # cells in the first case in the project.
 #
-# The script is intended to be used for TEST10K_FLT_LGR_NNC.EGRID.
-#
 # A discrete property is visualized with a category legend, in contrast
 # to the continuous legend used for floating point properties. Passing
 # data_type="INTEGER" flags the property as discrete regardless of the

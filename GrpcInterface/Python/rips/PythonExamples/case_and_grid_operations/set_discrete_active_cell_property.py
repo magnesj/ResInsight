@@ -2,8 +2,6 @@
 # This script creates a discrete (integer) property for all active
 # cells in the first case in the project.
 #
-# The script is intended to be used for TEST10K_FLT_LGR_NNC.EGRID.
-#
 # Passing data_type="INTEGER" flags the property as discrete regardless
 # of the property name (previously this required the name to end with
 # "NUM").
