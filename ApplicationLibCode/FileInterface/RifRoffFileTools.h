@@ -87,9 +87,8 @@ private:
                                               roff::Token::Kind   token,
                                               roff::Reader&       reader );
 
-    static bool appendZoneIndexPropertyFromSubgrids( RigEclipseCaseData*         caseData,
-                                                     roff::Reader&               reader,
-                                                     std::map<QString, QString>& keywordMapping );
+    static bool
+        appendZoneIndexPropertyFromSubgrids( RigEclipseCaseData* caseData, roff::Reader& reader, std::map<QString, QString>& keywordMapping );
 
     static RiaDefines::ResultDataType mapFromType( roff::Token::Kind kind );
 };

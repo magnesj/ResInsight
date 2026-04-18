@@ -803,8 +803,8 @@ bool RifRoffFileTools::appendZoneIndexPropertyFromSubgrids( RigEclipseCaseData* 
     std::vector<double> values = computeZoneValuesFromSubgrids( nLayers, nx, ny, nz );
     if ( values.empty() )
     {
-        RiaLogging::warning( QString( "ROFF subgrids.nLayers could not be expanded to grid K dimension (%1). Skipping zonation import." )
-                                 .arg( nz ) );
+        RiaLogging::warning(
+            QString( "ROFF subgrids.nLayers could not be expanded to grid K dimension (%1). Skipping zonation import." ).arg( nz ) );
         return false;
     }
 
@@ -818,8 +818,7 @@ bool RifRoffFileTools::appendZoneIndexPropertyFromSubgrids( RigEclipseCaseData* 
         }
     }
 
-    const QString resultName =
-        caseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->makeResultNameUnique( QString( "SUBGRIDS" ) );
+    const QString resultName = caseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->makeResultNameUnique( QString( "SUBGRIDS" ) );
 
     RigEclipseResultAddress resAddr( RiaDefines::ResultCatType::INPUT_PROPERTY, RiaDefines::ResultDataType::INTEGER, resultName );
     caseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->createResultEntry( resAddr, false );
