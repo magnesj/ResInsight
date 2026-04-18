@@ -254,12 +254,11 @@ void RimCorrelationPlot::addDataToChartBuilder( RiuGroupedBarChartBuilder& chart
 
     for ( auto parameterCorrPair : correlations )
     {
-        double  value     = m_showAbsoluteValues() ? std::abs( parameterCorrPair.second ) : parameterCorrPair.second;
-        double  sortValue = m_sortByAbsoluteValues() ? std::abs( value ) : value;
-        QString barText   = QString( "%1 (%2)" ).arg( parameterCorrPair.first.name ).arg( parameterCorrPair.second, 5, 'f', 2 );
-        // legendText becomes barChart->title() and is used for click-to-select; must equal param.name.
-        // barText is shown on the axis label and can include the correlation value.
-        chartBuilder.addBarEntry( "", "", "", sortValue, parameterCorrPair.first.name, barText, value );
+        RimCorrelationBarChartTools::addCorrelationBar( chartBuilder,
+                                                        parameterCorrPair.first.name,
+                                                        parameterCorrPair.second,
+                                                        m_showAbsoluteValues(),
+                                                        m_sortByAbsoluteValues() );
     }
 }
 

@@ -22,6 +22,7 @@
 
 #include <memory>
 
+class RiuGroupedBarChartBuilder;
 class RiuPlotItem;
 class RiuQwtPlotWidget;
 
@@ -41,4 +42,10 @@ void highlightSelectedParameterBar( RiuQwtPlotWidget* plotWidget,
                                     const QColor&     highlightColor );
 
 QString parameterNameFromPlotItem( std::shared_ptr<RiuPlotItem> plotItem );
+
+void addCorrelationBar( RiuGroupedBarChartBuilder& chartBuilder,
+                        const QString&             parameterName,
+                        double                     correlation,
+                        bool                       showAbsoluteValues,
+                        bool                       sortByAbsoluteValues );
 } // namespace RimCorrelationBarChartTools

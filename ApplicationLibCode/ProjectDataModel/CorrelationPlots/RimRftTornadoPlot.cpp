@@ -395,12 +395,7 @@ std::map<QString, double> RimRftTornadoPlot::addDataToChartBuilder( RiuGroupedBa
 
         correlations[param.name] = pearson;
 
-        double value     = m_showAbsoluteValues() ? std::abs( pearson ) : pearson;
-        double sortValue = m_sortByAbsoluteValues() ? std::abs( value ) : value;
-        // legendText becomes barChart->title() and is used for click-to-select; must equal param.name.
-        // barText is shown on the axis label and can include the correlation value.
-        QString axisLabel = QString( "%1 (%2)" ).arg( param.name ).arg( pearson, 5, 'f', 2 );
-        chartBuilder.addBarEntry( "", "", "", sortValue, param.name, axisLabel, value );
+        RimCorrelationBarChartTools::addCorrelationBar( chartBuilder, param.name, pearson, m_showAbsoluteValues(), m_sortByAbsoluteValues() );
     }
 
     return correlations;

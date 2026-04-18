@@ -18,6 +18,7 @@
 
 #include "RimCorrelationBarChartTools.h"
 
+#include "RiuGroupedBarChartBuilder.h"
 #include "RiuPlotItem.h"
 #include "RiuQwtPlotItem.h"
 #include "RiuQwtPlotWidget.h"
@@ -26,6 +27,8 @@
 #include "qwt_plot.h"
 #include "qwt_plot_barchart.h"
 #include "qwt_text.h"
+
+#include <cmath>
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -64,4 +67,23 @@ QString RimCorrelationBarChartTools::parameterNameFromPlotItem( std::shared_ptr<
     if ( !barChart ) return {};
 
     return barChart->title().text();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCorrelationBarChartTools::addCorrelationBar( RiuGroupedBarChartBuilder& chartBuilder,
+                                                     const QString&             parameterName,
+                                                     double                     correlation,
+                                                     bool                       showAbsoluteValues,
+                                                     bool                       sortByAbsoluteValues )
+{
+    const double  value     = showAbsoluteValues ? std::abs( correlation ) : correlation;
+    const double  sortValue = sortByAbsoluteValues ? std::abs( value ) : value;
+    const QString axisLabel = QString( "%1 (%2)" ).arg( parameterName ).arg( correlation, 5, 'f', 2 );
+
+    // legendText (5th arg) becomes barChart->title() and is used for click-to-select and
+    // selection highlight; it must equal parameterName.
+    // barText (6th arg) is shown on the axis label and can include the correlation value.
+    chartBuilder.addBarEntry( "", "", "", sortValue, parameterName, axisLabel, value );
 }
