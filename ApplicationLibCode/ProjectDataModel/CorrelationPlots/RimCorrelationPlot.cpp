@@ -43,6 +43,7 @@
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 
+#include "qwt_column_symbol.h"
 #include "qwt_plot.h"
 #include "qwt_plot_barchart.h"
 #include "qwt_text.h"
@@ -75,6 +76,8 @@ RimCorrelationPlot::RimCorrelationPlot()
     // Color taken from https://webviz-subsurface-example.azurewebsites.net/parameters-vs-rft
     QColor qColor = QColor( "#3173b2" );
     CAF_PDM_InitField( &m_barColor, "BarColor", RiaColorTools::fromQColorTo3f( qColor ), "Bar Color" );
+    QColor highlightColor = QColor( "#f5a623" );
+    CAF_PDM_InitField( &m_highlightBarColor, "HighlightBarColor", RiaColorTools::fromQColorTo3f( highlightColor ), "Bar Color (Selected)" );
 
     setLegendsVisible( false );
     setDeletable( true );
@@ -99,7 +102,8 @@ void RimCorrelationPlot::fieldChangedByUi( const caf::PdmFieldHandle* changedFie
 
     if ( changedField == &m_showAbsoluteValues || changedField == &m_sortByAbsoluteValues ||
          changedField == &m_excludeParametersWithoutVariation || changedField == &m_selectedParametersList ||
-         changedField == &m_showOnlyTopNCorrelations || changedField == &m_topNFilterCount || changedField == &m_barColor )
+         changedField == &m_showOnlyTopNCorrelations || changedField == &m_topNFilterCount || changedField == &m_barColor ||
+         changedField == &m_highlightBarColor )
     {
         if ( changedField == &m_excludeParametersWithoutVariation )
         {
@@ -142,6 +146,7 @@ void RimCorrelationPlot::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
     plotGroup->add( &m_axisTitleFontSize );
     plotGroup->add( &m_axisValueFontSize );
     plotGroup->add( &m_barColor );
+    plotGroup->add( &m_highlightBarColor );
 
     m_description.uiCapability()->setUiReadOnly( m_useAutoPlotTitle() );
     uiOrdering.skipRemainingFields( true );
@@ -191,6 +196,7 @@ void RimCorrelationPlot::onLoadDataAndUpdate()
 
         chartBuilder.addBarChartToPlot( m_plotWidget->qwtPlot(), Qt::Horizontal, m_showOnlyTopNCorrelations() ? m_topNFilterCount() : -1 );
         chartBuilder.setLabelFontSize( labelFontSize() );
+        highlightSelectedParameterBar();
 
         m_plotWidget->qwtPlot()->insertLegend( nullptr );
         m_plotWidget->updateLegend();
@@ -250,8 +256,9 @@ void RimCorrelationPlot::addDataToChartBuilder( RiuGroupedBarChartBuilder& chart
         double  value     = m_showAbsoluteValues() ? std::abs( parameterCorrPair.second ) : parameterCorrPair.second;
         double  sortValue = m_sortByAbsoluteValues() ? std::abs( value ) : value;
         QString barText   = QString( "%1 (%2)" ).arg( parameterCorrPair.first.name ).arg( parameterCorrPair.second, 5, 'f', 2 );
-        QString majorText = "", medText = "", minText = "", legendText = barText;
-        chartBuilder.addBarEntry( majorText, medText, minText, sortValue, legendText, barText, value );
+        // legendText becomes barChart->title() and is used for click-to-select; must equal param.name.
+        // barText is shown on the axis label and can include the correlation value.
+        chartBuilder.addBarEntry( "", "", "", sortValue, parameterCorrPair.first.name, barText, value );
     }
 }
 
@@ -275,24 +282,16 @@ void RimCorrelationPlot::updatePlotTitle()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimCorrelationPlot::onPlotItemSelected( std::shared_ptr<RiuPlotItem> plotItem, bool toggle, int sampleIndex )
+void RimCorrelationPlot::onPlotItemSelected( std::shared_ptr<RiuPlotItem> plotItem, bool /*toggle*/, int /*sampleIndex*/ )
 {
-    RiuQwtPlotItem* qwtPlotItem = dynamic_cast<RiuQwtPlotItem*>( plotItem.get() );
+    auto* qwtPlotItem = dynamic_cast<RiuQwtPlotItem*>( plotItem.get() );
     if ( !qwtPlotItem ) return;
 
-    QwtPlotBarChart* barChart = dynamic_cast<QwtPlotBarChart*>( qwtPlotItem->qwtPlotItem() );
-    if ( barChart && !curveDefinitions().empty() )
-    {
-        auto curveDef = curveDefinitions().front();
-        auto barTitle = barChart->title();
-        for ( auto param : ensembleParameters() )
-        {
-            if ( barTitle.text() == param.name )
-            {
-                tornadoItemSelected.send( std::make_pair( param.name, curveDef ) );
-            }
-        }
-    }
+    auto* barChart = dynamic_cast<QwtPlotBarChart*>( qwtPlotItem->qwtPlotItem() );
+    if ( !barChart ) return;
+    if ( curveDefinitions().empty() ) return;
+
+    tornadoItemSelected.send( std::make_pair( barChart->title().text(), curveDefinitions().front() ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -368,4 +367,38 @@ void RimCorrelationPlot::setShowOnlyTopNCorrelations( bool showOnlyTopNCorrelati
 void RimCorrelationPlot::setTopNFilterCount( int filterCount )
 {
     m_topNFilterCount = filterCount;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCorrelationPlot::setSelectedParameter( const QString& paramName )
+{
+    m_selectedParameter = paramName;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCorrelationPlot::highlightSelectedParameterBar()
+{
+    if ( !m_plotWidget ) return;
+
+    const QColor highlightColor = RiaColorTools::toQColor( m_highlightBarColor() );
+    const QColor barColor       = RiaColorTools::toQColor( m_barColor() );
+
+    for ( QwtPlotItem* item : m_plotWidget->qwtPlot()->itemList( QwtPlotItem::Rtti_PlotBarChart ) )
+    {
+        auto* barChart = static_cast<QwtPlotBarChart*>( item );
+        auto* symbol   = const_cast<QwtColumnSymbol*>( barChart->symbol() );
+        if ( !symbol ) continue;
+
+        const QString paramName = barChart->title().text();
+        const QColor  color     = ( paramName == m_selectedParameter ) ? highlightColor : barColor;
+
+        QPalette palette = symbol->palette();
+        palette.setColor( QPalette::Window, color );
+        palette.setColor( QPalette::Dark, color );
+        symbol->setPalette( palette );
+    }
 }
