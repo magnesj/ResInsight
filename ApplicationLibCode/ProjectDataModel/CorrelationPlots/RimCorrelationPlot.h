@@ -72,7 +72,6 @@ private:
     void addDataToChartBuilder( RiuGroupedBarChartBuilder& chartBuilder ) const;
     void updatePlotTitle() override;
     void onPlotItemSelected( std::shared_ptr<RiuPlotItem> plotItem, bool toggle, int sampleIndex ) override;
-    void highlightSelectedParameterBar();
 
 private:
     caf::PdmField<bool>                 m_showAbsoluteValues;
