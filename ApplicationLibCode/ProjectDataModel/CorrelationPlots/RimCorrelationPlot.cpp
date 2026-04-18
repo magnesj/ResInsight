@@ -372,4 +372,3 @@ void RimCorrelationPlot::setSelectedParameter( const QString& paramName )
 {
     m_selectedParameter = paramName;
 }
-
