@@ -201,7 +201,7 @@ jobs:
         id: vcpkg-cache
         uses: magnesj/vcpkg-cache@copilot/optimize-cache-storage-structure
         with:
-          cache-key: ${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
+          cache-key: ${{ runner.os }}-${{ matrix.config.cxx }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
           prefix: vcpkg-${{ matrix.config.cxx}}/
           
       - name: Print CMake version

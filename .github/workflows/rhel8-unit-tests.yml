@@ -136,7 +136,7 @@ jobs:
         id: vcpkg-cache
         uses: magnesj/vcpkg-cache@copilot/optimize-cache-storage-structure
         with:
-          cache-key: ${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
+          cache-key: ${{ runner.os }}-g++-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
           prefix: vcpkg-g++/
 
       - name: Use RHEL8 vcpkg configuration
