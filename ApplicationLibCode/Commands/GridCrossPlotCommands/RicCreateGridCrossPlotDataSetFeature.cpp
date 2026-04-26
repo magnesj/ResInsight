@@ -45,6 +45,7 @@ bool RicCreateGridCrossPlotDataSetFeature::isCommandEnabled() const
 void RicCreateGridCrossPlotDataSetFeature::onActionTriggered( bool isChecked )
 {
     RimGridCrossPlot* crossPlot = caf::SelectionManager::instance()->selectedItemOfType<RimGridCrossPlot>();
+    if ( !crossPlot ) return;
 
     RimGridCrossPlotDataSet* dataSet = crossPlot->createDataSet();
     dataSet->loadDataAndUpdate( true );

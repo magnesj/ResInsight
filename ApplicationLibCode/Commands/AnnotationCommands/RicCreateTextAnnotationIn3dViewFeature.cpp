@@ -51,9 +51,19 @@ void RicCreateTextAnnotationIn3dViewFeature::onActionTriggered( bool isChecked )
     if ( activeView )
     {
         RimGridView* viewOrComparisonView = RiaApplication::instance()->activeMainOrComparisonGridView();
+        if ( !viewOrComparisonView ) return;
 
-        cvf::Vec3d       domainCoord = activeView->viewer()->viewerCommands()->lastPickPositionInDomainCoords();
-        cvf::BoundingBox bbox        = viewOrComparisonView->ownerCase()->activeCellsBoundingBox();
+        auto viewer = activeView->viewer();
+        if ( !viewer ) return;
+
+        auto viewerCommands = viewer->viewerCommands();
+        if ( !viewerCommands ) return;
+
+        auto ownerCase = viewOrComparisonView->ownerCase();
+        if ( !ownerCase ) return;
+
+        cvf::Vec3d       domainCoord = viewerCommands->lastPickPositionInDomainCoords();
+        cvf::BoundingBox bbox        = ownerCase->activeCellsBoundingBox();
 
         if ( contMapView ) domainCoord[2] = bbox.max().z() - bbox.extent().z() * 0.2;
 
@@ -65,7 +75,8 @@ void RicCreateTextAnnotationIn3dViewFeature::onActionTriggered( bool isChecked )
             newAnnotation->setAnchorPoint( domainCoord );
             cvf::Vec3d labelPos = domainCoord;
 
-            cvf::Camera* viewCamera = activeView->viewer()->mainCamera();
+            cvf::Camera* viewCamera = viewer->mainCamera();
+            if ( !viewCamera ) return;
 
             if ( viewCamera->direction().z() <= 0 )
             {

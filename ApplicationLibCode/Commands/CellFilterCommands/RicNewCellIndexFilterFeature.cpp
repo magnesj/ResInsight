@@ -59,7 +59,10 @@ void RicNewCellIndexFilterFeature::onActionTriggered( bool isChecked )
     RimCellFilterCollection* filtColl = colls[0];
 
     // and the case to use
-    RimCase* sourceCase = filtColl->firstAncestorOrThisOfTypeAsserted<Rim3dView>()->ownerCase();
+    auto view3d = filtColl->firstAncestorOrThisOfType<Rim3dView>();
+    if ( !view3d ) return;
+
+    RimCase* sourceCase = view3d->ownerCase();
 
     if ( sourceCase )
     {

@@ -83,7 +83,7 @@ bool RicPlaceThermalFractureUsingTemplateDataFeature::isCommandEnabled() const
 RimWellPathFracture* RicPlaceThermalFractureUsingTemplateDataFeature::selectedThermalFracture()
 {
     auto fracture = caf::SelectionManager::instance()->selectedItemOfType<RimWellPathFracture>();
-    if ( !fracture->fractureTemplate() ) return nullptr;
+    if ( !fracture || !fracture->fractureTemplate() ) return nullptr;
 
     RimThermalFractureTemplate* thermalTemplate = dynamic_cast<RimThermalFractureTemplate*>( fracture->fractureTemplate() );
     if ( !thermalTemplate ) return nullptr;
