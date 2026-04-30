@@ -58,23 +58,23 @@ def import_sumo_ensemble(
     print(f"Found SUMO case: {sumo_case.name} (id: {sumo_case.uuid})")
 
     # Find the ensemble/iteration within the case
-    iterations = sumo_case.iterations
-    matching_iterations = [it for it in iterations if it.name == iteration_name]
+    ensembles = sumo_case.ensembles
+    matching_ensembles = [e for e in ensembles if e.name == iteration_name]
 
-    if not matching_iterations:
-        available = [it.name for it in iterations]
+    if not matching_ensembles:
+        available = [e.name for e in ensembles]
         print(f"Iteration '{iteration_name}' not found. Available: {available}")
         return
 
-    iteration = matching_iterations[0]
-    print(f"Found iteration: {iteration.name}")
+    ensemble = matching_ensembles[0]
+    print(f"Found iteration: {ensemble.name}")
 
-    # Get realization IDs from the iteration
-    realization_ids = [str(r) for r in iteration.realizations]
+    # Get realization IDs from the ensemble
+    realization_ids = [str(r) for r in ensemble.realizationids]
     print(f"Found {len(realization_ids)} realizations")
 
-    # Find summary tables within the iteration
-    summary_tables = iteration.tables.filter(tagname="summary")
+    # Find summary tables within the ensemble
+    summary_tables = ensemble.tables.filter(tagname="summary")
 
     if not summary_tables:
         print("No summary tables found for this iteration")
@@ -86,23 +86,23 @@ def import_sumo_ensemble(
     # Exclude metadata columns (DATE, REAL, ENSEMBLE, etc.)
     metadata_columns = {"DATE", "REAL", "ENSEMBLE", "ITER"}
     vector_names = [
-        col for col in summary_table.column_names if col.upper() not in metadata_columns
+        col for col in summary_table.columns if col.upper() not in metadata_columns
     ]
     print(f"Found {len(vector_names)} summary vectors")
 
     # Import the ensemble into ResInsight
     # This creates a SummaryEnsembleSumo object that will lazily load
     # the actual parquet data when plots are created
-    ensemble = project.import_summary_ensemble_sumo(
+    imported_ensemble = project.import_summary_ensemble_sumo(
         case_id=sumo_case.uuid,
         case_name=sumo_case.name,
-        ensemble_name=iteration.name,
+        ensemble_name=ensemble.name,
         vector_names=vector_names,
         realization_ids=realization_ids,
     )
 
-    if ensemble is not None:
-        print(f"Successfully imported SUMO ensemble: {ensemble.name}")
+    if imported_ensemble is not None:
+        print(f"Successfully imported SUMO ensemble: {imported_ensemble.name}")
     else:
         print("Failed to import SUMO ensemble")
 
@@ -111,6 +111,6 @@ if __name__ == "__main__":
     # Example: import a Drogon ensemble from SUMO
     import_sumo_ensemble(
         asset_name="Drogon",
-        case_name="Drogon_AHM_2023-02-01",
+        case_name="01_drogon_20260430_vfp_2",
         iteration_name="iter-0",
     )

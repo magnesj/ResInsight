@@ -32,6 +32,8 @@
 #include "RimSummaryCaseSumo.h"
 #include "RimSummarySumoDataSource.h"
 
+#include "cafPdmObjectScriptingCapability.h"
+
 #include <arrow/type_fwd.h>
 
 CAF_PDM_SOURCE_INIT( RimSummaryEnsembleSumo, "RimSummaryEnsembleSumo" );
@@ -41,7 +43,7 @@ CAF_PDM_SOURCE_INIT( RimSummaryEnsembleSumo, "RimSummaryEnsembleSumo" );
 //--------------------------------------------------------------------------------------------------
 RimSummaryEnsembleSumo::RimSummaryEnsembleSumo()
 {
-    CAF_PDM_InitObject( "Sumo Ensemble", ":/SummaryCase.svg", "", "The Base Class for all Summary Cases" );
+    CAF_PDM_InitScriptableObject( "Sumo Ensemble", ":/SummaryCase.svg", "", "The Base Class for all Summary Cases" );
 
     CAF_PDM_InitFieldNoDefault( &m_sumoDataSource, "SumoDataSource", "Sumo Data Source" + RiaDefines::betaFeaturePostfix() );
 
