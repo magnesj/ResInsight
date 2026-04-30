@@ -183,7 +183,7 @@ private:
     std::unique_ptr<RiuMdiMaximizeWindowGuard> m_maximizeWindowGuard;
 
 #ifdef ENABLE_SPIX
-    std::unique_ptr<spix::QtWidgetsBot>  m_spixBot;
-    std::unique_ptr<spix::AnyRpcServer>  m_spixServer;
+    std::unique_ptr<spix::QtWidgetsBot> m_spixBot;
+    std::unique_ptr<spix::AnyRpcServer> m_spixServer;
 #endif
 };
