@@ -10,7 +10,8 @@
         "type-lite",
         "fast-float",
         "spdlog",
-        "pugixml"
+        "pugixml",
+        { "name": "spix", "features": ["qtwidgets"] }
     ],
     "overrides": [
         {
