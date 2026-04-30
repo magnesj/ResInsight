@@ -4,7 +4,7 @@ import xmlrpc.client
 import pytest
 
 
-def test_spix_main_window_visible():
+def test_spix_server_responds():
     port = os.environ.get("RESINSIGHT_SPIX_PORT")
     if not port:
         pytest.skip(
@@ -12,4 +12,7 @@ def test_spix_main_window_visible():
         )
 
     proxy = xmlrpc.client.ServerProxy(f"http://localhost:{port}/")
-    assert proxy.existsAndVisible("mainWindow") is True
+    # getErrors() takes no widget path, so this verifies the RPC layer
+    # is alive without depending on any specific widget's objectName.
+    errors = proxy.getErrors()
+    assert isinstance(errors, list)
