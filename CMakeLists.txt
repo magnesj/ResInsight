@@ -262,7 +262,24 @@ option(RESINSIGHT_ENABLE_SPIX
        "Enable Spix UI test automation (HTTP/RPC server)" OFF
 )
 if(RESINSIGHT_ENABLE_SPIX)
-  find_package(Spix CONFIG REQUIRED)
+  # Spix is fetched as source and built against the project's existing Qt6
+  # rather than installed via vcpkg, so that vcpkg does not pull in qtbase /
+  # qtdeclarative. anyrpc is still consumed via vcpkg (find_package below).
+  find_package(AnyRPC CONFIG REQUIRED)
+
+  set(SPIX_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+  set(SPIX_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+  set(SPIX_BUILD_QTQUICK OFF CACHE BOOL "" FORCE)
+  set(SPIX_BUILD_QTWIDGETS ON CACHE BOOL "" FORCE)
+
+  include(FetchContent)
+  FetchContent_Declare(
+    spix
+    GIT_REPOSITORY https://github.com/faaxm/spix.git
+    GIT_TAG        a9c9bb178f6ac00068d4d8dfc3e394337e596cf8 # v0.14
+  )
+  FetchContent_MakeAvailable(spix)
+
   add_definitions(-DENABLE_SPIX)
   list(APPEND THIRD_PARTY_LIBRARIES Spix::QtWidgets)
 endif()

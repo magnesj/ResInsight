@@ -1,5 +1,6 @@
 {
     "dependencies": [
+        "anyrpc",
         "arrow",
         "boost-filesystem",
         "boost-spirit",
@@ -10,8 +11,7 @@
         "type-lite",
         "fast-float",
         "spdlog",
-        "pugixml",
-        { "name": "spix", "features": ["qtwidgets"] }
+        "pugixml"
     ],
     "overrides": [
         {
