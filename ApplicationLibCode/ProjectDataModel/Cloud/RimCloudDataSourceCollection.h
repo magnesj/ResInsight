@@ -44,7 +44,7 @@ public:
 
     std::vector<RimSummarySumoDataSource*> sumoDataSources() const;
 
-    void addSumoDataSource( RimSummarySumoDataSource* dataSource );
+    void        addSumoDataSource( RimSummarySumoDataSource* dataSource );
     static void createEnsemblesFromSelectedDataSources( const std::vector<RimSummarySumoDataSource*>& dataSources );
 
 private:
