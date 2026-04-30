@@ -38,6 +38,7 @@
 #include "RimOilField.h"
 #include "RimProject.h"
 #include "RimSummaryCase.h"
+#include "RimSummaryCaseMainCollection.h"
 #include "RimSurfaceCollection.h"
 #include "RimTools.h"
 #include "RimValveTemplateCollection.h"
