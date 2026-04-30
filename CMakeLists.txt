@@ -264,8 +264,9 @@ option(RESINSIGHT_ENABLE_SPIX
 if(RESINSIGHT_ENABLE_SPIX)
   # Spix is fetched as source and built against the project's existing Qt6
   # rather than installed via vcpkg, so that vcpkg does not pull in qtbase /
-  # qtdeclarative. anyrpc is still consumed via vcpkg (find_package below).
-  find_package(AnyRPC CONFIG REQUIRED)
+  # qtdeclarative. anyrpc is consumed via vcpkg; Spix ships its own
+  # FindAnyRPC.cmake (module mode) and locates the vcpkg-installed library
+  # via CMAKE_PREFIX_PATH once add_subdirectory(spix) runs.
 
   set(SPIX_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
   set(SPIX_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -281,7 +282,9 @@ if(RESINSIGHT_ENABLE_SPIX)
   FetchContent_MakeAvailable(spix)
 
   add_definitions(-DENABLE_SPIX)
-  list(APPEND THIRD_PARTY_LIBRARIES Spix::QtWidgets)
+  # Spix::QtWidgets is an ALIAS target, so it cannot be added to
+  # THIRD_PARTY_LIBRARIES (see the set_property(... FOLDER ...) walk later in
+  # this file). Linkage is wired in ApplicationLibCode/CMakeLists.txt.
 endif()
 
 # ##############################################################################
