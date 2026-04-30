@@ -114,9 +114,9 @@ public:
     QString                                       classKeywordReturnedType() const override;
 
 private:
-    caf::PdmField<QString>            m_caseId;
-    caf::PdmField<QString>            m_caseName;
-    caf::PdmField<QString>            m_ensembleName;
+    caf::PdmField<QString>              m_caseId;
+    caf::PdmField<QString>              m_caseName;
+    caf::PdmField<QString>              m_ensembleName;
     caf::PdmField<std::vector<QString>> m_vectorNames;
     caf::PdmField<std::vector<QString>> m_realizationIds;
 };
