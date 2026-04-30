@@ -256,6 +256,18 @@ if(RESINSIGHT_ENABLE_GRPC)
 endif()
 
 # ##############################################################################
+# Spix UI test automation
+# ##############################################################################
+option(RESINSIGHT_ENABLE_SPIX
+       "Enable Spix UI test automation (HTTP/RPC server)" OFF
+)
+if(RESINSIGHT_ENABLE_SPIX)
+  find_package(Spix CONFIG REQUIRED)
+  add_definitions(-DENABLE_SPIX)
+  list(APPEND THIRD_PARTY_LIBRARIES Spix::QtWidgets)
+endif()
+
+# ##############################################################################
 # Unity Build
 # ##############################################################################
 
