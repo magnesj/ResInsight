@@ -144,6 +144,11 @@
 #include <unistd.h> // for usleep
 #endif // WIN32
 
+#ifdef ENABLE_SPIX
+#include <Spix/AnyRpcServer.h>
+#include <Spix/QtWidgetsBot.h>
+#endif
+
 //==================================================================================================
 ///
 /// \class RiaGuiApplication
@@ -212,6 +217,13 @@ RiaGuiApplication::~RiaGuiApplication()
     // Set destruction flag to prevent notify from accessing member variables during destruction
     // This must be done before any window deletion that might trigger events
     setNotifyInDestructorFlag( true );
+
+#ifdef ENABLE_SPIX
+    // Tear down the Spix server before the windows it watches. The server destructor
+    // joins its worker thread, after which the bot can be released safely.
+    m_spixServer.reset();
+    m_spixBot.reset();
+#endif
 
     processEvents();
 
@@ -569,6 +581,17 @@ RiaApplication::ApplicationStatus RiaGuiApplication::handleArguments( gsl::not_n
             }
         }
     }
+
+#ifdef ENABLE_SPIX
+    if ( cvf::Option o = progOpt->option( "spix-port" ) )
+    {
+        if ( o.valueCount() == 1 )
+        {
+            int port = o.value( 0 ).toInt();
+            if ( port > 0 ) startSpixServer( port );
+        }
+    }
+#endif
 
     // Code generation
     // -----------------
@@ -1840,3 +1863,25 @@ bool RiaGuiApplication::notify( QObject* receiver, QEvent* event )
 
     return done;
 }
+
+#ifdef ENABLE_SPIX
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaGuiApplication::startSpixServer( int port )
+{
+    try
+    {
+        m_spixBot    = std::make_unique<spix::QtWidgetsBot>();
+        m_spixServer = std::make_unique<spix::AnyRpcServer>( port );
+        m_spixBot->runTestServer( *m_spixServer );
+        RiaLogging::info( QString( "Spix UI test automation server listening on port %1" ).arg( port ) );
+    }
+    catch ( const std::exception& e )
+    {
+        RiaLogging::error( QString( "Failed to start Spix server on port %1: %2" ).arg( port ).arg( e.what() ) );
+        m_spixServer.reset();
+        m_spixBot.reset();
+    }
+}
+#endif

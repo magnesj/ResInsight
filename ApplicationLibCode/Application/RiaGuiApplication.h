@@ -70,6 +70,14 @@ namespace caf
 class FontHolderInterface;
 }
 
+#ifdef ENABLE_SPIX
+namespace spix
+{
+class AnyRpcServer;
+class QtWidgetsBot;
+} // namespace spix
+#endif
+
 //==================================================================================================
 //
 //
@@ -158,6 +166,10 @@ private:
 
     void storeTreeViewState();
 
+#ifdef ENABLE_SPIX
+    void startSpixServer( int port );
+#endif
+
 private slots:
     void slotWorkerProcessFinished( int exitCode, QProcess::ExitStatus exitStatus );
     void onLastWindowClosed();
@@ -169,4 +181,9 @@ private:
     std::unique_ptr<RiuRecentFileActionProvider> m_recentFileActionProvider;
 
     std::unique_ptr<RiuMdiMaximizeWindowGuard> m_maximizeWindowGuard;
+
+#ifdef ENABLE_SPIX
+    std::unique_ptr<spix::QtWidgetsBot>  m_spixBot;
+    std::unique_ptr<spix::AnyRpcServer>  m_spixServer;
+#endif
 };
