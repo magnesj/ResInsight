@@ -73,6 +73,10 @@ bool RiaArgumentParser::parseArguments( cvf::ProgramOptions* progOpt )
     progOpt->registerOption( "console", "", "Launch as a console application without graphics" );
     progOpt->registerOption( "server", "[<portnumber>]", "Launch as a GRPC server. Default port is 50051", cvf::ProgramOptions::SINGLE_VALUE );
     progOpt->registerOption( "portnumberfile", "[<filename>]", "Write the port number to this file.", cvf::ProgramOptions::SINGLE_VALUE );
+    progOpt->registerOption( "spix-port",
+                             "<portnumber>",
+                             "Start Spix UI test automation server on the given HTTP port.",
+                             cvf::ProgramOptions::SINGLE_VALUE );
 
     progOpt->registerOption( "threadcount", "<threadcount>", "Set number of threads for parallel processing.\n", cvf::ProgramOptions::SINGLE_VALUE );
 
