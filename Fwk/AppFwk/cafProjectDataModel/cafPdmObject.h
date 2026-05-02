@@ -289,6 +289,26 @@ public:
         addFieldUi( field, QString( Keyword.value ), defaultValue, &fieldDescription );
     }
 
+    /// Overload of initField() for PdmField<AppEnum<T>> that accepts a raw enum value as the default,
+    /// matching the convenience provided by CAF_PDM_InitField (which dispatches via overload resolution
+    /// on addFieldUi). Without this overload, callers would have to write
+    /// `AppEnum<MyEnum>{ MyEnum::Value }` for the default.
+    template <PdmObjectDerived DerivedClass, caf::PdmKeyword Keyword, typename EnumType>
+    void initField( PdmField<AppEnum<EnumType>>* field,
+                    const EnumType&              defaultValue,
+                    const QString&               uiName,
+                    const QString&               iconResourceName = {},
+                    const QString&               toolTip          = {},
+                    const QString&               whatsThis        = {} )
+    {
+        initField<DerivedClass, Keyword>( field,
+                                          AppEnum<EnumType>( defaultValue ),
+                                          uiName,
+                                          iconResourceName,
+                                          toolTip,
+                                          whatsThis );
+    }
+
     /// Macro-free alternative to CAF_PDM_InitFieldNoDefault.
     ///
     /// Like initField(), but does not assign a default value to the field.

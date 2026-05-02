@@ -1048,11 +1048,15 @@ public:
         initField<MacroFreeObj, caf::PdmKeyword{ "IntField" }>( &m_intField, 42, "Integer Field", "", "Int tooltip" );
         initField<MacroFreeObj, caf::PdmKeyword{ "DoubleField" }>( &m_doubleField, 3.14, "Double Field" );
         initFieldNoDefault<MacroFreeObj, caf::PdmKeyword{ "StringField" }>( &m_stringField, "String Field" );
+
+        // Exercises the AppEnum overload: raw enum value (InheritedDemoObj::T2) as the default.
+        initField<MacroFreeObj, caf::PdmKeyword{ "EnumField" }>( &m_enumField, InheritedDemoObj::T2, "Enum Field" );
     }
 
-    caf::PdmField<int>     m_intField;
-    caf::PdmField<double>  m_doubleField;
-    caf::PdmField<QString> m_stringField;
+    caf::PdmField<int>                                          m_intField;
+    caf::PdmField<double>                                       m_doubleField;
+    caf::PdmField<QString>                                      m_stringField;
+    caf::PdmField<caf::AppEnum<InheritedDemoObj::TestEnumType>> m_enumField;
 };
 CAF_PDM_SOURCE_INIT( MacroFreeObj, "MacroFreeObj" );
 
@@ -1065,7 +1069,16 @@ TEST( MacroFreeTest, FieldRegistrationAndDefaults )
     EXPECT_DOUBLE_EQ( 3.14, obj.m_doubleField() );
 
     // Verify all fields are registered with the object
-    EXPECT_EQ( 3u, obj.fields().size() );
+    EXPECT_EQ( 4u, obj.fields().size() );
+}
+
+TEST( MacroFreeTest, AppEnumDefaultFromRawEnum )
+{
+    MacroFreeObj obj;
+
+    // The raw-enum overload of initField() must wrap the value in AppEnum<>.
+    EXPECT_EQ( InheritedDemoObj::T2, obj.m_enumField() );
+    EXPECT_EQ( QString( "EnumField" ), obj.m_enumField.keyword() );
 }
 
 TEST( MacroFreeTest, FieldKeywords )
