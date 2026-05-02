@@ -10,11 +10,18 @@ find_package(
 qt_standard_project_setup()
 
 set(PROJECT_FILES
-    bench_basic_fields.cpp bench_enum_fields.cpp bench_container_fields.cpp
-    bench_filepath_fields.cpp bench_mixed_fields.cpp bench_heavy_fields.cpp
-    bench_basic_fields_template.cpp bench_enum_fields_template.cpp
-    bench_container_fields_template.cpp bench_filepath_fields_template.cpp
-    bench_mixed_fields_template.cpp bench_heavy_fields_template.cpp
+    bench_basic_fields.cpp
+    bench_enum_fields.cpp
+    bench_container_fields.cpp
+    bench_filepath_fields.cpp
+    bench_mixed_fields.cpp
+    bench_heavy_fields.cpp
+    bench_basic_fields_template.cpp
+    bench_enum_fields_template.cpp
+    bench_container_fields_template.cpp
+    bench_filepath_fields_template.cpp
+    bench_mixed_fields_template.cpp
+    bench_heavy_fields_template.cpp
 )
 
 # OBJECT library: compiles each file individually without linking. This isolates
