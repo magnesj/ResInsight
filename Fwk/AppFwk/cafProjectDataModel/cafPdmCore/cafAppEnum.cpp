@@ -88,7 +88,7 @@ void AppEnumMapperBase::setDefault( int defaultEnumValue )
 int AppEnumMapperBase::defaultValue() const
 {
     if ( m_defaultValueIsSet ) return m_defaultValue;
-    // Matches prior behavior: undefined when m_mapping is empty.
+    CAF_ASSERT( !m_mapping.empty() );
     return m_mapping[0].m_enumVal;
 }
 

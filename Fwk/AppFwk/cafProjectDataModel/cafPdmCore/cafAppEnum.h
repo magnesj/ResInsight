@@ -42,6 +42,7 @@
 #include <QStringList>
 
 #include <map>
+#include <type_traits>
 #include <vector>
 
 namespace caf
@@ -157,6 +158,10 @@ private:
 template <class T>
 class AppEnum : public AppEnumInterface
 {
+    static_assert( std::is_enum_v<T>, "AppEnum<T> requires T to be an enum type." );
+    static_assert( sizeof( std::underlying_type_t<T> ) <= sizeof( int ),
+                   "AppEnum stores enum values as int; T's underlying type is wider than int." );
+
 public:
     AppEnum() { m_value = static_cast<T>( mapper().defaultValue() ); }
     AppEnum( T value )
@@ -206,25 +211,17 @@ public:
     }
     bool setFromText( const QString& text )
     {
-        int v = 0;
-        if ( mapper().enumVal( v, text ) )
-        {
-            m_value = static_cast<T>( v );
-            return true;
-        }
+        int  v  = 0;
+        bool ok = mapper().enumVal( v, text );
         m_value = static_cast<T>( v );
-        return false;
+        return ok;
     }
     bool setFromIndex( size_t index )
     {
-        int v = 0;
-        if ( mapper().enumVal( v, index ) )
-        {
-            m_value = static_cast<T>( v );
-            return true;
-        }
+        int  v  = 0;
+        bool ok = mapper().enumVal( v, index );
         m_value = static_cast<T>( v );
-        return false;
+        return ok;
     }
 
     QString textForSerialization() const override { return text(); }
@@ -271,6 +268,12 @@ private:
 
     // Per-T storage for the mapper. The base class methods are non-template so they're compiled
     // once total; only this accessor and the trivial static_cast shims above are instantiated per T.
+    //
+    // The explicit isInitialized flag (rather than e.g. std::call_once or a magic-static lambda) is
+    // deliberate: setUp() invokes addItem(), which calls mapper() recursively. Setting the flag
+    // before invoking setUp() lets the re-entrant calls return the storedInstance instead of
+    // deadlocking. First-access must therefore happen single-threaded; see
+    // CreateObjectInMultipleThreads in cafPdmBasicTest.cpp.
     static AppEnumMapperBase& mapper()
     {
         static AppEnumMapperBase storedInstance;
