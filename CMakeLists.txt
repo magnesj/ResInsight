@@ -265,19 +265,31 @@ if(RESINSIGHT_ENABLE_SPIX)
   # Spix is fetched as source and built against the project's existing Qt6
   # rather than installed via vcpkg, so that vcpkg does not pull in qtbase /
   # qtdeclarative. anyrpc is consumed via vcpkg; Spix ships its own
-  # FindAnyRPC.cmake (module mode) and locates the vcpkg-installed library
-  # via CMAKE_PREFIX_PATH once add_subdirectory(spix) runs.
+  # FindAnyRPC.cmake (module mode) and locates the vcpkg-installed library via
+  # CMAKE_PREFIX_PATH once add_subdirectory(spix) runs.
 
-  set(SPIX_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-  set(SPIX_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-  set(SPIX_BUILD_QTQUICK OFF CACHE BOOL "" FORCE)
-  set(SPIX_BUILD_QTWIDGETS ON CACHE BOOL "" FORCE)
+  set(SPIX_BUILD_EXAMPLES
+      OFF
+      CACHE BOOL "" FORCE
+  )
+  set(SPIX_BUILD_TESTS
+      OFF
+      CACHE BOOL "" FORCE
+  )
+  set(SPIX_BUILD_QTQUICK
+      OFF
+      CACHE BOOL "" FORCE
+  )
+  set(SPIX_BUILD_QTWIDGETS
+      ON
+      CACHE BOOL "" FORCE
+  )
 
   include(FetchContent)
   FetchContent_Declare(
     spix
     GIT_REPOSITORY https://github.com/faaxm/spix.git
-    GIT_TAG        a9c9bb178f6ac00068d4d8dfc3e394337e596cf8 # v0.14
+    GIT_TAG a9c9bb178f6ac00068d4d8dfc3e394337e596cf8 # v0.14
   )
   FetchContent_MakeAvailable(spix)
 
