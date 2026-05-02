@@ -301,12 +301,7 @@ public:
                     const QString&               toolTip          = {},
                     const QString&               whatsThis        = {} )
     {
-        initField<DerivedClass, Keyword>( field,
-                                          AppEnum<EnumType>( defaultValue ),
-                                          uiName,
-                                          iconResourceName,
-                                          toolTip,
-                                          whatsThis );
+        initField<DerivedClass, Keyword>( field, AppEnum<EnumType>( defaultValue ), uiName, iconResourceName, toolTip, whatsThis );
     }
 
     /// Macro-free alternative to CAF_PDM_InitFieldNoDefault.
