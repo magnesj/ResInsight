@@ -25,5 +25,5 @@ def test_main_window_addressable():
 
     assert proxy.existsAndVisible("RiuMainWindow"), (
         "RiuMainWindow not found by Spix — check that "
-        "RiuMainWindow::RiuMainWindow() calls setObjectName(\"RiuMainWindow\")"
+        'RiuMainWindow::RiuMainWindow() calls setObjectName("RiuMainWindow")'
     )
