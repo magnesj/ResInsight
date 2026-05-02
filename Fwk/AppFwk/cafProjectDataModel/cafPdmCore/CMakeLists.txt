@@ -26,6 +26,7 @@ set(PROJECT_FILES
     cafPdmChildField.inl
     cafPdmDataValueField.h
     cafPdmField.h
+    cafPdmField.cpp
     cafPdmFieldCapability.h
     cafPdmFieldHandle.cpp
     cafPdmFieldHandle.h
