@@ -230,8 +230,8 @@ public:
         this->isInheritedFromPdmXmlSerializable();
         this->registerClassKeyword( classKeyword() );
 
-        static caf::PdmUiItemInfo objDescr( uiName, iconResourceName, toolTip, whatsThis );
-        this->setUiItemInfo( &objDescr );
+        static caf::PdmUiItemInfo objectDescription( uiName, iconResourceName, toolTip, whatsThis );
+        this->setUiItemInfo( &objectDescription );
     }
 
     /// Macro-free alternative to CAF_PDM_InitField.
@@ -268,8 +268,8 @@ public:
         configureCapabilities( field );
         registerClassWithField( classKeyword(), field );
 
-        static caf::PdmUiItemInfo fieldDescr( uiName, iconResourceName, toolTip, whatsThis, Keyword.value );
-        addFieldUi( field, QString( Keyword.value ), defaultValue, &fieldDescr );
+        static caf::PdmUiItemInfo fieldDescription( uiName, iconResourceName, toolTip, whatsThis, Keyword.value );
+        addFieldUi( field, QString( Keyword.value ), defaultValue, &fieldDescription );
     }
 
     /// Macro-free alternative to CAF_PDM_InitFieldNoDefault.
@@ -303,8 +303,8 @@ public:
         configureCapabilities( field );
         registerClassWithField( classKeyword(), field );
 
-        static caf::PdmUiItemInfo fieldDescr( uiName, iconResourceName, toolTip, whatsThis, Keyword.value );
-        addFieldUiNoDefault( field, QString( Keyword.value ), &fieldDescr );
+        static caf::PdmUiItemInfo fieldDescription( uiName, iconResourceName, toolTip, whatsThis, Keyword.value );
+        addFieldUiNoDefault( field, QString( Keyword.value ), &fieldDescription );
     }
 
 protected:

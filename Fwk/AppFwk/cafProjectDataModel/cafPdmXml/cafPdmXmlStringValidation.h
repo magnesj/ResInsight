@@ -71,6 +71,8 @@ namespace caf
 template <std::size_t N>
 struct PdmKeyword
 {
+    // N is the size of the string literal including the null terminator.
+    // For a keyword "MyField", N = 8 (7 characters + null terminator).
     char value[N]{};
 
     // NOLINTNEXTLINE(google-explicit-constructor): intentionally implicit from string literal
