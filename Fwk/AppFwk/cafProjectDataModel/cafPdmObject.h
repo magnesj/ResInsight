@@ -48,6 +48,8 @@ class QXmlStreamWriter;
 #include "cafPdmXmlObjectHandle.h"
 #include "cafPdmXmlObjectHandleMacros.h"
 
+#include <concepts>
+
 namespace caf
 {
 class PdmFieldHandle;
@@ -151,6 +153,14 @@ class PdmObjectCapability;
 
 namespace caf
 {
+class PdmObject;
+
+/// Concept satisfied by any class publicly derived from PdmObject. Used to constrain the
+/// macro-free init template methods so misuse produces a clear "constraints not satisfied"
+/// diagnostic instead of a deep template error.
+template <typename T>
+concept PdmObjectDerived = std::derived_from<T, PdmObject>;
+
 class PdmObject : public PdmObjectHandle, public PdmXmlObjectHandle, public PdmUiObjectHandle
 {
 public:
@@ -220,7 +230,7 @@ public:
     ///       initPdmObject<MyClass>( "UI Name", ":/icon.png", "Tooltip", "WhatsThis" );
     ///   }
     /// @endcode
-    template <typename DerivedClass>
+    template <PdmObjectDerived DerivedClass>
     void initPdmObject( const QString& uiName,
                         const QString& iconResourceName = {},
                         const QString& toolTip          = {},
@@ -248,7 +258,7 @@ public:
     ///       initField<MyClass, caf::PdmKeyword{ "MyField" }>( &m_field, 42, "UI Name" );
     ///   }
     /// @endcode
-    template <typename DerivedClass, caf::PdmKeyword Keyword, typename FieldDataType>
+    template <PdmObjectDerived DerivedClass, caf::PdmKeyword Keyword, typename FieldDataType>
     void initField( PdmField<FieldDataType>* field,
                     const FieldDataType&     defaultValue,
                     const QString&           uiName,
@@ -259,6 +269,13 @@ public:
         static_assert( isFirstCharacterValidInXmlKeyword( Keyword.value ), "First character in keyword is invalid" );
         static_assert( !isFirstThreeCharactersXml( Keyword.value ), "Keyword starts with invalid sequence xml" );
         static_assert( isValidXmlKeyword( Keyword.value ), "Detected invalid character in keyword" );
+
+        // Compile/link-time guard mirroring CAF_PDM_InitField: ensures CAF_PDM_HEADER_INIT and
+        // CAF_PDM_SOURCE_INIT were added to DerivedClass. Missing HEADER_INIT yields a compile
+        // error (no such member); missing SOURCE_INIT yields a link error referencing this symbol.
+        static bool checkingThePresenceOfHeaderAndSourceInitMacros =
+            DerivedClass::Error_You_forgot_to_add_the_macro_CAF_PDM_XML_HEADER_INIT_and_or_CAF_PDM_XML_SOURCE_INIT_to_your_cpp_file_for_this_class();
+        Q_UNUSED( checkingThePresenceOfHeaderAndSourceInitMacros )
 
         this->isInheritedFromPdmUiObject();
         this->isInheritedFromPdmXmlSerializable();
@@ -284,7 +301,7 @@ public:
     ///       initFieldNoDefault<MyClass, caf::PdmKeyword{ "MyField" }>( &m_field, "UI Name" );
     ///   }
     /// @endcode
-    template <typename DerivedClass, caf::PdmKeyword Keyword, typename FieldType>
+    template <PdmObjectDerived DerivedClass, caf::PdmKeyword Keyword, typename FieldType>
     void initFieldNoDefault( FieldType*     field,
                              const QString& uiName,
                              const QString& iconResourceName = {},
@@ -294,6 +311,13 @@ public:
         static_assert( isFirstCharacterValidInXmlKeyword( Keyword.value ), "First character in keyword is invalid" );
         static_assert( !isFirstThreeCharactersXml( Keyword.value ), "Keyword starts with invalid sequence xml" );
         static_assert( isValidXmlKeyword( Keyword.value ), "Detected invalid character in keyword" );
+
+        // Compile/link-time guard mirroring CAF_PDM_InitFieldNoDefault: ensures CAF_PDM_HEADER_INIT
+        // and CAF_PDM_SOURCE_INIT were added to DerivedClass. Missing HEADER_INIT yields a compile
+        // error (no such member); missing SOURCE_INIT yields a link error referencing this symbol.
+        static bool checkingThePresenceOfHeaderAndSourceInitMacros =
+            DerivedClass::Error_You_forgot_to_add_the_macro_CAF_PDM_XML_HEADER_INIT_and_or_CAF_PDM_XML_SOURCE_INIT_to_your_cpp_file_for_this_class();
+        Q_UNUSED( checkingThePresenceOfHeaderAndSourceInitMacros )
 
         this->isInheritedFromPdmUiObject();
         this->isInheritedFromPdmXmlSerializable();
