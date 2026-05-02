@@ -98,6 +98,8 @@ RiuPlotMainWindow::RiuPlotMainWindow()
     , m_autoUpdateEnabled( false )
     , m_autoUpdateTimerId( -1 )
 {
+    setObjectName( "RiuPlotMainWindow" );
+
     m_mdiArea = new RiuMdiArea( this );
     connect( m_mdiArea, SIGNAL( subWindowActivated( QMdiSubWindow* ) ), SLOT( slotSubWindowActivated( QMdiSubWindow* ) ) );
 
