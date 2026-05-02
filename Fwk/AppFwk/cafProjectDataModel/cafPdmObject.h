@@ -206,6 +206,107 @@ public:
     /// Consider this method private. Please use the CAF_PDM_InitFieldNoDefault() macro instead.
     void addFieldUiNoDefault( PdmFieldHandle* field, const QString& keyword, PdmUiItemInfo* fieldDescription );
 
+    /// Macro-free alternative to CAF_PDM_InitObject.
+    ///
+    /// The DerivedClass template parameter ensures each class gets its own unique
+    /// static PdmUiItemInfo instance (stored as a function-local static in each
+    /// template instantiation). All instances of the same DerivedClass share the
+    /// same static item info, matching the behavior of the macro.
+    ///
+    /// Example:
+    /// @code
+    ///   MyClass::MyClass()
+    ///   {
+    ///       initPdmObject<MyClass>( "UI Name", ":/icon.png", "Tooltip", "WhatsThis" );
+    ///   }
+    /// @endcode
+    template <typename DerivedClass>
+    void initPdmObject( const QString& uiName,
+                        const QString& iconResourceName = {},
+                        const QString& toolTip          = {},
+                        const QString& whatsThis        = {} )
+    {
+        this->isInheritedFromPdmUiObject();
+        this->isInheritedFromPdmXmlSerializable();
+        this->registerClassKeyword( classKeyword() );
+
+        static caf::PdmUiItemInfo objDescr( uiName, iconResourceName, toolTip, whatsThis );
+        this->setUiItemInfo( &objDescr );
+    }
+
+    /// Macro-free alternative to CAF_PDM_InitField.
+    ///
+    /// The DerivedClass and Keyword template parameters together ensure each
+    /// (class, field-keyword) pair gets its own unique static PdmUiItemInfo.
+    /// The Keyword non-type template parameter also enables compile-time
+    /// validation that the keyword is a valid XML element name.
+    ///
+    /// Example:
+    /// @code
+    ///   MyClass::MyClass()
+    ///   {
+    ///       initField<MyClass, caf::PdmKeyword{ "MyField" }>( &m_field, 42, "UI Name" );
+    ///   }
+    /// @endcode
+    template <typename DerivedClass, caf::PdmKeyword Keyword, typename FieldDataType>
+    void initField( PdmField<FieldDataType>* field,
+                    const FieldDataType&     defaultValue,
+                    const QString&           uiName,
+                    const QString&           iconResourceName = {},
+                    const QString&           toolTip          = {},
+                    const QString&           whatsThis        = {} )
+    {
+        static_assert( isFirstCharacterValidInXmlKeyword( Keyword.value ), "First character in keyword is invalid" );
+        static_assert( !isFirstThreeCharactersXml( Keyword.value ), "Keyword starts with invalid sequence xml" );
+        static_assert( isValidXmlKeyword( Keyword.value ), "Detected invalid character in keyword" );
+
+        this->isInheritedFromPdmUiObject();
+        this->isInheritedFromPdmXmlSerializable();
+
+        addXmlCapabilityToField( field );
+        addUiCapabilityToField( field );
+        configureCapabilities( field );
+        registerClassWithField( classKeyword(), field );
+
+        static caf::PdmUiItemInfo fieldDescr( uiName, iconResourceName, toolTip, whatsThis, Keyword.value );
+        addFieldUi( field, QString( Keyword.value ), defaultValue, &fieldDescr );
+    }
+
+    /// Macro-free alternative to CAF_PDM_InitFieldNoDefault.
+    ///
+    /// Like initField(), but does not assign a default value to the field.
+    /// See initField() documentation for usage details.
+    ///
+    /// Example:
+    /// @code
+    ///   MyClass::MyClass()
+    ///   {
+    ///       initFieldNoDefault<MyClass, caf::PdmKeyword{ "MyField" }>( &m_field, "UI Name" );
+    ///   }
+    /// @endcode
+    template <typename DerivedClass, caf::PdmKeyword Keyword, typename FieldType>
+    void initFieldNoDefault( FieldType*     field,
+                             const QString& uiName,
+                             const QString& iconResourceName = {},
+                             const QString& toolTip          = {},
+                             const QString& whatsThis        = {} )
+    {
+        static_assert( isFirstCharacterValidInXmlKeyword( Keyword.value ), "First character in keyword is invalid" );
+        static_assert( !isFirstThreeCharactersXml( Keyword.value ), "Keyword starts with invalid sequence xml" );
+        static_assert( isValidXmlKeyword( Keyword.value ), "Detected invalid character in keyword" );
+
+        this->isInheritedFromPdmUiObject();
+        this->isInheritedFromPdmXmlSerializable();
+
+        addXmlCapabilityToField( field );
+        addUiCapabilityToField( field );
+        configureCapabilities( field );
+        registerClassWithField( classKeyword(), field );
+
+        static caf::PdmUiItemInfo fieldDescr( uiName, iconResourceName, toolTip, whatsThis, Keyword.value );
+        addFieldUiNoDefault( field, QString( Keyword.value ), &fieldDescr );
+    }
+
 protected:
     PdmObjectHandle* doCopyObject() const override;
 };

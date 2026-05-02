@@ -1032,3 +1032,77 @@ TEST( BaseTest, CopyObject )
     auto objectCopy = std::unique_ptr<SimpleObj>( ihd1->copyObject<SimpleObj>() );
     EXPECT_EQ( testValue, objectCopy->m_doubleMember );
 }
+
+/// A PDM object that uses the macro-free template functions (initPdmObject, initField,
+/// initFieldNoDefault) instead of the CAF_PDM_InitObject / CAF_PDM_InitField macros.
+/// CAF_PDM_HEADER_INIT and CAF_PDM_SOURCE_INIT are still required for class/factory registration.
+class MacroFreeObj : public caf::PdmObject
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    MacroFreeObj()
+    {
+        initPdmObject<MacroFreeObj>( "Macro-Free Object", "", "Tooltip MacroFreeObj", "WhatsThis MacroFreeObj" );
+
+        initField<MacroFreeObj, caf::PdmKeyword{ "IntField" }>( &m_intField, 42, "Integer Field", "", "Int tooltip" );
+        initField<MacroFreeObj, caf::PdmKeyword{ "DoubleField" }>( &m_doubleField, 3.14, "Double Field" );
+        initFieldNoDefault<MacroFreeObj, caf::PdmKeyword{ "StringField" }>( &m_stringField, "String Field" );
+    }
+
+    caf::PdmField<int>     m_intField;
+    caf::PdmField<double>  m_doubleField;
+    caf::PdmField<QString> m_stringField;
+};
+CAF_PDM_SOURCE_INIT( MacroFreeObj, "MacroFreeObj" );
+
+TEST( MacroFreeTest, FieldRegistrationAndDefaults )
+{
+    MacroFreeObj obj;
+
+    // Verify fields are accessible and have the expected default values
+    EXPECT_EQ( 42, obj.m_intField() );
+    EXPECT_DOUBLE_EQ( 3.14, obj.m_doubleField() );
+
+    // Verify all fields are registered with the object
+    EXPECT_EQ( 3u, obj.fields().size() );
+}
+
+TEST( MacroFreeTest, FieldKeywords )
+{
+    MacroFreeObj obj;
+
+    EXPECT_EQ( QString( "IntField" ), obj.m_intField.keyword() );
+    EXPECT_EQ( QString( "DoubleField" ), obj.m_doubleField.keyword() );
+    EXPECT_EQ( QString( "StringField" ), obj.m_stringField.keyword() );
+}
+
+TEST( MacroFreeTest, UiCapabilitiesPresent )
+{
+    MacroFreeObj obj;
+
+    EXPECT_NE( nullptr, obj.m_intField.uiCapability() );
+    EXPECT_NE( nullptr, obj.m_doubleField.uiCapability() );
+    EXPECT_NE( nullptr, obj.m_stringField.uiCapability() );
+}
+
+TEST( MacroFreeTest, UiItemInfoUiName )
+{
+    MacroFreeObj obj;
+
+    EXPECT_EQ( QString( "Integer Field" ), obj.m_intField.uiCapability()->uiName() );
+    EXPECT_EQ( QString( "Double Field" ), obj.m_doubleField.uiCapability()->uiName() );
+    EXPECT_EQ( QString( "String Field" ), obj.m_stringField.uiCapability()->uiName() );
+}
+
+TEST( MacroFreeTest, ObjectUiName )
+{
+    MacroFreeObj obj;
+
+    EXPECT_EQ( QString( "Macro-Free Object" ), obj.uiCapability()->uiName() );
+}
+
+TEST( MacroFreeTest, ClassKeyword )
+{
+    EXPECT_EQ( QString( "MacroFreeObj" ), MacroFreeObj::classKeywordStatic() );
+}
