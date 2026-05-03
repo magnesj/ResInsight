@@ -78,8 +78,7 @@ void AppEnumMapperBase::addItem( int enumVal, const QString& text, QString uiTex
 //--------------------------------------------------------------------------------------------------
 void AppEnumMapperBase::setDefault( int defaultEnumValue )
 {
-    m_defaultValue      = defaultEnumValue;
-    m_defaultValueIsSet = true;
+    m_defaultValue = defaultEnumValue;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -87,7 +86,7 @@ void AppEnumMapperBase::setDefault( int defaultEnumValue )
 //--------------------------------------------------------------------------------------------------
 int AppEnumMapperBase::defaultValue() const
 {
-    if ( m_defaultValueIsSet ) return m_defaultValue;
+    if ( m_defaultValue.has_value() ) return *m_defaultValue;
     CAF_ASSERT( !m_mapping.empty() );
     return m_mapping[0].m_enumVal;
 }

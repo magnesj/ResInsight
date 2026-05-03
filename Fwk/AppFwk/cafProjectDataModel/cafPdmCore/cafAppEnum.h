@@ -37,11 +37,13 @@
 #pragma once
 
 #include "cafPdmFieldHandle.h"
+#include "cafPdmFieldTraits.h"
 
 #include <QString>
 #include <QStringList>
 
 #include <map>
+#include <optional>
 #include <type_traits>
 #include <vector>
 
@@ -151,8 +153,7 @@ private:
     };
 
     std::vector<EnumData> m_mapping;
-    int                   m_defaultValue      = 0;
-    bool                  m_defaultValueIsSet = false;
+    std::optional<int>    m_defaultValue;
 };
 
 template <class T>
@@ -293,13 +294,6 @@ private:
 
 template <class T>
 std::map<QString, std::vector<T>> AppEnum<T>::m_enumSubset;
-
-} // namespace caf
-
-#include "cafPdmFieldTraits.h"
-
-namespace caf
-{
 
 template <typename T>
 QVariant pdmToVariant( const AppEnum<T>& value )
