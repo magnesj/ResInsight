@@ -523,10 +523,14 @@ void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply, const QString&
                     crs = ingested["persistableReferenceCrs"].toString();
                 }
 
-                // The trajectory parquet's MD/TVD/X/Y columns share a single length unit advertised on each
-                // AvailableTrajectoryStationProperties entry. Use the MD column's unit as the canonical one and
-                // derive a multiplier into meters, which downstream code uses to align with surface origin and
-                // datum elevation (always meters).
+                // The MD entry in AvailableTrajectoryStationProperties advertises a length unit that the parquet
+                // values are stored in. Treat it as the canonical length unit for the geometric columns
+                // (MD/TVD/X/Y) and use it to derive a multiplier into meters, so downstream code can combine the
+                // trajectory with surface origin and datum elevation (which are stored as meters).
+                //
+                // Note: in real-world OSDU records the X/Y entries sometimes advertise a different unit than
+                // MD/TVD (e.g. "dega" while the values are clearly meters/feet). Trusting MD's unit and applying
+                // it uniformly to all four columns gives the right result for those datasets too.
                 QString    mdUnitId;
                 QJsonArray availableProps = dataObj["AvailableTrajectoryStationProperties"].toArray();
                 for ( const QJsonValue& propValue : availableProps )
