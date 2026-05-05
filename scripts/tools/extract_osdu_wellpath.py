@@ -99,6 +99,8 @@ def main() -> int:
     parser.add_argument("--wellbore-id", required=True)
     parser.add_argument("--trajectory-id", required=True)
     parser.add_argument("--rows", type=int, default=5, help="Rows to print from head and tail of the parquet.")
+    parser.add_argument("--full", action="store_true",
+                        help="Print the full data block of each record, not just SpatialLocation.")
     args = parser.parse_args()
 
     config = load_json(args.config_file)
@@ -122,16 +124,47 @@ def main() -> int:
 
     print(f"=== Wellbore: {args.wellbore_id} ===")
     wellbore = fetch_storage_record(server, partition, token, args.wellbore_id)
-    spatial = wellbore.get("data", {}).get("SpatialLocation", {}) or {}
-    print(json.dumps(spatial, indent=2))
-    easting, northing, crs = extract_surface_origin(spatial)
-    print(f"Surface origin: easting={easting} northing={northing} crs={crs!r}")
+    wellbore_data = wellbore.get("data", {}) or {}
+    if args.full:
+        print(json.dumps(wellbore_data, indent=2))
+    else:
+        print(f"data keys: {sorted(wellbore_data.keys())}")
+        spatial = wellbore_data.get("SpatialLocation", {}) or {}
+        print("SpatialLocation:")
+        print(json.dumps(spatial, indent=2))
+    easting, northing, crs = extract_surface_origin(wellbore_data.get("SpatialLocation", {}) or {})
+    print(f"Wellbore surface origin: easting={easting} northing={northing} crs={crs!r}")
+
+    # Wellbores often have no SpatialLocation; the surface point lives on the parent Well.
+    well_id = (wellbore_data.get("WellID") or "").rstrip(":")
+    if well_id and (easting is None or northing is None):
+        print()
+        print(f"=== Well: {well_id} ===")
+        well = fetch_storage_record(server, partition, token, well_id)
+        well_data = well.get("data", {}) or {}
+        if args.full:
+            print(json.dumps(well_data, indent=2))
+        else:
+            print(f"data keys: {sorted(well_data.keys())}")
+            well_spatial = well_data.get("SpatialLocation", {}) or {}
+            print("SpatialLocation:")
+            print(json.dumps(well_spatial, indent=2))
+        well_easting, well_northing, well_crs = extract_surface_origin(well_data.get("SpatialLocation", {}) or {})
+        print(f"Well surface origin: easting={well_easting} northing={well_northing} crs={well_crs!r}")
+        if well_easting is not None and well_northing is not None:
+            easting, northing, crs = well_easting, well_northing, well_crs
 
     print()
     print(f"=== Trajectory: {args.trajectory_id} ===")
     trajectory = fetch_storage_record(server, partition, token, args.trajectory_id)
-    traj_spatial = trajectory.get("data", {}).get("SpatialLocation", {}) or {}
-    print(json.dumps(traj_spatial, indent=2))
+    traj_data = trajectory.get("data", {}) or {}
+    if args.full:
+        print(json.dumps(traj_data, indent=2))
+    else:
+        print(f"data keys: {sorted(traj_data.keys())}")
+        traj_spatial = traj_data.get("SpatialLocation", {}) or {}
+        print("SpatialLocation:")
+        print(json.dumps(traj_spatial, indent=2))
 
     print()
     print("=== Trajectory parquet ===")
