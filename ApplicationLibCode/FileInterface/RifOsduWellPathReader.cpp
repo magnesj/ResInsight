@@ -109,8 +109,11 @@ std::pair<cvf::ref<RigWellPath>, QString> RifOsduWellPathReader::parseCsv( const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::pair<cvf::ref<RigWellPath>, QString>
-    RifOsduWellPathReader::readWellPathData( const QByteArray& content, double datumElevation, double surfaceEasting, double surfaceNorthing )
+std::pair<cvf::ref<RigWellPath>, QString> RifOsduWellPathReader::readWellPathData( const QByteArray& content,
+                                                                                    double            datumElevation,
+                                                                                    double            surfaceEasting,
+                                                                                    double            surfaceNorthing,
+                                                                                    double            unitToMeters )
 {
     arrow::MemoryPool* pool = arrow::default_memory_pool();
 
@@ -170,12 +173,15 @@ std::pair<cvf::ref<RigWellPath>, QString>
 
         for ( size_t i = 0; i < firstSize; i++ )
         {
-            // Trajectory parquet stores X/Y as offsets relative to the wellbore surface point. Add the surface
-            // location (from the OSDU wellbore SpatialLocation) to recover absolute UTM coordinates.
-            cvf::Vec3d point( readValues[X][i] + surfaceEasting, readValues[Y][i] + surfaceNorthing, -readValues[TVD][i] + datumElevation );
-            double     md = readValues[MD][i];
+            // Trajectory parquet stores X/Y as offsets relative to the well surface point, and MD/TVD/X/Y in
+            // whatever length unit the trajectory advertises (typically ft or m). Convert to meters and add the
+            // surface origin (always meters) to recover absolute UTM coordinates.
+            const double x   = readValues[X][i] * unitToMeters;
+            const double y   = readValues[Y][i] * unitToMeters;
+            const double tvd = readValues[TVD][i] * unitToMeters;
+            const double md  = readValues[MD][i] * unitToMeters;
 
-            wellPathPoints.push_back( point );
+            wellPathPoints.push_back( cvf::Vec3d( x + surfaceEasting, y + surfaceNorthing, -tvd + datumElevation ) );
             measuredDepths.push_back( md );
         }
 

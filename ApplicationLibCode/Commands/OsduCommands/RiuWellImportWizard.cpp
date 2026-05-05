@@ -722,7 +722,8 @@ void WellSummaryPage::updateSummaryDisplay()
                                         .datumElevation       = wellbore.value().datumElevation,
                                         .surfaceEasting       = location.easting,
                                         .surfaceNorthing      = location.northing,
-                                        .crs                  = location.crs } );
+                                        .crs                  = location.crs,
+                                        .unitToMeters         = w.unitToMeters } );
                     includedCount++;
                 }
             }

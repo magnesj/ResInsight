@@ -35,6 +35,9 @@ RimOsduWellPath::RimOsduWellPath()
 
     CAF_PDM_InitFieldNoDefault( &m_crsFromOsdu, "CrsFromOsdu", "CRS From OSDU" );
     m_crsFromOsdu.uiCapability()->setUiReadOnly( true );
+
+    CAF_PDM_InitField( &m_unitToMetersFromOsdu, "UnitToMetersFromOsdu", 1.0, "Unit-to-meters Factor From OSDU" );
+    m_unitToMetersFromOsdu.uiCapability()->setUiReadOnly( true );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -159,6 +162,22 @@ QString RimOsduWellPath::crsFromOsdu() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimOsduWellPath::setUnitToMetersFromOsdu( double unitToMeters )
+{
+    m_unitToMetersFromOsdu = unitToMeters;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+double RimOsduWellPath::unitToMetersFromOsdu() const
+{
+    return m_unitToMetersFromOsdu;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimOsduWellPath::setExistenceKind( const QString& existenceKind )
 {
     m_existenceKind = existenceKind;
@@ -186,6 +205,7 @@ void RimOsduWellPath::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering
     osduGroup->add( &m_surfaceEastingFromOsdu );
     osduGroup->add( &m_surfaceNorthingFromOsdu );
     osduGroup->add( &m_crsFromOsdu );
+    osduGroup->add( &m_unitToMetersFromOsdu );
 
     RimWellPath::defineUiOrdering( uiConfigName, uiOrdering );
 }

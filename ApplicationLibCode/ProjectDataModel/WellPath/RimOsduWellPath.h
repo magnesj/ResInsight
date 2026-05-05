@@ -48,6 +48,9 @@ public:
     void    setCrsFromOsdu( const QString& crs );
     QString crsFromOsdu() const;
 
+    void   setUnitToMetersFromOsdu( double unitToMeters );
+    double unitToMetersFromOsdu() const;
+
     void    setExistenceKind( const QString& existenceKind );
     QString existenceKind() const;
 
@@ -63,4 +66,5 @@ private:
     caf::PdmField<double>  m_surfaceEastingFromOsdu;
     caf::PdmField<double>  m_surfaceNorthingFromOsdu;
     caf::PdmField<QString> m_crsFromOsdu;
+    caf::PdmField<double>  m_unitToMetersFromOsdu;
 };

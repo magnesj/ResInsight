@@ -55,6 +55,7 @@ struct OsduWellboreTrajectory
     QString wellboreId;
     QString existenceKind;
     QString crs;
+    double  unitToMeters = 1.0;
 };
 
 struct OsduWellLogChannel

@@ -388,6 +388,7 @@ public:
         double  surfaceEasting;
         double  surfaceNorthing;
         QString crs;
+        double  unitToMeters;
     };
 
     RiuWellImportWizard( RiaOsduConnector* osduConnector, QWidget* parent = nullptr );
