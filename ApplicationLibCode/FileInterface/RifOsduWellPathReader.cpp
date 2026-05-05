@@ -110,11 +110,11 @@ std::pair<cvf::ref<RigWellPath>, QString> RifOsduWellPathReader::parseCsv( const
 ///
 //--------------------------------------------------------------------------------------------------
 std::pair<cvf::ref<RigWellPath>, QString> RifOsduWellPathReader::readWellPathData( const QByteArray& content,
-                                                                                    double            datumElevation,
-                                                                                    double            surfaceEasting,
-                                                                                    double            surfaceNorthing,
-                                                                                    double            unitToMeters,
-                                                                                    double            targetUnitToMeters )
+                                                                                   double            datumElevation,
+                                                                                   double            surfaceEasting,
+                                                                                   double            surfaceNorthing,
+                                                                                   double            unitToMeters,
+                                                                                   double            targetUnitToMeters )
 {
     arrow::MemoryPool* pool = arrow::default_memory_pool();
 
@@ -178,10 +178,10 @@ std::pair<cvf::ref<RigWellPath>, QString> RifOsduWellPathReader::readWellPathDat
 
         for ( size_t i = 0; i < firstSize; i++ )
         {
-            const double xMeters   = readValues[X][i] * unitToMeters + surfaceEasting;
-            const double yMeters   = readValues[Y][i] * unitToMeters + surfaceNorthing;
-            const double zMeters   = -readValues[TVD][i] * unitToMeters + datumElevation;
-            const double mdMeters  = readValues[MD][i] * unitToMeters;
+            const double xMeters  = readValues[X][i] * unitToMeters + surfaceEasting;
+            const double yMeters  = readValues[Y][i] * unitToMeters + surfaceNorthing;
+            const double zMeters  = -readValues[TVD][i] * unitToMeters + datumElevation;
+            const double mdMeters = readValues[MD][i] * unitToMeters;
 
             wellPathPoints.push_back( cvf::Vec3d( xMeters * targetScale, yMeters * targetScale, zMeters * targetScale ) );
             measuredDepths.push_back( mdMeters * targetScale );
