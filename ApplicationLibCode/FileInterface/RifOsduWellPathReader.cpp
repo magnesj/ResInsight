@@ -109,7 +109,8 @@ std::pair<cvf::ref<RigWellPath>, QString> RifOsduWellPathReader::parseCsv( const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::pair<cvf::ref<RigWellPath>, QString> RifOsduWellPathReader::readWellPathData( const QByteArray& content, double datumElevation )
+std::pair<cvf::ref<RigWellPath>, QString>
+    RifOsduWellPathReader::readWellPathData( const QByteArray& content, double datumElevation, double surfaceEasting, double surfaceNorthing )
 {
     arrow::MemoryPool* pool = arrow::default_memory_pool();
 
@@ -169,7 +170,9 @@ std::pair<cvf::ref<RigWellPath>, QString> RifOsduWellPathReader::readWellPathDat
 
         for ( size_t i = 0; i < firstSize; i++ )
         {
-            cvf::Vec3d point( readValues[X][i], readValues[Y][i], -readValues[TVD][i] + datumElevation );
+            // Trajectory parquet stores X/Y as offsets relative to the wellbore surface point. Add the surface
+            // location (from the OSDU wellbore SpatialLocation) to recover absolute UTM coordinates.
+            cvf::Vec3d point( readValues[X][i] + surfaceEasting, readValues[Y][i] + surfaceNorthing, -readValues[TVD][i] + datumElevation );
             double     md = readValues[MD][i];
 
             wellPathPoints.push_back( point );
