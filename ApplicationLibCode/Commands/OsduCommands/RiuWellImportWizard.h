@@ -364,6 +364,7 @@ private:
     QTextEdit*                                             m_textEdit;
     QRadioButton*                                          m_showAllRadioButton;
     QRadioButton*                                          m_showActualRadioButton;
+    QComboBox*                                             m_targetUnitComboBox;
     std::set<QString>                                      m_pendingWellboreIds;
     std::map<QString, std::vector<OsduWellboreTrajectory>> m_wellboreTrajectories;
     mutable QMutex                                         m_mutex;
@@ -389,6 +390,7 @@ public:
         double  surfaceNorthing;
         QString crs;
         double  unitToMeters;
+        double  targetUnitToMeters;
     };
 
     RiuWellImportWizard( RiaOsduConnector* osduConnector, QWidget* parent = nullptr );

@@ -113,7 +113,8 @@ std::pair<cvf::ref<RigWellPath>, QString> RifOsduWellPathReader::readWellPathDat
                                                                                     double            datumElevation,
                                                                                     double            surfaceEasting,
                                                                                     double            surfaceNorthing,
-                                                                                    double            unitToMeters )
+                                                                                    double            unitToMeters,
+                                                                                    double            targetUnitToMeters )
 {
     arrow::MemoryPool* pool = arrow::default_memory_pool();
 
@@ -171,18 +172,19 @@ std::pair<cvf::ref<RigWellPath>, QString> RifOsduWellPathReader::readWellPathDat
         std::vector<cvf::Vec3d> wellPathPoints;
         std::vector<double>     measuredDepths;
 
+        // Convert OSDU values to meters (the surface origin and datum elevation are already meters), then scale
+        // the result into the user-selected target unit system.
+        const double targetScale = ( targetUnitToMeters != 0.0 ) ? 1.0 / targetUnitToMeters : 1.0;
+
         for ( size_t i = 0; i < firstSize; i++ )
         {
-            // Trajectory parquet stores X/Y as offsets relative to the well surface point, and MD/TVD/X/Y in
-            // whatever length unit the trajectory advertises (typically ft or m). Convert to meters and add the
-            // surface origin (always meters) to recover absolute UTM coordinates.
-            const double x   = readValues[X][i] * unitToMeters;
-            const double y   = readValues[Y][i] * unitToMeters;
-            const double tvd = readValues[TVD][i] * unitToMeters;
-            const double md  = readValues[MD][i] * unitToMeters;
+            const double xMeters   = readValues[X][i] * unitToMeters + surfaceEasting;
+            const double yMeters   = readValues[Y][i] * unitToMeters + surfaceNorthing;
+            const double zMeters   = -readValues[TVD][i] * unitToMeters + datumElevation;
+            const double mdMeters  = readValues[MD][i] * unitToMeters;
 
-            wellPathPoints.push_back( cvf::Vec3d( x + surfaceEasting, y + surfaceNorthing, -tvd + datumElevation ) );
-            measuredDepths.push_back( md );
+            wellPathPoints.push_back( cvf::Vec3d( xMeters * targetScale, yMeters * targetScale, zMeters * targetScale ) );
+            measuredDepths.push_back( mdMeters * targetScale );
         }
 
         auto wellPath = cvf::make_ref<RigWellPath>( wellPathPoints, measuredDepths );

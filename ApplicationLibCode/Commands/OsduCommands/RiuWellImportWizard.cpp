@@ -596,6 +596,17 @@ WellSummaryPage::WellSummaryPage( RiaOsduConnector* osduConnector, QWidget* pare
 
     layout->addLayout( existenceFilterLayout );
 
+    // Target unit system: the OSDU trajectory parquet is converted to this unit before storing the well path.
+    QHBoxLayout* unitLayout = new QHBoxLayout;
+    unitLayout->addWidget( new QLabel( "Target unit system:", this ) );
+    m_targetUnitComboBox = new QComboBox( this );
+    m_targetUnitComboBox->addItem( "Meters", 1.0 );
+    m_targetUnitComboBox->addItem( "Feet", 0.3048 );
+    m_targetUnitComboBox->setCurrentIndex( 0 );
+    unitLayout->addWidget( m_targetUnitComboBox );
+    unitLayout->addStretch();
+    layout->addLayout( unitLayout );
+
     m_textEdit = new QTextEdit( this );
     m_textEdit->setReadOnly( true );
     layout->addWidget( m_textEdit );
@@ -608,6 +619,7 @@ WellSummaryPage::WellSummaryPage( RiaOsduConnector* osduConnector, QWidget* pare
 
     connect( m_showAllRadioButton, SIGNAL( toggled( bool ) ), this, SLOT( onFilterChanged() ) );
     connect( m_showActualRadioButton, SIGNAL( toggled( bool ) ), this, SLOT( onFilterChanged() ) );
+    connect( m_targetUnitComboBox, SIGNAL( currentIndexChanged( int ) ), this, SLOT( onFilterChanged() ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -713,7 +725,8 @@ void WellSummaryPage::updateSummaryDisplay()
                 if ( shouldIncludeTrajectory( w.existenceKind ) )
                 {
                     QString wellboreTrajectoryId = w.id;
-                    auto location = m_osduConnector->requestWellSurfaceLocationBlocking( wellbore.value().wellId );
+                    auto         location           = m_osduConnector->requestWellSurfaceLocationBlocking( wellbore.value().wellId );
+                    const double targetUnitToMeters = m_targetUnitComboBox->currentData().toDouble();
                     wiz->addWellInfo( { .name                 = wellbore.value().name,
                                         .wellId               = wellbore.value().wellId,
                                         .wellboreId           = w.wellboreId,
@@ -723,7 +736,8 @@ void WellSummaryPage::updateSummaryDisplay()
                                         .surfaceEasting       = location.easting,
                                         .surfaceNorthing      = location.northing,
                                         .crs                  = location.crs,
-                                        .unitToMeters         = w.unitToMeters } );
+                                        .unitToMeters         = w.unitToMeters,
+                                        .targetUnitToMeters   = targetUnitToMeters } );
                     includedCount++;
                 }
             }
