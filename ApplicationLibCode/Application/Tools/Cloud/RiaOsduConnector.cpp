@@ -470,7 +470,7 @@ void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply, const QString&
                 QString unitSymbol;
                 if ( mdUnitId.endsWith( ':' ) )
                 {
-                    int lastColon       = mdUnitId.lastIndexOf( ':', mdUnitId.length() - 2 );
+                    int lastColon = mdUnitId.lastIndexOf( ':', mdUnitId.length() - 2 );
                     if ( lastColon >= 0 ) unitSymbol = mdUnitId.mid( lastColon + 1, mdUnitId.length() - lastColon - 2 );
                 }
                 if ( unitSymbol.compare( "ft", Qt::CaseInsensitive ) == 0 )
@@ -483,8 +483,7 @@ void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply, const QString&
                         QString( "Unrecognized MD unit '%1' for trajectory %2; assuming meters." ).arg( unitSymbol ).arg( id ) );
                 }
 
-                m_wellboreTrajectories[wellboreId].push_back(
-                    OsduWellboreTrajectory{ id, kind, wellboreId, existenceKind, crs, unitToMeters } );
+                m_wellboreTrajectories[wellboreId].push_back( OsduWellboreTrajectory{ id, kind, wellboreId, existenceKind, crs, unitToMeters } );
             }
         }
 
@@ -833,9 +832,9 @@ RiaOsduConnector::WellSurfaceLocation RiaOsduConnector::requestWellSurfaceLocati
 
     if ( reply->error() == QNetworkReply::NoError )
     {
-        QByteArray    body = reply->readAll();
-        QJsonDocument doc  = QJsonDocument::fromJson( body );
-        QJsonObject   data = doc.object()["data"].toObject();
+        QByteArray    body            = reply->readAll();
+        QJsonDocument doc             = QJsonDocument::fromJson( body );
+        QJsonObject   data            = doc.object()["data"].toObject();
         QJsonObject   spatialLocation = data["SpatialLocation"].toObject();
         QJsonObject   ingested        = spatialLocation["AsIngestedCoordinates"].toObject();
 
