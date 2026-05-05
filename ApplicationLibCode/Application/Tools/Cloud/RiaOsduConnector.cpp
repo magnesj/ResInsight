@@ -393,7 +393,36 @@ void RiaOsduConnector::parseWellboresByFieldId( QNetworkReply* reply, const QStr
                     datumElevation = 0.0;
                 }
 
-                m_wellbores[fieldId].push_back( OsduWellbore{ id, kind, name, wellId, fieldId, datumElevation } );
+                // Extract surface location from SpatialLocation. The well trajectory parquet stores X/Y as offsets
+                // relative to this surface point, so it is needed to recover absolute UTM coordinates.
+                double      surfaceEasting  = 0.0;
+                double      surfaceNorthing = 0.0;
+                QString     crs;
+                QJsonObject spatialLocation = resultObj["data"].toObject()["SpatialLocation"].toObject();
+                QJsonObject ingested        = spatialLocation["AsIngestedCoordinates"].toObject();
+                if ( !ingested.isEmpty() )
+                {
+                    crs = ingested["persistableReferenceCrs"].toString();
+
+                    QJsonArray features = ingested["features"].toArray();
+                    if ( !features.isEmpty() )
+                    {
+                        QJsonArray coordinates = features[0].toObject()["geometry"].toObject()["coordinates"].toArray();
+                        if ( coordinates.size() >= 2 )
+                        {
+                            surfaceEasting  = coordinates[0].toDouble();
+                            surfaceNorthing = coordinates[1].toDouble();
+                        }
+                    }
+                }
+
+                if ( surfaceEasting == 0.0 && surfaceNorthing == 0.0 )
+                {
+                    RiaLogging::warning( QString( "Missing surface location for well bore '%1'. Id: %2" ).arg( name ).arg( id ) );
+                }
+
+                m_wellbores[fieldId].push_back(
+                    OsduWellbore{ id, kind, name, wellId, fieldId, datumElevation, surfaceEasting, surfaceNorthing, crs } );
             }
         }
 
@@ -430,6 +459,7 @@ void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply, const QString&
                 QString id   = resultObj["id"].toString();
                 QString kind = resultObj["kind"].toString();
                 QString existenceKind;
+                QString crs;
 
                 // Safely extract existenceKind from nested data object
                 QJsonObject dataObj = resultObj["data"].toObject();
@@ -438,7 +468,14 @@ void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply, const QString&
                     existenceKind = dataObj["ExistenceKind"].toString();
                 }
 
-                m_wellboreTrajectories[wellboreId].push_back( OsduWellboreTrajectory{ id, kind, wellboreId, existenceKind } );
+                QJsonObject spatialLocation = dataObj["SpatialLocation"].toObject();
+                QJsonObject ingested        = spatialLocation["AsIngestedCoordinates"].toObject();
+                if ( !ingested.isEmpty() )
+                {
+                    crs = ingested["persistableReferenceCrs"].toString();
+                }
+
+                m_wellboreTrajectories[wellboreId].push_back( OsduWellboreTrajectory{ id, kind, wellboreId, existenceKind, crs } );
             }
         }
 

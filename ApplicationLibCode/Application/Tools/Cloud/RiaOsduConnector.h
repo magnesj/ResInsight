@@ -43,6 +43,9 @@ struct OsduWellbore
     QString wellId;
     QString fieldId;
     double  datumElevation;
+    double  surfaceEasting  = 0.0;
+    double  surfaceNorthing = 0.0;
+    QString crs;
 };
 
 struct OsduWellboreTrajectory
@@ -51,6 +54,7 @@ struct OsduWellboreTrajectory
     QString kind;
     QString wellboreId;
     QString existenceKind;
+    QString crs;
 };
 
 struct OsduWellLogChannel
