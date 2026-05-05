@@ -111,7 +111,10 @@ void RimOsduWellPathDataLoader::parquetDownloadComplete( const QByteArray& conte
         if ( !contents.isEmpty() )
         {
             auto oWPath                           = m_wellPaths[id];
-            auto [wellPathGeometry, errorMessage] = RifOsduWellPathReader::readWellPathData( contents, oWPath->datumElevationFromOsdu() );
+            auto [wellPathGeometry, errorMessage] = RifOsduWellPathReader::readWellPathData( contents,
+                                                                                              oWPath->datumElevationFromOsdu(),
+                                                                                              oWPath->surfaceEastingFromOsdu(),
+                                                                                              oWPath->surfaceNorthingFromOsdu() );
             if ( wellPathGeometry.notNull() )
             {
                 oWPath->setWellPathGeometry( wellPathGeometry.p() );

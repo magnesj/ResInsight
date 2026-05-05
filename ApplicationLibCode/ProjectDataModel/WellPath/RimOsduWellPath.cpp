@@ -26,6 +26,15 @@ RimOsduWellPath::RimOsduWellPath()
 
     CAF_PDM_InitField( &m_datumElevationFromOsdu, "DatumElevationFromOsdu", 0.0, "Datum Elevation From OSDU" );
     m_datumElevationFromOsdu.uiCapability()->setUiReadOnly( true );
+
+    CAF_PDM_InitField( &m_surfaceEastingFromOsdu, "SurfaceEastingFromOsdu", 0.0, "Surface Easting From OSDU" );
+    m_surfaceEastingFromOsdu.uiCapability()->setUiReadOnly( true );
+
+    CAF_PDM_InitField( &m_surfaceNorthingFromOsdu, "SurfaceNorthingFromOsdu", 0.0, "Surface Northing From OSDU" );
+    m_surfaceNorthingFromOsdu.uiCapability()->setUiReadOnly( true );
+
+    CAF_PDM_InitFieldNoDefault( &m_crsFromOsdu, "CrsFromOsdu", "CRS From OSDU" );
+    m_crsFromOsdu.uiCapability()->setUiReadOnly( true );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -102,6 +111,54 @@ double RimOsduWellPath::datumElevationFromOsdu() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimOsduWellPath::setSurfaceEastingFromOsdu( double surfaceEasting )
+{
+    m_surfaceEastingFromOsdu = surfaceEasting;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+double RimOsduWellPath::surfaceEastingFromOsdu() const
+{
+    return m_surfaceEastingFromOsdu;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimOsduWellPath::setSurfaceNorthingFromOsdu( double surfaceNorthing )
+{
+    m_surfaceNorthingFromOsdu = surfaceNorthing;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+double RimOsduWellPath::surfaceNorthingFromOsdu() const
+{
+    return m_surfaceNorthingFromOsdu;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimOsduWellPath::setCrsFromOsdu( const QString& crs )
+{
+    m_crsFromOsdu = crs;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimOsduWellPath::crsFromOsdu() const
+{
+    return m_crsFromOsdu;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimOsduWellPath::setExistenceKind( const QString& existenceKind )
 {
     m_existenceKind = existenceKind;
@@ -126,6 +183,9 @@ void RimOsduWellPath::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering
     osduGroup->add( &m_wellboreTrajectoryId );
     osduGroup->add( &m_existenceKind );
     osduGroup->add( &m_datumElevationFromOsdu );
+    osduGroup->add( &m_surfaceEastingFromOsdu );
+    osduGroup->add( &m_surfaceNorthingFromOsdu );
+    osduGroup->add( &m_crsFromOsdu );
 
     RimWellPath::defineUiOrdering( uiConfigName, uiOrdering );
 }

@@ -385,6 +385,9 @@ public:
         QString wellboreTrajectoryId;
         QString existenceKind;
         double  datumElevation;
+        double  surfaceEasting;
+        double  surfaceNorthing;
+        QString crs;
     };
 
     RiuWellImportWizard( RiaOsduConnector* osduConnector, QWidget* parent = nullptr );

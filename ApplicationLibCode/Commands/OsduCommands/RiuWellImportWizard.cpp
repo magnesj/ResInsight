@@ -718,7 +718,10 @@ void WellSummaryPage::updateSummaryDisplay()
                                         .wellboreId           = w.wellboreId,
                                         .wellboreTrajectoryId = wellboreTrajectoryId,
                                         .existenceKind        = w.existenceKind,
-                                        .datumElevation       = wellbore.value().datumElevation } );
+                                        .datumElevation       = wellbore.value().datumElevation,
+                                        .surfaceEasting       = wellbore.value().surfaceEasting,
+                                        .surfaceNorthing      = wellbore.value().surfaceNorthing,
+                                        .crs                  = wellbore.value().crs } );
                     includedCount++;
                 }
             }
