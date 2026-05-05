@@ -110,6 +110,15 @@ public:
     std::pair<QByteArray, QString> requestWellLogParquetDataByIdBlocking( const QString& wellLogId );
     std::pair<QByteArray, QString> requestWellboreTrajectoryParquetDataByIdBlocking( const QString& wellboreTrajectoryId );
 
+    struct WellSurfaceLocation
+    {
+        double  easting  = 0.0;
+        double  northing = 0.0;
+        QString crs;
+        bool    isValid = false;
+    };
+    WellSurfaceLocation requestWellSurfaceLocationBlocking( const QString& wellId );
+
     std::optional<OsduWellbore> wellboreById( const QString& wellboreId ) const;
 
     void cancelRequestForId( const QString& id );
@@ -178,4 +187,5 @@ private:
     std::map<QString, QByteArray>                          m_parquetData;
     std::map<QString, QString>                             m_parquetErrors;
     std::map<QString, QPointer<QNetworkReply>>             m_replies;
+    std::map<QString, WellSurfaceLocation>                 m_wellSurfaceLocations;
 };

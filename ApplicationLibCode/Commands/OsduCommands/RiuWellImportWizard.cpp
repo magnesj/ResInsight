@@ -713,15 +713,16 @@ void WellSummaryPage::updateSummaryDisplay()
                 if ( shouldIncludeTrajectory( w.existenceKind ) )
                 {
                     QString wellboreTrajectoryId = w.id;
+                    auto location = m_osduConnector->requestWellSurfaceLocationBlocking( wellbore.value().wellId );
                     wiz->addWellInfo( { .name                 = wellbore.value().name,
                                         .wellId               = wellbore.value().wellId,
                                         .wellboreId           = w.wellboreId,
                                         .wellboreTrajectoryId = wellboreTrajectoryId,
                                         .existenceKind        = w.existenceKind,
                                         .datumElevation       = wellbore.value().datumElevation,
-                                        .surfaceEasting       = wellbore.value().surfaceEasting,
-                                        .surfaceNorthing      = wellbore.value().surfaceNorthing,
-                                        .crs                  = wellbore.value().crs } );
+                                        .surfaceEasting       = location.easting,
+                                        .surfaceNorthing      = location.northing,
+                                        .crs                  = location.crs } );
                     includedCount++;
                 }
             }
