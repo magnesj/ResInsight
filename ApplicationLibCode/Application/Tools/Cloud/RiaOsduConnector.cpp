@@ -449,7 +449,42 @@ void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply, const QString&
                     crs = ingested["persistableReferenceCrs"].toString();
                 }
 
-                m_wellboreTrajectories[wellboreId].push_back( OsduWellboreTrajectory{ id, kind, wellboreId, existenceKind, crs } );
+                // The trajectory parquet's MD/TVD/X/Y columns share a single length unit advertised on each
+                // AvailableTrajectoryStationProperties entry. Use the MD column's unit as the canonical one and
+                // derive a multiplier into meters, which downstream code uses to align with surface origin and
+                // datum elevation (always meters).
+                double     unitToMeters = 1.0;
+                QString    mdUnitId;
+                QJsonArray availableProps = dataObj["AvailableTrajectoryStationProperties"].toArray();
+                for ( const QJsonValue& propValue : availableProps )
+                {
+                    QJsonObject propObj = propValue.toObject();
+                    if ( propObj["Name"].toString() == "MD" )
+                    {
+                        mdUnitId = propObj["StationPropertyUnitID"].toString();
+                        break;
+                    }
+                }
+                // OSDU unit-of-measure ids look like "data:reference-data--UnitOfMeasure:ft:" — the symbol is
+                // between the last two colons.
+                QString unitSymbol;
+                if ( mdUnitId.endsWith( ':' ) )
+                {
+                    int lastColon       = mdUnitId.lastIndexOf( ':', mdUnitId.length() - 2 );
+                    if ( lastColon >= 0 ) unitSymbol = mdUnitId.mid( lastColon + 1, mdUnitId.length() - lastColon - 2 );
+                }
+                if ( unitSymbol.compare( "ft", Qt::CaseInsensitive ) == 0 )
+                {
+                    unitToMeters = 0.3048;
+                }
+                else if ( unitSymbol.compare( "m", Qt::CaseInsensitive ) != 0 && !unitSymbol.isEmpty() )
+                {
+                    RiaLogging::warning(
+                        QString( "Unrecognized MD unit '%1' for trajectory %2; assuming meters." ).arg( unitSymbol ).arg( id ) );
+                }
+
+                m_wellboreTrajectories[wellboreId].push_back(
+                    OsduWellboreTrajectory{ id, kind, wellboreId, existenceKind, crs, unitToMeters } );
             }
         }
 

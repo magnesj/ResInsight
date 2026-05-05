@@ -96,6 +96,7 @@ void RicWellPathsImportOsduFeature::onActionTriggered( bool isChecked )
             wellPath->setSurfaceEastingFromOsdu( w.surfaceEasting );
             wellPath->setSurfaceNorthingFromOsdu( w.surfaceNorthing );
             wellPath->setCrsFromOsdu( w.crs );
+            wellPath->setUnitToMetersFromOsdu( w.unitToMeters );
             wellPath->setWellPathColor( RiaColorTables::wellPathsPaletteColors().cycledColor3f( colorIndex++ ) );
 
             newWells.push_back( wellPath );
