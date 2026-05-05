@@ -25,10 +25,76 @@
 #include <QJsonObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QRegularExpression>
 
 #include <limits>
 
 #include "cafAssert.h"
+
+namespace
+{
+//--------------------------------------------------------------------------------------------------
+/// Parse an OSDU UnitOfMeasure reference id (e.g. "data:reference-data--UnitOfMeasure:ft:") and return
+/// the multiplier that converts the value into meters. Returns 1.0 (and sets recognized=false) when the
+/// id is empty or the symbol is unknown, so callers can log a single warning at the call site.
+//--------------------------------------------------------------------------------------------------
+double unitOfMeasureToMeters( const QString& unitId, bool* recognized = nullptr )
+{
+    if ( recognized ) *recognized = false;
+
+    QString symbol;
+    if ( unitId.endsWith( ':' ) )
+    {
+        int lastColon = unitId.lastIndexOf( ':', unitId.length() - 2 );
+        if ( lastColon >= 0 ) symbol = unitId.mid( lastColon + 1, unitId.length() - lastColon - 2 );
+    }
+    if ( symbol.isEmpty() ) return 1.0;
+
+    if ( symbol.compare( "m", Qt::CaseInsensitive ) == 0 )
+    {
+        if ( recognized ) *recognized = true;
+        return 1.0;
+    }
+    if ( symbol.compare( "ft", Qt::CaseInsensitive ) == 0 )
+    {
+        if ( recognized ) *recognized = true;
+        return 0.3048;
+    }
+    return 1.0;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Extract the linear unit factor (-> meters) from a persistableReferenceCrs JSON string by scanning
+/// the embedded WKT. The PROJCS WKT places the projection's linear UNIT after the nested angular GEOGCS
+/// UNIT, so the last `UNIT["name", factor]` token is the linear one. Falls back to 1.0 on any parse
+/// failure or for non-projected CRSs.
+//--------------------------------------------------------------------------------------------------
+double linearCrsUnitToMeters( const QString& persistableReferenceCrs )
+{
+    if ( persistableReferenceCrs.isEmpty() ) return 1.0;
+
+    QJsonDocument doc = QJsonDocument::fromJson( persistableReferenceCrs.toUtf8() );
+    if ( !doc.isObject() ) return 1.0;
+
+    QJsonObject obj = doc.object();
+    QString     wkt = obj["wkt"].toString();
+    if ( wkt.isEmpty() ) wkt = obj["lateBoundCRS"].toObject()["wkt"].toString();
+    if ( wkt.isEmpty() ) return 1.0;
+    if ( !wkt.startsWith( "PROJCS", Qt::CaseInsensitive ) ) return 1.0;
+
+    QRegularExpression      re( "UNIT\\[\"[^\"]+\"\\s*,\\s*([0-9.eE+\\-]+)\\]" );
+    auto                    matches = re.globalMatch( wkt );
+    double                  factor  = 1.0;
+    while ( matches.hasNext() )
+    {
+        QRegularExpressionMatch m  = matches.next();
+        bool                    ok = false;
+        double                  v  = m.captured( 1 ).toDouble( &ok );
+        if ( ok ) factor = v;
+    }
+    return factor;
+}
+} // namespace
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -383,8 +449,18 @@ void RiaOsduConnector::parseWellboresByFieldId( QNetworkReply* reply, const QStr
                     QString verticalMeasurementId = vma["VerticalMeasurementID"].toString();
                     if ( verticalMeasurementId == defaultVerticalMeasurementId )
                     {
-                        double verticalMeasurement = vma["VerticalMeasurement"].toDouble( 0.0 );
-                        datumElevation             = verticalMeasurement;
+                        double  verticalMeasurement = vma["VerticalMeasurement"].toDouble( 0.0 );
+                        QString unitId              = vma["VerticalMeasurementUnitOfMeasureID"].toString();
+                        bool    unitRecognized      = false;
+                        double  factor              = unitOfMeasureToMeters( unitId, &unitRecognized );
+                        if ( !unitRecognized && !unitId.isEmpty() )
+                        {
+                            RiaLogging::warning(
+                                QString( "Unrecognized datum elevation unit '%1' for well bore '%2'; assuming meters." )
+                                    .arg( unitId )
+                                    .arg( name ) );
+                        }
+                        datumElevation = verticalMeasurement * factor;
                     }
                 }
 
@@ -453,7 +529,6 @@ void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply, const QString&
                 // AvailableTrajectoryStationProperties entry. Use the MD column's unit as the canonical one and
                 // derive a multiplier into meters, which downstream code uses to align with surface origin and
                 // datum elevation (always meters).
-                double     unitToMeters = 1.0;
                 QString    mdUnitId;
                 QJsonArray availableProps = dataObj["AvailableTrajectoryStationProperties"].toArray();
                 for ( const QJsonValue& propValue : availableProps )
@@ -465,22 +540,12 @@ void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply, const QString&
                         break;
                     }
                 }
-                // OSDU unit-of-measure ids look like "data:reference-data--UnitOfMeasure:ft:" — the symbol is
-                // between the last two colons.
-                QString unitSymbol;
-                if ( mdUnitId.endsWith( ':' ) )
-                {
-                    int lastColon       = mdUnitId.lastIndexOf( ':', mdUnitId.length() - 2 );
-                    if ( lastColon >= 0 ) unitSymbol = mdUnitId.mid( lastColon + 1, mdUnitId.length() - lastColon - 2 );
-                }
-                if ( unitSymbol.compare( "ft", Qt::CaseInsensitive ) == 0 )
-                {
-                    unitToMeters = 0.3048;
-                }
-                else if ( unitSymbol.compare( "m", Qt::CaseInsensitive ) != 0 && !unitSymbol.isEmpty() )
+                bool   unitRecognized = false;
+                double unitToMeters   = unitOfMeasureToMeters( mdUnitId, &unitRecognized );
+                if ( !unitRecognized && !mdUnitId.isEmpty() )
                 {
                     RiaLogging::warning(
-                        QString( "Unrecognized MD unit '%1' for trajectory %2; assuming meters." ).arg( unitSymbol ).arg( id ) );
+                        QString( "Unrecognized MD unit '%1' for trajectory %2; assuming meters." ).arg( mdUnitId ).arg( id ) );
                 }
 
                 m_wellboreTrajectories[wellboreId].push_back(
@@ -841,15 +906,18 @@ RiaOsduConnector::WellSurfaceLocation RiaOsduConnector::requestWellSurfaceLocati
 
         if ( !ingested.isEmpty() )
         {
-            location.crs        = ingested["persistableReferenceCrs"].toString();
-            QJsonArray features = ingested["features"].toArray();
+            location.crs              = ingested["persistableReferenceCrs"].toString();
+            const double crsToMeters  = linearCrsUnitToMeters( location.crs );
+            QJsonArray   features     = ingested["features"].toArray();
             if ( !features.isEmpty() )
             {
                 QJsonArray coordinates = features[0].toObject()["geometry"].toObject()["coordinates"].toArray();
                 if ( coordinates.size() >= 2 )
                 {
-                    location.easting  = coordinates[0].toDouble();
-                    location.northing = coordinates[1].toDouble();
+                    // CRS WKT may declare a non-meter linear unit (e.g. US survey foot for state-plane CRSs).
+                    // Convert here so downstream code can rely on the surface origin always being meters.
+                    location.easting  = coordinates[0].toDouble() * crsToMeters;
+                    location.northing = coordinates[1].toDouble() * crsToMeters;
                     location.isValid  = true;
                 }
             }
