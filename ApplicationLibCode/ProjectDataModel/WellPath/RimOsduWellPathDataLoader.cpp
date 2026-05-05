@@ -115,7 +115,8 @@ void RimOsduWellPathDataLoader::parquetDownloadComplete( const QByteArray& conte
                                                                                               oWPath->datumElevationFromOsdu(),
                                                                                               oWPath->surfaceEastingFromOsdu(),
                                                                                               oWPath->surfaceNorthingFromOsdu(),
-                                                                                              oWPath->unitToMetersFromOsdu() );
+                                                                                              oWPath->unitToMetersFromOsdu(),
+                                                                                              oWPath->targetUnitToMeters() );
             if ( wellPathGeometry.notNull() )
             {
                 oWPath->setWellPathGeometry( wellPathGeometry.p() );
