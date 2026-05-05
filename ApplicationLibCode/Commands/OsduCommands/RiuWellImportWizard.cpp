@@ -18,7 +18,13 @@
 
 #include "RiuWellImportWizard.h"
 
+#include "RiaDefines.h"
 #include "RiaStringListSerializer.h"
+
+#include "RigEclipseCaseData.h"
+
+#include "RimEclipseCase.h"
+#include "RimProject.h"
 
 #include <QAbstractTableModel>
 #include <QObject>
@@ -597,12 +603,31 @@ WellSummaryPage::WellSummaryPage( RiaOsduConnector* osduConnector, QWidget* pare
     layout->addLayout( existenceFilterLayout );
 
     // Target unit system: the OSDU trajectory parquet is converted to this unit before storing the well path.
+    // Default to the unit system of the first grid case in the project so the imported well path matches the
+    // case's coordinate frame; fall back to Meters when no Eclipse case is loaded.
     QHBoxLayout* unitLayout = new QHBoxLayout;
     unitLayout->addWidget( new QLabel( "Target unit system:", this ) );
     m_targetUnitComboBox = new QComboBox( this );
     m_targetUnitComboBox->addItem( "Meters", 1.0 );
     m_targetUnitComboBox->addItem( "Feet", 0.3048 );
-    m_targetUnitComboBox->setCurrentIndex( 0 );
+
+    int defaultUnitIndex = 0;
+    if ( auto* project = RimProject::current() )
+    {
+        for ( RimCase* gridCase : project->allGridCases() )
+        {
+            auto* eclipseCase = dynamic_cast<RimEclipseCase*>( gridCase );
+            if ( eclipseCase && eclipseCase->eclipseCaseData() )
+            {
+                if ( eclipseCase->eclipseCaseData()->unitsType() == RiaDefines::EclipseUnitSystem::UNITS_FIELD )
+                {
+                    defaultUnitIndex = 1;
+                }
+                break;
+            }
+        }
+    }
+    m_targetUnitComboBox->setCurrentIndex( defaultUnitIndex );
     unitLayout->addWidget( m_targetUnitComboBox );
     unitLayout->addStretch();
     layout->addLayout( unitLayout );
