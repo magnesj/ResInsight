@@ -82,9 +82,9 @@ double linearCrsUnitToMeters( const QString& persistableReferenceCrs )
     if ( wkt.isEmpty() ) return 1.0;
     if ( !wkt.startsWith( "PROJCS", Qt::CaseInsensitive ) ) return 1.0;
 
-    QRegularExpression      re( "UNIT\\[\"[^\"]+\"\\s*,\\s*([0-9.eE+\\-]+)\\]" );
-    auto                    matches = re.globalMatch( wkt );
-    double                  factor  = 1.0;
+    QRegularExpression re( "UNIT\\[\"[^\"]+\"\\s*,\\s*([0-9.eE+\\-]+)\\]" );
+    auto               matches = re.globalMatch( wkt );
+    double             factor  = 1.0;
     while ( matches.hasNext() )
     {
         QRegularExpressionMatch m  = matches.next();
@@ -456,9 +456,7 @@ void RiaOsduConnector::parseWellboresByFieldId( QNetworkReply* reply, const QStr
                         if ( !unitRecognized && !unitId.isEmpty() )
                         {
                             RiaLogging::warning(
-                                QString( "Unrecognized datum elevation unit '%1' for well bore '%2'; assuming meters." )
-                                    .arg( unitId )
-                                    .arg( name ) );
+                                QString( "Unrecognized datum elevation unit '%1' for well bore '%2'; assuming meters." ).arg( unitId ).arg( name ) );
                         }
                         datumElevation = verticalMeasurement * factor;
                     }
@@ -544,12 +542,10 @@ void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply, const QString&
                 double unitToMeters   = unitOfMeasureToMeters( mdUnitId, &unitRecognized );
                 if ( !unitRecognized && !mdUnitId.isEmpty() )
                 {
-                    RiaLogging::warning(
-                        QString( "Unrecognized MD unit '%1' for trajectory %2; assuming meters." ).arg( mdUnitId ).arg( id ) );
+                    RiaLogging::warning( QString( "Unrecognized MD unit '%1' for trajectory %2; assuming meters." ).arg( mdUnitId ).arg( id ) );
                 }
 
-                m_wellboreTrajectories[wellboreId].push_back(
-                    OsduWellboreTrajectory{ id, kind, wellboreId, existenceKind, crs, unitToMeters } );
+                m_wellboreTrajectories[wellboreId].push_back( OsduWellboreTrajectory{ id, kind, wellboreId, existenceKind, crs, unitToMeters } );
             }
         }
 
@@ -898,17 +894,17 @@ RiaOsduConnector::WellSurfaceLocation RiaOsduConnector::requestWellSurfaceLocati
 
     if ( reply->error() == QNetworkReply::NoError )
     {
-        QByteArray    body = reply->readAll();
-        QJsonDocument doc  = QJsonDocument::fromJson( body );
-        QJsonObject   data = doc.object()["data"].toObject();
+        QByteArray    body            = reply->readAll();
+        QJsonDocument doc             = QJsonDocument::fromJson( body );
+        QJsonObject   data            = doc.object()["data"].toObject();
         QJsonObject   spatialLocation = data["SpatialLocation"].toObject();
         QJsonObject   ingested        = spatialLocation["AsIngestedCoordinates"].toObject();
 
         if ( !ingested.isEmpty() )
         {
-            location.crs              = ingested["persistableReferenceCrs"].toString();
-            const double crsToMeters  = linearCrsUnitToMeters( location.crs );
-            QJsonArray   features     = ingested["features"].toArray();
+            location.crs             = ingested["persistableReferenceCrs"].toString();
+            const double crsToMeters = linearCrsUnitToMeters( location.crs );
+            QJsonArray   features    = ingested["features"].toArray();
             if ( !features.isEmpty() )
             {
                 QJsonArray coordinates = features[0].toObject()["geometry"].toObject()["coordinates"].toArray();

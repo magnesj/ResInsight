@@ -34,8 +34,8 @@ public:
     static std::pair<cvf::ref<RigWellPath>, QString> parseCsv( const QString& content );
     static std::pair<cvf::ref<RigWellPath>, QString> readWellPathData( const QByteArray& content,
                                                                        double            datumElevation,
-                                                                       double            surfaceEasting    = 0.0,
-                                                                       double            surfaceNorthing   = 0.0,
-                                                                       double            unitToMeters      = 1.0,
+                                                                       double            surfaceEasting     = 0.0,
+                                                                       double            surfaceNorthing    = 0.0,
+                                                                       double            unitToMeters       = 1.0,
                                                                        double            targetUnitToMeters = 1.0 );
 };

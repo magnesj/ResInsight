@@ -749,9 +749,9 @@ void WellSummaryPage::updateSummaryDisplay()
             {
                 if ( shouldIncludeTrajectory( w.existenceKind ) )
                 {
-                    QString wellboreTrajectoryId = w.id;
-                    auto         location           = m_osduConnector->requestWellSurfaceLocationBlocking( wellbore.value().wellId );
-                    const double targetUnitToMeters = m_targetUnitComboBox->currentData().toDouble();
+                    QString      wellboreTrajectoryId = w.id;
+                    auto         location             = m_osduConnector->requestWellSurfaceLocationBlocking( wellbore.value().wellId );
+                    const double targetUnitToMeters   = m_targetUnitComboBox->currentData().toDouble();
                     wiz->addWellInfo( { .name                 = wellbore.value().name,
                                         .wellId               = wellbore.value().wellId,
                                         .wellboreId           = w.wellboreId,
