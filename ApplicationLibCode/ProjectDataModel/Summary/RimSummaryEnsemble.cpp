@@ -67,7 +67,7 @@ RimSummaryEnsemble::RimSummaryEnsemble()
 
     CAF_PDM_InitFieldNoDefault( &m_cases, "SummaryCases", "" );
 
-    CAF_PDM_InitScriptableField( &m_name, "SummaryCollectionName", QString( "Group" ), "Name" );
+    CAF_PDM_InitScriptableFieldWithScriptKeyword( &m_name, "SummaryCollectionName", "Name", QString( "Group" ), "Name" );
     CAF_PDM_InitScriptableField( &m_autoName, "CreateAutoName", true, "Auto Name" );
     CAF_PDM_InitScriptableField( &m_useKey1, "UseKey1", false, "Use First Path Part" );
     CAF_PDM_InitScriptableField( &m_useKey2, "UseKey2", false, "Use Second Path Part" );
