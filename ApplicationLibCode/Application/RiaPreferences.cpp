@@ -32,6 +32,7 @@
 #include "RiaPreferencesOsdu.h"
 #include "RiaPreferencesSummary.h"
 #include "RiaPreferencesSumo.h"
+#include "RiaPreferencesSumoExplorer.h"
 #include "RiaPreferencesSystem.h"
 #include "RiaQDateTimeTools.h"
 #include "RiaValidRegExpValidator.h"
@@ -285,6 +286,9 @@ RiaPreferences::RiaPreferences()
     CAF_PDM_InitFieldNoDefault( &m_sumoPreferences, "sumoPreferences", "sumoPreferences" );
     m_sumoPreferences = new RiaPreferencesSumo;
 
+    CAF_PDM_InitFieldNoDefault( &m_sumoExplorerPreferences, "sumoExplorerPreferences", "sumoExplorerPreferences" );
+    m_sumoExplorerPreferences = new RiaPreferencesSumoExplorer;
+
     CAF_PDM_InitFieldNoDefault( &m_openTelemetryPreferences, "openTelemetryPreferences", "openTelemetryPreferences" );
     m_openTelemetryPreferences = new RiaPreferencesOpenTelemetry;
 }
@@ -519,6 +523,10 @@ void RiaPreferences::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
         sumoGroup->setCollapsedByDefault();
         m_sumoPreferences()->uiOrdering( uiConfigName, *sumoGroup );
         sumoGroup->addNewButton( "Delete Token", []() { RicDeleteSumoTokenFeature::deleteUserToken(); } );
+
+        caf::PdmUiGroup* sumoExplorerGroup = uiOrdering.addNewGroup( "SUMO Explorer" );
+        sumoExplorerGroup->setCollapsedByDefault();
+        m_sumoExplorerPreferences()->uiOrdering( uiConfigName, *sumoExplorerGroup );
 
         caf::PdmUiGroup* openTelemetryGroup = uiOrdering.addNewGroup( "OpenTelemetry" );
         openTelemetryGroup->setCollapsedByDefault();
@@ -1061,6 +1069,14 @@ RiaPreferencesOsdu* RiaPreferences::osduPreferences() const
 RiaPreferencesSumo* RiaPreferences::sumoPreferences() const
 {
     return m_sumoPreferences();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaPreferencesSumoExplorer* RiaPreferences::sumoExplorerPreferences() const
+{
+    return m_sumoExplorerPreferences();
 }
 
 //--------------------------------------------------------------------------------------------------

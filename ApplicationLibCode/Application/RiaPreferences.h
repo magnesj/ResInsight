@@ -46,6 +46,7 @@ class RiaPreferencesSystem;
 class RiaPreferencesOsdu;
 class RiaPreferencesGrid;
 class RiaPreferencesSumo;
+class RiaPreferencesSumoExplorer;
 class RiaPreferencesOpm;
 class RiaPreferencesOpenTelemetry;
 
@@ -129,6 +130,7 @@ public:
     RiaPreferencesSystem*        systemPreferences() const;
     RiaPreferencesOsdu*          osduPreferences() const;
     RiaPreferencesSumo*          sumoPreferences() const;
+    RiaPreferencesSumoExplorer*  sumoExplorerPreferences() const;
     RiaPreferencesGrid*          gridPreferences() const;
     RiaPreferencesOpm*           opmPreferences() const;
     RiaPreferencesOpenTelemetry* openTelemetryPreferences() const;
@@ -240,6 +242,9 @@ private:
 
     // sumo settings
     caf::PdmChildField<RiaPreferencesSumo*> m_sumoPreferences;
+
+    // sumo explorer settings
+    caf::PdmChildField<RiaPreferencesSumoExplorer*> m_sumoExplorerPreferences;
 
     // OpenTelemetry settings
     caf::PdmChildField<RiaPreferencesOpenTelemetry*> m_openTelemetryPreferences;
