@@ -25,10 +25,10 @@
 #include "RigFlowDiagTimeStepResult.h"
 #include "RigMainGrid.h"
 
+#include "RiaLogging.h"
 #include "RigFlowDiagResultFrames.h"
 #include "RigNumberOfFloodedPoreVolumesCalculator.h"
 #include "RigStatisticsDataCache.h"
-#include "RimEclipseCase.h"
 #include "RimEclipseResultCase.h"
 #include "RimFlowDiagSolution.h"
 
@@ -432,13 +432,29 @@ std::vector<double>* RigFlowDiagResults::calculateCommunicationResult( const Rig
 //--------------------------------------------------------------------------------------------------
 void RigFlowDiagResults::calculateNumFloodedPV( const RigFlowDiagResultAddress& resVarAddr )
 {
-    auto                 eclipseCase = m_flowDiagSolution->firstAncestorOrThisOfTypeAsserted<RimEclipseCase>();
+    auto eclCase = m_flowDiagSolution->firstAncestorOrThisOfType<RimEclipseResultCase>();
+    if ( !eclCase )
+    {
+        RiaLogging::warning(
+            "calculateNumFloodedPV: Could not find RimEclipseResultCase ancestor. Water Flooded PV result will be missing." );
+        return;
+    }
+
+    auto* eclipseCaseData = eclCase->eclipseCaseData();
+    auto* gridCellResults = eclCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+    if ( !eclipseCaseData || !gridCellResults )
+    {
+        RiaLogging::warning( "calculateNumFloodedPV: Eclipse case data is not loaded. Water Flooded PV result will be missing." );
+        return;
+    }
+
     std::vector<QString> tracerNames;
     for ( const std::string& tracerName : resVarAddr.selectedTracerNames )
     {
         tracerNames.push_back( QString::fromUtf8( tracerName.c_str() ) );
     }
-    RigNumberOfFloodedPoreVolumesCalculator calc( eclipseCase, tracerNames );
+    RigNumberOfFloodedPoreVolumesCalculator
+        calc( eclipseCaseData, gridCellResults, [eclCase]( size_t idx ) { return eclCase->uiToNativeTimeStepIndex( idx ); }, tracerNames );
 
     RigFlowDiagResultFrames* frames = createScalarResult( resVarAddr );
     for ( size_t frameIdx = 0; frameIdx < m_timeStepCount; ++frameIdx )

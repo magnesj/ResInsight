@@ -18,19 +18,11 @@
 
 #include "RigFaultReactivationModelGenerator.h"
 
-#include "RiaApplication.h"
-
 #include "RigActiveCellInfo.h"
 #include "RigCell.h"
 #include "RigFault.h"
 #include "RigGriddedPart3d.h"
 #include "RigMainGrid.h"
-
-#include "RimCellFilterCollection.h"
-#include "RimEclipseCase.h"
-#include "RimEclipseView.h"
-#include "RimGridView.h"
-#include "RimUserDefinedIndexFilter.h"
 
 #include "cafHexGridIntersectionTools/cafHexGridIntersectionTools.h"
 
@@ -235,25 +227,6 @@ size_t RigFaultReactivationModelGenerator::oppositeStartCellIndex( const std::ve
     }
 
     return oppositeCellIdx;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RigFaultReactivationModelGenerator::updateFilters( std::vector<size_t> cellsFront, std::vector<size_t> cellsBack )
-{
-    RimEclipseView* view = dynamic_cast<RimEclipseView*>( RiaApplication::instance()->activeGridView() );
-    if ( view == nullptr ) return;
-
-    auto cellFilters = view->cellFilterCollection();
-    if ( cellFilters == nullptr ) return;
-
-    auto eCase       = cellFilters->firstAncestorOfType<RimEclipseCase>();
-    auto frontFilter = cellFilters->addNewUserDefinedIndexFilter( eCase, cellsFront );
-    frontFilter->setName( "Front" );
-
-    auto backFilter = cellFilters->addNewUserDefinedIndexFilter( eCase, cellsBack );
-    backFilter->setName( "Back" );
 }
 
 //--------------------------------------------------------------------------------------------------

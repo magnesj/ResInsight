@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "RimFaultReactivationEnums.h"
+#include "RigFaultReactivationEnums.h"
 
 #include "cvfArray.h"
 #include "cvfColor3.h"
@@ -34,9 +34,10 @@
 #include <utility>
 #include <vector>
 
+class RigActiveCellInfo;
 class RigGriddedPart3d;
 class RigFaultReactivationModelGenerator;
-class RimEclipseCase;
+class RigMainGrid;
 
 class RigFRModelPart
 {
@@ -54,7 +55,7 @@ public:
 //==================================================================================================
 class RigFaultReactivationModel : public cvf::Object
 {
-    using GridPart = RimFaultReactivation::GridPart;
+    using GridPart = RigFaultReactivation::GridPart;
 
 public:
     RigFaultReactivationModel();
@@ -85,9 +86,9 @@ public:
     const std::pair<cvf::Vec3d, cvf::Vec3d> faultTopBottom() const;
     std::pair<double, double>               depthTopBottom() const;
 
-    RimFaultReactivation::GridPart normalPointsAt() const;
+    RigFaultReactivation::GridPart normalPointsAt() const;
 
-    void postProcessElementSets( const RimEclipseCase* eCase );
+    void postProcessElementSets( const RigMainGrid* mainGrid, const RigActiveCellInfo* cellInfo );
 
 private:
     std::shared_ptr<RigFaultReactivationModelGenerator> m_generator;
@@ -98,5 +99,5 @@ private:
     bool m_isValid;
 
     std::map<GridPart, RigGriddedPart3d*> m_3dparts;
-    RimFaultReactivation::GridPart        m_normalPointsAt;
+    RigFaultReactivation::GridPart        m_normalPointsAt;
 };

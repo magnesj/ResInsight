@@ -18,7 +18,7 @@
 
 #include "RigElasticProperties.h"
 
-#include "RiaInterpolationTools.h"
+#include "RigInterpolationTools.h"
 
 #include "cafAssert.h"
 
@@ -158,6 +158,6 @@ std::pair<double, bool> RigElasticProperties::getValueForPorosity( RiaDefines::C
     }
 
     bool   isExtrapolated = porosity > porosityMax() || porosity < porosityMin();
-    double value = RiaInterpolationTools::linear( m_porosity, scaledValues, porosity, RiaInterpolationTools::ExtrapolationMode::CLOSEST );
+    double value = RigInterpolationTools::linear( m_porosity, scaledValues, porosity, RigInterpolationTools::ExtrapolationMode::CLOSEST );
     return std::make_pair( value, isExtrapolated );
 }

@@ -23,10 +23,6 @@
 #include "RigFractureGrid.h"
 #include "Well/RigWellPath.h"
 
-#include "RimFracture.h"
-#include "RimFractureTemplate.h"
-#include "RimStimPlanFractureTemplate.h"
-
 #include "cvfMath.h"
 
 #include <cmath>
@@ -34,24 +30,20 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigWellPathStimplanIntersector::RigWellPathStimplanIntersector( const std::vector<cvf::Vec3d>&    wellPathPoints,
-                                                                gsl::not_null<const RimFracture*> rimFracture )
+RigWellPathStimplanIntersector::RigWellPathStimplanIntersector( const std::vector<cvf::Vec3d>& wellPathPoints,
+                                                                const cvf::Mat4d&              fractureXf,
+                                                                double                         wellRadius,
+                                                                double                         perforationLength,
+                                                                const RigFractureGrid*         fractureGrid )
 {
-    cvf::Mat4d fractureXf = rimFracture->transformMatrix();
-    double     wellRadius = rimFracture->wellRadius();
-
     std::vector<std::vector<cvf::Vec3d>> fractureGridCellPolygons;
+    if ( fractureGrid )
     {
-        if ( rimFracture->fractureGrid() )
+        for ( const auto& stpCell : fractureGrid->fractureCells() )
         {
-            const std::vector<RigFractureCell>& stpCells = rimFracture->fractureGrid()->fractureCells();
-            for ( const auto& stpCell : stpCells )
-            {
-                fractureGridCellPolygons.push_back( stpCell.getPolygon() );
-            }
+            fractureGridCellPolygons.push_back( stpCell.getPolygon() );
         }
     }
-    double perforationLength = rimFracture->perforationLength();
 
     calculate( fractureXf, wellPathPoints, wellRadius, perforationLength, fractureGridCellPolygons, m_stimPlanCellIdxToIntersectionInfoMap );
 }

@@ -20,13 +20,10 @@
 
 #include "cvfMatrix4.h"
 
-#include <gsl/gsl>
-
 #include <map>
 #include <vector>
 
-class RigWellPath;
-class RimFracture;
+class RigFractureGrid;
 class RigWellPathStimplanIntersectorTester;
 
 //--------------------------------------------------------------------------------------------------
@@ -50,7 +47,11 @@ public:
         double computeLength() const { return cvf::Math::sqrt( hlength * hlength + vlength * vlength ); }
     };
 
-    RigWellPathStimplanIntersector( const std::vector<cvf::Vec3d>& wellPathPoints, gsl::not_null<const RimFracture*> rimFracture );
+    RigWellPathStimplanIntersector( const std::vector<cvf::Vec3d>& wellPathPoints,
+                                    const cvf::Mat4d&              fractureXf,
+                                    double                         wellRadius,
+                                    double                         perforationLength,
+                                    const RigFractureGrid*         fractureGrid );
 
     const std::map<size_t, WellCellIntersection>& intersections() const;
 
