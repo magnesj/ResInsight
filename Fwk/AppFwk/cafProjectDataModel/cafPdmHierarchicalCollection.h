@@ -60,8 +60,8 @@ public:
     void    setCollectionName( const QString& name );
 
     // Subcollection access
-    std::vector<SelfT*>           subCollections() const;
-    PdmChildArrayField<SelfT*>&   subCollectionsField();
+    std::vector<SelfT*>               subCollections() const;
+    PdmChildArrayField<SelfT*>&       subCollectionsField();
     const PdmChildArrayField<SelfT*>& subCollectionsField() const;
 
     // Subcollection CRUD
