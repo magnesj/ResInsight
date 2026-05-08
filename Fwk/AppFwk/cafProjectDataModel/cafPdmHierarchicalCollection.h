@@ -49,7 +49,10 @@ namespace caf
 template <typename SelfT, typename ItemT>
 class PdmHierarchicalCollection : public PdmObjectCollection<ItemT>
 {
-    static_assert( std::is_base_of<PdmObject, SelfT>::value, "SelfT must inherit from caf::PdmObject" );
+    // No static_assert on SelfT here: in the typical CRTP usage SelfT is the derived class
+    // and is incomplete at the point this template is instantiated as a base. The constraint
+    // that SelfT inherits from PdmObject is enforced implicitly when m_subCollections is
+    // exercised (PdmChildArrayField requires the pointee to be a PdmObject).
 
 public:
     // Collection name

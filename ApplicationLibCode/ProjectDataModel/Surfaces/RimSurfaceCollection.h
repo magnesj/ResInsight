@@ -17,9 +17,10 @@
 /////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "RimSurface.h"
+
 #include "cafPdmHierarchicalCollection.h"
 
-class RimSurface;
 class RimEnsembleSurface;
 class RimCase;
 
