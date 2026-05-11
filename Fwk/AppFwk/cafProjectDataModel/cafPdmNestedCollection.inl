@@ -16,6 +16,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+#include "cafPdmUiTableViewEditor.h"
+
 namespace caf
 {
 
@@ -24,9 +26,9 @@ namespace caf
 //--------------------------------------------------------------------------------------------------
 template <typename SelfT, typename ItemT>
 PdmNestedCollection<SelfT, ItemT>::PdmNestedCollection()
-    : m_isTopLevelFolder( false )
 {
     static_assert( DerivedFromPdmObject<SelfT>, "SelfT must inherit from caf::PdmObject" );
+    static_assert( DerivedFromPdmObject<ItemT>, "ItemT must inherit from caf::PdmObject" );
     // m_items, m_collectionName and m_subCollections must be initialized by the derived class
     // using CAF_PDM_InitFieldNoDefault, so that the XML keywords are stable for that class.
 }
@@ -43,18 +45,123 @@ PdmNestedCollection<SelfT, ItemT>::~PdmNestedCollection()
 ///
 //--------------------------------------------------------------------------------------------------
 template <typename SelfT, typename ItemT>
-QString PdmNestedCollection<SelfT, ItemT>::collectionName() const
+std::vector<ItemT*> PdmNestedCollection<SelfT, ItemT>::items() const
 {
-    return m_collectionName.value();
+    return m_items.childrenByType();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 template <typename SelfT, typename ItemT>
-void PdmNestedCollection<SelfT, ItemT>::setCollectionName( const QString& name )
+size_t PdmNestedCollection<SelfT, ItemT>::count() const
 {
-    m_collectionName.setValue( name );
+    return m_items.size();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+template <typename SelfT, typename ItemT>
+bool PdmNestedCollection<SelfT, ItemT>::isEmpty() const
+{
+    return m_items.empty();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+template <typename SelfT, typename ItemT>
+PdmChildArrayField<ItemT*>& PdmNestedCollection<SelfT, ItemT>::itemsField()
+{
+    return m_items;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+template <typename SelfT, typename ItemT>
+const PdmChildArrayField<ItemT*>& PdmNestedCollection<SelfT, ItemT>::itemsField() const
+{
+    return m_items;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+template <typename SelfT, typename ItemT>
+void PdmNestedCollection<SelfT, ItemT>::addItem( ItemT* item )
+{
+    if ( item )
+    {
+        m_items.push_back( item );
+        onItemsChanged();
+        updateConnectedEditors();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+template <typename SelfT, typename ItemT>
+void PdmNestedCollection<SelfT, ItemT>::insertItem( ItemT* insertBefore, ItemT* item )
+{
+    if ( !item ) return;
+
+    size_t index = m_items.indexOf( insertBefore );
+    if ( index < m_items.size() )
+        m_items.insert( index, item );
+    else
+        m_items.push_back( item );
+
+    onItemsChanged();
+    updateConnectedEditors();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+template <typename SelfT, typename ItemT>
+void PdmNestedCollection<SelfT, ItemT>::deleteItem( ItemT* item )
+{
+    if ( item )
+    {
+        m_items.removeChild( item );
+        delete item;
+        updateConnectedEditors();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+template <typename SelfT, typename ItemT>
+void PdmNestedCollection<SelfT, ItemT>::deleteAllItems()
+{
+    m_items.deleteChildren();
+    updateConnectedEditors();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+template <typename SelfT, typename ItemT>
+ItemT* PdmNestedCollection<SelfT, ItemT>::createDefaultItem()
+{
+    auto* item = new ItemT();
+    addItem( item );
+    return item;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+template <typename SelfT, typename ItemT>
+void PdmNestedCollection<SelfT, ItemT>::updateConnectedEditors()
+{
+    this->uiCapability()->updateConnectedEditors();
+    m_items.uiCapability()->updateConnectedEditors();
+    m_subCollections.uiCapability()->updateConnectedEditors();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -94,22 +201,6 @@ PdmObject* PdmNestedCollection<SelfT, ItemT>::addNewSubCollection()
 ///
 //--------------------------------------------------------------------------------------------------
 template <typename SelfT, typename ItemT>
-std::vector<ItemT*> PdmNestedCollection<SelfT, ItemT>::allItems() const
-{
-    std::vector<ItemT*> result = this->items();
-    for ( auto* sub : subCollections() )
-    {
-        if ( !sub ) continue;
-        auto subItems = sub->allItems();
-        result.insert( result.end(), subItems.begin(), subItems.end() );
-    }
-    return result;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-template <typename SelfT, typename ItemT>
 SelfT* PdmNestedCollection<SelfT, ItemT>::findSubCollectionByName( const QString& name ) const
 {
     for ( auto coll : m_subCollections )
@@ -124,22 +215,41 @@ SelfT* PdmNestedCollection<SelfT, ItemT>::findSubCollectionByName( const QString
 ///
 //--------------------------------------------------------------------------------------------------
 template <typename SelfT, typename ItemT>
-PdmFieldHandle* PdmNestedCollection<SelfT, ItemT>::userDescriptionField()
+std::vector<ItemT*> PdmNestedCollection<SelfT, ItemT>::allItems() const
 {
-    if ( m_isTopLevelFolder ) return nullptr;
-    return &m_collectionName;
+    std::vector<ItemT*> result = items();
+    for ( auto* sub : subCollections() )
+    {
+        if ( !sub ) continue;
+        auto subItems = sub->allItems();
+        result.insert( result.end(), subItems.begin(), subItems.end() );
+    }
+    return result;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 template <typename SelfT, typename ItemT>
-void PdmNestedCollection<SelfT, ItemT>::setAsTopmostFolder()
+void PdmNestedCollection<SelfT, ItemT>::onItemsChanged()
 {
-    m_collectionName.uiCapability()->setUiHidden( true );
-    m_collectionName.xmlCapability()->disableIO();
-    this->setDeletable( false );
-    m_isTopLevelFolder = true;
+    // Default implementation does nothing; derived classes may override.
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+template <typename SelfT, typename ItemT>
+void PdmNestedCollection<SelfT, ItemT>::fieldChangedByUi( const PdmFieldHandle* changedField,
+                                                          const QVariant&       oldValue,
+                                                          const QVariant&       newValue )
+{
+    if ( changedField == &m_items )
+    {
+        onItemsChanged();
+    }
+
+    updateConnectedEditors();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -150,7 +260,37 @@ void PdmNestedCollection<SelfT, ItemT>::defineUiOrdering( QString uiConfigName, 
 {
     uiOrdering.add( &m_collectionName );
     uiOrdering.add( &m_subCollections );
-    uiOrdering.add( &this->m_items );
+    uiOrdering.add( &m_items );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+template <typename SelfT, typename ItemT>
+void PdmNestedCollection<SelfT, ItemT>::defineEditorAttribute( const PdmFieldHandle* field,
+                                                               QString               uiConfigName,
+                                                               PdmUiEditorAttribute* attribute )
+{
+    if ( field == &m_items )
+    {
+        auto tvAttribute = dynamic_cast<PdmUiTableViewEditorAttribute*>( attribute );
+        if ( tvAttribute )
+        {
+            tvAttribute->resizePolicy              = PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER;
+            tvAttribute->alwaysEnforceResizePolicy = true;
+            tvAttribute->minimumHeight             = 300;
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+template <typename SelfT, typename ItemT>
+void PdmNestedCollection<SelfT, ItemT>::onChildDeleted( PdmChildArrayFieldHandle*      childArray,
+                                                        std::vector<PdmObjectHandle*>& referringObjects )
+{
+    updateConnectedEditors();
 }
 
 } // namespace caf

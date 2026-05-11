@@ -23,7 +23,7 @@
 //==================================================================================================
 ///
 /// Adds a new subcollection ("folder") to the selected caf::PdmNestedCollection-derived object.
-/// Works with any nested collection type via caf::PdmNestedCollectionInterface.
+/// Works with any nested collection type via caf::PdmNestedCollectionBase.
 ///
 //==================================================================================================
 class RicNewNestedCollectionFeature : public caf::CmdFeature

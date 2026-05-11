@@ -16,62 +16,66 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RicNewNestedCollectionFeature.h"
-
-#include "Riu3DMainWindowTools.h"
-
 #include "cafPdmNestedCollectionBase.h"
-#include "cafPdmUiItem.h"
-#include "cafSelectionManager.h"
 
-#include <QAction>
+namespace caf
+{
 
-CAF_CMD_SOURCE_INIT( RicNewNestedCollectionFeature, "RicNewNestedCollectionFeature" );
+CAF_PDM_ABSTRACT_SOURCE_INIT( PdmNestedCollectionBase, "PdmNestedCollectionBase" );
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-static caf::PdmNestedCollectionBase* selectedNestedCollection()
+PdmNestedCollectionBase::PdmNestedCollectionBase()
+    : m_isTopLevelFolder( false )
 {
-    auto items = caf::SelectionManager::instance()->selectedItems();
-    for ( auto* item : items )
-    {
-        if ( auto* nested = dynamic_cast<caf::PdmNestedCollectionBase*>( item ) )
-        {
-            return nested;
-        }
-    }
-    return nullptr;
+    CAF_PDM_InitObject( "Nested Collection" );
+
+    // m_collectionName is initialized by derived classes with a derived-specific XML keyword,
+    // matching the existing per-class scriptable-field convention.
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RicNewNestedCollectionFeature::isCommandEnabled() const
+PdmNestedCollectionBase::~PdmNestedCollectionBase()
 {
-    auto* nested = selectedNestedCollection();
-    return nested != nullptr && nested->canAddSubCollection();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicNewNestedCollectionFeature::onActionTriggered( bool isChecked )
+QString PdmNestedCollectionBase::collectionName() const
 {
-    auto* parent = selectedNestedCollection();
-    if ( !parent || !parent->canAddSubCollection() ) return;
-
-    caf::PdmObject* added = parent->addNewSubCollection();
-    if ( !added ) return;
-
-    Riu3DMainWindowTools::selectAsCurrentItem( added );
+    return m_collectionName.value();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicNewNestedCollectionFeature::setupActionLook( QAction* actionToSetup )
+void PdmNestedCollectionBase::setCollectionName( const QString& name )
 {
-    actionToSetup->setText( "Add Folder" );
-    actionToSetup->setIcon( QIcon( ":/Folder.png" ) );
+    m_collectionName.setValue( name );
 }
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void PdmNestedCollectionBase::setAsTopmostFolder()
+{
+    m_collectionName.uiCapability()->setUiHidden( true );
+    m_collectionName.xmlCapability()->disableIO();
+    setDeletable( false );
+    m_isTopLevelFolder = true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+PdmFieldHandle* PdmNestedCollectionBase::userDescriptionField()
+{
+    if ( m_isTopLevelFolder ) return nullptr;
+    return &m_collectionName;
+}
+
+} // namespace caf

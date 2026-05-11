@@ -20,8 +20,8 @@
 
 #include "cafPdmChildArrayField.h"
 #include "cafPdmField.h"
-#include "cafPdmNestedCollectionInterface.h"
-#include "cafPdmObjectCollection.h"
+#include "cafPdmNestedCollectionBase.h"
+#include "cafPdmObjectCollection.h" // for DerivedFromPdmObject concept
 
 #include <QString>
 
@@ -34,9 +34,10 @@ namespace caf
 ///
 /// Generic templated nested collection base class
 ///
-/// Extends PdmObjectCollection<ItemT> with a user-visible collection name and a vector of
-/// subcollections of the same (derived) type. Use this as a base for tree-shaped PDM containers
-/// such as a folder of items that can also contain folders of the same kind.
+/// CRTP template for tree-shaped PDM containers (folder of items + folder of folders). Derives
+/// from caf::PdmNestedCollectionBase, which provides the non-templated PdmObject anchor (so
+/// generic script methods like AddFolder can be registered once on the base and inherit through
+/// every concrete derivation).
 ///
 /// Template parameters:
 ///   SelfT - The derived class (CRTP). Must inherit from caf::PdmObject.
@@ -48,12 +49,24 @@ namespace caf
 ///
 //==================================================================================================
 template <typename SelfT, typename ItemT>
-class PdmNestedCollection : public PdmObjectCollection<ItemT>, public PdmNestedCollectionInterface
+class PdmNestedCollection : public PdmNestedCollectionBase
 {
 public:
-    // Collection name (PdmNestedCollectionInterface)
-    QString collectionName() const override;
-    void    setCollectionName( const QString& name ) override;
+    // Item access
+    std::vector<ItemT*>               items() const;
+    size_t                            count() const;
+    bool                              isEmpty() const;
+    PdmChildArrayField<ItemT*>&       itemsField();
+    const PdmChildArrayField<ItemT*>& itemsField() const;
+
+    // Item CRUD
+    void   addItem( ItemT* item );
+    void   insertItem( ItemT* insertBefore, ItemT* item );
+    void   deleteItem( ItemT* item );
+    void   deleteAllItems();
+    ItemT* createDefaultItem();
+
+    void updateConnectedEditors();
 
     // Subcollection access
     std::vector<SelfT*> subCollections() const;
@@ -64,24 +77,23 @@ public:
     SelfT*     findSubCollectionByName( const QString& name ) const;
 
     // Returns items held by this collection and recursively by all subcollections.
-    // For items at this level only, use the inherited items() from PdmObjectCollection<ItemT>.
+    // For items at this level only, use items().
     std::vector<ItemT*> allItems() const;
-
-    // Marks this instance as the topmost folder: hides and disables IO on the collection name,
-    // makes the object non-deletable, and suppresses it as the userDescriptionField.
-    void setAsTopmostFolder();
 
 protected:
     PdmNestedCollection();
     ~PdmNestedCollection() override;
 
-    PdmFieldHandle* userDescriptionField() override;
-    void            defineUiOrdering( QString uiConfigName, PdmUiOrdering& uiOrdering ) override;
+    // Hook for derived classes; called when m_items changes.
+    virtual void onItemsChanged();
 
-    PdmField<QString>          m_collectionName;
+    void fieldChangedByUi( const PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+    void defineUiOrdering( QString uiConfigName, PdmUiOrdering& uiOrdering ) override;
+    void defineEditorAttribute( const PdmFieldHandle* field, QString uiConfigName, PdmUiEditorAttribute* attribute ) override;
+    void onChildDeleted( PdmChildArrayFieldHandle* childArray, std::vector<PdmObjectHandle*>& referringObjects ) override;
+
     PdmChildArrayField<SelfT*> m_subCollections;
-
-    bool m_isTopLevelFolder;
+    PdmChildArrayField<ItemT*> m_items;
 };
 
 } // namespace caf

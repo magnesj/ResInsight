@@ -37,7 +37,7 @@ RimPolygonContainer::RimPolygonContainer()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObject* RimPolygonContainer::addNewSubCollection()
+RimPolygonContainer* RimPolygonContainer::addNewSubCollection()
 {
     auto* sub = new RimPolygonCollection();
     addSubCollection( sub );

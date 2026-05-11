@@ -27,7 +27,8 @@ set(PROJECT_FILES
     cafPdmObjectCollection.inl
     cafPdmNestedCollection.h
     cafPdmNestedCollection.inl
-    cafPdmNestedCollectionInterface.h
+    cafPdmNestedCollectionBase.h
+    cafPdmNestedCollectionBase.cpp
 )
 
 add_library(${PROJECT_NAME} ${PROJECT_FILES})

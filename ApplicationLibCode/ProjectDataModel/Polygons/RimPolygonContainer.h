@@ -38,9 +38,10 @@ class RimPolygonContainer : public caf::PdmNestedCollection<RimPolygonContainer,
 public:
     RimPolygonContainer();
 
-    // "Add Folder" via PdmNestedCollectionInterface should produce a real folder
-    // (RimPolygonCollection), not another container shell. Override here so the default
-    // base impl (new SelfT) is bypassed for both this class and any derivative that does
-    // not override it.
-    caf::PdmObject* addNewSubCollection() override;
+    // "Add Folder" should produce a real folder (RimPolygonCollection), not another container
+    // shell. Override here so the default base impl (new SelfT) is bypassed for both this class
+    // and any derivative that does not override it. The runtime instance is a RimPolygonCollection;
+    // the return type stays at RimPolygonContainer* to avoid pulling RimPolygonCollection.h into
+    // this header (which would create an include cycle).
+    RimPolygonContainer* addNewSubCollection() override;
 };

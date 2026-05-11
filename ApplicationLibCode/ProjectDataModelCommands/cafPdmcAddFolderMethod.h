@@ -18,37 +18,34 @@
 
 #pragma once
 
+#include "cafPdmField.h"
+#include "cafPdmObjectHandle.h"
+#include "cafPdmObjectMethod.h"
+
 #include <QString>
 
 namespace caf
 {
-class PdmObject;
 
 //==================================================================================================
 ///
-/// Non-templated interface implemented by caf::PdmNestedCollection<SelfT, ItemT>.
-///
-/// Lets generic command features operate on any nested collection without knowing the concrete
-/// SelfT / ItemT template parameters.
+/// Generic "Add Folder" script method registered once against caf::PdmNestedCollectionBase.
+/// Every concrete nested collection inherits the method through the CAF method-factory
+/// inheritance walk, so derived classes do not need their own AddFolder counterpart.
 ///
 //==================================================================================================
-class PdmNestedCollectionInterface
+class PdmcAddFolderMethod : public PdmObjectCreationMethod
 {
+    CAF_PDM_HEADER_INIT;
+
 public:
-    virtual ~PdmNestedCollectionInterface() = default;
+    PdmcAddFolderMethod( PdmObjectHandle* self );
 
-    virtual QString collectionName() const                   = 0;
-    virtual void    setCollectionName( const QString& name ) = 0;
+    std::expected<PdmObjectHandle*, QString> execute() override;
+    QString                                  classKeywordReturnedType() const override;
 
-    // Whether this container accepts sub-collections. Leaf containers (e.g. file-backed
-    // folders) return false, in which case addNewSubCollection() must not be called and
-    // generic UI features should hide the corresponding action.
-    virtual bool canAddSubCollection() const { return true; }
-
-    // Creates a subcollection, adds it to this collection, and returns it. Ownership of
-    // the returned object is held by this collection. Must not be called when
-    // canAddSubCollection() returns false.
-    virtual PdmObject* addNewSubCollection() = 0;
+private:
+    PdmField<QString> m_folderName;
 };
 
 } // namespace caf

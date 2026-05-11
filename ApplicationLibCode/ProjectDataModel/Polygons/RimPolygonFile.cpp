@@ -143,7 +143,7 @@ QString RimPolygonFile::name() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObject* RimPolygonFile::addNewSubCollection()
+RimPolygonContainer* RimPolygonFile::addNewSubCollection()
 {
     return nullptr;
 }
