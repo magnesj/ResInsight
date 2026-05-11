@@ -31,9 +31,9 @@ namespace caf
 ///
 /// Constrains a template parameter to types deriving from caf::PdmObject.
 ///
-/// Checked via `static_assert` inside a lazily-instantiated member function (the constructor)
-/// rather than as a class-template constraint, so that T may be forward-declared at the point
-/// the class template is instantiated as a base class.
+/// Apply via `requires` on a lazily-instantiated member function (typically the constructor)
+/// rather than as a class-template constraint, so that types may be forward-declared at the
+/// point the class template is instantiated as a base class.
 ///
 //==================================================================================================
 template <typename T>
