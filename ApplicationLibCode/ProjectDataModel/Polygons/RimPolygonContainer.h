@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2020-     Equinor ASA
+//  Copyright (C) 2026     Equinor ASA
 //
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,16 +18,29 @@
 
 #pragma once
 
-#include "cafCmdFeature.h"
+#include "cafPdmNestedCollection.h"
+
+class RimPolygon;
 
 //==================================================================================================
 ///
+/// Common base for polygon containers (folders and files).
+///
+/// Both RimPolygonCollection (a user-managed folder) and RimPolygonFile (a file-backed
+/// folder of polygons) inherit from this. They live polymorphically in the inherited
+/// m_subCollections, so the in-view mirror tree picks both up uniformly.
+///
 //==================================================================================================
-class RicNewSurfaceCollectionFeature : public caf::CmdFeature
+class RimPolygonContainer : public caf::PdmNestedCollection<RimPolygonContainer, RimPolygon>
 {
-    CAF_CMD_HEADER_INIT;
+    CAF_PDM_HEADER_INIT;
 
-protected:
-    void onActionTriggered( bool isChecked ) override;
-    void setupActionLook( QAction* actionToSetup ) override;
+public:
+    RimPolygonContainer();
+
+    // "Add Folder" via PdmNestedCollectionInterface should produce a real folder
+    // (RimPolygonCollection), not another container shell. Override here so the default
+    // base impl (new SelfT) is bypassed for both this class and any derivative that does
+    // not override it.
+    caf::PdmObject* addNewSubCollection() override;
 };

@@ -94,6 +94,7 @@ RimOilField::RimOilField()
     annotationCollection         = new RimAnnotationCollection();
     ensembleWellLogsCollection   = new RimEnsembleWellLogsCollection();
     polygonCollection            = new RimPolygonCollection();
+    polygonCollection->setAsTopmostFolder();
 
     CAF_PDM_InitFieldNoDefault( &vfpDataCollection, "VfpDataCollection", "VFP Data" );
     vfpDataCollection = new RimVfpDataCollection();

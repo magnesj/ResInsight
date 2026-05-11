@@ -17,16 +17,13 @@
 /////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "cafPdmField.h"
-
-#include "cafPdmChildArrayField.h"
-#include "cafPdmObject.h"
+#include "cafPdmNestedCollection.h"
 
 class RimSurface;
 class RimEnsembleSurface;
 class RimCase;
 
-class RimSurfaceCollection : public caf::PdmObject
+class RimSurfaceCollection : public caf::PdmNestedCollection<RimSurfaceCollection, RimSurface>
 {
     CAF_PDM_HEADER_INIT;
 
@@ -35,7 +32,6 @@ public:
     ~RimSurfaceCollection() override;
 
     void addSurface( RimSurface* surface );
-    void setAsTopmostFolder();
 
     void                             addEnsembleSurface( RimEnsembleSurface* ensembleSurface );
     std::vector<RimEnsembleSurface*> ensembleSurfaces() const;
@@ -46,10 +42,6 @@ public:
     RimSurface* addSurfacesAtIndex( int index, std::vector<RimSurface*> surfaces );
 
     static RimSurface* createSurfaceFromFile( const QString& fileName );
-
-    void                  addSubCollection( RimSurfaceCollection* collection );
-    RimSurfaceCollection* getSubCollection( const QString& name ) const;
-    void                  deleteSubCollection( const QString& name );
 
     bool containsFileSurface( QString filename );
     bool containsSurface();
@@ -65,22 +57,11 @@ public:
 
     void onChildDeleted( caf::PdmChildArrayFieldHandle* childArray, std::vector<caf::PdmObjectHandle*>& referringObjects ) override;
 
-    QString collectionName() const;
-    void    setCollectionName( const QString name );
-
-    std::vector<RimSurface*>           surfaces() const;
-    std::vector<RimSurfaceCollection*> subCollections() const;
+    std::vector<RimSurface*> surfaces() const;
 
 protected:
-    caf::PdmFieldHandle* userDescriptionField() override;
-    void                 appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
+    void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
 
 private:
     void orderChanged( const caf::SignalEmitter* emitter );
-
-    caf::PdmField<QString>                         m_collectionName;
-    caf::PdmChildArrayField<RimSurface*>           m_surfaces;
-    caf::PdmChildArrayField<RimSurfaceCollection*> m_subCollections;
-
-    bool m_isTopLevelFolder;
 };
