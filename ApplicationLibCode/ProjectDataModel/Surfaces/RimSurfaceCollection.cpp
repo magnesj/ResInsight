@@ -516,4 +516,3 @@ bool RimSurfaceCollection::containsFileSurface( QString filename )
 
     return false;
 }
-
