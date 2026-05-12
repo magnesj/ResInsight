@@ -27,7 +27,7 @@ CAF_PDM_ABSTRACT_SOURCE_INIT( PdmNestedCollectionBase, "PdmNestedCollectionBase"
 ///
 //--------------------------------------------------------------------------------------------------
 PdmNestedCollectionBase::PdmNestedCollectionBase()
-    : m_isTopLevelFolder( false )
+    : m_isTopmostFolder( false )
 {
     CAF_PDM_InitObject( "Nested Collection" );
 
@@ -66,7 +66,7 @@ void PdmNestedCollectionBase::setAsTopmostFolder()
     m_collectionName.uiCapability()->setUiHidden( true );
     m_collectionName.xmlCapability()->disableIO();
     setDeletable( false );
-    m_isTopLevelFolder = true;
+    m_isTopmostFolder = true;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ void PdmNestedCollectionBase::setAsTopmostFolder()
 //--------------------------------------------------------------------------------------------------
 PdmFieldHandle* PdmNestedCollectionBase::userDescriptionField()
 {
-    if ( m_isTopLevelFolder ) return nullptr;
+    if ( m_isTopmostFolder ) return nullptr;
     return &m_collectionName;
 }
 

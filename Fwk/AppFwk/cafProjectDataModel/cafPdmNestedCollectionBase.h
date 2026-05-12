@@ -68,7 +68,7 @@ protected:
 
     PdmField<QString> m_collectionName;
 
-    bool m_isTopLevelFolder;
+    bool m_isTopmostFolder;
 };
 
 } // namespace caf
