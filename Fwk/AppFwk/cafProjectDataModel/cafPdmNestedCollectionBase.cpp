@@ -18,6 +18,11 @@
 
 #include "cafPdmNestedCollectionBase.h"
 
+#include "cafIconProvider.h"
+
+#include <QApplication>
+#include <QStyle>
+
 namespace caf
 {
 
@@ -33,6 +38,20 @@ PdmNestedCollectionBase::PdmNestedCollectionBase()
 
     // m_collectionName is initialized by derived classes with a derived-specific XML keyword,
     // matching the existing per-class scriptable-field convention.
+
+    // Apply the platform-native folder icon as the per-instance default so every nested
+    // collection looks like a folder in the project tree. Derived classes that want a branded
+    // icon (e.g. the top-level instance) override via setUiIcon / createTopmost(). In console
+    // mode there is no QApplication / QStyle, so we fall back to whatever static icon the
+    // derived class supplied to CAF_PDM_InitObject.
+    if ( qobject_cast<QApplication*>( QApplication::instance() ) )
+    {
+        if ( QStyle* style = QApplication::style() )
+        {
+            QPixmap pix = style->standardIcon( QStyle::SP_DirIcon ).pixmap( 16, 16 );
+            uiCapability()->setUiIcon( IconProvider( pix ) );
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
