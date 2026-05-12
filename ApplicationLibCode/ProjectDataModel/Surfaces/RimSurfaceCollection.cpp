@@ -52,7 +52,7 @@ CAF_PDM_SOURCE_INIT( RimSurfaceCollection, "SurfaceCollection" );
 //--------------------------------------------------------------------------------------------------
 RimSurfaceCollection::RimSurfaceCollection()
 {
-    CAF_PDM_InitScriptableObject( "Surfaces", ":/ReservoirSurfaces16x16.png" );
+    CAF_PDM_InitScriptableObject( "Surfaces", ":/Folder.png" );
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_collectionName, "SurfaceUserDescription", "Name" );
     m_collectionName.registerKeywordAlias( "SurfaceUserDecription" );
@@ -73,6 +73,17 @@ RimSurfaceCollection::RimSurfaceCollection()
 //--------------------------------------------------------------------------------------------------
 RimSurfaceCollection::~RimSurfaceCollection()
 {
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimSurfaceCollection* RimSurfaceCollection::createTopmost()
+{
+    auto* coll = new RimSurfaceCollection();
+    coll->setAsTopmostFolder();
+    coll->uiCapability()->setUiIconFromResourceString( ":/ReservoirSurfaces16x16.png" );
+    return coll;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -505,3 +516,4 @@ bool RimSurfaceCollection::containsFileSurface( QString filename )
 
     return false;
 }
+

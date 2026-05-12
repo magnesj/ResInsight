@@ -34,6 +34,11 @@ class RimPolygonCollection : public RimPolygonContainer
 public:
     RimPolygonCollection();
 
+    // Construct the single top-level polygon collection. Marks the instance as the topmost folder
+    // and applies the branded polygon icon. Sub-folders use the default folder icon from the
+    // constructor.
+    static RimPolygonCollection* createTopmost();
+
     void        loadData();
     RimPolygon* createUserDefinedPolygon();
     RimPolygon* appendUserDefinedPolygon();

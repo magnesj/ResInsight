@@ -37,7 +37,7 @@ CAF_PDM_SOURCE_INIT( RimPolygonCollection, "PolygonCollection", "RimPolygonColle
 //--------------------------------------------------------------------------------------------------
 RimPolygonCollection::RimPolygonCollection()
 {
-    CAF_PDM_InitScriptableObject( "Polygons", ":/PolylinesFromFile16x16.png" );
+    CAF_PDM_InitScriptableObject( "Polygons", ":/Folder.png" );
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_collectionName, "PolygonCollectionName", "Name" );
     m_collectionName = "Polygons";
@@ -50,6 +50,17 @@ RimPolygonCollection::RimPolygonCollection()
     m_polygonFiles_OBSOLETE.xmlCapability()->setIOWritable( false );
 
     setDeletable( true );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimPolygonCollection* RimPolygonCollection::createTopmost()
+{
+    auto* coll = new RimPolygonCollection();
+    coll->setAsTopmostFolder();
+    coll->uiCapability()->setUiIconFromResourceString( ":/PolylinesFromFile16x16.png" );
+    return coll;
 }
 
 //--------------------------------------------------------------------------------------------------
