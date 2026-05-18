@@ -139,6 +139,12 @@ private:
     bool hasFaultWithName( const QString& name ) const;
     void computeBoundingBox();
 
+    void addFaultFacesFromNNCs( const RigActiveCellInfo* activeCellInfo,
+                                RigFault*                unNamedFault,
+                                int                      unNamedFaultIdx,
+                                RigFault*                unNamedFaultWithInactive,
+                                int                      unNamedFaultWithInactiveIdx );
+
     static std::array<double, 6> defaultMapAxes();
 
     void doBuildCellSearchTree( std::string* aabbTreeInfo = nullptr ) const;

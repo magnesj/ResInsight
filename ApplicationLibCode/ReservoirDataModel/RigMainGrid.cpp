@@ -518,6 +518,64 @@ void RigMainGrid::calculateFaults( const RigActiveCellInfo* activeCellInfo )
                               unNamedFaultFacesInactive,
                               m_faultsPrCellAcc.p() );
     }
+
+    // Augment fault detection with NNCs from the file. NNCs can mark faulted face pairs that the
+    // pure geometric (sharedFaceVertices) check above misses, in particular K-faces and
+    // pinch-out/LGR-related connections. Only NNCs with a resolved face direction that are not
+    // already associated with a fault face are added.
+    addFaultFacesFromNNCs( activeCellInfo, unNamedFault, unNamedFaultIdx, unNamedFaultWithInactive, unNamedFaultWithInactiveIdx );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigMainGrid::addFaultFacesFromNNCs( const RigActiveCellInfo* activeCellInfo,
+                                         RigFault*                unNamedFault,
+                                         int                      unNamedFaultIdx,
+                                         RigFault*                unNamedFaultWithInactive,
+                                         int                      unNamedFaultWithInactiveIdx )
+{
+    if ( m_nncData.isNull() || m_faultsPrCellAcc.isNull() || activeCellInfo == nullptr ) return;
+
+    // NNCs read from file have no face direction until buildPolygonsForEclipseConnections runs.
+    // Trigger it here so we can use the face direction during fault detection.
+    m_nncData->buildPolygonsForEclipseConnections();
+
+    const RigConnectionContainer& nncs       = m_nncData->availableConnections();
+    const size_t                  cellsCount = totalCellCount();
+
+    std::vector<RigFault::FaultFace>& unNamedFaultFaces         = unNamedFault->faultFaces();
+    std::vector<RigFault::FaultFace>& unNamedFaultFacesInactive = unNamedFaultWithInactive->faultFaces();
+
+    for ( size_t nncIdx = 0; nncIdx < nncs.size(); ++nncIdx )
+    {
+        const RigConnection&               conn = nncs[nncIdx];
+        StructGridInterface::FaceType      face = conn.face();
+        if ( face == StructGridInterface::NO_FACE ) continue;
+
+        const size_t c1 = conn.c1GlobIdx();
+        const size_t c2 = conn.c2GlobIdx();
+        if ( c1 >= cellsCount || c2 >= cellsCount ) continue;
+
+        if ( m_faultsPrCellAcc->faultIdx( c1, face ) != RigFaultsPrCellAccumulator::NO_FAULT ) continue;
+
+        const bool isC1Active = activeCellInfo->isActive( ReservoirCellIndex( c1 ) );
+        const bool isC2Active = activeCellInfo->isActive( ReservoirCellIndex( c2 ) );
+        const int  faultIdx   = ( isC1Active && isC2Active ) ? unNamedFaultIdx : unNamedFaultWithInactiveIdx;
+
+        m_faultsPrCellAcc->setFaultIdx( c1, face, faultIdx );
+        m_faultsPrCellAcc->setFaultIdx( c2, StructGridInterface::oppositeFace( face ), faultIdx );
+
+        RigFault::FaultFace ff( c1, face, c2 );
+        if ( isC1Active && isC2Active )
+        {
+            unNamedFaultFaces.push_back( ff );
+        }
+        else
+        {
+            unNamedFaultFacesInactive.push_back( ff );
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -637,6 +695,23 @@ void RigMainGrid::distributeNNCsToFaults()
 {
     if ( m_faultsPrCellAcc.isNull() ) return;
 
+    // Resolve the unnamed fault indices once, so any NNC with a resolved face direction that is
+    // not already covered by an existing fault can be added to them. This catches NNCs synthesized
+    // by computeAdditionalNncs that ran after RigMainGrid::calculateFaults.
+    int unNamedFaultIdx             = RigFaultsPrCellAccumulator::NO_FAULT;
+    int unNamedFaultWithInactiveIdx = RigFaultsPrCellAccumulator::NO_FAULT;
+    for ( size_t i = 0; i < m_faults.size(); ++i )
+    {
+        if ( m_faults[i]->name() == RiaResultNames::undefinedGridFaultName() )
+        {
+            unNamedFaultIdx = static_cast<int>( i );
+        }
+        else if ( m_faults[i]->name() == RiaResultNames::undefinedGridFaultWithInactiveName() )
+        {
+            unNamedFaultWithInactiveIdx = static_cast<int>( i );
+        }
+    }
+
     const RigConnectionContainer& nncs = nncData()->allConnections();
     for ( size_t nncIdx = 0; nncIdx < nncs.size(); ++nncIdx )
     {
@@ -651,16 +726,40 @@ void RigMainGrid::distributeNNCsToFaults()
             fIdx2 = m_faultsPrCellAcc->faultIdx( conn.c2GlobIdx(), StructGridInterface::oppositeFace( conn.face() ) );
         }
 
-        if ( fIdx1 < 0 && fIdx2 < 0 )
+        // If the NNC describes a face that is not covered by an existing fault on either side,
+        // synthesize a fault face on the appropriate unnamed fault. We also cover the asymmetric
+        // case where one side has a fault on the opposite direction but the other side does not
+        // (common at LGR boundaries, where the NNC asserts a fault face distinct from the
+        // geometric pair already detected).
+        if ( conn.face() != StructGridInterface::NO_FACE && ( fIdx1 < 0 || fIdx2 < 0 ) && unNamedFaultIdx >= 0 &&
+             unNamedFaultWithInactiveIdx >= 0 )
         {
-            cvf::String lgrString( "Same Grid" );
-            if ( cell( conn.c1GlobIdx() ).hostGrid() != cell( conn.c2GlobIdx() ).hostGrid() )
-            {
-                lgrString = "Different Grid";
-            }
+            const size_t c1 = conn.c1GlobIdx();
+            const size_t c2 = conn.c2GlobIdx();
 
-            // cvf::Trace::show("NNC: No Fault for NNC C1: " + cvf::String((int)conn.m_c1GlobIdx) + " C2: " +
-            // cvf::String((int)conn.m_c2GlobIdx) + " Grid: " + lgrString);
+            if ( !cell( c1 ).isInvalid() && !cell( c2 ).isInvalid() )
+            {
+                const bool sameHostGrid = cell( c1 ).hostGrid() == cell( c2 ).hostGrid();
+
+                // Connections that cross grids (LGR boundaries) are pushed to the
+                // "with inactive" fault, mirroring how the geometric pass treats them.
+                const int targetFaultIdx = sameHostGrid ? unNamedFaultIdx : unNamedFaultWithInactiveIdx;
+
+                // Only update the accumulator for sides that are not already assigned, so we do not
+                // overwrite an existing fault assignment with this one.
+                if ( fIdx1 < 0 )
+                {
+                    m_faultsPrCellAcc->setFaultIdx( c1, conn.face(), targetFaultIdx );
+                    fIdx1 = targetFaultIdx;
+                }
+                if ( fIdx2 < 0 )
+                {
+                    m_faultsPrCellAcc->setFaultIdx( c2, StructGridInterface::oppositeFace( conn.face() ), targetFaultIdx );
+                    fIdx2 = targetFaultIdx;
+                }
+
+                m_faults[targetFaultIdx]->faultFaces().push_back( RigFault::FaultFace( c1, conn.face(), c2 ) );
+            }
         }
 
         if ( fIdx1 >= 0 )
