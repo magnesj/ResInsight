@@ -549,8 +549,8 @@ void RigMainGrid::addFaultFacesFromNNCs( const RigActiveCellInfo* activeCellInfo
 
     for ( size_t nncIdx = 0; nncIdx < nncs.size(); ++nncIdx )
     {
-        const RigConnection&               conn = nncs[nncIdx];
-        StructGridInterface::FaceType      face = conn.face();
+        const RigConnection&          conn = nncs[nncIdx];
+        StructGridInterface::FaceType face = conn.face();
         if ( face == StructGridInterface::NO_FACE ) continue;
 
         const size_t c1 = conn.c1GlobIdx();
