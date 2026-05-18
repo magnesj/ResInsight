@@ -67,8 +67,8 @@ TEST( RigDrogonHistNestedFaultTest, DISABLED_AddFaultFacesFromNNCs )
     {
         const RigFault* fault = mainGrid->faults().at( i );
         totalFaultFaces += fault->faultFaces().size();
-        qDebug() << "Fault" << static_cast<int>( i ) << ":" << fault->name() << "-"
-                 << static_cast<int>( fault->faultFaces().size() ) << "faces";
+        qDebug() << "Fault" << static_cast<int>( i ) << ":" << fault->name() << "-" << static_cast<int>( fault->faultFaces().size() )
+                 << "faces";
     }
     EXPECT_GT( totalFaultFaces, 0u );
 
