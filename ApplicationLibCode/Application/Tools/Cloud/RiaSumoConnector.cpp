@@ -81,34 +81,12 @@ void RiaSumoConnector::requestCasesForField( const QString& fieldName )
 {
     m_cases.clear();
 
-    requestTokenBlocking();
-
     QNetworkRequest m_networkRequest;
-    m_networkRequest.setUrl( QUrl( constructSearchUrl( m_server ) ) );
+    QString url = QString( "http://localhost:8000/cases?asset_name=%1" ).arg( fieldName );
+    m_networkRequest.setUrl( QUrl( url ) );
+    m_networkRequest.setHeader( QNetworkRequest::ContentTypeHeader, RiaCloudDefines::contentTypeJson() );
 
-    addStandardHeader( m_networkRequest, token(), RiaCloudDefines::contentTypeJson() );
-
-    QString payloadTemplate = R"(
-{
-    "query": {
-        "bool": {
-            "filter": [
-                        {"term":{"class.keyword":"case"}},
-                        {"term":{"access.asset.name.keyword":"%1"}}
-            ]
-        }
-    },
-    "sort": [
-            {"tracklog.datetime":{"order":"desc"}}
-    ],
-    "track_total_hits":true,
-    "size":100,
-    "from":0
-}
-)";
-
-    QString payload = payloadTemplate.arg( fieldName );
-    auto    reply   = m_networkAccessManager->post( m_networkRequest, payload.toUtf8() );
+    auto reply = m_networkAccessManager->get( m_networkRequest );
 
     connect( reply,
              &QNetworkReply::finished,
@@ -136,12 +114,9 @@ void RiaSumoConnector::requestCasesForFieldBlocking( const QString& fieldName )
 //--------------------------------------------------------------------------------------------------
 void RiaSumoConnector::requestAssets()
 {
-    requestTokenBlocking();
-
     QNetworkRequest m_networkRequest;
-    m_networkRequest.setUrl( QUrl( m_server + "/api/v1/userpermissions" ) );
-
-    addStandardHeader( m_networkRequest, token(), RiaCloudDefines::contentTypeJson() );
+    m_networkRequest.setUrl( QUrl( "http://localhost:8000/assets" ) );
+    m_networkRequest.setHeader( QNetworkRequest::ContentTypeHeader, RiaCloudDefines::contentTypeJson() );
 
     auto reply = m_networkAccessManager->get( m_networkRequest );
 
@@ -171,79 +146,12 @@ void RiaSumoConnector::requestAssetsBlocking()
 //--------------------------------------------------------------------------------------------------
 void RiaSumoConnector::requestEnsembleByCasesId( const SumoCaseId& caseId )
 {
-    requestTokenBlocking();
-
-    // See the following file for query definition
-    // https://github.com/equinor/fmu-sumo/blob/main/src/fmu/sumo/explorer/objects/case.py
-
-    QString payloadTemplate = R"(
-
- {
-        "query": {
-            "term": {
-                "fmu.case.uuid.keyword": "%1"
-            }
-        },
-        "aggs": {
-            "ensemble_uuids": {
-                "terms": {
-                    "field": "fmu.ensemble.uuid.keyword",
-                    "size": 100
-                }
-            },
-            "ensemble_names": {
-                "terms": {
-                    "field": "fmu.ensemble.name.keyword",
-                    "size": 100
-                }
-            },
-            "data_types": {
-                "terms": {
-                    "field": "class.keyword",
-                    "size": 100
-                }
-            },
-            "ensembles": {
-                "terms": {
-                    "field": "fmu.ensemble.uuid.keyword",
-                    "size": 100
-                },
-                "aggs": {
-                    "ensemble_name": {
-                        "terms": {
-                            "field": "fmu.ensemble.name.keyword",
-                            "size": 100
-                        }
-                    },
-                    "numreal": {
-                        "cardinality": {
-                            "field": "fmu.realization.id"
-                        }
-                    },
-                    "maxreal": {
-                        "max": {
-                            "field": "fmu.realization.id"
-                        }
-                    },
-                    "minreal": {
-                        "min": {
-                            "field": "fmu.realization.id"
-                        }
-                    }
-                }
-            }
-        },
-        "size": 0
-    }
-)";
-
     QNetworkRequest m_networkRequest;
-    m_networkRequest.setUrl( QUrl( m_server + "/api/v1/search" ) );
+    QString url = QString( "http://localhost:8000/cases/%1/ensembles" ).arg( caseId.get() );
+    m_networkRequest.setUrl( QUrl( url ) );
+    m_networkRequest.setHeader( QNetworkRequest::ContentTypeHeader, RiaCloudDefines::contentTypeJson() );
 
-    addStandardHeader( m_networkRequest, token(), RiaCloudDefines::contentTypeJson() );
-
-    auto payload = payloadTemplate.arg( caseId.get() );
-    auto reply   = m_networkAccessManager->post( m_networkRequest, payload.toUtf8() );
+    auto reply = m_networkAccessManager->get( m_networkRequest );
 
     connect( reply,
              &QNetworkReply::finished,
@@ -261,9 +169,6 @@ void RiaSumoConnector::requestEnsembleByCasesId( const SumoCaseId& caseId )
 //--------------------------------------------------------------------------------------------------
 void RiaSumoConnector::parseEnsembleNames( QNetworkReply* reply, const SumoCaseId& caseId )
 {
-    // See the following file for parsing of the reply
-    // https://github.com/equinor/fmu-sumo/blob/main/src/fmu/sumo/explorer/objects/case.py
-
     QByteArray result = reply->readAll();
     reply->deleteLater();
 
@@ -271,17 +176,12 @@ void RiaSumoConnector::parseEnsembleNames( QNetworkReply* reply, const SumoCaseI
     {
         m_ensembleNames.clear();
 
-        QJsonDocument doc                      = QJsonDocument::fromJson( result );
-        QJsonObject   jsonObj                  = doc.object();
-        QJsonObject   aggregationsObject       = jsonObj["aggregations"].toObject();
-        QJsonObject   aggregationColumnsObject = aggregationsObject["ensemble_names"].toObject();
+        QJsonDocument doc = QJsonDocument::fromJson( result );
+        QJsonArray jsonArray = doc.array();
 
-        QJsonArray bucketsArray = aggregationColumnsObject["buckets"].toArray();
-        for ( const QJsonValue& bucket : bucketsArray )
+        for ( const QJsonValue& value : jsonArray )
         {
-            QJsonObject bucketObj    = bucket.toObject();
-            auto        ensembleName = bucketObj["key"].toString();
-
+            QString ensembleName = value.toString();
             m_ensembleNames.push_back( { caseId, ensembleName } );
         }
 
@@ -377,43 +277,14 @@ void RiaSumoConnector::requestVectorNamesForEnsembleBlocking( const SumoCaseId& 
 //--------------------------------------------------------------------------------------------------
 void RiaSumoConnector::requestRealizationIdsForEnsemble( const SumoCaseId& caseId, const QString& ensembleName )
 {
-    QString payloadTemplate = R"(
-{
-    "track_total_hits": true,
-    "query": {
-        "bool": {
-            "must": [
-                {"term": {"class": "table"}},
-                {"term": {"_sumo.parent_object.keyword": "%1"}},
-                {"term": {"fmu.ensemble.name.keyword": "%2"}},
-                {"term": {"fmu.context.stage.keyword": "iteration"}},
-                {"term": {"fmu.aggregation.operation.keyword": "collection"}},
-                {"term": {"data.tagname.keyword": "summary"}},
-                {"term": {"data.content.keyword": "timeseries"}}
-            ]
-        }
-    },
-    "aggs": {
-        "realization-ids": {
-            "terms": {
-                "field": "fmu.aggregation.realization_ids",
-                "size": 1000
-            }
-        }
-    },
-    "_source": false,
-    "size": 0
-}
-)";
     m_realizationIds.clear();
 
     QNetworkRequest m_networkRequest;
-    m_networkRequest.setUrl( QUrl( m_server + "/api/v1/search" ) );
+    QString url = QString( "http://localhost:8000/cases/%1/ensembles/%2/realizations" ).arg( caseId.get() ).arg( ensembleName );
+    m_networkRequest.setUrl( QUrl( url ) );
+    m_networkRequest.setHeader( QNetworkRequest::ContentTypeHeader, RiaCloudDefines::contentTypeJson() );
 
-    addStandardHeader( m_networkRequest, token(), RiaCloudDefines::contentTypeJson() );
-
-    auto payload = payloadTemplate.arg( caseId.get() ).arg( ensembleName );
-    auto reply   = m_networkAccessManager->post( m_networkRequest, payload.toUtf8() );
+    auto reply = m_networkAccessManager->get( m_networkRequest );
 
     connect( reply,
              &QNetworkReply::finished,
@@ -783,17 +654,15 @@ void RiaSumoConnector::parseAssets( QNetworkReply* reply )
 
     if ( reply->error() == QNetworkReply::NoError )
     {
-        QJsonDocument doc     = QJsonDocument::fromJson( result );
-        QJsonObject   jsonObj = doc.object();
+        QJsonDocument doc = QJsonDocument::fromJson( result );
+        QJsonArray jsonArray = doc.array();
 
         m_assets.clear();
 
-        for ( auto key : jsonObj.keys() )
+        for ( const QJsonValue& value : jsonArray )
         {
-            QString id;
-            QString kind;
-            QString fieldName = key;
-            m_assets.push_back( SumoAsset{ SumoAssetId( id ), kind, fieldName } );
+            QString assetName = value.toString();
+            m_assets.push_back( SumoAsset{ SumoAssetId( "" ), "", assetName } );
         }
 
         for ( auto a : m_assets )
@@ -819,24 +688,19 @@ void RiaSumoConnector::parseCases( QNetworkReply* reply )
 
     if ( reply->error() == QNetworkReply::NoError )
     {
-        QJsonDocument doc         = QJsonDocument::fromJson( result );
-        QJsonObject   jsonObj     = doc.object();
-        QJsonObject   rootHits    = jsonObj["hits"].toObject();
-        QJsonArray    hitsObjects = rootHits["hits"].toArray();
+        QJsonDocument doc = QJsonDocument::fromJson( result );
+        QJsonArray jsonArray = doc.array();
 
         m_cases.clear();
 
-        for ( const QJsonValue& value : hitsObjects )
+        for ( const QJsonValue& value : jsonArray )
         {
-            QJsonObject resultObj = value.toObject();
-            QJsonObject sourceObj = resultObj["_source"].toObject();
-            QJsonObject fmuObj    = sourceObj["fmu"].toObject();
-            QJsonObject fmuCase   = fmuObj["case"].toObject();
+            QJsonObject caseObj = value.toObject();
 
-            QString id        = resultObj["_id"].toString();
-            QString kind      = "";
-            QString fieldName = fmuCase["name"].toString();
-            m_cases.push_back( SumoCase{ SumoCaseId( id ), kind, fieldName } );
+            QString id   = caseObj["id"].toString();
+            QString kind = "";
+            QString name = caseObj["name"].toString();
+            m_cases.push_back( SumoCase{ SumoCaseId( id ), kind, name } );
         }
 
         RiaLogging::debug( std::format( "Case count : {}", m_cases.size() ) );
@@ -892,16 +756,12 @@ void RiaSumoConnector::parseRealizationNumbers( QNetworkReply* reply, const Sumo
 
     if ( reply->error() == QNetworkReply::NoError )
     {
-        QJsonDocument doc     = QJsonDocument::fromJson( result );
-        QJsonObject   jsonObj = doc.object();
+        QJsonDocument doc = QJsonDocument::fromJson( result );
+        QJsonArray jsonArray = doc.array();
 
-        QJsonArray hits = jsonObj["aggregations"].toObject()["realization-ids"].toObject()["buckets"].toArray();
-        for ( const auto& hit : hits )
+        for ( const QJsonValue& value : jsonArray )
         {
-            QJsonObject resultObj = hit.toObject();
-            auto        val       = resultObj.value( "key" );
-            auto        intValue  = val.toInt();
-
+            int intValue = value.toInt();
             auto realizationId = QString::number( intValue );
             m_realizationIds.push_back( realizationId );
         }
