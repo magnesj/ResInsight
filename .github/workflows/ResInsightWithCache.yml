@@ -205,6 +205,9 @@ jobs:
         shell: bash
         run: echo "sha=$(git rev-parse HEAD:ThirdParty/vcpkg)" >> $GITHUB_OUTPUT
 
+      - name: Print vcpkg key
+        run: echo "vcpkg key: ${{ runner.os }}-${{ matrix.config.cxx }}-${{ steps.vcpkg_sha.outputs.sha }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}"
+        
       - name: Restore vcpkg cache
         id: vcpkg-cache
         uses: CeetronSolutions/vcpkg-cache@copilot/optimize-cache-storage-structure
