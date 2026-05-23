@@ -143,6 +143,29 @@ TEST( RigStatisticsMath, HistogramPercentiles )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+TEST( RigStatisticsMath, HistogramCalculations )
+{
+    std::vector<size_t>    histogram;
+    RigHistogramCalculator histCalc( 0.0, 10.0, 5, &histogram );
+
+    std::vector<double> values{ 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, HUGE_VAL, -HUGE_VAL };
+    histCalc.addData( values );
+
+    ASSERT_EQ( 5u, histogram.size() );
+    EXPECT_EQ( 3u, histogram[0] );
+    EXPECT_EQ( 2u, histogram[1] );
+    EXPECT_EQ( 3u, histogram[2] );
+    EXPECT_EQ( 2u, histogram[3] );
+    EXPECT_EQ( 1u, histogram[4] );
+
+    EXPECT_DOUBLE_EQ( 0.0, histCalc.calculatePercentil( 0.0, RigStatisticsMath::PercentileStyle::REGULAR ) );
+    EXPECT_DOUBLE_EQ( 10.0, histCalc.calculatePercentil( 1.0, RigStatisticsMath::PercentileStyle::REGULAR ) );
+    EXPECT_NEAR( 4.333333333333333, histCalc.calculatePercentil( 0.5, RigStatisticsMath::PercentileStyle::REGULAR ), 1e-12 );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 TEST( RigStatisticsMath, InterpolatedPercentiles )
 {
     std::vector<double> values;
