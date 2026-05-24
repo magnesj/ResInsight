@@ -20,6 +20,7 @@
 
 #include "RimSummaryEnsembleParameter.h"
 
+#include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmUiTreeOrdering.h"
 
 CAF_PDM_SOURCE_INIT( RimSummaryEnsembleParameterCollection, "RimSummaryEnsembleParameterCollection" );
@@ -104,6 +105,14 @@ void RimSummaryEnsembleParameterCollection::updateUiTreeOrdering( caf::PdmUiTree
     {
         subnode->add( p );
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryEnsembleParameterCollection::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
+{
+    menuBuilder << "RicCreateEnsembleParameterCsvReportFeature";
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -27,6 +27,11 @@
 
 class RimSummaryEnsembleParameter;
 
+namespace caf
+{
+class CmdFeatureMenuBuilder;
+}
+
 class RimSummaryEnsembleParameterCollection : public RimNamedObject
 {
     CAF_PDM_HEADER_INIT;
@@ -46,6 +51,8 @@ public:
     bool isEmpty() const;
 
     void updateUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering ) const;
+
+    void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
 
 private:
     caf::PdmChildArrayField<RimSummaryEnsembleParameter*> m_parameters;
