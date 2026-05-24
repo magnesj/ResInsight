@@ -143,6 +143,46 @@ TEST( RigStatisticsMath, HistogramPercentiles )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+TEST( RigStatisticsMath, HistogramPercentilesSwitchedStyle )
+{
+    std::vector<double> values;
+    values.push_back( HUGE_VAL );
+    values.push_back( 2788.2723335651900 );
+    values.push_back( -22481.0927881701000 );
+    values.push_back( 68778.6851686236000 );
+    values.push_back( -76092.8157632591000 );
+    values.push_back( 6391.97999909729003 );
+    values.push_back( 65930.1200169780000 );
+    values.push_back( -27696.2320267235000 );
+    values.push_back( -HUGE_VAL );
+    values.push_back( -HUGE_VAL );
+    values.push_back( 96161.7546348456000 );
+    values.push_back( 73875.6716288563000 );
+    values.push_back( 80720.4378655615000 );
+    values.push_back( -98649.8109937874000 );
+    values.push_back( 99372.9362079615000 );
+    values.push_back( HUGE_VAL );
+    values.push_back( -57020.4389966513000 );
+
+    double min, max, range, mean, stdev;
+    RigStatisticsMath::calculateBasicStatistics( values, &min, &max, nullptr, &range, &mean, &stdev );
+
+    std::vector<size_t>    histogram;
+    RigHistogramCalculator histCalc( min, max, 100, &histogram );
+    histCalc.addData( values );
+
+    double p10 = histCalc.calculatePercentil( 0.1, RigStatisticsMath::PercentileStyle::SWITCHED );
+    double p50 = histCalc.calculatePercentil( 0.5, RigStatisticsMath::PercentileStyle::SWITCHED );
+    double p90 = histCalc.calculatePercentil( 0.9, RigStatisticsMath::PercentileStyle::SWITCHED );
+
+    EXPECT_DOUBLE_EQ( 94818.413022321271, p10 );
+    EXPECT_DOUBLE_EQ( 5312.1312871307755, p50 );
+    EXPECT_DOUBLE_EQ( -76273.240559989776, p90 );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 TEST( RigStatisticsMath, InterpolatedPercentiles )
 {
     std::vector<double> values;
