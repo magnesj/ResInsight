@@ -217,6 +217,14 @@ if(RESINSIGHT_FOUND_HDF5)
 endif()
 
 #
+# RESQML (fesapi)
+#
+if(RESINSIGHT_FOUND_RESQML)
+  add_definitions(-DRESINSIGHT_HAVE_RESQML)
+  list(APPEND RI_PRIVATE_INCLUDES "${CMAKE_SOURCE_DIR}/ThirdParty/fesapi/src")
+endif()
+
+#
 # OpenTelemetry
 #
 set(OPENTELEMETRY_FILES

@@ -127,6 +127,7 @@ protected: // only for use by file readers and internal services. TODO: replace 
     friend class RifEclipseOutputFileTools;
     friend class RifReaderEclipseOutput;
     friend class RifReaderOpmCommon;
+    friend class RifResqmlFileTools;
     friend class RiaGrpcCaseService;
     friend class RiaGrpcActiveCellInfoStateHandler;
     friend class RicCreateTemporaryLgrFeature;

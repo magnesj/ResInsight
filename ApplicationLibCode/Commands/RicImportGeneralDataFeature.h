@@ -43,12 +43,14 @@ public:
         QStringList eclipseInputFiles;
         QStringList eclipseSummaryFiles;
         QStringList roffFiles;
+        QStringList resqmlFiles;
 
         std::vector<int> createdCaseIds;
 
         operator bool() const
         {
-            return !( eclipseCaseFiles.empty() && eclipseInputFiles.empty() && eclipseSummaryFiles.empty() && roffFiles.empty() );
+            return !( eclipseCaseFiles.empty() && eclipseInputFiles.empty() && eclipseSummaryFiles.empty() && roffFiles.empty() &&
+                      resqmlFiles.empty() );
         }
     };
 
@@ -85,4 +87,6 @@ protected:
     static bool openRoffFilesFromFileNames( const QStringList& fileNames, bool createDefaultView, std::vector<int>& createdCaseIds );
     static bool openRoffCasesFromFileNames( const QStringList& fileNames, bool createDefaultView, std::vector<int>& createdCaseIds );
     static bool openRoffCaseAndPropertiesFromFileNames( const QStringList& fileNames, bool createDefaultView, std::vector<int>& createdCaseIds );
+
+    static bool openResqmlFilesFromFileNames( const QStringList& fileNames, bool createDefaultView, std::vector<int>& createdCaseIds );
 };

@@ -29,6 +29,7 @@
 #include "RimEclipseInputPropertyCollection.h"
 #include "RimEclipseResultCase.h"
 #include "RimEclipseView.h"
+#include "RimResqmlCase.h"
 #include "RimRoffCase.h"
 
 #include "Riu3DMainWindowTools.h"
@@ -50,6 +51,7 @@ bool RicAddEclipseInputPropertyFeature::isCommandEnabled() const
     return caf::SelectionManager::instance()->selectedItemOfType<RimEclipseInputCase>() ||
            caf::SelectionManager::instance()->selectedItemOfType<RimEclipseResultCase>() ||
            caf::SelectionManager::instance()->selectedItemOfType<RimRoffCase>() ||
+           caf::SelectionManager::instance()->selectedItemOfType<RimResqmlCase>() ||
            caf::SelectionManager::instance()->selectedItemOfType<RimEclipseCellColors>() ||
            caf::SelectionManager::instance()->selectedItemOfType<RimEclipseView>();
 }

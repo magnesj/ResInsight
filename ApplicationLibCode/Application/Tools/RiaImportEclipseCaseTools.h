@@ -28,6 +28,7 @@
 class QString;
 class RimIdenticalGridCaseGroup;
 class RimRoffCase;
+class RimResqmlCase;
 
 struct RifReaderSettings;
 
@@ -61,6 +62,9 @@ public:
 
     static std::vector<int> openRoffCasesFromFileNames( const QStringList& fileNames, bool createDefaultView );
     static RimRoffCase*     openRoffCaseFromFileName( const QString& fileName, bool createDefaultView );
+
+    static std::vector<int> openResqmlCasesFromFileNames( const QStringList& fileNames, bool createDefaultView );
+    static RimResqmlCase*   openResqmlCaseFromFileName( const QString& fileName, bool createDefaultView );
 
     static bool openEmFilesFromFileNames( const QStringList& fileNames, bool createDefaultView, std::vector<int>& createdCaseIds );
 

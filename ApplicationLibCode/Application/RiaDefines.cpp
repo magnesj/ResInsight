@@ -316,6 +316,10 @@ RiaDefines::ImportFileType RiaDefines::obtainFileTypeFromFileName( const QString
     {
         return ImportFileType::ROFF_FILE;
     }
+    else if ( fileName.endsWith( "epc", Qt::CaseInsensitive ) )
+    {
+        return ImportFileType::RESQML_FILE;
+    }
     else if ( fileName.endsWith( "SMSPEC", Qt::CaseInsensitive ) )
     {
         return ImportFileType::ECLIPSE_SUMMARY_FILE;
