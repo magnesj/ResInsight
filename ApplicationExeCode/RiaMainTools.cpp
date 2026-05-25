@@ -47,7 +47,12 @@
 
 #ifndef WIN32
 #include <signal.h>
+// macOS marks <ucontext.h> as deprecated and the mcontext layout
+// (gregs[REG_RIP]) is Linux-only — skip the program-counter capture
+// path on Apple platforms.  See #14045.
+#ifndef __APPLE__
 #include <ucontext.h>
+#endif
 #endif
 
 namespace internal
@@ -225,6 +230,12 @@ void manageSegFailureSA( int signalCode, siginfo_t* info, void* ucontext )
         }
     }
 
+    // Program-counter capture relies on the Linux ucontext layout
+    // (gregs[REG_RIP] for x86_64, mcontext.pc for aarch64).  macOS exposes
+    // a different layout and marks <ucontext.h> as deprecated, so skip it
+    // there; remaining crash attributes (signal code, fault address) are
+    // still recorded.  See #14045.
+#if !defined( __APPLE__ )
 #if defined( __x86_64__ )
     if ( ucontext )
     {
@@ -241,6 +252,9 @@ void manageSegFailureSA( int signalCode, siginfo_t* info, void* ucontext )
         pcStr << "0x" << std::hex << ctx->uc_mcontext.pc;
         extraAttrs["crash.program_counter"] = pcStr.str();
     }
+#endif
+#else
+    (void)ucontext;
 #endif
 
     performCrashLogging( signalCode, extraAttrs );
