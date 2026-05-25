@@ -90,6 +90,23 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   add_definitions(-DCVF_LINUX)
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   add_definitions(-DCVF_OSX)
+
+  # macOS: Apple's SDK ships an older libc++ that lacks C++23 symbols ResInsight
+  # needs (std::to_chars(double), std::bad_expected_access, etc.).  Homebrew
+  # llvm packages place their own libc++ at <prefix>/lib/c++, but clang does
+  # not add that to its default link search, so -lc++ resolves to the SDK copy
+  # via -isysroot.  Prepend the toolchain's libc++ dir to the linker search
+  # (and rpath for runtime) when we detect a Homebrew layout.  See #14045.
+  get_filename_component(_ri_llvm_bin_dir "${CMAKE_CXX_COMPILER}" DIRECTORY)
+  get_filename_component(_ri_llvm_root "${_ri_llvm_bin_dir}" DIRECTORY)
+  set(_ri_llvm_libcxx_dir "${_ri_llvm_root}/lib/c++")
+  if(EXISTS "${_ri_llvm_libcxx_dir}/libc++.dylib")
+    message(STATUS "macOS: forcing toolchain libc++ from ${_ri_llvm_libcxx_dir}")
+    add_link_options(
+      "-L${_ri_llvm_libcxx_dir}"
+      "-Wl,-rpath,${_ri_llvm_libcxx_dir}"
+    )
+  endif()
 elseif(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
   set(_HAS_STD_BYTE 0)
@@ -446,7 +463,15 @@ endif()
 # OpenVDS seismic file access
 # ##############################################################################
 
-option(RESINSIGHT_ENABLE_OPENVDS "Add support for OpenVDS seismic files" ON)
+# Bluware only ships Windows and Linux binaries (manylinux_2014); there is no
+# macOS distribution.  Default to OFF on Apple platforms so the feature can be
+# explicitly opted in if the user supplies their own build.  See #14045.
+if(APPLE)
+  set(_ri_default_openvds OFF)
+else()
+  set(_ri_default_openvds ON)
+endif()
+option(RESINSIGHT_ENABLE_OPENVDS "Add support for OpenVDS seismic files" ${_ri_default_openvds})
 
 if(RESINSIGHT_ENABLE_OPENVDS)
   message(STATUS "Starting download of external library OpenVDS ...")
