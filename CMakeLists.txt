@@ -570,6 +570,42 @@ list(APPEND THIRD_PARTY_LIBRARIES NRLib)
 
 add_definitions(-DOPENZGY_STATIC)
 
+# macOS: openzgy assumes the glibc strerror_r signature and unconditionally
+# includes <omp.h>.  Apply a local patch that stubs OpenMP and rewrites the
+# strerror_r fallback so the vendored sources compile without libomp.  The
+# patch is idempotent via git apply --reverse --check.
+if(APPLE)
+  set(CMAKE_DISABLE_FIND_PACKAGE_OpenMP
+      ON
+      CACHE BOOL "openzgy is patched to not require OpenMP on macOS" FORCE
+  )
+  set(_openzgy_macos_patch
+      "${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/openzgy-patches/macos-disable-openmp.patch"
+  )
+  execute_process(
+    COMMAND git apply --reverse --check "${_openzgy_macos_patch}"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/openzgy"
+    RESULT_VARIABLE _openzgy_already_applied
+    OUTPUT_QUIET ERROR_QUIET
+  )
+  if(NOT _openzgy_already_applied EQUAL 0)
+    message(STATUS "openzgy: applying macOS OpenMP-disable patch")
+    execute_process(
+      COMMAND git apply "${_openzgy_macos_patch}"
+      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/openzgy"
+      RESULT_VARIABLE _openzgy_apply_result
+    )
+    if(NOT _openzgy_apply_result EQUAL 0)
+      message(
+        FATAL_ERROR
+          "openzgy: failed to apply ${_openzgy_macos_patch} - openzgy source may have been re-vendored; refresh the patch."
+      )
+    endif()
+  else()
+    message(STATUS "openzgy: macOS patch already applied")
+  endif()
+endif()
+
 # Suppress CMake deprecation warnings from openzgy/zfp's old CMakeLists.txt
 set(CMAKE_WARN_DEPRECATED
     OFF
