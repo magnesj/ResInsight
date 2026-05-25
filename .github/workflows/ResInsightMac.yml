@@ -53,6 +53,15 @@ jobs:
           echo '__version__ = "0.0.0.dev"' > GrpcInterface/Python/rips/_version.py
           pip install -e GrpcInterface/Python[dev]
 
+      - name: Install Homebrew build tools
+        # vcpkg's thrift port (transitive dep of arrow) requires bison > 2.5;
+        # macOS ships an ancient /usr/bin/bison (2.3).  Install Homebrew's
+        # bison and put it ahead on PATH so the port build finds it.
+        run: |
+          brew install bison
+          echo "$(brew --prefix bison)/bin" >> "$GITHUB_PATH"
+          "$(brew --prefix bison)/bin/bison" --version | head -1
+
       - name: Install Qt
         uses: CeetronSolutions/install-qt-action@bump-node24
         with:
