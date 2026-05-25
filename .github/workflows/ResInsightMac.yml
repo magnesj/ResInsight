@@ -54,20 +54,48 @@ jobs:
           echo '__version__ = "0.0.0.dev"' > GrpcInterface/Python/rips/_version.py
           pip install -e GrpcInterface/Python[dev]
 
-      - name: Setup buildcache
-        uses: CeetronSolutions/setup-buildcache-action@v1.1
+      - name: Restore buildcache tool binary
+        uses: actions/cache@v5
+        with:
+          path: ${{ github.workspace }}/buildcache-tool
+          key: ${{ runner.os }}-buildcache-tool-v0.33.0
+
+      - name: Build buildcache from source if needed
+        # CeetronSolutions/setup-buildcache-action has no macOS support, so
+        # build the binary from the upstream source release and add it to
+        # PATH.  Source build (~30 s) only happens on cache miss; subsequent
+        # runs restore the binary from the cache step above.
+        env:
+          BUILDCACHE_VERSION: v0.33.0
+          BUILDCACHE_PREFIX: ${{ github.workspace }}/buildcache-tool
+        run: |
+          if [ ! -x "$BUILDCACHE_PREFIX/bin/buildcache" ]; then
+            workdir="$RUNNER_TEMP/buildcache-src"
+            mkdir -p "$workdir" "$BUILDCACHE_PREFIX"
+            cd "$workdir"
+            curl -sSL "https://gitlab.com/bits-n-bites/buildcache/-/archive/${BUILDCACHE_VERSION}/buildcache-${BUILDCACHE_VERSION}.tar.gz" \
+              | tar xz --strip-components=1
+            cmake -S src -B build -G Ninja \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_INSTALL_PREFIX="$BUILDCACHE_PREFIX"
+            cmake --build build --target install
+          fi
+          echo "$BUILDCACHE_PREFIX/bin" >> "$GITHUB_PATH"
+          "$BUILDCACHE_PREFIX/bin/buildcache" --version
 
       - name: Get current date
         id: current-time
         shell: bash
         run: echo "formattedTime=$(date -u +%Y-%m-%d)" >> $GITHUB_OUTPUT
 
-      - name: Cache Buildcache
+      - name: Cache buildcache contents
         id: cache-buildcache
         uses: actions/cache@v5
         with:
           path: ${{ env.BUILDCACHE_DIR }}
-          key: ${{ runner.os }}-appleclang-6.7.0-cache-v01-${{ steps.current-time.outputs.formattedTime }}
+          key: ${{ runner.os }}-appleclang-6.7.0-buildcache-v01-${{ steps.current-time.outputs.formattedTime }}
+          restore-keys: |
+            ${{ runner.os }}-appleclang-6.7.0-buildcache-v01-
 
       - name: Create folder for buildcache
         run: mkdir -p "${{ env.BUILDCACHE_DIR }}"
@@ -117,6 +145,8 @@ jobs:
           -DCMAKE_INSTALL_PREFIX=cmakebuild/install
           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
           -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+          -DCMAKE_C_COMPILER_LAUNCHER=buildcache
+          -DCMAKE_CXX_COMPILER_LAUNCHER=buildcache
           -DRESINSIGHT_INCLUDE_APPLICATION_UNIT_TESTS=true
           -DRESINSIGHT_TREAT_WARNINGS_AS_ERRORS=false
           -DRESINSIGHT_ENABLE_PRECOMPILED_HEADERS=false
