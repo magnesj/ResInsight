@@ -25,6 +25,8 @@ jobs:
     env:
       BUILD_TYPE: Release
       VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+      BUILDCACHE_DIR: ${{ github.workspace }}/buildcache_dir
+      BUILDCACHE_ACCURACY: SLOPPY
 
     steps:
       - name: Checkout
@@ -51,6 +53,24 @@ jobs:
           # fallback so the editable install below can resolve the version.
           echo '__version__ = "0.0.0.dev"' > GrpcInterface/Python/rips/_version.py
           pip install -e GrpcInterface/Python[dev]
+
+      - name: Setup buildcache
+        uses: CeetronSolutions/setup-buildcache-action@v1.1
+
+      - name: Get current date
+        id: current-time
+        shell: bash
+        run: echo "formattedTime=$(date -u +%Y-%m-%d)" >> $GITHUB_OUTPUT
+
+      - name: Cache Buildcache
+        id: cache-buildcache
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.BUILDCACHE_DIR }}
+          key: ${{ runner.os }}-appleclang-6.7.0-cache-v01-${{ steps.current-time.outputs.formattedTime }}
+
+      - name: Create folder for buildcache
+        run: mkdir -p "${{ env.BUILDCACHE_DIR }}"
 
       - name: Install Homebrew build tools
         # vcpkg's thrift port (transitive dep of arrow) requires bison > 2.5;
@@ -109,6 +129,9 @@ jobs:
       - name: Build
         run: |
           cmake --build cmakebuild --target install
+
+      - name: Stats for buildcache
+        run: buildcache -s
 
       - name: Run Unit Tests
         shell: bash
