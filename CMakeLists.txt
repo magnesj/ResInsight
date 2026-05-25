@@ -47,9 +47,9 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     )
   endif()
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-  # AppleClang versions trail mainline LLVM by ~2 majors; AppleClang 17 in
-  # Xcode 16 is based on LLVM 19 and ships a libc++ with the C++23 features
-  # we use.  Reject earlier AppleClang explicitly.
+  # AppleClang versions trail mainline LLVM by ~2 majors; AppleClang 17 in Xcode
+  # 16 is based on LLVM 19 and ships a libc++ with the C++23 features we use.
+  # Reject earlier AppleClang explicitly.
   if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17.0)
     message(
       FATAL_ERROR
@@ -105,18 +105,19 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
   # macOS: Apple's SDK ships an older libc++ that lacks C++23 symbols ResInsight
   # needs (std::to_chars(double), std::bad_expected_access, etc.).  Homebrew
-  # llvm packages place their own libc++ at <prefix>/lib/c++, but clang does
-  # not add that to its default link search, so -lc++ resolves to the SDK copy
-  # via -isysroot.  Prepend the toolchain's libc++ dir to the linker search
-  # (and rpath for runtime) when we detect a Homebrew layout.  See #14045.
+  # llvm packages place their own libc++ at <prefix>/lib/c++, but clang does not
+  # add that to its default link search, so -lc++ resolves to the SDK copy via
+  # -isysroot.  Prepend the toolchain's libc++ dir to the linker search (and
+  # rpath for runtime) when we detect a Homebrew layout.  See #14045.
   get_filename_component(_ri_llvm_bin_dir "${CMAKE_CXX_COMPILER}" DIRECTORY)
   get_filename_component(_ri_llvm_root "${_ri_llvm_bin_dir}" DIRECTORY)
   set(_ri_llvm_libcxx_dir "${_ri_llvm_root}/lib/c++")
   if(EXISTS "${_ri_llvm_libcxx_dir}/libc++.dylib")
-    message(STATUS "macOS: forcing toolchain libc++ from ${_ri_llvm_libcxx_dir}")
+    message(
+      STATUS "macOS: forcing toolchain libc++ from ${_ri_llvm_libcxx_dir}"
+    )
     add_link_options(
-      "-L${_ri_llvm_libcxx_dir}"
-      "-Wl,-rpath,${_ri_llvm_libcxx_dir}"
+      "-L${_ri_llvm_libcxx_dir}" "-Wl,-rpath,${_ri_llvm_libcxx_dir}"
     )
   endif()
 elseif(MSVC)
@@ -483,7 +484,9 @@ if(APPLE)
 else()
   set(_ri_default_openvds ON)
 endif()
-option(RESINSIGHT_ENABLE_OPENVDS "Add support for OpenVDS seismic files" ${_ri_default_openvds})
+option(RESINSIGHT_ENABLE_OPENVDS "Add support for OpenVDS seismic files"
+       ${_ri_default_openvds}
+)
 
 if(RESINSIGHT_ENABLE_OPENVDS)
   message(STATUS "Starting download of external library OpenVDS ...")
@@ -609,8 +612,8 @@ add_definitions(-DOPENZGY_STATIC)
 
 # macOS: openzgy assumes the glibc strerror_r signature and unconditionally
 # includes <omp.h>.  Apply a local patch that stubs OpenMP and rewrites the
-# strerror_r fallback so the vendored sources compile without libomp.  The
-# patch is idempotent via git apply --reverse --check.
+# strerror_r fallback so the vendored sources compile without libomp.  The patch
+# is idempotent via git apply --reverse --check.
 if(APPLE)
   set(CMAKE_DISABLE_FIND_PACKAGE_OpenMP
       ON
