@@ -37,11 +37,23 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   endif()
 endif()
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  # Pure LLVM/Homebrew clang: require 19+ for the C++23 stdlib coverage
+  # ResInsight depends on.
   if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0)
     message(
       FATAL_ERROR
         "Minimum supported version is Clang 19, detected version: ${CMAKE_CXX_COMPILER_VERSION}"
+    )
+  endif()
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+  # AppleClang versions trail mainline LLVM by ~2 majors; AppleClang 17 in
+  # Xcode 16 is based on LLVM 19 and ships a libc++ with the C++23 features
+  # we use.  Reject earlier AppleClang explicitly.
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17.0)
+    message(
+      FATAL_ERROR
+        "Minimum supported version is AppleClang 17 (Xcode 16), detected version: ${CMAKE_CXX_COMPILER_VERSION}"
     )
   endif()
 endif()
