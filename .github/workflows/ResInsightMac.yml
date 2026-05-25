@@ -1,9 +1,10 @@
 name: ResInsight Mac Build
 
-# Nightly macOS build to track progress on the Mac compile.  Currently
-# expected to fail until the blockers in #14045 are resolved; the workflow
-# is intentionally not wired to push/PR so a red Mac build does not gate
-# other work.  Manual runs available via workflow_dispatch.
+# Nightly macOS build plus per-push validation while the macOS port is
+# being shaken out on mac-prototype.  Once macOS is green and on `dev`,
+# the push/PR filters should be broadened (or dropped) so all branches
+# get covered.  Manual runs available via workflow_dispatch.  Tracker:
+# OPM/ResInsight#14045.
 
 on:
   schedule:
@@ -11,11 +12,9 @@ on:
     - cron: '0 2 * * *'
   workflow_dispatch:
   push:
-    paths:
-      - .github/workflows/ResInsightMac.yml
-      - vcpkg.json
-      - vcpkg-configuration.json
-      - ThirdParty/vcpkg-overlay-triplets/**
+    branches: [mac-prototype]
+  pull_request:
+    branches: [mac-prototype]
 
 permissions:
   contents: read
