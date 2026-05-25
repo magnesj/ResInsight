@@ -119,7 +119,13 @@
 
 #include <algorithm>
 #include <csignal>
+
+// libc++ on Homebrew llvm@19 does not yet provide <stacktrace>.  This TU
+// only carries the include for transitive uses; guard it so macOS builds
+// without C++23 stacktrace.  See #14045.
+#if __has_include( <stacktrace> )
 #include <stacktrace>
+#endif
 
 //==================================================================================================
 ///
