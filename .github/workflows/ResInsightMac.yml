@@ -13,7 +13,9 @@ on:
   push:
     paths:
       - .github/workflows/ResInsightMac.yml
-      - vcpkg-mac.json
+      - vcpkg.json
+      - vcpkg-configuration.json
+      - ThirdParty/vcpkg-overlay-triplets/**
 
 permissions:
   contents: read
@@ -72,9 +74,6 @@ jobs:
         with:
           cache-key: ${{ runner.os }}-clang-${{ steps.vcpkg-sha.outputs.sha }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
           prefix: vcpkg-clang/
-
-      - name: Use Mac vcpkg configuration (no grpc)
-        run: cp vcpkg-mac.json vcpkg.json
 
       - name: Configure
         shell: bash
