@@ -21,3 +21,7 @@ if(NOT DEFINED VCPKG_OSX_SYSROOT OR VCPKG_OSX_SYSROOT STREQUAL "")
     set(VCPKG_OSX_SYSROOT "${_xcrun_sdk_path}")
   endif()
 endif()
+
+# CMake 4.x removed compatibility with cmake_minimum_required(VERSION < 3.5).
+# See x64-osx.cmake for the same workaround.
+list(APPEND VCPKG_CMAKE_CONFIGURE_OPTIONS "-DCMAKE_POLICY_VERSION_MINIMUM=3.5")
