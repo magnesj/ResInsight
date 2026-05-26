@@ -110,11 +110,15 @@ jobs:
           "$(brew --prefix bison)/bin/bison" --version | head -1
 
       - name: Install Qt
+        # cache: false on macOS: the 1.1 GB Qt tarball eats most of the
+        # 10 GB per-repo Actions cache quota; downloading fresh each run
+        # is ~30 s on the runner-internal mirror and leaves room for the
+        # buildcache + vcpkg caches which actually save build time.
         uses: CeetronSolutions/install-qt-action@bump-node24
         with:
           version: 6.7.0
           dir: "${{ github.workspace }}/Qt/"
-          cache: true
+          cache: false
           setup-python: false
           modules: "qtnetworkauth"
 
