@@ -19,6 +19,16 @@ on:
 permissions:
   contents: read
 
+# Cancel a still-running build when a new push lands on the same ref --
+# otherwise two simultaneous Mac runs race on the same daily cache keys
+# (vcpkg-clang/macOS-..., macOS-appleclang-...-buildcache-v01-<date>,
+# macOS-buildcache-tool-v0.33.0) and one reports
+# "Failed to save: Unable to reserve cache with key ..., another job may
+# be creating this cache."  Mirrors the pattern in ResInsightWithCache.yml.
+concurrency:
+  group: mac-build-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: macos-latest
