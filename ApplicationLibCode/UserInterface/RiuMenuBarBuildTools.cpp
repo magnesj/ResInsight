@@ -42,6 +42,7 @@ QMenu* RiuMenuBarBuildTools::createDefaultFileMenu( QMenuBar* menuBar )
 
     QMenu* fileMenu = new RiuToolTipMenu( menuBar );
     fileMenu->setTitle( "&File" );
+    fileMenu->setObjectName( "FileMenu" );
 
     menuBar->addMenu( fileMenu );
 
@@ -60,6 +61,7 @@ QMenu* RiuMenuBarBuildTools::createDefaultEditMenu( QMenuBar* menuBar )
     CVF_ASSERT( menuBar && cmdFeatureMgr );
 
     QMenu* editMenu = menuBar->addMenu( "&Edit" );
+    editMenu->setObjectName( "EditMenu" );
     editMenu->addAction( cmdFeatureMgr->action( "RicSnapshotViewToClipboardFeature" ) );
     editMenu->addSeparator();
     editMenu->addAction( cmdFeatureMgr->action( "RicShowMemoryCleanupDialogFeature" ) );
@@ -78,6 +80,7 @@ QMenu* RiuMenuBarBuildTools::createDefaultViewMenu( QMenuBar* menuBar )
     CVF_ASSERT( menuBar && cmdFeatureMgr );
 
     QMenu* viewMenu = menuBar->addMenu( "&View" );
+    viewMenu->setObjectName( "ViewMenu" );
     viewMenu->addAction( cmdFeatureMgr->action( "RicViewZoomAllFeature" ) );
 
     return viewMenu;
@@ -92,6 +95,7 @@ QMenu* RiuMenuBarBuildTools::createDefaultHelpMenu( QMenuBar* menuBar )
     CVF_ASSERT( menuBar && cmdFeatureMgr );
 
     QMenu* helpMenu = menuBar->addMenu( "&Help" );
+    helpMenu->setObjectName( "HelpMenu" );
     helpMenu->addAction( cmdFeatureMgr->action( "RicHelpAboutFeature" ) );
     helpMenu->addAction( cmdFeatureMgr->action( "RicHelpCommandLineFeature" ) );
     helpMenu->addAction( cmdFeatureMgr->action( "RicHelpSummaryCommandLineFeature" ) );

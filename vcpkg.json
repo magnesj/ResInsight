@@ -1,5 +1,6 @@
 {
     "dependencies": [
+        "anyrpc",
         "arrow",
         "boost-filesystem",
         "boost-spirit",

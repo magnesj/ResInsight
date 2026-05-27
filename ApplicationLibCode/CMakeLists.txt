@@ -353,6 +353,10 @@ target_link_libraries(
 )
 target_link_libraries(ApplicationLibCode PRIVATE ResInsightCommonSettings)
 
+if(RESINSIGHT_ENABLE_SPIX)
+  target_link_libraries(ApplicationLibCode PUBLIC Spix::QtWidgets)
+endif()
+
 target_include_directories(
   ${PROJECT_NAME}
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Commands

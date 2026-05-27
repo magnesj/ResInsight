@@ -141,6 +141,7 @@ RiuMainWindow::RiuMainWindow()
     , m_seismicHistogramPanel( nullptr )
 {
     setAttribute( Qt::WA_DeleteOnClose );
+    setObjectName( "RiuMainWindow" );
 
     m_mdiArea = new RiuMdiArea( this );
     connect( m_mdiArea, SIGNAL( subWindowActivated( QMdiSubWindow* ) ), SLOT( slotSubWindowActivated( QMdiSubWindow* ) ) );
@@ -503,6 +504,7 @@ void RiuMainWindow::createMenus()
 
     // Export menu actions
     QMenu* exportMenu = fileMenu->addMenu( "&Export" );
+    exportMenu->setObjectName( "ExportMenu" );
     exportMenu->addAction( cmdFeatureMgr->action( "RicSnapshotViewToFileFeature" ) );
     exportMenu->addAction( m_snapshotAllViewsToFile );
     exportMenu->addAction( cmdFeatureMgr->action( "RicAdvancedSnapshotExportFeature" ) );
@@ -525,6 +527,7 @@ void RiuMainWindow::createMenus()
 
     fileMenu->addSeparator();
     QMenu* testMenu = fileMenu->addMenu( "&Testing" );
+    testMenu->setObjectName( "TestingMenu" );
 
     // Close and Exit actions
     fileMenu->addSeparator();
@@ -584,6 +587,7 @@ void RiuMainWindow::createMenus()
 
     // Windows menu
     m_windowMenu = menuBar()->addMenu( "&Windows" );
+    m_windowMenu->setObjectName( "WindowsMenu" );
     connect( m_windowMenu, SIGNAL( aboutToShow() ), SLOT( slotBuildWindowActions() ) );
 
     // Help menu
