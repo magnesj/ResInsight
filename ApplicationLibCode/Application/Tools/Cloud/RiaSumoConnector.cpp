@@ -16,6 +16,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+#pragma once
+
 #include "RiaSumoConnector.h"
 
 #include "RiaCloudDefines.h"
@@ -32,6 +34,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QTimer>
+
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -181,7 +184,7 @@ void RiaSumoConnector::parseEnsembleNames( QNetworkReply* reply, const SumoCaseI
 
         for ( const QJsonValue& value : jsonArray )
         {
-            QString ensembleName = value.toString();
+            QString ensembleName = value["name"].toString();
             m_ensembleNames.push_back( { caseId, ensembleName } );
         }
 
@@ -659,9 +662,10 @@ void RiaSumoConnector::parseAssets( QNetworkReply* reply )
 
         m_assets.clear();
 
-        for ( const QJsonValue& value : jsonArray )
+        // This json is an array of AssetInfo
+        for ( const QJsonValue& assetInfo : jsonArray )
         {
-            QString assetName = value.toString();
+            QString assetName = assetInfo["name"].toString();
             m_assets.push_back( SumoAsset{ SumoAssetId( "" ), "", assetName } );
         }
 
