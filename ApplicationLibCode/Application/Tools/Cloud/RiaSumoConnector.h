@@ -119,6 +119,7 @@ public slots:
     void parseCases( QNetworkReply* reply );
     void parseVectorNames( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName );
     void parseRealizationNumbers( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName );
+    void parseBlobUrl( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName, const QString& vectorName, bool isParameters );
     void parseBlobIds( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName, const QString& vectorName, bool isParameters );
 
     void requestFailed( const QAbstractOAuth::Error error );

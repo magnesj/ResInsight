@@ -6,5 +6,6 @@ typed, task-oriented methods for the router layer to consume.
 
 from .case_inventory_access import CaseInventoryAccess
 from .summary_access import SummaryAccess
+from .parameter_access import ParameterAccess
 
-__all__ = ["CaseInventoryAccess", "SummaryAccess"]
+__all__ = ["CaseInventoryAccess", "SummaryAccess", "ParameterAccess"]
