@@ -36,6 +36,7 @@ async def get_vector_blob_url(
     vector_name: str = Path(description="Vector name"),
 ) -> str:
     """Get the blob URL for the given summary vector"""
+    print("THIS IS A TEST PRINT STATEMENT - SHOULD NOT APPEAR IN PRODUCTION LOGS")
     access = SummaryAccess.from_case_uuid(case_uuid, ensemble_name)
     try:
         url = await access.get_vector_blob_url_async(vector_name)
