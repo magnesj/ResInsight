@@ -1,0 +1,20 @@
+{
+    "dependencies": [
+        "arrow",
+        "boost-filesystem",
+        "boost-spirit",
+        "boost-test",
+        "clipper2",
+        "eigen3",
+        "type-lite",
+        "fast-float",
+        "spdlog",
+        "pugixml"
+    ],
+    "overrides": [
+        {
+            "name": "fmt",
+            "version": "10.1.1"
+        }
+    ]
+}
