@@ -205,6 +205,9 @@ QByteArray buildTrianglesJson()
 }
 } // namespace
 
+std::atomic<quint64> RiaHtmlServer::sm_viewVersion{ 0 };
+std::atomic<quint64> RiaHtmlServer::sm_geometryVersion{ 0 };
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -213,6 +216,22 @@ RiaHtmlServer::RiaHtmlServer( QObject* parent )
     , m_httpServer( nullptr )
     , m_port( 0 )
 {
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaHtmlServer::notifyViewChanged()
+{
+    sm_viewVersion.fetch_add( 1, std::memory_order_relaxed );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaHtmlServer::notifyGeometryChanged()
+{
+    sm_geometryVersion.fetch_add( 1, std::memory_order_relaxed );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -289,6 +308,17 @@ bool RiaHtmlServer::start( quint16 preferredPort )
                          {
                              Q_UNUSED( request );
                              return QHttpServerResponse( QByteArray( "application/json" ), buildTrianglesJson() );
+                         } );
+
+    m_httpServer->route( "/viewstate",
+                         []( const QHttpServerRequest& request ) -> QHttpServerResponse
+                         {
+                             Q_UNUSED( request );
+                             const quint64    view     = sm_viewVersion.load( std::memory_order_relaxed );
+                             const quint64    geometry = sm_geometryVersion.load( std::memory_order_relaxed );
+                             const QByteArray json     = "{\"view\":" + QByteArray::number( view ) +
+                                                     ",\"geometry\":" + QByteArray::number( geometry ) + "}";
+                             return QHttpServerResponse( QByteArray( "application/json" ), json );
                          } );
 
     // Try the preferred port, then fall back to a small range if it is taken.
@@ -555,6 +585,18 @@ QString RiaHtmlServer::renderObjectPage( const QString& path ) const
 
     body += "</div>"; // .editorpane-body
 
+    // Poll the view-state versions and reload the snapshot whenever the native 3D view changes in
+    // the desktop app, whether from camera navigation or a visible-cell change. The embedded
+    // triangle view refreshes itself (on geometry changes only), so it is left untouched here.
+    body += "<script>"
+            "(function(){var last=null;function poll(){"
+            "fetch('/viewstate',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){"
+            "var key=d.view+'/'+d.geometry;"
+            "if(last!==null&&key!==last){var img=document.querySelector('.viewshot');"
+            "if(img)img.src='/viewsnapshot?ts='+Date.now();}last=key;}).catch(function(){});}"
+            "setInterval(poll,750);poll();})();"
+            "</script>";
+
     return pageShell( name, body );
 }
 
@@ -675,49 +717,77 @@ function frameToBox(box) {
   controls.update();
 }
 
-fetch('/triangles').then(r => r.json()).then(data => {
-  const meshes = data.meshes || [];
-  let triCount = 0;
-  for (const m of meshes) {
-    const geom = new THREE.BufferGeometry();
-    geom.setAttribute('position', new THREE.Float32BufferAttribute(m.vertices, 3));
-    geom.setIndex(m.indices);
-    geom.computeVertexNormals();
-    const opacity = (m.opacity === undefined) ? 1 : m.opacity;
-    const params = { transparent: opacity < 1, opacity: opacity, side: THREE.DoubleSide };
-    if (m.texData) {
-      // Cell-result coloring: sample the color-legend image through per-vertex UVs. The legend is
-      // RGB; expand to RGBA for a DataTexture, keeping the OpenGL lower-left origin (flipY = false).
-      const rgb = Uint8Array.from(atob(m.texData), ch => ch.charCodeAt(0));
-      const pixelCount = m.texWidth * m.texHeight;
-      const rgba = new Uint8Array(pixelCount * 4);
-      for (let i = 0; i < pixelCount; i++) {
-        rgba[i*4] = rgb[i*3]; rgba[i*4+1] = rgb[i*3+1]; rgba[i*4+2] = rgb[i*3+2]; rgba[i*4+3] = 255;
+function clearGroup() {
+  for (const child of group.children) {
+    child.geometry.dispose();
+    if (child.material.map) child.material.map.dispose();
+    child.material.dispose();
+  }
+  group.clear();
+  group.position.set(0, 0, 0);
+}
+
+let framed = false; // frame the camera only on the first load; keep the user's view afterwards
+
+function loadGeometry() {
+  return fetch('/triangles').then(r => r.json()).then(data => {
+    clearGroup();
+    const meshes = data.meshes || [];
+    let triCount = 0;
+    for (const m of meshes) {
+      const geom = new THREE.BufferGeometry();
+      geom.setAttribute('position', new THREE.Float32BufferAttribute(m.vertices, 3));
+      geom.setIndex(m.indices);
+      geom.computeVertexNormals();
+      const opacity = (m.opacity === undefined) ? 1 : m.opacity;
+      const params = { transparent: opacity < 1, opacity: opacity, side: THREE.DoubleSide };
+      if (m.texData) {
+        // Cell-result coloring: sample the color-legend image through per-vertex UVs. The legend is
+        // RGB; expand to RGBA for a DataTexture, keeping the OpenGL lower-left origin (flipY = false).
+        const rgb = Uint8Array.from(atob(m.texData), ch => ch.charCodeAt(0));
+        const pixelCount = m.texWidth * m.texHeight;
+        const rgba = new Uint8Array(pixelCount * 4);
+        for (let i = 0; i < pixelCount; i++) {
+          rgba[i*4] = rgb[i*3]; rgba[i*4+1] = rgb[i*3+1]; rgba[i*4+2] = rgb[i*3+2]; rgba[i*4+3] = 255;
+        }
+        const tex = new THREE.DataTexture(rgba, m.texWidth, m.texHeight, THREE.RGBAFormat);
+        tex.flipY = false;
+        tex.minFilter = THREE.LinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+        tex.wrapS = THREE.ClampToEdgeWrapping;
+        tex.wrapT = THREE.ClampToEdgeWrapping;
+        tex.needsUpdate = true;
+        geom.setAttribute('uv', new THREE.Float32BufferAttribute(m.uv, 2));
+        params.map = tex;
+      } else {
+        const c = m.color || [0.7, 0.7, 0.7];
+        params.color = new THREE.Color(c[0], c[1], c[2]);
       }
-      const tex = new THREE.DataTexture(rgba, m.texWidth, m.texHeight, THREE.RGBAFormat);
-      tex.flipY = false;
-      tex.minFilter = THREE.LinearFilter;
-      tex.magFilter = THREE.LinearFilter;
-      tex.wrapS = THREE.ClampToEdgeWrapping;
-      tex.wrapT = THREE.ClampToEdgeWrapping;
-      tex.needsUpdate = true;
-      geom.setAttribute('uv', new THREE.Float32BufferAttribute(m.uv, 2));
-      params.map = tex;
-    } else {
-      const c = m.color || [0.7, 0.7, 0.7];
-      params.color = new THREE.Color(c[0], c[1], c[2]);
+      const mat = new THREE.MeshLambertMaterial(params);
+      group.add(new THREE.Mesh(geom, mat));
+      triCount += m.indices.length / 3;
     }
-    const mat = new THREE.MeshLambertMaterial(params);
-    group.add(new THREE.Mesh(geom, mat));
-    triCount += m.indices.length / 3;
-  }
-  if (meshes.length === 0) {
-    info.innerHTML = 'No active 3D view with triangle geometry. <a href="/">Back to project tree</a>';
-    return;
-  }
-  frameToBox(new THREE.Box3().setFromObject(group));
-  info.innerHTML = meshes.length + ' mesh(es), ' + triCount + ' triangles. Drag to orbit, scroll to zoom. <a href="/">Back</a>';
-}).catch(e => { info.textContent = 'Failed to load geometry: ' + e; });
+    if (meshes.length === 0) {
+      info.innerHTML = 'No active 3D view with triangle geometry. <a href="/">Back to project tree</a>';
+      return;
+    }
+    if (!framed) { frameToBox(new THREE.Box3().setFromObject(group)); framed = true; }
+    info.innerHTML = meshes.length + ' mesh(es), ' + triCount + ' triangles. Drag to orbit, scroll to zoom. <a href="/">Back</a>';
+  }).catch(e => { info.textContent = 'Failed to load geometry: ' + e; });
+}
+
+loadGeometry();
+
+// Refetch the geometry whenever the visible cells change in the native 3D view (filters, time
+// step, etc.). Pure camera navigation does not bump the geometry version, so the orbit view is
+// preserved.
+let lastGeometry = null;
+setInterval(() => {
+  fetch('/viewstate', { cache: 'no-store' }).then(r => r.json()).then(d => {
+    if (lastGeometry !== null && d.geometry !== lastGeometry) loadGeometry();
+    lastGeometry = d.geometry;
+  }).catch(() => {});
+}, 750);
 
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
