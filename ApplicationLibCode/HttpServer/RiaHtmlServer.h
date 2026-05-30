@@ -68,6 +68,7 @@ public:
 private:
     static caf::PdmObjectHandle*              rootObject();
     static std::vector<caf::PdmObjectHandle*> orderedChildren( caf::PdmObjectHandle* object );
+    static bool                               subtreeContainsObject( caf::PdmObjectHandle* object, caf::PdmObjectHandle* target );
     static caf::PdmObjectHandle*              resolvePath( const QString& path );
 
     QString renderTreePage() const;
