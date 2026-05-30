@@ -37,6 +37,7 @@ class Drawable;
 
 class RIProcess;
 
+class RiaHtmlServer;
 class RiaPreferences;
 class RiaProjectModifier;
 class RiaSocketServer;
@@ -169,4 +170,6 @@ private:
     std::unique_ptr<RiuRecentFileActionProvider> m_recentFileActionProvider;
 
     std::unique_ptr<RiuMdiMaximizeWindowGuard> m_maximizeWindowGuard;
+
+    RiaHtmlServer* m_htmlServer;
 };
