@@ -594,10 +594,9 @@ endif()
 find_package(
   Qt6
   COMPONENTS
-  REQUIRED Core Gui OpenGL Network Widgets HttpServer
+  REQUIRED Core Gui OpenGL Network Widgets
 )
-set(QT_LIBRARIES Qt6::Core Qt6::Gui Qt6::OpenGL Qt6::Network Qt6::Widgets
-                 Qt6::HttpServer)
+set(QT_LIBRARIES Qt6::Core Qt6::Gui Qt6::OpenGL Qt6::Network Qt6::Widgets)
 qt_standard_project_setup()
 
 # Disable use of foreach
