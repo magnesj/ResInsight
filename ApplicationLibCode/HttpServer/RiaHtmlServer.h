@@ -39,6 +39,9 @@ class PdmObjectHandle;
 ///   GET  /                 Project tree
 ///   GET  /object?path=...  Property editor for the object at the given tree path
 ///   POST /object?path=...  Apply edited field values, then re-render the editor
+///   GET  /viewsnapshot     PNG snapshot of the active 3D view
+///   GET  /trianglesview    WebGL page rendering the active view's triangle meshes
+///   GET  /triangles        Triangle meshes of the active grid view as JSON
 ///
 /// Objects are addressed by a dotted path of child indices from the project root, e.g. "0.3.1".
 //==================================================================================================
@@ -55,14 +58,15 @@ public:
     QString url() const;
 
 private:
-    static caf::PdmObjectHandle*               rootObject();
-    static std::vector<caf::PdmObjectHandle*>  orderedChildren( caf::PdmObjectHandle* object );
-    static caf::PdmObjectHandle*               resolvePath( const QString& path );
+    static caf::PdmObjectHandle*              rootObject();
+    static std::vector<caf::PdmObjectHandle*> orderedChildren( caf::PdmObjectHandle* object );
+    static caf::PdmObjectHandle*              resolvePath( const QString& path );
 
     QString renderTreePage() const;
     void    renderTreeNode( caf::PdmObjectHandle* object, const QString& path, QString& html ) const;
     QString renderObjectPage( const QString& path ) const;
     QString applyFieldChanges( caf::PdmObjectHandle* object, const QHttpServerRequest& request ) const;
+    QString renderTrianglesPage() const;
 
     static QString pageShell( const QString& title, const QString& body );
 
