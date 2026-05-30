@@ -22,7 +22,17 @@
 #include "RiaLogging.h"
 
 #include "Rim3dView.h"
+#include "RimGridView.h"
 #include "RimProject.h"
+
+#include "RifJsonEncodeDecode.h"
+
+// The triangle extraction reuses the same machinery that RicHoloLensSession uses to ship
+// geometry to the HoloLens sharing server. These headers live in the sibling Commands library.
+#include "../Commands/HoloLensCommands/VdeArrayDataPacket.h"
+#include "../Commands/HoloLensCommands/VdeCachingHashedIdFactory.h"
+#include "../Commands/HoloLensCommands/VdePacketDirectory.h"
+#include "../Commands/HoloLensCommands/VdeVizDataExtractor.h"
 
 #include "cafPdmFieldHandle.h"
 #include "cafPdmObjectHandle.h"
@@ -39,6 +49,8 @@
 #include <QHttpServerResponse>
 #include <QImage>
 #include <QUrlQuery>
+#include <QVariantList>
+#include <QVariantMap>
 
 namespace
 {
@@ -53,6 +65,143 @@ QString htmlEscape( const QString& text )
     escaped.replace( '>', "&gt;" );
     escaped.replace( '"', "&quot;" );
     return escaped;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Extract the triangle meshes of the active grid view as JSON for the WebGL viewer.
+///
+/// This drives the exact same extraction pipeline that RicHoloLensSession uses to feed the
+/// HoloLens sharing server: VdeVizDataExtractor produces a meta-data JSON describing each mesh
+/// plus a set of binary array packets (vertices and connectivities). Here the browser plays the
+/// role of the HoloLens client, so we transcode those packets into a compact JSON payload:
+///
+///   { "meshes": [ { "name", "opacity", "vertices":[x,y,z,...], "indices":[i,j,k,...],
+///                   <coloring> }, ... ] }
+///
+/// <coloring> is either a solid "color":[r,g,b], or, for cell-result meshes, a color-legend
+/// texture: "uv":[u,v,...] plus a base64 RGB image in "texData" with "texWidth"/"texHeight".
+///
+/// Only triangle meshes are emitted; line geometry (verticesPerPrimitive == 2) is skipped.
+//--------------------------------------------------------------------------------------------------
+QByteArray buildTrianglesJson()
+{
+    RimGridView* view = RiaApplication::instance()->activeGridView();
+    if ( !view )
+    {
+        return QByteArray( "{\"meshes\":[]}" );
+    }
+
+    VdeCachingHashedIdFactory idFactory;
+    VdePacketDirectory        packetDirectory;
+    VdeVizDataExtractor       extractor( *view, &idFactory );
+
+    QString          modelMetaJsonStr;
+    std::vector<int> allReferencedArrayIds;
+    extractor.extractViewContents( &modelMetaJsonStr, &allReferencedArrayIds, &packetDirectory );
+
+    const QMap<QString, QVariant> modelMeta = ResInsightInternalJson::Json::decode( modelMetaJsonStr );
+    const QVariantList            meshList  = modelMeta.value( "meshArr" ).toList();
+
+    QByteArray json;
+    json.reserve( 1024 * 1024 );
+    json += "{\"meshes\":[";
+
+    bool firstMesh = true;
+    for ( const QVariant& meshVar : meshList )
+    {
+        const QVariantMap mesh = meshVar.toMap();
+
+        // Triangles only.
+        if ( mesh.value( "verticesPerPrimitive" ).toInt() != 3 ) continue;
+
+        const VdeArrayDataPacket* vertexPacket = packetDirectory.lookupPacket( mesh.value( "vertexArrId", -1 ).toInt() );
+        const VdeArrayDataPacket* connPacket   = packetDirectory.lookupPacket( mesh.value( "connArrId", -1 ).toInt() );
+        if ( !vertexPacket || !connPacket ) continue;
+        if ( vertexPacket->elementType() != VdeArrayDataPacket::Float32 ) continue;
+        if ( connPacket->elementType() != VdeArrayDataPacket::Uint32 ) continue;
+
+        const float opacity = mesh.value( "opacity", 1.0 ).toFloat();
+
+        // A mesh is either textured (cell results sample a per-vertex texture coordinate into a
+        // color-legend image) or carries a single solid color. Reproduce both so the WebGL view
+        // shows the same coloring as the native 3D view.
+        const VdeArrayDataPacket* texCoordPacket = packetDirectory.lookupPacket( mesh.value( "texCoordsArrId", -1 ).toInt() );
+        const VdeArrayDataPacket* texImagePacket = packetDirectory.lookupPacket( mesh.value( "texImageArrId", -1 ).toInt() );
+        if ( texCoordPacket && texCoordPacket->elementType() != VdeArrayDataPacket::Float32 ) texCoordPacket = nullptr;
+        if ( texImagePacket && texImagePacket->elementType() != VdeArrayDataPacket::Uint8 ) texImagePacket = nullptr;
+        const bool textured = texCoordPacket && texImagePacket;
+
+        if ( !firstMesh ) json += ',';
+        firstMesh = false;
+
+        QString name = mesh.value( "meshSourceObjName" ).toString();
+        name.replace( '\\', "\\\\" ).replace( '"', "\\\"" );
+
+        json += "{\"name\":\"";
+        json += name.toUtf8();
+        json += "\",\"opacity\":";
+        json += QByteArray::number( opacity );
+
+        if ( textured )
+        {
+            // RGB legend image, base64-encoded. The browser builds a DataTexture directly from
+            // these bytes (no PNG round-trip), preserving the OpenGL lower-left origin.
+            const QByteArray rgb( texImagePacket->arrayData(), static_cast<int>( texImagePacket->elementCount() ) );
+            json += ",\"texWidth\":" + QByteArray::number( texImagePacket->imageWidth() );
+            json += ",\"texHeight\":" + QByteArray::number( texImagePacket->imageHeight() );
+            json += ",\"texData\":\"" + rgb.toBase64() + "\"";
+
+            json += ",\"uv\":[";
+            const float* uv    = reinterpret_cast<const float*>( texCoordPacket->arrayData() );
+            const size_t count = texCoordPacket->elementCount();
+            for ( size_t i = 0; i < count; i++ )
+            {
+                if ( i ) json += ',';
+                json += QByteArray::number( uv[i] );
+            }
+            json += "]";
+        }
+        else
+        {
+            float r = 0.6f, g = 0.7f, b = 0.85f;
+            if ( mesh.contains( "color" ) )
+            {
+                const QVariantMap color = mesh.value( "color" ).toMap();
+                r                       = color.value( "r", r ).toFloat();
+                g                       = color.value( "g", g ).toFloat();
+                b                       = color.value( "b", b ).toFloat();
+            }
+            json += ",\"color\":[";
+            json += QByteArray::number( r ) + ',' + QByteArray::number( g ) + ',' + QByteArray::number( b );
+            json += "]";
+        }
+
+        json += ",\"vertices\":[";
+        {
+            const float* floats = reinterpret_cast<const float*>( vertexPacket->arrayData() );
+            const size_t count  = vertexPacket->elementCount();
+            for ( size_t i = 0; i < count; i++ )
+            {
+                if ( i ) json += ',';
+                json += QByteArray::number( floats[i] );
+            }
+        }
+
+        json += "],\"indices\":[";
+        {
+            const unsigned int* indices = reinterpret_cast<const unsigned int*>( connPacket->arrayData() );
+            const size_t        count   = connPacket->elementCount();
+            for ( size_t i = 0; i < count; i++ )
+            {
+                if ( i ) json += ',';
+                json += QByteArray::number( indices[i] );
+            }
+        }
+        json += "]}";
+    }
+
+    json += "]}";
+    return json;
 }
 } // namespace
 
@@ -84,8 +233,7 @@ bool RiaHtmlServer::start( quint16 preferredPort )
                          [this]( const QHttpServerRequest& request ) -> QHttpServerResponse
                          {
                              Q_UNUSED( request );
-                             return QHttpServerResponse( QByteArray( "text/html; charset=utf-8" ),
-                                                         renderTreePage().toUtf8() );
+                             return QHttpServerResponse( QByteArray( "text/html; charset=utf-8" ), renderTreePage().toUtf8() );
                          } );
 
     m_httpServer->route( "/object",
@@ -101,8 +249,7 @@ bool RiaHtmlServer::start( quint16 preferredPort )
                                  }
                              }
 
-                             return QHttpServerResponse( QByteArray( "text/html; charset=utf-8" ),
-                                                         renderObjectPage( path ).toUtf8() );
+                             return QHttpServerResponse( QByteArray( "text/html; charset=utf-8" ), renderObjectPage( path ).toUtf8() );
                          } );
 
     m_httpServer->route( "/viewsnapshot",
@@ -130,6 +277,20 @@ bool RiaHtmlServer::start( quint16 preferredPort )
                              return QHttpServerResponse( QByteArray( "image/png" ), bytes );
                          } );
 
+    m_httpServer->route( "/trianglesview",
+                         [this]( const QHttpServerRequest& request ) -> QHttpServerResponse
+                         {
+                             Q_UNUSED( request );
+                             return QHttpServerResponse( QByteArray( "text/html; charset=utf-8" ), renderTrianglesPage().toUtf8() );
+                         } );
+
+    m_httpServer->route( "/triangles",
+                         []( const QHttpServerRequest& request ) -> QHttpServerResponse
+                         {
+                             Q_UNUSED( request );
+                             return QHttpServerResponse( QByteArray( "application/json" ), buildTrianglesJson() );
+                         } );
+
     // Try the preferred port, then fall back to a small range if it is taken.
     for ( quint16 candidate = preferredPort; candidate < preferredPort + 20; ++candidate )
     {
@@ -137,8 +298,7 @@ bool RiaHtmlServer::start( quint16 preferredPort )
         if ( boundPort != 0 )
         {
             m_port = boundPort;
-            RiaLogging::info(
-                QString( "HTML project browser started. Open %1 in a web browser." ).arg( url() ).toStdString() );
+            RiaLogging::info( QString( "HTML project browser started. Open %1 in a web browser." ).arg( url() ).toStdString() );
             return true;
         }
     }
@@ -240,7 +400,10 @@ QString RiaHtmlServer::renderTreePage() const
     // selected node loaded into a separate view (iframe) on the right.
     QString body;
     body += "<div class=\"layout\">";
-    body += QString( "<div class=\"treepane\"><h2>Project tree</h2>%1</div>" ).arg( tree );
+    body += "<div class=\"treepane\"><h2>Project tree</h2>";
+    body += "<p class=\"toolbar\"><a href=\"/trianglesview\" target=\"editor\">Open 3D triangle view &rarr;</a></p>";
+    body += tree;
+    body += "</div>";
     body += "<iframe class=\"editorpane\" name=\"editor\" src=\"/object\" "
             "title=\"Property editor\"></iframe>";
     body += "</div>";
@@ -260,8 +423,7 @@ void RiaHtmlServer::renderTreeNode( caf::PdmObjectHandle* object, const QString&
     if ( name.isEmpty() && object->xmlCapability() ) name = object->xmlCapability()->classKeyword();
     if ( name.isEmpty() ) name = "Object";
 
-    const QString link =
-        QString( "<a href=\"/object?path=%1\" target=\"editor\">%2</a>" ).arg( path, htmlEscape( name ) );
+    const QString link = QString( "<a href=\"/object?path=%1\" target=\"editor\">%2</a>" ).arg( path, htmlEscape( name ) );
 
     std::vector<caf::PdmObjectHandle*> children = orderedChildren( object );
 
@@ -371,13 +533,20 @@ QString RiaHtmlServer::renderObjectPage( const QString& path ) const
 
     body += "</div>"; // .objmain
 
-    // Active 3D view screenshot in the right column. The cache-busting timestamp forces the browser
-    // to fetch a fresh image every time this page is (re-)rendered, e.g. after applying a change.
+    // Right column: a static screenshot of the active 3D view and, below it, an interactive WebGL
+    // view of the same triangle geometry. The cache-busting timestamp forces the browser to fetch a
+    // fresh image every time this page is (re-)rendered, e.g. after applying a change.
     body += "<div class=\"objside\">";
     if ( RiaApplication::instance()->activeReservoirView() )
     {
         body += "<h3>Active 3D view</h3>";
-        body += QString( "<img class=\"viewshot\" src=\"/viewsnapshot?ts=%1\" alt=\"Active 3D view\">" )
+        body +=
+            QString( "<img class=\"viewshot\" src=\"/viewsnapshot?ts=%1\" alt=\"Active 3D view\">" ).arg( QDateTime::currentMSecsSinceEpoch() );
+    }
+    if ( RiaApplication::instance()->activeGridView() )
+    {
+        body += "<h3>3D triangle view</h3>";
+        body += QString( "<iframe class=\"viewframe\" src=\"/trianglesview?ts=%1\" title=\"3D triangle view\"></iframe>" )
                     .arg( QDateTime::currentMSecsSinceEpoch() );
     }
     body += "</div>"; // .objside
@@ -441,6 +610,129 @@ QString RiaHtmlServer::applyFieldChanges( caf::PdmObjectHandle* object, const QH
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Self-contained WebGL page that fetches the active view's triangle meshes from /triangles and
+/// renders them with three.js (loaded from a CDN). Drag to orbit, scroll to zoom.
+//--------------------------------------------------------------------------------------------------
+QString RiaHtmlServer::renderTrianglesPage() const
+{
+    return QString::fromUtf8(
+        R"HTMLPAGE(<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>ResInsight 3D triangle view</title>
+<style>
+  html,body{margin:0;height:100%;background:#1e1e1e;color:#ddd;font-family:Segoe UI,Arial,sans-serif;}
+  #info{position:absolute;top:8px;left:10px;font-size:0.85em;z-index:10;}
+  #info a{color:#6fb1ff;}
+  canvas{display:block;}
+</style>
+<script type="importmap">
+{ "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="info">Loading geometry&hellip;</div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const info = document.getElementById('info');
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1e1e1e);
+
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1e7);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+document.body.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+const headLight = new THREE.DirectionalLight(0xffffff, 0.8);
+headLight.position.set(1, 1, 1);
+scene.add(headLight);
+
+const group = new THREE.Group();
+scene.add(group);
+
+function frameToBox(box) {
+  const size = new THREE.Vector3(); box.getSize(size);
+  const center = new THREE.Vector3(); box.getCenter(center);
+  group.position.sub(center); // recenter at origin to preserve float precision
+  const radius = Math.max(size.x, size.y, size.z) || 1;
+  const dist = radius * 1.8;
+  camera.position.set(dist, dist, dist);
+  camera.near = radius / 100;
+  camera.far = radius * 100;
+  camera.updateProjectionMatrix();
+  controls.target.set(0, 0, 0);
+  controls.update();
+}
+
+fetch('/triangles').then(r => r.json()).then(data => {
+  const meshes = data.meshes || [];
+  let triCount = 0;
+  for (const m of meshes) {
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute('position', new THREE.Float32BufferAttribute(m.vertices, 3));
+    geom.setIndex(m.indices);
+    geom.computeVertexNormals();
+    const opacity = (m.opacity === undefined) ? 1 : m.opacity;
+    const params = { transparent: opacity < 1, opacity: opacity, side: THREE.DoubleSide };
+    if (m.texData) {
+      // Cell-result coloring: sample the color-legend image through per-vertex UVs. The legend is
+      // RGB; expand to RGBA for a DataTexture, keeping the OpenGL lower-left origin (flipY = false).
+      const rgb = Uint8Array.from(atob(m.texData), ch => ch.charCodeAt(0));
+      const pixelCount = m.texWidth * m.texHeight;
+      const rgba = new Uint8Array(pixelCount * 4);
+      for (let i = 0; i < pixelCount; i++) {
+        rgba[i*4] = rgb[i*3]; rgba[i*4+1] = rgb[i*3+1]; rgba[i*4+2] = rgb[i*3+2]; rgba[i*4+3] = 255;
+      }
+      const tex = new THREE.DataTexture(rgba, m.texWidth, m.texHeight, THREE.RGBAFormat);
+      tex.flipY = false;
+      tex.minFilter = THREE.LinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.wrapS = THREE.ClampToEdgeWrapping;
+      tex.wrapT = THREE.ClampToEdgeWrapping;
+      tex.needsUpdate = true;
+      geom.setAttribute('uv', new THREE.Float32BufferAttribute(m.uv, 2));
+      params.map = tex;
+    } else {
+      const c = m.color || [0.7, 0.7, 0.7];
+      params.color = new THREE.Color(c[0], c[1], c[2]);
+    }
+    const mat = new THREE.MeshLambertMaterial(params);
+    group.add(new THREE.Mesh(geom, mat));
+    triCount += m.indices.length / 3;
+  }
+  if (meshes.length === 0) {
+    info.innerHTML = 'No active 3D view with triangle geometry. <a href="/">Back to project tree</a>';
+    return;
+  }
+  frameToBox(new THREE.Box3().setFromObject(group));
+  info.innerHTML = meshes.length + ' mesh(es), ' + triCount + ' triangles. Drag to orbit, scroll to zoom. <a href="/">Back</a>';
+}).catch(e => { info.textContent = 'Failed to load geometry: ' + e; });
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
+animate();
+</script>
+</body>
+</html>)HTMLPAGE" );
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 QString RiaHtmlServer::pageShell( const QString& title, const QString& body )
@@ -475,6 +767,7 @@ QString RiaHtmlServer::pageShell( const QString& title, const QString& body )
             ".objside{flex:1 1 24em;min-width:0;}"
             ".objside h3{margin-top:0;}"
             ".viewshot{max-width:100%;border:1px solid #ccc;margin-top:0.5em;}"
+            ".viewframe{width:100%;height:24em;border:1px solid #ccc;margin-top:0.5em;}"
             "</style></head><body>";
     page += body;
     page += "</body></html>";
