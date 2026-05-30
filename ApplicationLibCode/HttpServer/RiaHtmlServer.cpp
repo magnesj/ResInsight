@@ -36,6 +36,9 @@
 
 #include "cafPdmFieldHandle.h"
 #include "cafPdmObjectHandle.h"
+#include "cafPdmOptionItemInfo.h"
+#include "cafPdmPointer.h"
+#include "cafPdmUiCommandSystemProxy.h"
 #include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiObjectHandle.h"
 #include "cafPdmValueField.h"
@@ -65,6 +68,16 @@ QString htmlEscape( const QString& text )
     escaped.replace( '>', "&gt;" );
     escaped.replace( '"', "&quot;" );
     return escaped;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// A pointer field (caf::PdmPtrField) references another object. Its value is a guarded pointer, so
+/// its QVariant always wraps a caf::PdmPointer<caf::PdmObjectHandle> (even when null). Such fields
+/// are shown read-only and never modified from the HTML editor.
+//--------------------------------------------------------------------------------------------------
+bool isPointerField( caf::PdmValueField* valueField )
+{
+    return valueField && valueField->toQVariant().userType() == qMetaTypeId<caf::PdmPointer<caf::PdmObjectHandle>>();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -544,11 +557,55 @@ QString RiaHtmlServer::renderObjectPage( const QString& path ) const
         const QString value    = valueField->toQVariant().toString();
         const bool    readOnly = valueField->isReadOnly();
 
+        // Pick an editor based on the field: pointer fields are shown read-only (never editable), a
+        // drop-down for fields with selectable options, a checkbox for booleans, otherwise a plain
+        // text input.
+        const QList<caf::PdmOptionItemInfo> options = ( uiField && !isPointerField( valueField ) ) ? uiField->valueOptions()
+                                                                                                   : QList<caf::PdmOptionItemInfo>();
+
+        QString editor;
+        if ( isPointerField( valueField ) )
+        {
+            // Show the referenced object's name as static text; pointer references are not editable.
+            QString                                  refName;
+            const std::vector<caf::PdmObjectHandle*> referenced = field->ptrReferencedObjects();
+            if ( !referenced.empty() && referenced.front() && referenced.front()->uiCapability() )
+            {
+                refName = referenced.front()->uiCapability()->uiName();
+            }
+            if ( refName.isEmpty() ) refName = "(none)";
+            editor = QString( "<span class=\"ptrref\">%1</span>" ).arg( htmlEscape( refName ) );
+        }
+        else if ( !options.isEmpty() )
+        {
+            const int selectedIndex = uiField->uiValue().toInt();
+            editor = QString( "<select name=\"%1\"%2>" ).arg( htmlEscape( keyword ), readOnly ? QString( " disabled" ) : QString() );
+            for ( int i = 0; i < options.size(); ++i )
+            {
+                editor += QString( "<option value=\"%1\"%2>%3</option>" )
+                              .arg( QString::number( i ),
+                                    i == selectedIndex ? QString( " selected" ) : QString(),
+                                    htmlEscape( options[i].optionUiText() ) );
+            }
+            editor += "</select>";
+        }
+        else if ( valueField->toQVariant().typeId() == QMetaType::Bool )
+        {
+            editor = QString( "<input type=\"checkbox\" name=\"%1\" value=\"true\"%2%3>" )
+                         .arg( htmlEscape( keyword ),
+                               valueField->toQVariant().toBool() ? QString( " checked" ) : QString(),
+                               readOnly ? QString( " disabled" ) : QString() );
+        }
+        else
+        {
+            editor = QString( "<input type=\"text\" name=\"%1\" value=\"%2\"%3>" )
+                         .arg( htmlEscape( keyword ), htmlEscape( value ), readOnly ? QString( " readonly" ) : QString() );
+        }
+
         body += "<tr>";
         body += QString( "<td>%1</td>" ).arg( htmlEscape( fieldName ) );
         body += QString( "<td class=\"keyword\">%1</td>" ).arg( htmlEscape( keyword ) );
-        body += QString( "<td><input type=\"text\" name=\"%1\" value=\"%2\"%3></td>" )
-                    .arg( htmlEscape( keyword ), htmlEscape( value ), readOnly ? QString( " readonly" ) : QString() );
+        body += QString( "<td>%1</td>" ).arg( editor );
         body += "</tr>";
     }
 
@@ -638,28 +695,52 @@ QString RiaHtmlServer::applyFieldChanges( caf::PdmObjectHandle* object, const QH
         auto* valueField = dynamic_cast<caf::PdmValueField*>( field );
         if ( !valueField || valueField->isReadOnly() ) continue;
 
+        // Pointer fields reference other objects and are never modified from the HTML editor.
+        if ( isPointerField( valueField ) ) continue;
+
+        caf::PdmUiFieldHandle* uiField = field->uiCapability();
+        if ( !uiField ) continue;
+
         const QString keyword = field->keyword();
-        if ( !form.hasQueryItem( keyword ) ) continue;
 
-        const QString submitted = form.queryItemValue( keyword, QUrl::FullyDecoded );
-        if ( submitted.isEmpty() ) continue;
+        // The UI value is what the editor submits: an index into the options for a drop-down, the
+        // checked state for a checkbox, or the real value otherwise. setUiValueToField() converts
+        // it back to the stored value and notifies the data model exactly like the desktop editors.
+        const QList<caf::PdmOptionItemInfo> options    = uiField->valueOptions();
+        const QVariant                      oldUiValue = uiField->uiValue();
 
-        const QVariant oldValue = valueField->toQVariant();
-
-        QVariant newValue( submitted );
-        if ( oldValue.isValid() && oldValue.typeId() != QMetaType::QString )
+        QVariant newUiValue;
+        if ( !options.isEmpty() )
         {
-            QVariant converted = newValue;
-            if ( converted.convert( oldValue.metaType() ) ) newValue = converted;
+            if ( !form.hasQueryItem( keyword ) ) continue;
+            bool      ok    = false;
+            const int index = form.queryItemValue( keyword ).toInt( &ok );
+            if ( !ok || index < 0 || index >= options.size() ) continue;
+            newUiValue = QVariant( index );
+        }
+        else if ( valueField->toQVariant().typeId() == QMetaType::Bool )
+        {
+            // An unchecked checkbox submits nothing, so presence of the keyword means "checked".
+            newUiValue = QVariant( form.hasQueryItem( keyword ) );
+        }
+        else
+        {
+            if ( !form.hasQueryItem( keyword ) ) continue;
+            const QString submitted = form.queryItemValue( keyword, QUrl::FullyDecoded );
+            if ( submitted.isEmpty() ) continue;
+
+            QVariant converted( submitted );
+            if ( oldUiValue.isValid() && oldUiValue.typeId() != QMetaType::QString )
+            {
+                QVariant tmp = converted;
+                if ( tmp.convert( oldUiValue.metaType() ) ) converted = tmp;
+            }
+            newUiValue = converted;
         }
 
-        if ( newValue == oldValue ) continue;
+        if ( newUiValue == oldUiValue ) continue;
 
-        valueField->setFromQVariant( newValue );
-        if ( object->uiCapability() )
-        {
-            object->uiCapability()->fieldChangedByUi( field, oldValue, newValue );
-        }
+        caf::PdmUiCommandSystemProxy::instance()->setUiValueToField( uiField, newUiValue );
         changedCount++;
     }
 
@@ -744,7 +825,8 @@ function clearGroup() {
     child.material.dispose();
   }
   group.clear();
-  group.position.set(0, 0, 0);
+  // Keep group.position (the recentering offset) so the camera, rotation, zoom and panning are
+  // preserved across geometry reloads. Only the very first load frames the view.
 }
 
 let framed = false; // frame the camera only on the first load; keep the user's view afterwards
@@ -850,7 +932,8 @@ QString RiaHtmlServer::pageShell( const QString& title, const QString& body )
             "table.props th,table.props td{border:1px solid #ddd;padding:4px 8px;text-align:left;}"
             "table.props th{background:#f3f3f3;}"
             ".keyword{color:#888;font-family:Consolas,monospace;font-size:0.85em;}"
-            "input[type=text]{min-width:18em;}"
+            ".ptrref{color:#555;font-style:italic;}"
+            "input[type=text],select{min-width:18em;}"
             "button{padding:5px 14px;}"
             ".objcols{display:flex;gap:1.5em;align-items:flex-start;flex-wrap:wrap;}"
             ".objmain{flex:1 1 28em;min-width:0;}"
