@@ -382,6 +382,21 @@ std::vector<caf::PdmObjectHandle*> RiaHtmlServer::orderedChildren( caf::PdmObjec
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Returns true if target is object itself or any descendant of it.
+//--------------------------------------------------------------------------------------------------
+bool RiaHtmlServer::subtreeContainsObject( caf::PdmObjectHandle* object, caf::PdmObjectHandle* target )
+{
+    if ( !object ) return false;
+    if ( object == target ) return true;
+
+    for ( caf::PdmObjectHandle* child : orderedChildren( object ) )
+    {
+        if ( subtreeContainsObject( child, target ) ) return true;
+    }
+    return false;
+}
+
+//--------------------------------------------------------------------------------------------------
 /// Resolves a dotted path of child indices (e.g. "0.3.1") to an object, starting at the project
 /// root. An empty path resolves to the root object.
 //--------------------------------------------------------------------------------------------------
@@ -465,8 +480,13 @@ void RiaHtmlServer::renderTreeNode( caf::PdmObjectHandle* object, const QString&
     }
     else
     {
-        // Expandable node: <details>/<summary> provides a native expand/collapse triangle.
-        html += "<details open><summary>" + link + "</summary><ul>";
+        // Expandable node: <details>/<summary> provides a native expand/collapse triangle. The root
+        // node and the chain of nodes leading to the active 3D view are open by default so that view
+        // is revealed; all other nodes start collapsed.
+        caf::PdmObjectHandle* activeView   = RiaApplication::instance()->activeReservoirView();
+        const bool            onActivePath = activeView && subtreeContainsObject( object, activeView );
+        const QString         openAttr     = ( path.isEmpty() || onActivePath ) ? " open" : QString();
+        html += "<details" + openAttr + "><summary>" + link + "</summary><ul>";
         for ( size_t i = 0; i < children.size(); ++i )
         {
             const QString childPath = path.isEmpty() ? QString::number( i ) : QString( "%1.%2" ).arg( path ).arg( i );
