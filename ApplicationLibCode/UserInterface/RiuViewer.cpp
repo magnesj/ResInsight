@@ -24,6 +24,7 @@
 #include "RiaBaseDefs.h"
 #include "RiaColorTools.h"
 #include "RiaGuiApplication.h"
+#include "RiaHtmlServer.h"
 #include "RiaPreferences.h"
 #include "RiaRegressionTestRunner.h"
 
@@ -1039,6 +1040,9 @@ void RiuViewer::navigationPolicyUpdate()
 {
     caf::Viewer::navigationPolicyUpdate();
     ownerViewWindow()->viewNavigationChanged();
+
+    // Let polling web pages know the view changed so they can refresh the snapshot.
+    RiaHtmlServer::notifyViewChanged();
     if ( m_rimView )
     {
         RimViewLinker* viewLinker = m_rimView->assosiatedViewLinker();

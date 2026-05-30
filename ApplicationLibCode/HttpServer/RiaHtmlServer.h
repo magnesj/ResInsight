@@ -21,6 +21,7 @@
 #include <QObject>
 #include <QString>
 
+#include <atomic>
 #include <vector>
 
 class QHttpServer;
@@ -42,6 +43,7 @@ class PdmObjectHandle;
 ///   GET  /viewsnapshot     PNG snapshot of the active 3D view
 ///   GET  /trianglesview    WebGL page rendering the active view's triangle meshes
 ///   GET  /triangles        Triangle meshes of the active grid view as JSON
+///   GET  /viewstate        Version counters {view, geometry} for camera and visible-cell changes
 ///
 /// Objects are addressed by a dotted path of child indices from the project root, e.g. "0.3.1".
 //==================================================================================================
@@ -56,6 +58,12 @@ public:
     bool    start( quint16 preferredPort = 8080 );
     quint16 port() const;
     QString url() const;
+
+    // Bump the version counters so polling web pages know to refresh. Safe to call even when no
+    // server is running. notifyViewChanged() is for camera navigation (refresh the snapshot);
+    // notifyGeometryChanged() is for visible-cell changes (also refetch the triangle geometry).
+    static void notifyViewChanged();
+    static void notifyGeometryChanged();
 
 private:
     static caf::PdmObjectHandle*              rootObject();
@@ -73,4 +81,7 @@ private:
 private:
     QHttpServer* m_httpServer;
     quint16      m_port;
+
+    static std::atomic<quint64> sm_viewVersion;
+    static std::atomic<quint64> sm_geometryVersion;
 };
