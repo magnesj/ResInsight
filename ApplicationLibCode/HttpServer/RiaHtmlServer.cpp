@@ -46,6 +46,8 @@
 
 #include <QBuffer>
 #include <QDateTime>
+#include <QFile>
+#include <QFileInfo>
 #include <QHostAddress>
 #include <QHttpServer>
 #include <QHttpServerRequest>
@@ -323,6 +325,18 @@ bool RiaHtmlServer::start( quint16 preferredPort )
                              return QHttpServerResponse( QByteArray( "application/json" ), buildTrianglesJson() );
                          } );
 
+    m_httpServer->route( "/appicon.png",
+                         []( const QHttpServerRequest& request ) -> QHttpServerResponse
+                         {
+                             Q_UNUSED( request );
+                             QFile iconFile( ":/AppLogo48x48.png" );
+                             if ( !iconFile.open( QIODevice::ReadOnly ) )
+                             {
+                                 return QHttpServerResponse( QHttpServerResponder::StatusCode::NotFound );
+                             }
+                             return QHttpServerResponse( QByteArray( "image/png" ), iconFile.readAll() );
+                         } );
+
     m_httpServer->route( "/viewstate",
                          []( const QHttpServerRequest& request ) -> QHttpServerResponse
                          {
@@ -454,9 +468,24 @@ QString RiaHtmlServer::renderTreePage() const
         tree += "</ul>";
     }
 
+    // Title bar with the application icon and, when a project is open, its file name.
+    QString projectName;
+    if ( RimProject* proj = RiaApplication::instance()->project() )
+    {
+        if ( !proj->fileName().isEmpty() ) projectName = QFileInfo( proj->fileName() ).fileName();
+    }
+
+    QString header = "<div class=\"appheader\">";
+    header += "<img class=\"applogo\" src=\"/appicon.png\" alt=\"\">";
+    header += "<span class=\"apptitle\">ResInsight";
+    if ( !projectName.isEmpty() ) header += QString( " <span class=\"project\">&mdash; %1</span>" ).arg( htmlEscape( projectName ) );
+    header += "</span></div>";
+
     // Two-pane layout: the collapsible project tree on the left, the property editor for the
     // selected node loaded into a separate view (iframe) on the right.
     QString body;
+    body += "<div class=\"appshell\">";
+    body += header;
     body += "<div class=\"layout\">";
     body += "<div class=\"treepane\"><h2>Project tree</h2>";
     body += "<p class=\"toolbar\"><a href=\"/trianglesview\" target=\"editor\">Open 3D triangle view &rarr;</a></p>";
@@ -464,9 +493,10 @@ QString RiaHtmlServer::renderTreePage() const
     body += "</div>";
     body += "<iframe class=\"editorpane\" name=\"editor\" src=\"/object\" "
             "title=\"Property editor\"></iframe>";
-    body += "</div>";
+    body += "</div>"; // .layout
+    body += "</div>"; // .appshell
 
-    return pageShell( "ResInsight Project Tree", body );
+    return pageShell( "ResInsight Project Browser", body );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -764,8 +794,9 @@ QString RiaHtmlServer::renderTrianglesPage() const
 <head>
 <meta charset="utf-8">
 <title>ResInsight 3D triangle view</title>
+<link rel="icon" type="image/png" href="/appicon.png">
 <style>
-  html,body{margin:0;height:100%;background:#1e1e1e;color:#ddd;font-family:Segoe UI,Arial,sans-serif;}
+  html,body{margin:0;height:100%;background:#24292e;color:#e6e7ea;font-family:Segoe UI,Arial,sans-serif;}
   #info{position:absolute;top:8px;left:10px;font-size:0.85em;z-index:10;}
   #info a{color:#6fb1ff;}
   canvas{display:block;}
@@ -786,7 +817,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 const info = document.getElementById('info');
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x1e1e1e);
+scene.background = new THREE.Color(0x24292e);
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1e7);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -912,35 +943,47 @@ QString RiaHtmlServer::pageShell( const QString& title, const QString& body )
     QString page;
     page += "<!DOCTYPE html><html><head><meta charset=\"utf-8\">";
     page += QString( "<title>%1</title>" ).arg( htmlEscape( title ) );
+    page += "<link rel=\"icon\" type=\"image/png\" href=\"/appicon.png\">";
+    // Dark theme, matching the colors of the ResInsight dark theme (ApplicationExeCode/Resources/themes/dark.qss).
     page += "<style>"
             "html,body{height:100%;}"
-            "body{font-family:Segoe UI,Arial,sans-serif;margin:0;color:#222;}"
+            "body{font-family:Segoe UI,Arial,sans-serif;margin:0;background:#24292e;color:#e6e7ea;}"
             "h2{margin-bottom:0.2em;}"
-            ".classname{color:#888;margin-top:0;font-size:0.85em;}"
-            ".layout{display:flex;height:100vh;}"
-            ".treepane{flex:0 0 24em;overflow:auto;padding:1em;border-right:1px solid #ccc;}"
+            "h3{color:#e6e7ea;}"
+            ".classname{color:#89939d;margin-top:0;font-size:0.85em;}"
+            ".appshell{display:flex;flex-direction:column;height:100vh;}"
+            ".appheader{display:flex;align-items:center;gap:0.6em;flex:0 0 auto;padding:0.5em 1em;"
+            "background:#1b1f24;border-bottom:1px solid #394046;}"
+            ".applogo{height:28px;width:28px;}"
+            ".apptitle{font-size:1.1em;font-weight:600;}"
+            ".apptitle .project{color:#89939d;font-weight:400;}"
+            ".layout{display:flex;flex:1 1 auto;min-height:0;}"
+            ".treepane{flex:0 0 24em;overflow:auto;padding:1em;border-right:1px solid #394046;}"
             ".treepane h2{margin-top:0;}"
-            ".editorpane{flex:1 1 auto;border:0;height:100%;}"
+            ".editorpane{flex:1 1 auto;border:0;height:100%;background:#24292e;}"
             "ul.tree,ul.tree ul{list-style:none;padding-left:1.1em;margin:0;}"
             "ul.tree{padding-left:0;}"
             "details>summary{cursor:pointer;list-style:revert;}"
             "li .leaf{display:inline-block;padding-left:1.1em;}"
-            "a{color:#1565c0;text-decoration:none;}"
+            "a{color:#6fb1ff;text-decoration:none;}"
             "a:hover{text-decoration:underline;}"
             ".editorpane-body,body.editor{padding:1.5em;}"
             "table.props{border-collapse:collapse;margin-top:0.5em;}"
-            "table.props th,table.props td{border:1px solid #ddd;padding:4px 8px;text-align:left;}"
-            "table.props th{background:#f3f3f3;}"
-            ".keyword{color:#888;font-family:Consolas,monospace;font-size:0.85em;}"
-            ".ptrref{color:#555;font-style:italic;}"
-            "input[type=text],select{min-width:18em;}"
-            "button{padding:5px 14px;}"
+            "table.props th,table.props td{border:1px solid #394046;padding:4px 8px;text-align:left;}"
+            "table.props th{background:#394046;}"
+            "table.props td{background:#2f353b;}"
+            ".keyword{color:#89939d;font-family:Consolas,monospace;font-size:0.85em;}"
+            ".ptrref{color:#adbac6;font-style:italic;}"
+            "input[type=text],select{min-width:18em;background:#394046;color:#e6e7ea;"
+            "border:1px solid #5a6067;padding:3px 5px;}"
+            "button{padding:5px 14px;background:#0a639d;color:#fff;border:0;border-radius:3px;cursor:pointer;}"
+            "button:hover{background:#136fa3;}"
             ".objcols{display:flex;gap:1.5em;align-items:flex-start;flex-wrap:wrap;}"
             ".objmain{flex:1 1 28em;min-width:0;}"
             ".objside{flex:1 1 24em;min-width:0;}"
             ".objside h3{margin-top:0;}"
-            ".viewshot{max-width:100%;border:1px solid #ccc;margin-top:0.5em;}"
-            ".viewframe{width:100%;height:24em;border:1px solid #ccc;margin-top:0.5em;}"
+            ".viewshot{max-width:100%;border:1px solid #394046;margin-top:0.5em;}"
+            ".viewframe{width:100%;height:24em;border:1px solid #394046;margin-top:0.5em;}"
             "</style></head><body>";
     page += body;
     page += "</body></html>";
