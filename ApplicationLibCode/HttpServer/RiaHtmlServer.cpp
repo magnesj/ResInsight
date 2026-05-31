@@ -29,10 +29,10 @@
 
 // The triangle extraction reuses the same machinery that RicHoloLensSession uses to ship
 // geometry to the HoloLens sharing server. These headers live in the sibling Commands library.
-#include "../Commands/HoloLensCommands/VdeArrayDataPacket.h"
-#include "../Commands/HoloLensCommands/VdeCachingHashedIdFactory.h"
-#include "../Commands/HoloLensCommands/VdePacketDirectory.h"
-#include "../Commands/HoloLensCommands/VdeVizDataExtractor.h"
+#include "HoloLensCommands/VdeArrayDataPacket.h"
+#include "HoloLensCommands/VdeCachingHashedIdFactory.h"
+#include "HoloLensCommands/VdePacketDirectory.h"
+#include "HoloLensCommands/VdeVizDataExtractor.h"
 
 #include "cafPdmFieldHandle.h"
 #include "cafPdmObjectHandle.h"
