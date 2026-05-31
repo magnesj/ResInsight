@@ -588,8 +588,8 @@ QString RiaHtmlServer::renderObjectPage( const QString& path ) const
         const bool    readOnly = valueField->isReadOnly();
 
         // Pick an editor based on the field: pointer fields are shown read-only (never editable), a
-        // drop-down for fields with selectable options, a checkbox for booleans, otherwise a plain
-        // text input.
+        // filterable drop-down for fields with selectable options (including string fields whose
+        // options are supplied by the object), a checkbox for booleans, otherwise a plain text input.
         const QList<caf::PdmOptionItemInfo> options = ( uiField && !isPointerField( valueField ) ) ? uiField->valueOptions()
                                                                                                    : QList<caf::PdmOptionItemInfo>();
 
@@ -608,8 +608,21 @@ QString RiaHtmlServer::renderObjectPage( const QString& path ) const
         }
         else if ( !options.isEmpty() )
         {
-            const int selectedIndex = uiField->uiValue().toInt();
-            editor = QString( "<select name=\"%1\"%2>" ).arg( htmlEscape( keyword ), readOnly ? QString( " disabled" ) : QString() );
+            // Read uiValue() after valueOptions() above so the option cache is populated. Short
+            // option lists render as a plain drop-down. Long lists get a filter box plus a list box
+            // (a sized <select>) so the filtered options are visible at once (see the page script).
+            const int     selectedIndex = uiField->uiValue().toInt();
+            const QString selectId      = "sel_" + keyword;
+            const bool    filterable    = !readOnly && options.size() > 8;
+
+            QString selectAttr = readOnly ? QString( " disabled" ) : QString();
+            if ( filterable )
+            {
+                editor += QString( "<input type=\"text\" class=\"optfilter\" data-target=\"%1\" placeholder=\"Filter...\">" )
+                              .arg( htmlEscape( selectId ) );
+                selectAttr += " size=\"10\"";
+            }
+            editor += QString( "<select name=\"%1\" id=\"%2\"%3>" ).arg( htmlEscape( keyword ), htmlEscape( selectId ), selectAttr );
             for ( int i = 0; i < options.size(); ++i )
             {
                 editor += QString( "<option value=\"%1\"%2>%3</option>" )
@@ -692,6 +705,17 @@ QString RiaHtmlServer::renderObjectPage( const QString& path ) const
 
     body += "</div>"; // .editorpane-body
 
+    // Filter boxes for long option drop-downs: typing hides the non-matching options in the
+    // associated <select> (the selected option is always kept visible).
+    body += "<script>"
+            "document.querySelectorAll('.optfilter').forEach(function(f){"
+            "f.addEventListener('input',function(){"
+            "var sel=document.getElementById(f.dataset.target);if(!sel)return;"
+            "var q=f.value.toLowerCase();"
+            "for(var i=0;i<sel.options.length;i++){var o=sel.options[i];"
+            "o.hidden=q&&!o.selected&&o.text.toLowerCase().indexOf(q)<0;}});});"
+            "</script>";
+
     // Poll the view-state versions and reload the snapshot whenever the native 3D view changes in
     // the desktop app, whether from camera navigation or a visible-cell change. The embedded
     // triangle view refreshes itself (on geometry changes only), so it is left untouched here.
@@ -742,11 +766,13 @@ QString RiaHtmlServer::applyFieldChanges( caf::PdmObjectHandle* object, const QH
         QVariant newUiValue;
         if ( !options.isEmpty() )
         {
+            // The drop-down submits the selected option index. It must be a UInt for the option-based
+            // field path to recognize it as an index (an int is treated as a raw value instead).
             if ( !form.hasQueryItem( keyword ) ) continue;
             bool      ok    = false;
             const int index = form.queryItemValue( keyword ).toInt( &ok );
             if ( !ok || index < 0 || index >= options.size() ) continue;
-            newUiValue = QVariant( index );
+            newUiValue = QVariant( static_cast<uint>( index ) );
         }
         else if ( valueField->toQVariant().typeId() == QMetaType::Bool )
         {
@@ -976,6 +1002,7 @@ QString RiaHtmlServer::pageShell( const QString& title, const QString& body )
             ".ptrref{color:#adbac6;font-style:italic;}"
             "input[type=text],select{min-width:18em;background:#394046;color:#e6e7ea;"
             "border:1px solid #5a6067;padding:3px 5px;}"
+            ".optfilter{display:block;margin-bottom:3px;}"
             "button{padding:5px 14px;background:#0a639d;color:#fff;border:0;border-radius:3px;cursor:pointer;}"
             "button:hover{background:#136fa3;}"
             ".objcols{display:flex;gap:1.5em;align-items:flex-start;flex-wrap:wrap;}"
