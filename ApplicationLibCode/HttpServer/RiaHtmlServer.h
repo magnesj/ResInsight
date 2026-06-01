@@ -41,6 +41,7 @@ class PdmUiTreeOrdering;
 ///   GET  /                 Project tree
 ///   GET  /object?path=...  Property editor for the object at the given tree path
 ///   POST /object?path=...  Apply edited field values, then re-render the editor
+///   GET  /icon?id=...      PNG of a tree node icon
 ///   GET  /viewsnapshot     PNG snapshot of the active 3D view
 ///   GET  /trianglesview    WebGL page rendering the active view's triangle meshes
 ///   GET  /triangles        Triangle meshes of the active grid view as JSON

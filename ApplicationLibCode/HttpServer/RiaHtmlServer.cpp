@@ -52,11 +52,14 @@
 #include <QDateTime>
 #include <QFile>
 #include <QFileInfo>
+#include <QHash>
 #include <QHostAddress>
 #include <QHttpServer>
 #include <QHttpServerRequest>
 #include <QHttpServerResponse>
+#include <QIcon>
 #include <QImage>
+#include <QPixmap>
 #include <QUrlQuery>
 #include <QVariantList>
 #include <QVariantMap>
@@ -108,6 +111,57 @@ caf::PdmUiTreeOrdering* treeNodeAtPath( caf::PdmUiTreeOrdering* root, const QStr
         node = node->child( index );
     }
     return node;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Process-wide registry of distinct tree icons (as PNG bytes), served via the /icon route. Keyed
+/// by the PNG bytes so identical icons (the common case) collapse to a single id, keeping the page
+/// small and letting the browser cache each icon once. Accessed only from the server (GUI) thread.
+//--------------------------------------------------------------------------------------------------
+std::vector<QByteArray>& iconRegistry()
+{
+    static std::vector<QByteArray> registry;
+    return registry;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Renders a UI item's icon to a 16x16 PNG, registers it, and returns its id (-1 if there is none).
+//--------------------------------------------------------------------------------------------------
+int registerIcon( caf::PdmUiItem* item )
+{
+    if ( !item ) return -1;
+
+    std::unique_ptr<QIcon> icon = item->uiIcon( TREE_CONFIG_NAME );
+    if ( !icon || icon->isNull() ) return -1;
+
+    const QPixmap pixmap = icon->pixmap( 16, 16 );
+    if ( pixmap.isNull() ) return -1;
+
+    QByteArray png;
+    QBuffer    buffer( &png );
+    buffer.open( QIODevice::WriteOnly );
+    pixmap.toImage().save( &buffer, "PNG" );
+    if ( png.isEmpty() ) return -1;
+
+    static QHash<QByteArray, int> indexByPng;
+    auto                          it = indexByPng.constFind( png );
+    if ( it != indexByPng.constEnd() ) return it.value();
+
+    std::vector<QByteArray>& registry = iconRegistry();
+    const int                id       = static_cast<int>( registry.size() );
+    registry.push_back( png );
+    indexByPng.insert( png, id );
+    return id;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Returns an <img> tag for a UI item's icon, or an empty string when the item has no icon.
+//--------------------------------------------------------------------------------------------------
+QString iconImgTag( caf::PdmUiItem* item )
+{
+    const int id = registerIcon( item );
+    if ( id < 0 ) return QString();
+    return QString( "<img class=\"treeicon\" src=\"/icon?id=%1\" alt=\"\">" ).arg( id );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -365,6 +419,19 @@ bool RiaHtmlServer::start( quint16 preferredPort )
                              return QHttpServerResponse( QByteArray( "image/png" ), iconFile.readAll() );
                          } );
 
+    m_httpServer->route( "/icon",
+                         []( const QHttpServerRequest& request ) -> QHttpServerResponse
+                         {
+                             bool                           ok       = false;
+                             const int                      id       = request.query().queryItemValue( "id" ).toInt( &ok );
+                             const std::vector<QByteArray>& registry = iconRegistry();
+                             if ( !ok || id < 0 || id >= static_cast<int>( registry.size() ) )
+                             {
+                                 return QHttpServerResponse( QHttpServerResponder::StatusCode::NotFound );
+                             }
+                             return QHttpServerResponse( QByteArray( "image/png" ), registry[id] );
+                         } );
+
     m_httpServer->route( "/viewstate",
                          []( const QHttpServerRequest& request ) -> QHttpServerResponse
                          {
@@ -512,14 +579,15 @@ void RiaHtmlServer::renderTreeNode( caf::PdmUiTreeOrdering* node, const QString&
     if ( name.isEmpty() ) name = "Object";
 
     // Object nodes are clickable (load the property editor). Field/title group nodes are plain labels.
-    QString label;
+    const QString icon = iconImgTag( item );
+    QString       label;
     if ( node->isRepresentingObject() && node->object() )
     {
-        label = QString( "<a href=\"/object?path=%1\" target=\"editor\">%2</a>" ).arg( path, htmlEscape( name ) );
+        label = QString( "<a href=\"/object?path=%1\" target=\"editor\">%2%3</a>" ).arg( path, icon, htmlEscape( name ) );
     }
     else
     {
-        label = htmlEscape( name );
+        label = icon + htmlEscape( name );
     }
 
     html += "<li>";
@@ -696,7 +764,8 @@ QString RiaHtmlServer::renderObjectPage( const QString& path ) const
             QString         childName = childItem ? childItem->uiName( TREE_CONFIG_NAME ) : QString();
             if ( childName.isEmpty() ) childName = "Object";
 
-            childList += QString( "<li><a href=\"/object?path=%1\">%2</a></li>" ).arg( childPath, htmlEscape( childName ) );
+            childList +=
+                QString( "<li><a href=\"/object?path=%1\">%2%3</a></li>" ).arg( childPath, iconImgTag( childItem ), htmlEscape( childName ) );
         }
         if ( !childList.isEmpty() ) body += "<h3>Children</h3><ul class=\"tree\">" + childList + "</ul>";
     }
@@ -1011,6 +1080,7 @@ QString RiaHtmlServer::pageShell( const QString& title, const QString& body )
             "ul.tree{padding-left:0;}"
             "details>summary{cursor:pointer;list-style:revert;}"
             "li .leaf{display:inline-block;padding-left:1.1em;}"
+            ".treeicon{width:16px;height:16px;vertical-align:-3px;margin-right:4px;}"
             "a{color:#6fb1ff;text-decoration:none;}"
             "a:hover{text-decoration:underline;}"
             ".editorpane-body,body.editor{padding:1.5em;}"
