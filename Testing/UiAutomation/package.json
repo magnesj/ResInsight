@@ -1,0 +1,17 @@
+{
+  "name": "resinsight-ui-automation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright UI automation tests driving the ResInsight automation HTTP API (see docs/automation/openapi.yaml).",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test smoke",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}
