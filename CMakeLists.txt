@@ -299,12 +299,17 @@ endif()
 # UI Automation server (Qt HTTP Server)
 # ##############################################################################
 
-option(RESINSIGHT_ENABLE_UI_AUTOMATION
-       "Enable the localhost UI automation HTTP server (requires Qt6::HttpServer)"
-       OFF
+option(
+  RESINSIGHT_ENABLE_UI_AUTOMATION
+  "Enable the localhost UI automation HTTP server (requires Qt6::HttpServer)"
+  OFF
 )
 if(RESINSIGHT_ENABLE_UI_AUTOMATION)
-  find_package(Qt6 COMPONENTS HttpServer REQUIRED)
+  find_package(
+    Qt6
+    COMPONENTS HttpServer
+    REQUIRED
+  )
   add_definitions(-DENABLE_UI_AUTOMATION)
   message(STATUS "UI automation server enabled (Qt6::HttpServer)")
 endif()
