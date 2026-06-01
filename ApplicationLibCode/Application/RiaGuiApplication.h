@@ -37,6 +37,7 @@ class Drawable;
 
 class RIProcess;
 
+class RiaAutomationServer;
 class RiaPreferences;
 class RiaProjectModifier;
 class RiaSocketServer;
@@ -169,4 +170,8 @@ private:
     std::unique_ptr<RiuRecentFileActionProvider> m_recentFileActionProvider;
 
     std::unique_ptr<RiuMdiMaximizeWindowGuard> m_maximizeWindowGuard;
+
+#ifdef ENABLE_UI_AUTOMATION
+    std::unique_ptr<RiaAutomationServer> m_automationServer;
+#endif
 };
