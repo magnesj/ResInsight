@@ -40,9 +40,13 @@
 #include "cafPdmPointer.h"
 #include "cafPdmUiCommandSystemProxy.h"
 #include "cafPdmUiFieldHandle.h"
+#include "cafPdmUiItem.h"
 #include "cafPdmUiObjectHandle.h"
+#include "cafPdmUiTreeOrdering.h"
 #include "cafPdmValueField.h"
 #include "cafPdmXmlObjectHandle.h"
+
+#include <memory>
 
 #include <QBuffer>
 #include <QDateTime>
@@ -59,6 +63,10 @@
 
 namespace
 {
+// UI config name of the desktop main-window project tree. Object tree ordering (defineUiTreeOrdering)
+// and names are config-dependent, e.g. RimEclipseCase only lists its views under this config.
+const QString TREE_CONFIG_NAME = "MainWindow.ProjectTree";
+
 //--------------------------------------------------------------------------------------------------
 /// Minimal HTML escaping for text inserted into the generated pages.
 //--------------------------------------------------------------------------------------------------
@@ -80,6 +88,26 @@ QString htmlEscape( const QString& text )
 bool isPointerField( caf::PdmValueField* valueField )
 {
     return valueField && valueField->toQVariant().userType() == qMetaTypeId<caf::PdmPointer<caf::PdmObjectHandle>>();
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Walk a dotted index path (e.g. "0.3.1") from the given root UI-tree node. An empty path returns
+/// the root node. Returns nullptr if any index is out of range. The returned node is owned by root.
+//--------------------------------------------------------------------------------------------------
+caf::PdmUiTreeOrdering* treeNodeAtPath( caf::PdmUiTreeOrdering* root, const QString& path )
+{
+    caf::PdmUiTreeOrdering* node = root;
+    if ( !node || path.isEmpty() ) return node;
+
+    const QStringList indices = path.split( '.', Qt::SkipEmptyParts );
+    for ( const QString& indexText : indices )
+    {
+        bool      ok    = false;
+        const int index = indexText.toInt( &ok );
+        if ( !ok || !node || index < 0 || index >= node->childCount() ) return nullptr;
+        node = node->child( index );
+    }
+    return node;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -389,64 +417,34 @@ caf::PdmObjectHandle* RiaHtmlServer::rootObject()
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Returns the child objects of the given object in field/declaration order. This mirrors the
-/// structure of the project data model and gives each child a stable index for addressing.
+/// Returns true if the node's subtree represents the target object.
 //--------------------------------------------------------------------------------------------------
-std::vector<caf::PdmObjectHandle*> RiaHtmlServer::orderedChildren( caf::PdmObjectHandle* object )
+bool RiaHtmlServer::subtreeContainsObject( caf::PdmUiTreeOrdering* node, caf::PdmObjectHandle* target )
 {
-    std::vector<caf::PdmObjectHandle*> children;
-    if ( !object ) return children;
+    if ( !node ) return false;
+    if ( node->isRepresentingObject() && node->object() == target ) return true;
 
-    for ( caf::PdmFieldHandle* field : object->fields() )
+    for ( int i = 0; i < node->childCount(); ++i )
     {
-        for ( caf::PdmObjectHandle* child : field->children() )
-        {
-            if ( child ) children.push_back( child );
-        }
-    }
-
-    return children;
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Returns true if target is object itself or any descendant of it.
-//--------------------------------------------------------------------------------------------------
-bool RiaHtmlServer::subtreeContainsObject( caf::PdmObjectHandle* object, caf::PdmObjectHandle* target )
-{
-    if ( !object ) return false;
-    if ( object == target ) return true;
-
-    for ( caf::PdmObjectHandle* child : orderedChildren( object ) )
-    {
-        if ( subtreeContainsObject( child, target ) ) return true;
+        if ( subtreeContainsObject( node->child( i ), target ) ) return true;
     }
     return false;
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Resolves a dotted path of child indices (e.g. "0.3.1") to an object, starting at the project
-/// root. An empty path resolves to the root object.
+/// Resolves a dotted path of child indices (e.g. "0.3.1") into the project's UI tree ordering to an
+/// object. An empty path resolves to the root object. Returns nullptr for paths that are invalid or
+/// that land on a non-object node (a field/title group node).
 //--------------------------------------------------------------------------------------------------
 caf::PdmObjectHandle* RiaHtmlServer::resolvePath( const QString& path )
 {
-    caf::PdmObjectHandle* current = rootObject();
-    if ( !current || path.isEmpty() ) return current;
+    caf::PdmObjectHandle* root = rootObject();
+    if ( !root || !root->uiCapability() ) return nullptr;
+    if ( path.isEmpty() ) return root;
 
-    const QStringList indices = path.split( '.', Qt::SkipEmptyParts );
-    for ( const QString& indexText : indices )
-    {
-        bool      ok    = false;
-        const int index = indexText.toInt( &ok );
-
-        std::vector<caf::PdmObjectHandle*> children = orderedChildren( current );
-        if ( !ok || index < 0 || index >= static_cast<int>( children.size() ) )
-        {
-            return nullptr;
-        }
-        current = children[index];
-    }
-
-    return current;
+    std::unique_ptr<caf::PdmUiTreeOrdering> ordering( root->uiCapability()->uiTreeOrdering( TREE_CONFIG_NAME ) );
+    caf::PdmUiTreeOrdering*                 node = treeNodeAtPath( ordering.get(), path );
+    return ( node && node->isRepresentingObject() ) ? node->object() : nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -456,15 +454,18 @@ QString RiaHtmlServer::renderTreePage() const
 {
     caf::PdmObjectHandle* root = rootObject();
 
-    QString tree;
-    if ( !root )
+    QString                                 tree;
+    std::unique_ptr<caf::PdmUiTreeOrdering> ordering;
+    if ( !root || !root->uiCapability() )
     {
         tree = "<p>No project is currently open.</p>";
     }
     else
     {
+        // Build the tree from the caf UI tree ordering so it mirrors the desktop project tree.
+        ordering.reset( root->uiCapability()->uiTreeOrdering( TREE_CONFIG_NAME ) );
         tree = "<ul class=\"tree\">";
-        renderTreeNode( root, "", tree );
+        renderTreeNode( ordering.get(), "", tree );
         tree += "</ul>";
     }
 
@@ -502,24 +503,30 @@ QString RiaHtmlServer::renderTreePage() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaHtmlServer::renderTreeNode( caf::PdmObjectHandle* object, const QString& path, QString& html ) const
+void RiaHtmlServer::renderTreeNode( caf::PdmUiTreeOrdering* node, const QString& path, QString& html ) const
 {
-    if ( !object ) return;
+    if ( !node || !node->isValid() ) return;
 
-    caf::PdmUiObjectHandle* uiObject = object->uiCapability();
-    QString                 name     = uiObject ? uiObject->uiName() : QString();
-    if ( name.isEmpty() && object->xmlCapability() ) name = object->xmlCapability()->classKeyword();
+    caf::PdmUiItem* item = node->activeItem();
+    QString         name = item ? item->uiName( TREE_CONFIG_NAME ) : QString();
     if ( name.isEmpty() ) name = "Object";
 
-    const QString link = QString( "<a href=\"/object?path=%1\" target=\"editor\">%2</a>" ).arg( path, htmlEscape( name ) );
-
-    std::vector<caf::PdmObjectHandle*> children = orderedChildren( object );
+    // Object nodes are clickable (load the property editor). Field/title group nodes are plain labels.
+    QString label;
+    if ( node->isRepresentingObject() && node->object() )
+    {
+        label = QString( "<a href=\"/object?path=%1\" target=\"editor\">%2</a>" ).arg( path, htmlEscape( name ) );
+    }
+    else
+    {
+        label = htmlEscape( name );
+    }
 
     html += "<li>";
-    if ( children.empty() )
+    if ( node->childCount() == 0 )
     {
         // Leaf node: align with parents that show an expander triangle.
-        html += QString( "<span class=\"leaf\">%1</span>" ).arg( link );
+        html += QString( "<span class=\"leaf\">%1</span>" ).arg( label );
     }
     else
     {
@@ -527,13 +534,13 @@ void RiaHtmlServer::renderTreeNode( caf::PdmObjectHandle* object, const QString&
         // node and the chain of nodes leading to the active 3D view are open by default so that view
         // is revealed; all other nodes start collapsed.
         caf::PdmObjectHandle* activeView   = RiaApplication::instance()->activeReservoirView();
-        const bool            onActivePath = activeView && subtreeContainsObject( object, activeView );
+        const bool            onActivePath = activeView && subtreeContainsObject( node, activeView );
         const QString         openAttr     = ( path.isEmpty() || onActivePath ) ? " open" : QString();
-        html += "<details" + openAttr + "><summary>" + link + "</summary><ul>";
-        for ( size_t i = 0; i < children.size(); ++i )
+        html += "<details" + openAttr + "><summary>" + label + "</summary><ul>";
+        for ( int i = 0; i < node->childCount(); ++i )
         {
             const QString childPath = path.isEmpty() ? QString::number( i ) : QString( "%1.%2" ).arg( path ).arg( i );
-            renderTreeNode( children[i], childPath, html );
+            renderTreeNode( node->child( i ), childPath, html );
         }
         html += "</ul></details>";
     }
@@ -545,7 +552,19 @@ void RiaHtmlServer::renderTreeNode( caf::PdmObjectHandle* object, const QString&
 //--------------------------------------------------------------------------------------------------
 QString RiaHtmlServer::renderObjectPage( const QString& path ) const
 {
-    caf::PdmObjectHandle* object = resolvePath( path );
+    // Resolve the path against the UI tree ordering so the object and its listed children match the
+    // tree. The ordering is kept alive for the duration of this method (the child nodes are used
+    // below); the objects it references outlive it.
+    caf::PdmObjectHandle*                   root = rootObject();
+    std::unique_ptr<caf::PdmUiTreeOrdering> ordering;
+    caf::PdmUiTreeOrdering*                 node = nullptr;
+    if ( root && root->uiCapability() )
+    {
+        ordering.reset( root->uiCapability()->uiTreeOrdering( TREE_CONFIG_NAME ) );
+        node = treeNodeAtPath( ordering.get(), path );
+    }
+
+    caf::PdmObjectHandle* object = ( node && node->isRepresentingObject() ) ? node->object() : nullptr;
     if ( !object )
     {
         return pageShell( "Object not found",
@@ -664,21 +683,22 @@ QString RiaHtmlServer::renderObjectPage( const QString& path ) const
     }
     body += "</form>";
 
-    std::vector<caf::PdmObjectHandle*> children = orderedChildren( object );
-    if ( !children.empty() )
+    if ( node->childCount() > 0 )
     {
-        body += "<h3>Children</h3><ul class=\"tree\">";
-        for ( size_t i = 0; i < children.size(); ++i )
+        QString childList;
+        for ( int i = 0; i < node->childCount(); ++i )
         {
-            const QString childPath = path.isEmpty() ? QString::number( i ) : QString( "%1.%2" ).arg( path ).arg( i );
+            caf::PdmUiTreeOrdering* childNode = node->child( i );
+            if ( !childNode || !childNode->isRepresentingObject() || !childNode->object() ) continue;
 
-            caf::PdmUiObjectHandle* childUi   = children[i]->uiCapability();
-            QString                 childName = childUi ? childUi->uiName() : QString();
+            const QString   childPath = path.isEmpty() ? QString::number( i ) : QString( "%1.%2" ).arg( path ).arg( i );
+            caf::PdmUiItem* childItem = childNode->activeItem();
+            QString         childName = childItem ? childItem->uiName( TREE_CONFIG_NAME ) : QString();
             if ( childName.isEmpty() ) childName = "Object";
 
-            body += QString( "<li><a href=\"/object?path=%1\">%2</a></li>" ).arg( childPath, htmlEscape( childName ) );
+            childList += QString( "<li><a href=\"/object?path=%1\">%2</a></li>" ).arg( childPath, htmlEscape( childName ) );
         }
-        body += "</ul>";
+        if ( !childList.isEmpty() ) body += "<h3>Children</h3><ul class=\"tree\">" + childList + "</ul>";
     }
 
     body += "</div>"; // .objmain
