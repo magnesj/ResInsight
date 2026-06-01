@@ -1,0 +1,356 @@
+openapi: 3.0.3
+info:
+  title: ResInsight UI Automation API
+  description: >-
+    Localhost-only HTTP API exposed by ResInsight for UI automation. It serves
+    two use cases with a single surface:
+
+      * deterministic UI workflow tests in CI (driven by Playwright), and
+      * UI event simulation for AI tooling.
+
+    The API is the source of truth for the automation surface. The in-app
+    implementation (Qt HTTP Server, Qt 6.6.3) and all external clients are
+    expected to conform to this specification.
+
+    Security note: the server binds to 127.0.0.1 only and is intended for use on
+    the same machine as the running ResInsight instance.
+  version: 1.0.0
+  license:
+    name: GPL-3.0-or-later
+    url: https://www.gnu.org/licenses/gpl-3.0.html
+
+servers:
+  - url: http://127.0.0.1:{port}/api/v1
+    description: Local ResInsight instance
+    variables:
+      port:
+        default: "8080"
+        description: Port the automation server is listening on.
+
+tags:
+  - name: system
+    description: Liveness and version information.
+  - name: project
+    description: Inspection of the open project tree and PDM objects.
+  - name: views
+    description: 3D view state used to assert UI outcomes.
+  - name: commands
+    description: Execution of ResInsight commands to drive UI workflows.
+
+paths:
+  /health:
+    get:
+      tags: [system]
+      summary: Liveness and version probe.
+      operationId: getHealth
+      responses:
+        "200":
+          description: The server is alive.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+
+  /project:
+    get:
+      tags: [project]
+      summary: Get the open project as an object tree.
+      operationId: getProject
+      parameters:
+        - $ref: "#/components/parameters/MaxDepth"
+      responses:
+        "200":
+          description: The project tree rooted at the project object.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PdmObject"
+        "404":
+          description: No project is currently open.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /objects/{address}:
+    get:
+      tags: [project]
+      summary: Get a single PDM object and its scriptable fields.
+      operationId: getObject
+      parameters:
+        - $ref: "#/components/parameters/Address"
+        - $ref: "#/components/parameters/MaxDepth"
+      responses:
+        "200":
+          description: The requested object.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PdmObject"
+        "404":
+          description: No object with the given address exists in the project tree.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /objects/{address}/fields/{fieldName}:
+    put:
+      tags: [project]
+      summary: Set the value of a scriptable field on a PDM object.
+      description: >-
+        The value is written through the same scripting capability used by the
+        Python/gRPC interface, so enums, units and change notifications behave
+        like the desktop editors.
+      operationId: setObjectField
+      parameters:
+        - $ref: "#/components/parameters/Address"
+        - name: fieldName
+          in: path
+          required: true
+          description: Scripting name of the field to set.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FieldValue"
+      responses:
+        "200":
+          description: The updated object.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PdmObject"
+        "400":
+          description: The value could not be parsed for the target field.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Object or field not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /views:
+    get:
+      tags: [views]
+      summary: List the 3D views in the project.
+      operationId: getViews
+      responses:
+        "200":
+          description: The 3D views.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/View"
+
+  /views/{viewId}/visibleCellCount:
+    get:
+      tags: [views]
+      summary: Get the number of currently visible cells in a grid view.
+      description: >-
+        Reflects the result of filters, time-step and cell visibility, and is
+        the primary assertion point for cell-filter workflow tests.
+      operationId: getVisibleCellCount
+      parameters:
+        - name: viewId
+          in: path
+          required: true
+          description: The view id as reported by /views.
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: The visible cell count.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VisibleCellCount"
+        "404":
+          description: No grid view with the given id exists.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /commands:
+    post:
+      tags: [commands]
+      summary: Execute one or more ResInsight commands.
+      description: >-
+        Accepts a command in the ResInsight command-file (RICF) text format. The
+        same command vocabulary used by command files and the Python interface
+        is available, which lets a test create, manipulate and delete project
+        objects.
+      operationId: executeCommand
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommandRequest"
+      responses:
+        "200":
+          description: The command executed (possibly with non-fatal messages).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommandResponse"
+        "400":
+          description: The command text could not be parsed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: The command failed during execution.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommandResponse"
+
+components:
+  parameters:
+    Address:
+      name: address
+      in: path
+      required: true
+      description: Opaque object address as reported in PdmObject.address.
+      schema:
+        type: string
+    MaxDepth:
+      name: maxDepth
+      in: query
+      required: false
+      description: >-
+        Maximum number of child levels to include. 0 returns the object without
+        children. Omit for the full subtree.
+      schema:
+        type: integer
+        minimum: 0
+
+  schemas:
+    Health:
+      type: object
+      required: [status, application, version]
+      properties:
+        status:
+          type: string
+          example: ok
+        application:
+          type: string
+          example: ResInsight
+        version:
+          type: string
+          example: "2025.04.0"
+        apiVersion:
+          type: string
+          example: "1.0.0"
+
+    PdmObject:
+      type: object
+      required: [address, keyword]
+      properties:
+        address:
+          type: string
+          description: Opaque, session-stable handle for this object.
+        keyword:
+          type: string
+          description: PDM class keyword.
+        uiName:
+          type: string
+          description: Display name shown in the project tree.
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/Field"
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/PdmObject"
+
+    Field:
+      type: object
+      required: [name, value]
+      properties:
+        name:
+          type: string
+          description: Scripting name of the field.
+        value:
+          type: string
+          description: Field value rendered as scripting text.
+        dataType:
+          type: string
+
+    FieldValue:
+      type: object
+      required: [value]
+      properties:
+        value:
+          type: string
+          description: New value rendered as scripting text.
+
+    View:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+          description: PDM class keyword of the view.
+        address:
+          type: string
+
+    VisibleCellCount:
+      type: object
+      required: [viewId, visibleCellCount]
+      properties:
+        viewId:
+          type: integer
+        visibleCellCount:
+          type: integer
+          format: int64
+        totalCellCount:
+          type: integer
+          format: int64
+
+    CommandRequest:
+      type: object
+      required: [command]
+      properties:
+        command:
+          type: string
+          description: Command(s) in ResInsight command-file (RICF) text format.
+          example: setTimeStep(viewId=1, timeStep=2)
+
+    CommandResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok, warning, error]
+        messages:
+          type: array
+          items:
+            type: string
+
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+        detail:
+          type: string
