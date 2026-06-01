@@ -1,11 +1,9 @@
-set(SOURCE_GROUP_HEADER_FILES
-    ${CMAKE_CURRENT_LIST_DIR}/RiaAutomationServer.h
-    ${CMAKE_CURRENT_LIST_DIR}/RiaAutomationJson.h
+set(SOURCE_GROUP_HEADER_FILES ${CMAKE_CURRENT_LIST_DIR}/RiaAutomationServer.h
+                              ${CMAKE_CURRENT_LIST_DIR}/RiaAutomationJson.h
 )
 
-set(SOURCE_GROUP_SOURCE_FILES
-    ${CMAKE_CURRENT_LIST_DIR}/RiaAutomationServer.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RiaAutomationJson.cpp
+set(SOURCE_GROUP_SOURCE_FILES ${CMAKE_CURRENT_LIST_DIR}/RiaAutomationServer.cpp
+                              ${CMAKE_CURRENT_LIST_DIR}/RiaAutomationJson.cpp
 )
 
 list(APPEND CODE_HEADER_FILES ${SOURCE_GROUP_HEADER_FILES})
