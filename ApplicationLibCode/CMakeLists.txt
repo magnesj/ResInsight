@@ -154,6 +154,10 @@ list(
   SocketInterface/CMakeLists_files.cmake
 )
 
+if(RESINSIGHT_ENABLE_UI_AUTOMATION)
+  list(APPEND REFERENCED_CMAKE_FILES Automation/CMakeLists_files.cmake)
+endif()
+
 # Include source file lists from *.cmake files
 foreach(referencedfile ${REFERENCED_CMAKE_FILES})
   include(${referencedfile})
@@ -352,6 +356,10 @@ target_link_libraries(
   ApplicationLibCode PUBLIC ${LINK_LIBRARIES} ${EXTERNAL_LINK_LIBRARIES}
 )
 target_link_libraries(ApplicationLibCode PRIVATE ResInsightCommonSettings)
+
+if(RESINSIGHT_ENABLE_UI_AUTOMATION)
+  target_link_libraries(ApplicationLibCode PRIVATE Qt6::HttpServer)
+endif()
 
 target_include_directories(
   ${PROJECT_NAME}
