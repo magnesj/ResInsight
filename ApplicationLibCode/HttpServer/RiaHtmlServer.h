@@ -30,7 +30,8 @@ class QHttpServerRequest;
 namespace caf
 {
 class PdmObjectHandle;
-}
+class PdmUiTreeOrdering;
+} // namespace caf
 
 //==================================================================================================
 ///
@@ -45,7 +46,9 @@ class PdmObjectHandle;
 ///   GET  /triangles        Triangle meshes of the active grid view as JSON
 ///   GET  /viewstate        Version counters {view, geometry} for camera and visible-cell changes
 ///
-/// Objects are addressed by a dotted path of child indices from the project root, e.g. "0.3.1".
+/// The tree mirrors the desktop project tree: it is built from the caf UI tree ordering
+/// (defineUiTreeOrdering) of the project root. Nodes are addressed by a dotted path of child
+/// indices into that ordering, e.g. "0.3.1".
 //==================================================================================================
 class RiaHtmlServer : public QObject
 {
@@ -66,13 +69,12 @@ public:
     static void notifyGeometryChanged();
 
 private:
-    static caf::PdmObjectHandle*              rootObject();
-    static std::vector<caf::PdmObjectHandle*> orderedChildren( caf::PdmObjectHandle* object );
-    static bool                               subtreeContainsObject( caf::PdmObjectHandle* object, caf::PdmObjectHandle* target );
-    static caf::PdmObjectHandle*              resolvePath( const QString& path );
+    static caf::PdmObjectHandle* rootObject();
+    static bool                  subtreeContainsObject( caf::PdmUiTreeOrdering* node, caf::PdmObjectHandle* target );
+    static caf::PdmObjectHandle* resolvePath( const QString& path );
 
     QString renderTreePage() const;
-    void    renderTreeNode( caf::PdmObjectHandle* object, const QString& path, QString& html ) const;
+    void    renderTreeNode( caf::PdmUiTreeOrdering* node, const QString& path, QString& html ) const;
     QString renderObjectPage( const QString& path ) const;
     QString applyFieldChanges( caf::PdmObjectHandle* object, const QHttpServerRequest& request ) const;
     QString renderTrianglesPage() const;
