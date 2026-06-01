@@ -22,7 +22,6 @@
 #include <memory>
 
 class QHttpServer;
-class QTcpServer;
 
 //==================================================================================================
 ///
@@ -54,6 +53,5 @@ private:
 
 private:
     std::unique_ptr<QHttpServer> m_httpServer;
-    QTcpServer*                  m_tcpServer;
     quint16                      m_listenPort;
 };

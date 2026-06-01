@@ -41,13 +41,14 @@
 
 #include "cvfArray.h"
 
+#include <QHostAddress>
 #include <QHttpServer>
+#include <QHttpServerRequest>
 #include <QHttpServerResponder>
 #include <QHttpServerResponse>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QTcpServer>
 #include <QTextStream>
 #include <QUrlQuery>
 
@@ -60,7 +61,7 @@ using StatusCode = QHttpServerResponder::StatusCode;
 //--------------------------------------------------------------------------------------------------
 static QHttpServerResponse makeJsonResponse( const QJsonObject& object, StatusCode statusCode = StatusCode::Ok )
 {
-    return QHttpServerResponse( "application/json", QJsonDocument( object ).toJson( QJsonDocument::Compact ), statusCode );
+    return QHttpServerResponse( object, statusCode );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -68,7 +69,7 @@ static QHttpServerResponse makeJsonResponse( const QJsonObject& object, StatusCo
 //--------------------------------------------------------------------------------------------------
 static QHttpServerResponse makeJsonResponse( const QJsonArray& array, StatusCode statusCode = StatusCode::Ok )
 {
-    return QHttpServerResponse( "application/json", QJsonDocument( array ).toJson( QJsonDocument::Compact ), statusCode );
+    return QHttpServerResponse( array, statusCode );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -87,7 +88,6 @@ static QHttpServerResponse makeErrorResponse( StatusCode statusCode, const QStri
 //--------------------------------------------------------------------------------------------------
 RiaAutomationServer::RiaAutomationServer( QObject* parent )
     : QObject( parent )
-    , m_tcpServer( nullptr )
     , m_listenPort( 0 )
 {
 }
@@ -105,25 +105,20 @@ bool RiaAutomationServer::start( quint16 preferredPort )
     m_httpServer = std::make_unique<QHttpServer>();
     registerRoutes();
 
-    m_tcpServer = new QTcpServer( this );
-
     // Bind to loopback only. Fall back to an ephemeral port if the preferred one is taken.
-    if ( !m_tcpServer->listen( QHostAddress::LocalHost, preferredPort ) )
+    quint16 boundPort = m_httpServer->listen( QHostAddress::LocalHost, preferredPort );
+    if ( boundPort == 0 )
     {
-        if ( !m_tcpServer->listen( QHostAddress::LocalHost, 0 ) )
-        {
-            RiaLogging::error( "UI automation server: failed to listen on 127.0.0.1" );
-            return false;
-        }
+        boundPort = m_httpServer->listen( QHostAddress::LocalHost, 0 );
     }
 
-    if ( !m_httpServer->bind( m_tcpServer ) )
+    if ( boundPort == 0 )
     {
-        RiaLogging::error( "UI automation server: failed to bind HTTP server to the listening socket" );
+        RiaLogging::error( "UI automation server: failed to listen on 127.0.0.1" );
         return false;
     }
 
-    m_listenPort = m_tcpServer->serverPort();
+    m_listenPort = boundPort;
     RiaLogging::info( QString( "UI automation server listening on http://127.0.0.1:%1/api/v1" ).arg( m_listenPort ).toStdString() );
 
     return true;
@@ -134,7 +129,7 @@ bool RiaAutomationServer::start( quint16 preferredPort )
 //--------------------------------------------------------------------------------------------------
 bool RiaAutomationServer::isRunning() const
 {
-    return m_tcpServer && m_tcpServer->isListening();
+    return m_httpServer && m_listenPort != 0;
 }
 
 //--------------------------------------------------------------------------------------------------
