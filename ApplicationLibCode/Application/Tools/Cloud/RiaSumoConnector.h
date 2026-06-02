@@ -63,6 +63,12 @@ struct SumoEnsemble
     QString    name;
 };
 
+struct SumoGridInfo
+{
+    QString          name;
+    std::vector<int> realizations;
+};
+
 //==================================================================================================
 ///
 //==================================================================================================
@@ -105,11 +111,20 @@ public:
 
     QByteArray requestParquetDataBlocking( const SumoCaseId& caseId, const QString& ensembleName, const QString& vectorName );
 
+    void requestGridInfoForEnsemble( const SumoCaseId& caseId, const QString& ensembleName );
+    void requestGridInfoForEnsembleBlocking( const SumoCaseId& caseId, const QString& ensembleName );
+
+    void requestGridBlobIdForEnsemble( const SumoCaseId& caseId, const QString& ensembleName, const QString& gridName, int realization );
+    void requestGridBlobIdForEnsembleBlocking( const SumoCaseId& caseId, const QString& ensembleName, const QString& gridName, int realization );
+
+    QByteArray requestGridDataBlocking( const SumoCaseId& caseId, const QString& ensembleName, const QString& gridName, int realization );
+
     std::vector<SumoAsset>    assets() const;
     std::vector<SumoCase>     cases() const;
     std::vector<QString>      ensembleNamesForCase( const SumoCaseId& caseId ) const;
     std::vector<QString>      vectorNames() const;
     std::vector<QString>      realizationIds() const;
+    std::vector<SumoGridInfo> gridInfos() const;
     std::vector<QString>      blobUrls() const;
     std::vector<SumoRedirect> blobContents() const;
 
@@ -119,6 +134,7 @@ public slots:
     void parseCases( QNetworkReply* reply );
     void parseVectorNames( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName );
     void parseRealizationNumbers( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName );
+    void parseGridInfo( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName );
     void parseBlobUrl( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName, const QString& vectorName, bool isParameters );
     void parseBlobIds( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName, const QString& vectorName, bool isParameters );
 
@@ -137,6 +153,7 @@ signals:
     void blobIdFinished();
     void assetsFinished();
     void realizationIdsFinished();
+    void gridInfoFinished();
 
 private:
     void addStandardHeader( QNetworkRequest& networkRequest, const QString& token, const QString& contentType );
@@ -156,6 +173,7 @@ private:
     std::vector<QString>      m_vectorNames;
     std::vector<QString>      m_realizationIds;
     std::vector<SumoEnsemble> m_ensembleNames;
+    std::vector<SumoGridInfo> m_gridInfos;
 
     std::vector<QString> m_blobUrl;
 

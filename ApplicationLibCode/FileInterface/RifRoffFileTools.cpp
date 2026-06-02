@@ -107,6 +107,14 @@ bool RifRoffFileTools::openGridFile( const QString& fileName, RigEclipseCaseData
         return false;
     }
 
+    return openGridFile( stream, eclipseCase, errorMessages );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RifRoffFileTools::openGridFile( std::istream& stream, RigEclipseCaseData* eclipseCase, QString* errorMessages )
+{
     auto getInt = []( auto values, const std::string& name )
     {
         auto v = std::find_if( values.begin(), values.end(), [&name]( const auto& arg ) { return arg.first == name; } );
@@ -273,6 +281,7 @@ bool RifRoffFileTools::openGridFile( const QString& fileName, RigEclipseCaseData
     catch ( std::runtime_error& err )
     {
         RiaLogging::error( std::format( "Roff file import failed: {}", err.what() ) );
+        if ( errorMessages ) *errorMessages = QString::fromStdString( err.what() );
         return false;
     }
 

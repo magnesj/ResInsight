@@ -25,6 +25,7 @@
 #include "RimOilField.h"
 #include "RimProject.h"
 #include "RimSummaryCaseMainCollection.h"
+#include "Sumo/RimSumoGridDataSource.h"
 #include "Sumo/RimSummaryEnsembleSumo.h"
 #include "Sumo/RimSummarySumoDataSource.h"
 
@@ -57,7 +58,11 @@ RimCloudDataSourceCollection::RimCloudDataSourceCollection()
     CAF_PDM_InitFieldNoDefault( &m_addEnsembles, "AddEnsembles", "", "", "Add Data Sources and Create Summary Ensemble Plots" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_addEnsembles );
 
+    CAF_PDM_InitFieldNoDefault( &m_addGridDataSources, "AddGridDataSources", "", "", "Add Grid Data Sources" );
+    caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_addGridDataSources );
+
     CAF_PDM_InitFieldNoDefault( &m_sumoDataSources, "SumoDataSources", "Sumo Data Sources" );
+    CAF_PDM_InitFieldNoDefault( &m_sumoGridDataSources, "SumoGridDataSources", "Sumo Grid Data Sources" );
 
     m_sumoConnector = RiaApplication::instance()->makeSumoConnector();
 }
@@ -147,6 +152,12 @@ void RimCloudDataSourceCollection::fieldChangedByUi( const caf::PdmFieldHandle* 
 
         m_addDataSources = false;
     }
+    if ( changedField == &m_addGridDataSources )
+    {
+        addGridDataSources();
+
+        m_addGridDataSources = false;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -226,6 +237,7 @@ void RimCloudDataSourceCollection::defineUiOrdering( QString uiConfigName, caf::
 
         uiOrdering.add( &m_addDataSources, layout );
         uiOrdering.add( &m_addEnsembles, layout );
+        uiOrdering.add( &m_addGridDataSources, layout );
     }
     uiOrdering.skipRemainingFields();
 }
@@ -256,6 +268,13 @@ void RimCloudDataSourceCollection::defineEditorAttribute( const caf::PdmFieldHan
         if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
         {
             attrib->m_buttonText = "Add Ensemble(s)";
+        }
+    }
+    else if ( field == &m_addGridDataSources )
+    {
+        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
+        {
+            attrib->m_buttonText = "Add Grid Data Source(s)";
         }
     }
 }
@@ -337,4 +356,70 @@ void RimCloudDataSourceCollection::addEnsembles()
 {
     auto dataSources = addDataSources();
     createEnsemblesFromSelectedDataSources( dataSources );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<RimSumoGridDataSource*> RimCloudDataSourceCollection::addGridDataSources()
+{
+    if ( !m_sumoConnector ) return {};
+
+    std::vector<RimSumoGridDataSource*> dataSources;
+
+    RimSumoGridDataSource* objectToSelect = nullptr;
+    auto                   sumoCaseId     = SumoCaseId( m_sumoCaseId );
+
+    for ( const auto& ensembleName : m_sumoEnsembleNames() )
+    {
+        bool createNewDataSource = true;
+        for ( const auto dataSource : m_sumoGridDataSources.childrenByType() )
+        {
+            if ( dataSource->caseId() == sumoCaseId && dataSource->ensembleName() == ensembleName )
+            {
+                createNewDataSource = false;
+                break;
+            }
+        }
+
+        if ( !createNewDataSource )
+        {
+            continue;
+        }
+
+        QString caseName;
+        for ( const auto& sumoCase : m_sumoConnector->cases() )
+        {
+            if ( sumoCase.caseId == sumoCaseId )
+            {
+                caseName = sumoCase.name;
+                break;
+            }
+        }
+
+        // Prime the connector cache with the grids available for this ensemble.
+        m_sumoConnector->requestGridInfoForEnsembleBlocking( sumoCaseId, ensembleName );
+
+        auto dataSource = new RimSumoGridDataSource();
+        dataSource->setCaseId( sumoCaseId );
+        dataSource->setAssetName( m_sumoFieldName );
+        dataSource->setCaseName( caseName );
+        dataSource->setEnsembleName( ensembleName );
+        dataSource->updateName();
+
+        objectToSelect = dataSource;
+
+        m_sumoGridDataSources.push_back( dataSource );
+        dataSources.push_back( dataSource );
+    }
+
+    uiCapability()->updateAllRequiredEditors();
+
+    if ( objectToSelect )
+    {
+        RiuPlotMainWindowTools::setExpanded( objectToSelect );
+        RiuPlotMainWindowTools::selectAsCurrentItem( objectToSelect );
+    }
+
+    return dataSources;
 }

@@ -28,6 +28,7 @@
 #include <QString>
 
 class RimSummarySumoDataSource;
+class RimSumoGridDataSource;
 
 //==================================================================================================
 ///
@@ -57,6 +58,8 @@ private:
     std::vector<RimSummarySumoDataSource*> addDataSources();
     void                                   addEnsembles();
 
+    std::vector<RimSumoGridDataSource*> addGridDataSources();
+
 private:
     caf::PdmField<bool>                 m_authenticate;
     caf::PdmField<QString>              m_sumoFieldName;
@@ -65,7 +68,9 @@ private:
 
     caf::PdmField<bool>                                m_addDataSources;
     caf::PdmField<bool>                                m_addEnsembles;
+    caf::PdmField<bool>                                m_addGridDataSources;
     caf::PdmChildArrayField<RimSummarySumoDataSource*> m_sumoDataSources;
+    caf::PdmChildArrayField<RimSumoGridDataSource*>    m_sumoGridDataSources;
 
     QPointer<RiaSumoConnector> m_sumoConnector;
 };

@@ -25,6 +25,7 @@
 
 #include <QString>
 
+#include <iosfwd>
 #include <map>
 #include <vector>
 
@@ -51,6 +52,10 @@ public:
     ~RifRoffFileTools() override;
 
     static bool openGridFile( const QString& fileName, RigEclipseCaseData* eclipseCase, QString* errorMessages );
+
+    // Parse a roff grid directly from an already opened binary stream. Used when the roff data does not
+    // originate from a file on disk (e.g. a blob downloaded from Sumo).
+    static bool openGridFile( std::istream& stream, RigEclipseCaseData* eclipseCase, QString* errorMessages );
 
     static std::pair<bool, std::map<QString, QString>> createInputProperties( const QString& fileName, RigEclipseCaseData* eclipseCase );
 

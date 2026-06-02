@@ -2,6 +2,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimSummaryEnsembleSumo.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimSummaryCaseSumo.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimSummarySumoDataSource.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimSumoGridDataSource.cpp
 )
 
 list(APPEND CODE_SOURCE_FILES ${SOURCE_GROUP_SOURCE_FILES})

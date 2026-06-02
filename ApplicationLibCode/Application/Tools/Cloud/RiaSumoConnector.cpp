@@ -280,6 +280,138 @@ void RiaSumoConnector::requestRealizationIdsForEnsembleBlocking( const SumoCaseI
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RiaSumoConnector::requestGridInfoForEnsemble( const SumoCaseId& caseId, const QString& ensembleName )
+{
+    m_gridInfos.clear();
+
+    QNetworkRequest m_networkRequest;
+
+    QString encodedEnsembleName = QUrl::toPercentEncoding( ensembleName );
+
+    QString url =
+        QString( "http://localhost:8000/cases/%1/ensembles/%2/grid_info_list" ).arg( caseId.get() ).arg( encodedEnsembleName );
+    m_networkRequest.setUrl( QUrl( url ) );
+    m_networkRequest.setHeader( QNetworkRequest::ContentTypeHeader, RiaCloudDefines::contentTypeJson() );
+
+    auto reply = m_networkAccessManager->get( m_networkRequest );
+
+    connect( reply,
+             &QNetworkReply::finished,
+             [this, reply, ensembleName, caseId]()
+             {
+                 if ( reply->error() == QNetworkReply::NoError )
+                 {
+                     parseGridInfo( reply, caseId, ensembleName );
+                 }
+                 else
+                 {
+                     RiaLogging::error( std::format( "Request grid info failed: '{}'", reply->errorString().toStdString() ) );
+                     emit gridInfoFinished();
+                 }
+             } );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaSumoConnector::requestGridInfoForEnsembleBlocking( const SumoCaseId& caseId, const QString& ensembleName )
+{
+    auto        requestCallable = [this, caseId, ensembleName] { requestGridInfoForEnsemble( caseId, ensembleName ); };
+    QMetaMethod signalMethod    = QMetaMethod::fromSignal( &RiaSumoConnector::gridInfoFinished );
+    wrapAndCallNetworkRequest( requestCallable, signalMethod );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaSumoConnector::requestGridBlobIdForEnsemble( const SumoCaseId& caseId, const QString& ensembleName, const QString& gridName, int realization )
+{
+    QNetworkRequest m_networkRequest;
+
+    // Properly URL-encode the path components
+    QString encodedEnsembleName = QUrl::toPercentEncoding( ensembleName );
+    QString encodedGridName     = QUrl::toPercentEncoding( gridName );
+
+    QString url = QString( "http://localhost:8000/cases/%1/ensembles/%2/grids/%3/realizations/%4/blob_url" )
+                      .arg( caseId.get() )
+                      .arg( encodedEnsembleName )
+                      .arg( encodedGridName )
+                      .arg( realization );
+    m_networkRequest.setUrl( QUrl( url ) );
+    m_networkRequest.setHeader( QNetworkRequest::ContentTypeHeader, RiaCloudDefines::contentTypeJson() );
+
+    auto reply = m_networkAccessManager->get( m_networkRequest );
+
+    connect( reply,
+             &QNetworkReply::finished,
+             [this, reply, ensembleName, caseId, gridName]()
+             {
+                 if ( reply->error() == QNetworkReply::NoError )
+                 {
+                     parseBlobUrl( reply, caseId, ensembleName, gridName, false );
+                 }
+                 else
+                 {
+                     RiaLogging::error( std::format( "Request grid blob URL failed: '{}'", reply->errorString().toStdString() ) );
+                     emit blobIdFinished();
+                 }
+             } );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaSumoConnector::requestGridBlobIdForEnsembleBlocking( const SumoCaseId& caseId,
+                                                             const QString&    ensembleName,
+                                                             const QString&    gridName,
+                                                             int               realization )
+{
+    auto requestCallable = [this, caseId, ensembleName, gridName, realization]
+    { requestGridBlobIdForEnsemble( caseId, ensembleName, gridName, realization ); };
+    QMetaMethod signalMethod = QMetaMethod::fromSignal( &RiaSumoConnector::blobIdFinished );
+    wrapAndCallNetworkRequest( requestCallable, signalMethod );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QByteArray
+    RiaSumoConnector::requestGridDataBlocking( const SumoCaseId& caseId, const QString& ensembleName, const QString& gridName, int realization )
+{
+    requestGridBlobIdForEnsembleBlocking( caseId, ensembleName, gridName, realization );
+
+    if ( m_blobUrl.empty() ) return {};
+
+    // The REST API returns the complete blob URL, extract the blob id (last path segment).
+    auto blobUrl  = m_blobUrl.back();
+    auto urlParts = blobUrl.split( '/' );
+    auto blobId   = urlParts.last();
+
+    QEventLoop eventLoop;
+    QTimer     timer;
+    timer.setSingleShot( true );
+    QObject::connect( &timer, SIGNAL( timeout() ), &eventLoop, SLOT( quit() ) );
+    QObject::connect( this, SIGNAL( parquetDownloadFinished( const QByteArray&, const QString& ) ), &eventLoop, SLOT( quit() ) );
+
+    requestBlobDownload( blobId );
+
+    timer.start( RiaSumoDefines::requestTimeoutMillis() );
+    eventLoop.exec( QEventLoop::ProcessEventsFlag::ExcludeUserInputEvents );
+
+    for ( const auto& blobData : m_redirectInfo )
+    {
+        if ( blobData.objectId == blobId )
+        {
+            return blobData.contents;
+        }
+    }
+
+    return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QByteArray RiaSumoConnector::requestParametersParquetDataBlocking( const SumoCaseId& caseId, const QString& ensembleName )
 {
     requestParametersBlobIdForEnsembleBlocking( caseId, ensembleName );
@@ -728,6 +860,46 @@ void RiaSumoConnector::parseRealizationNumbers( QNetworkReply* reply, const Sumo
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RiaSumoConnector::parseGridInfo( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName )
+{
+    QByteArray result = reply->readAll();
+    reply->deleteLater();
+
+    m_gridInfos.clear();
+
+    if ( reply->error() == QNetworkReply::NoError )
+    {
+        QJsonDocument doc       = QJsonDocument::fromJson( result );
+        QJsonArray    jsonArray = doc.array();
+
+        for ( const QJsonValue& value : jsonArray )
+        {
+            QJsonObject gridObj = value.toObject();
+
+            SumoGridInfo gridInfo;
+            gridInfo.name = gridObj["name"].toString();
+
+            for ( const QJsonValue& realizationValue : gridObj["realizations"].toArray() )
+            {
+                gridInfo.realizations.push_back( realizationValue.toInt() );
+            }
+
+            m_gridInfos.push_back( gridInfo );
+        }
+
+        RiaLogging::debug( std::format( "Grid info count : {}", m_gridInfos.size() ) );
+    }
+    else
+    {
+        RiaLogging::error( std::format( "Request grid info failed: '{}'", reply->errorString().toStdString() ) );
+    }
+
+    emit gridInfoFinished();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RiaSumoConnector::parseBlobUrl( QNetworkReply*    reply,
                                      const SumoCaseId& caseId,
                                      const QString&    ensembleName,
@@ -917,6 +1089,14 @@ std::vector<QString> RiaSumoConnector::vectorNames() const
 std::vector<QString> RiaSumoConnector::realizationIds() const
 {
     return m_realizationIds;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<SumoGridInfo> RiaSumoConnector::gridInfos() const
+{
+    return m_gridInfos;
 }
 
 //--------------------------------------------------------------------------------------------------
