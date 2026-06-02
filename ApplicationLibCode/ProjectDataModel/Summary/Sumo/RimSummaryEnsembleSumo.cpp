@@ -30,8 +30,8 @@
 #include "RifEclipseSummaryAddress.h"
 
 #include "Cloud/RimCloudDataSourceCollection.h"
+#include "RimSumoDataSource.h"
 #include "RimSummaryCaseSumo.h"
-#include "RimSummarySumoDataSource.h"
 
 #include "cafPdmObjectScriptingCapability.h"
 
@@ -60,7 +60,7 @@ RimSummaryEnsembleSumo::RimSummaryEnsembleSumo()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryEnsembleSumo::setSumoDataSource( RimSummarySumoDataSource* sumoDataSource )
+void RimSummaryEnsembleSumo::setSumoDataSource( RimSumoDataSource* sumoDataSource )
 {
     m_sumoDataSource = sumoDataSource;
 }
@@ -561,7 +561,7 @@ void RimSummaryEnsembleSumo::onLoadDataAndUpdate()
 {
     if ( m_sumoDataSource() )
     {
-        auto realizationIds = m_sumoDataSource->realizationIds();
+        auto realizationIds = m_sumoDataSource->selectedRealizationIds();
         if ( realizationIds.size() != m_cases.size() )
         {
             m_cases.deleteChildren();

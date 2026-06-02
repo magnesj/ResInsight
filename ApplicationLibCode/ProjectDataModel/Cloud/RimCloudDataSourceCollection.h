@@ -27,8 +27,7 @@
 #include <QPointer>
 #include <QString>
 
-class RimSummarySumoDataSource;
-class RimSumoGridDataSource;
+class RimSumoDataSource;
 
 //==================================================================================================
 ///
@@ -43,10 +42,10 @@ public:
 
     static RimCloudDataSourceCollection* instance();
 
-    std::vector<RimSummarySumoDataSource*> sumoDataSources() const;
+    std::vector<RimSumoDataSource*> sumoDataSources() const;
 
-    void        addSumoDataSource( RimSummarySumoDataSource* dataSource );
-    static void createEnsemblesFromSelectedDataSources( const std::vector<RimSummarySumoDataSource*>& dataSources );
+    void        addSumoDataSource( RimSumoDataSource* dataSource );
+    static void createEnsemblesFromSelectedDataSources( const std::vector<RimSumoDataSource*>& dataSources );
 
 private:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
@@ -55,22 +54,19 @@ private:
     void                          defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
 
-    std::vector<RimSummarySumoDataSource*> addDataSources();
-    void                                   addEnsembles();
-
-    std::vector<RimSumoGridDataSource*> addGridDataSources();
+    std::vector<RimSumoDataSource*> addDataSources();
+    void                            addEnsembles();
 
 private:
     caf::PdmField<bool>                 m_authenticate;
     caf::PdmField<QString>              m_sumoFieldName;
     caf::PdmField<QString>              m_sumoCaseId;
     caf::PdmField<std::vector<QString>> m_sumoEnsembleNames;
+    caf::PdmField<std::vector<QString>> m_sumoRealizationIds;
 
-    caf::PdmField<bool>                                m_addDataSources;
-    caf::PdmField<bool>                                m_addEnsembles;
-    caf::PdmField<bool>                                m_addGridDataSources;
-    caf::PdmChildArrayField<RimSummarySumoDataSource*> m_sumoDataSources;
-    caf::PdmChildArrayField<RimSumoGridDataSource*>    m_sumoGridDataSources;
+    caf::PdmField<bool>                         m_addDataSources;
+    caf::PdmField<bool>                         m_addEnsembles;
+    caf::PdmChildArrayField<RimSumoDataSource*> m_sumoDataSources;
 
     QPointer<RiaSumoConnector> m_sumoConnector;
 };

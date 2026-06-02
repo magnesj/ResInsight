@@ -20,7 +20,7 @@
 
 #include "cafCmdFeature.h"
 
-class RimSumoGridDataSource;
+class RimSumoDataSource;
 
 //==================================================================================================
 ///
@@ -34,5 +34,5 @@ protected:
     void setupActionLook( QAction* actionToSetup ) override;
 
 private:
-    static void createGridEnsemble( RimSumoGridDataSource* dataSource );
+    static void createGridEnsemble( RimSumoDataSource* dataSource );
 };

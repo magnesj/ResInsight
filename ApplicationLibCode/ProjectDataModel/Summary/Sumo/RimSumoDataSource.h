@@ -21,22 +21,25 @@
 
 #include "Cloud/RiaSumoConnector.h"
 
-#include "cafPdmField.h"
-
-#include <QPointer>
+#include "cafPdmProxyValueField.h"
 
 //==================================================================================================
 //
-// GUI data source used to select a grid and a set of realizations from a Sumo ensemble, from which
-// a set of RimEclipseCaseSumo grid cases can be created (one per selected realization).
+// Common data source describing a single Sumo ensemble. Holds the information required both for
+// summary ensembles (vector names) and for grid case ensembles (asset, grid names). The available
+// ensemble realizations - fetched from the realizations endpoint - are the source of truth, and the
+// user selects a subset of them ("ensemble selection"). Both summary and grid consumers listen to
+// the selected realization id subset. All values are populated by RimCloudDataSourceCollection,
+// which owns the RiaSumoConnector; this object does not talk to the connector directly.
 //
 //==================================================================================================
-class RimSumoGridDataSource : public RimNamedObject
+
+class RimSumoDataSource : public RimNamedObject
 {
     CAF_PDM_HEADER_INIT;
 
 public:
-    RimSumoGridDataSource();
+    RimSumoDataSource();
 
     SumoCaseId caseId() const;
     void       setCaseId( const SumoCaseId& caseId );
@@ -50,8 +53,21 @@ public:
     QString ensembleName() const;
     void    setEnsembleName( const QString& ensembleName );
 
-    QString          gridName() const;
-    std::vector<int> selectedRealizations() const;
+    // All realizations available for the ensemble (the source of truth).
+    std::vector<QString> availableRealizationIds() const;
+    void                 setAvailableRealizationIds( const std::vector<QString>& realizationIds );
+
+    // The subset of realizations selected by the user. Both summary and grid creation listen to this.
+    std::vector<QString> selectedRealizationIds() const;
+    void                 setSelectedRealizationIds( const std::vector<QString>& realizationIds );
+
+    std::vector<QString> vectorNames() const;
+    void                 setVectorNames( const std::vector<QString>& vectorNames );
+
+    std::vector<QString> gridNames() const;
+    void                 setGridNames( const std::vector<QString>& gridNames );
+
+    QString selectedGridName() const;
 
     void updateName();
 
@@ -62,6 +78,8 @@ private:
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
 
+    QString selectedRealizationsText() const;
+
 private:
     caf::PdmField<QString> m_caseId;
     caf::PdmField<QString> m_assetName;
@@ -69,8 +87,12 @@ private:
     caf::PdmField<QString> m_ensembleName;
     caf::PdmField<QString> m_customName;
 
-    caf::PdmField<QString>           m_gridName;
-    caf::PdmField<std::vector<int>>  m_realizations;
+    caf::PdmField<std::vector<QString>> m_availableRealizationIds;
+    caf::PdmField<std::vector<QString>> m_selectedRealizationIds;
+    caf::PdmProxyValueField<QString>    m_selectedRealizationsText;
 
-    QPointer<RiaSumoConnector> m_sumoConnector;
+    caf::PdmField<std::vector<QString>> m_vectorNames;
+
+    caf::PdmField<std::vector<QString>> m_gridNames;
+    caf::PdmField<QString>              m_selectedGridName;
 };

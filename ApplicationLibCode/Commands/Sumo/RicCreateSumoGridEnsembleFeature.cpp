@@ -31,7 +31,7 @@
 #include "RimOilField.h"
 #include "RimProject.h"
 #include "RimViewNameConfig.h"
-#include "Sumo/RimSumoGridDataSource.h"
+#include "Sumo/RimSumoDataSource.h"
 
 #include "cafSelectionManagerTools.h"
 
@@ -44,7 +44,7 @@ CAF_CMD_SOURCE_INIT( RicCreateSumoGridEnsembleFeature, "RicCreateSumoGridEnsembl
 //--------------------------------------------------------------------------------------------------
 void RicCreateSumoGridEnsembleFeature::onActionTriggered( bool isChecked )
 {
-    auto dataSources = caf::selectedObjectsByType<RimSumoGridDataSource*>();
+    auto dataSources = caf::selectedObjectsByType<RimSumoDataSource*>();
 
     for ( auto dataSource : dataSources )
     {
@@ -55,12 +55,12 @@ void RicCreateSumoGridEnsembleFeature::onActionTriggered( bool isChecked )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicCreateSumoGridEnsembleFeature::createGridEnsemble( RimSumoGridDataSource* dataSource )
+void RicCreateSumoGridEnsembleFeature::createGridEnsemble( RimSumoDataSource* dataSource )
 {
     if ( !dataSource ) return;
 
-    const QString          gridName     = dataSource->gridName();
-    const std::vector<int> realizations = dataSource->selectedRealizations();
+    const QString              gridName        = dataSource->selectedGridName();
+    const std::vector<QString> realizationIds = dataSource->selectedRealizationIds();
 
     if ( gridName.isEmpty() )
     {
@@ -68,7 +68,7 @@ void RicCreateSumoGridEnsembleFeature::createGridEnsemble( RimSumoGridDataSource
         return;
     }
 
-    if ( realizations.empty() )
+    if ( realizationIds.empty() )
     {
         RiaLogging::warning( "No realizations selected. Unable to create grid ensemble from Sumo." );
         return;
@@ -83,8 +83,12 @@ void RicCreateSumoGridEnsembleFeature::createGridEnsemble( RimSumoGridDataSource
     auto eclipseCaseEnsemble = new RimEclipseCaseEnsemble;
     eclipseCaseEnsemble->setName( QString( "%1 - %2" ).arg( dataSource->ensembleName(), gridName ) );
 
-    for ( int realization : realizations )
+    for ( const QString& realizationId : realizationIds )
     {
+        bool ok          = false;
+        int  realization = realizationId.toInt( &ok );
+        if ( !ok ) continue;
+
         auto* gridCase = new RimEclipseCaseSumo();
         gridCase->setSumoCaseId( dataSource->caseId().get() );
         gridCase->setEnsembleName( dataSource->ensembleName() );
@@ -100,10 +104,15 @@ void RicCreateSumoGridEnsembleFeature::createGridEnsemble( RimSumoGridDataSource
         eclipseCaseEnsemble->addCase( gridCase );
     }
 
+    if ( eclipseCaseEnsemble->cases().empty() )
+    {
+        RiaLogging::warning( "No valid realizations selected. No grid ensemble created." );
+        delete eclipseCaseEnsemble;
+        return;
+    }
+
     oilfield->analysisModels()->caseEnsembles.push_back( eclipseCaseEnsemble );
     oilfield->analysisModels()->updateConnectedEditors();
-
-    if ( eclipseCaseEnsemble->cases().empty() ) return;
 
     auto firstCase = eclipseCaseEnsemble->cases().front();
     if ( !firstCase ) return;

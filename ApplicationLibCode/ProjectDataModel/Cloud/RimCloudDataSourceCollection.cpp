@@ -25,14 +25,15 @@
 #include "RimOilField.h"
 #include "RimProject.h"
 #include "RimSummaryCaseMainCollection.h"
-#include "Sumo/RimSumoGridDataSource.h"
+#include "Sumo/RimSumoDataSource.h"
 #include "Sumo/RimSummaryEnsembleSumo.h"
-#include "Sumo/RimSummarySumoDataSource.h"
 
 #include "RiuPlotMainWindowTools.h"
 
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+
+#include <set>
 
 CAF_PDM_SOURCE_INIT( RimCloudDataSourceCollection, "RimCloudDataSourceCollection" );
 //--------------------------------------------------------------------------------------------------
@@ -52,17 +53,16 @@ RimCloudDataSourceCollection::RimCloudDataSourceCollection()
     CAF_PDM_InitFieldNoDefault( &m_sumoEnsembleNames, "SumoEnsembleNames", "Ensembles" );
     m_sumoEnsembleNames.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
 
+    CAF_PDM_InitFieldNoDefault( &m_sumoRealizationIds, "SumoRealizationIds", "Realizations" );
+    m_sumoRealizationIds.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
+
     CAF_PDM_InitFieldNoDefault( &m_addDataSources, "AddDataSources", "", "", "Add Data Sources without Ensembles" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_addDataSources );
 
     CAF_PDM_InitFieldNoDefault( &m_addEnsembles, "AddEnsembles", "", "", "Add Data Sources and Create Summary Ensemble Plots" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_addEnsembles );
 
-    CAF_PDM_InitFieldNoDefault( &m_addGridDataSources, "AddGridDataSources", "", "", "Add Grid Data Sources" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_addGridDataSources );
-
     CAF_PDM_InitFieldNoDefault( &m_sumoDataSources, "SumoDataSources", "Sumo Data Sources" );
-    CAF_PDM_InitFieldNoDefault( &m_sumoGridDataSources, "SumoGridDataSources", "Sumo Grid Data Sources" );
 
     m_sumoConnector = RiaApplication::instance()->makeSumoConnector();
 }
@@ -78,7 +78,7 @@ RimCloudDataSourceCollection* RimCloudDataSourceCollection::instance()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RimSummarySumoDataSource*> RimCloudDataSourceCollection::sumoDataSources() const
+std::vector<RimSumoDataSource*> RimCloudDataSourceCollection::sumoDataSources() const
 {
     return m_sumoDataSources.childrenByType();
 }
@@ -86,7 +86,7 @@ std::vector<RimSummarySumoDataSource*> RimCloudDataSourceCollection::sumoDataSou
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimCloudDataSourceCollection::createEnsemblesFromSelectedDataSources( const std::vector<RimSummarySumoDataSource*>& dataSources )
+void RimCloudDataSourceCollection::createEnsemblesFromSelectedDataSources( const std::vector<RimSumoDataSource*>& dataSources )
 {
     auto sumCaseMainColl = RiaSummaryTools::summaryCaseMainCollection();
     if ( !sumCaseMainColl ) return;
@@ -109,7 +109,7 @@ void RimCloudDataSourceCollection::createEnsemblesFromSelectedDataSources( const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimCloudDataSourceCollection::addSumoDataSource( RimSummarySumoDataSource* dataSource )
+void RimCloudDataSourceCollection::addSumoDataSource( RimSumoDataSource* dataSource )
 {
     if ( !dataSource ) return;
     m_sumoDataSources.push_back( dataSource );
@@ -133,12 +133,18 @@ void RimCloudDataSourceCollection::fieldChangedByUi( const caf::PdmFieldHandle* 
     {
         m_sumoCaseId = "";
         m_sumoEnsembleNames.v().clear();
+        m_sumoRealizationIds.v().clear();
 
         m_sumoConnector->requestCasesForFieldBlocking( m_sumoFieldName );
     }
     else if ( changedField == &m_sumoCaseId )
     {
         m_sumoEnsembleNames.v().clear();
+        m_sumoRealizationIds.v().clear();
+    }
+    else if ( changedField == &m_sumoEnsembleNames )
+    {
+        m_sumoRealizationIds.v().clear();
     }
     if ( changedField == &m_addEnsembles )
     {
@@ -151,12 +157,6 @@ void RimCloudDataSourceCollection::fieldChangedByUi( const caf::PdmFieldHandle* 
         addDataSources();
 
         m_addDataSources = false;
-    }
-    if ( changedField == &m_addGridDataSources )
-    {
-        addGridDataSources();
-
-        m_addGridDataSources = false;
     }
 }
 
@@ -209,6 +209,28 @@ QList<caf::PdmOptionItemInfo> RimCloudDataSourceCollection::calculateValueOption
             options.push_back( { name, name } );
         }
     }
+    else if ( fieldNeedingOptions == &m_sumoRealizationIds && !m_sumoCaseId().isEmpty() && !m_sumoEnsembleNames().empty() )
+    {
+        // The realization set may differ between ensembles; present the union of the selected ensembles.
+        auto          sumoCaseId = SumoCaseId( m_sumoCaseId );
+        std::set<int> realizations;
+        for ( const auto& ensembleName : m_sumoEnsembleNames() )
+        {
+            m_sumoConnector->requestRealizationIdsForEnsembleBlocking( sumoCaseId, ensembleName );
+            for ( const auto& realizationId : m_sumoConnector->realizationIds() )
+            {
+                bool ok    = false;
+                int  value = realizationId.toInt( &ok );
+                if ( ok ) realizations.insert( value );
+            }
+        }
+
+        for ( int realization : realizations )
+        {
+            auto realizationId = QString::number( realization );
+            options.push_back( { realizationId, realizationId } );
+        }
+    }
 
     return options;
 }
@@ -234,10 +256,10 @@ void RimCloudDataSourceCollection::defineUiOrdering( QString uiConfigName, caf::
         uiOrdering.add( &m_sumoFieldName, layout );
         uiOrdering.add( &m_sumoCaseId, layout );
         uiOrdering.add( &m_sumoEnsembleNames, layout );
+        uiOrdering.add( &m_sumoRealizationIds, layout );
 
         uiOrdering.add( &m_addDataSources, layout );
         uiOrdering.add( &m_addEnsembles, layout );
-        uiOrdering.add( &m_addGridDataSources, layout );
     }
     uiOrdering.skipRemainingFields();
 }
@@ -270,26 +292,19 @@ void RimCloudDataSourceCollection::defineEditorAttribute( const caf::PdmFieldHan
             attrib->m_buttonText = "Add Ensemble(s)";
         }
     }
-    else if ( field == &m_addGridDataSources )
-    {
-        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            attrib->m_buttonText = "Add Grid Data Source(s)";
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RimSummarySumoDataSource*> RimCloudDataSourceCollection::addDataSources()
+std::vector<RimSumoDataSource*> RimCloudDataSourceCollection::addDataSources()
 {
     if ( !m_sumoConnector ) return {};
 
-    std::vector<RimSummarySumoDataSource*> dataSources;
+    std::vector<RimSumoDataSource*> dataSources;
 
-    RimSummarySumoDataSource* objectToSelect = nullptr;
-    auto                      sumoCaseId     = SumoCaseId( m_sumoCaseId );
+    RimSumoDataSource* objectToSelect = nullptr;
+    auto               sumoCaseId     = SumoCaseId( m_sumoCaseId );
 
     for ( const auto& ensembleName : m_sumoEnsembleNames() )
     {
@@ -320,16 +335,39 @@ std::vector<RimSummarySumoDataSource*> RimCloudDataSourceCollection::addDataSour
 
         m_sumoConnector->requestRealizationIdsForEnsembleBlocking( sumoCaseId, ensembleName );
         m_sumoConnector->requestVectorNamesForEnsembleBlocking( sumoCaseId, ensembleName );
+        m_sumoConnector->requestGridInfoForEnsembleBlocking( sumoCaseId, ensembleName );
 
-        auto realizationIds = m_sumoConnector->realizationIds();
-        auto vectorNames    = m_sumoConnector->vectorNames();
+        auto availableRealizationIds = m_sumoConnector->realizationIds();
+        auto vectorNames             = m_sumoConnector->vectorNames();
 
-        auto dataSource = new RimSummarySumoDataSource();
+        std::vector<QString> gridNames;
+        for ( const auto& gridInfo : m_sumoConnector->gridInfos() )
+        {
+            gridNames.push_back( gridInfo.name );
+        }
+
+        // Apply the realizations selected in this collection. If none are selected, use all available.
+        std::vector<QString> selectedRealizationIds = availableRealizationIds;
+        if ( !m_sumoRealizationIds().empty() )
+        {
+            std::set<QString> chosen( m_sumoRealizationIds().begin(), m_sumoRealizationIds().end() );
+
+            selectedRealizationIds.clear();
+            for ( const auto& realizationId : availableRealizationIds )
+            {
+                if ( chosen.count( realizationId ) > 0 ) selectedRealizationIds.push_back( realizationId );
+            }
+        }
+
+        auto dataSource = new RimSumoDataSource();
         dataSource->setCaseId( sumoCaseId );
+        dataSource->setAssetName( m_sumoFieldName );
         dataSource->setCaseName( caseName );
         dataSource->setEnsembleName( ensembleName );
-        dataSource->setRealizationIds( realizationIds );
+        dataSource->setAvailableRealizationIds( availableRealizationIds );
+        dataSource->setSelectedRealizationIds( selectedRealizationIds );
         dataSource->setVectorNames( vectorNames );
+        dataSource->setGridNames( gridNames );
         dataSource->updateName();
 
         objectToSelect = dataSource;
@@ -356,70 +394,4 @@ void RimCloudDataSourceCollection::addEnsembles()
 {
     auto dataSources = addDataSources();
     createEnsemblesFromSelectedDataSources( dataSources );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::vector<RimSumoGridDataSource*> RimCloudDataSourceCollection::addGridDataSources()
-{
-    if ( !m_sumoConnector ) return {};
-
-    std::vector<RimSumoGridDataSource*> dataSources;
-
-    RimSumoGridDataSource* objectToSelect = nullptr;
-    auto                   sumoCaseId     = SumoCaseId( m_sumoCaseId );
-
-    for ( const auto& ensembleName : m_sumoEnsembleNames() )
-    {
-        bool createNewDataSource = true;
-        for ( const auto dataSource : m_sumoGridDataSources.childrenByType() )
-        {
-            if ( dataSource->caseId() == sumoCaseId && dataSource->ensembleName() == ensembleName )
-            {
-                createNewDataSource = false;
-                break;
-            }
-        }
-
-        if ( !createNewDataSource )
-        {
-            continue;
-        }
-
-        QString caseName;
-        for ( const auto& sumoCase : m_sumoConnector->cases() )
-        {
-            if ( sumoCase.caseId == sumoCaseId )
-            {
-                caseName = sumoCase.name;
-                break;
-            }
-        }
-
-        // Prime the connector cache with the grids available for this ensemble.
-        m_sumoConnector->requestGridInfoForEnsembleBlocking( sumoCaseId, ensembleName );
-
-        auto dataSource = new RimSumoGridDataSource();
-        dataSource->setCaseId( sumoCaseId );
-        dataSource->setAssetName( m_sumoFieldName );
-        dataSource->setCaseName( caseName );
-        dataSource->setEnsembleName( ensembleName );
-        dataSource->updateName();
-
-        objectToSelect = dataSource;
-
-        m_sumoGridDataSources.push_back( dataSource );
-        dataSources.push_back( dataSource );
-    }
-
-    uiCapability()->updateAllRequiredEditors();
-
-    if ( objectToSelect )
-    {
-        RiuPlotMainWindowTools::setExpanded( objectToSelect );
-        RiuPlotMainWindowTools::selectAsCurrentItem( objectToSelect );
-    }
-
-    return dataSources;
 }

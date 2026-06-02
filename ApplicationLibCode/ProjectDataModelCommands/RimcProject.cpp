@@ -43,8 +43,8 @@
 #include "RimTools.h"
 #include "RimValveTemplateCollection.h"
 #include "RimWellPathCollection.h"
+#include "Sumo/RimSumoDataSource.h"
 #include "Sumo/RimSummaryEnsembleSumo.h"
-#include "Sumo/RimSummarySumoDataSource.h"
 
 #include "Summary/RiaSummaryTools.h"
 
@@ -327,11 +327,11 @@ std::expected<caf::PdmObjectHandle*, QString> RimProject_importSummaryEnsembleSu
     auto sumCaseMainColl = RiaSummaryTools::summaryCaseMainCollection();
     if ( !sumCaseMainColl ) return std::unexpected( "No summary case main collection found." );
 
-    auto dataSource = new RimSummarySumoDataSource();
+    auto dataSource = new RimSumoDataSource();
     dataSource->setCaseId( SumoCaseId( m_caseId() ) );
     dataSource->setCaseName( m_caseName() );
     dataSource->setEnsembleName( m_ensembleName() );
-    dataSource->setRealizationIds( m_realizationIds() );
+    dataSource->setAvailableRealizationIds( m_realizationIds() );
     dataSource->setVectorNames( m_vectorNames() );
     dataSource->updateName();
 
