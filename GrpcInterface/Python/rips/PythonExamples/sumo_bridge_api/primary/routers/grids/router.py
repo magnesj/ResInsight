@@ -1,0 +1,42 @@
+"""Grids router
+
+Exposes endpoints for discovering and (eventually) fetching grid data from Sumo.
+"""
+
+from __future__ import annotations
+
+from fastapi import APIRouter, HTTPException, Path
+
+from ....services.sumo_access import GridAccess
+
+from .schemas import GridInfo
+
+router = APIRouter(tags=["grids"])
+
+@router.get("/cases/{case_uuid}/ensembles/{ensemble_name}/grid_info_list")
+async def get_grid_info_list(
+    case_uuid: str = Path(description="Sumo case uuid"),
+    ensemble_name: str = Path(description="Ensemble name")
+) -> list[GridInfo]:
+    """List available grids, with their realizations, for the given case + ensemble."""
+    access = GridAccess.from_case_uuid(case_uuid, ensemble_name)
+    try:
+        grids = await access.get_available_grid_info_list_async()
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return [GridInfo(name=g.name, realizations=g.realizations) for g in grids]
+
+@router.get("/cases/{case_uuid}/ensembles/{ensemble_name}/grids/{grid_name}/realizations/{realization}/blob_url")
+async def get_grid_blob_url(
+    case_uuid: str = Path(description="Sumo case uuid"),
+    ensemble_name: str = Path(description="Ensemble name"),
+    grid_name: str = Path(description="Grid name"),
+    realization: int = Path(description="Realization id"),
+) -> str:
+    """Get the blob URL for the grid data for the given case + ensemble."""
+    access = GridAccess.from_case_uuid(case_uuid, ensemble_name)
+    try:
+        url = await access.get_grid_blob_url_async(grid_name, realization)
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return url

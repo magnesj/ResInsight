@@ -21,6 +21,7 @@ from .routers.explore.router import router as explore_router
 from .routers.polygons.router import router as polygons_router
 from .routers.surfaces.router import router as surfaces_router
 from .routers.timeseries.router import router as timeseries_router
+from .routers.grids.router import router as grids_router
 
 logger = logging.getLogger("sumo_bridge")
 logging.basicConfig(level=logging.INFO)
@@ -40,3 +41,4 @@ app.include_router(explore_router)
 app.include_router(timeseries_router)
 app.include_router(polygons_router)
 app.include_router(surfaces_router)
+app.include_router(grids_router)
