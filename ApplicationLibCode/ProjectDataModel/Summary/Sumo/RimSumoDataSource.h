@@ -57,10 +57,11 @@ public:
     std::vector<QString> availableRealizationIds() const;
     void                 setAvailableRealizationIds( const std::vector<QString>& realizationIds );
 
-    // The subset of realizations selected by the user. Both summary and grid creation listen to this.
+    // The subset of realizations matching the realization filter. Both summary and grid creation listen to this.
     std::vector<QString> selectedRealizationIds() const;
-    void                 setSelectedRealizationIds( const std::vector<QString>& realizationIds );
 
+    // Available summary vectors for the ensemble. Not shown in the UI, but used to populate the
+    // ensemble's available result addresses (RimSummaryEnsembleSumo::updateResultAddresses).
     std::vector<QString> vectorNames() const;
     void                 setVectorNames( const std::vector<QString>& vectorNames );
 
@@ -78,7 +79,7 @@ private:
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
 
-    QString selectedRealizationsText() const;
+    QString realizationFilterInfoText() const;
 
 private:
     caf::PdmField<QString> m_caseId;
@@ -88,8 +89,8 @@ private:
     caf::PdmField<QString> m_customName;
 
     caf::PdmField<std::vector<QString>> m_availableRealizationIds;
-    caf::PdmField<std::vector<QString>> m_selectedRealizationIds;
-    caf::PdmProxyValueField<QString>    m_selectedRealizationsText;
+    caf::PdmField<QString>              m_realizationFilter;
+    caf::PdmProxyValueField<QString>    m_realizationFilterInfo;
 
     caf::PdmField<std::vector<QString>> m_vectorNames;
 

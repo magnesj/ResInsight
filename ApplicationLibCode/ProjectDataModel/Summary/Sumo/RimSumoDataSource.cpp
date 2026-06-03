@@ -20,8 +20,11 @@
 
 #include "RiaStdStringTools.h"
 
+#include "RimSummaryEnsembleSumo.h"
+
 #include "cafCmdFeatureMenuBuilder.h"
-#include "cafPdmUiTreeSelectionEditor.h"
+#include "cafPdmUiLineEditor.h"
+#include "cafPdmUiTextEditor.h"
 
 CAF_PDM_SOURCE_INIT( RimSumoDataSource, "RimSumoDataSource", "RimSummarySumoDataSource", "RimSumoGridDataSource" );
 
@@ -41,15 +44,20 @@ RimSumoDataSource::RimSumoDataSource()
     CAF_PDM_InitFieldNoDefault( &m_availableRealizationIds, "RealizationIds", "Available Realization Ids" );
     m_availableRealizationIds.uiCapability()->setUiHidden( true );
 
-    CAF_PDM_InitFieldNoDefault( &m_selectedRealizationIds, "SelectedRealizationIds", "Select" );
-    m_selectedRealizationIds.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
+    CAF_PDM_InitField( &m_realizationFilter,
+                       "RealizationFilter",
+                       QString(),
+                       "Realization Filter",
+                       "",
+                       "Specify realization numbers. Example: 1-5, 8, 11-20, !4 will include 1, 2, 3, 5, 8, 11-20" );
 
-    CAF_PDM_InitFieldNoDefault( &m_selectedRealizationsText, "SelectedRealizationsText", "Realizations" );
-    m_selectedRealizationsText.registerGetMethod( this, &RimSumoDataSource::selectedRealizationsText );
-    m_selectedRealizationsText.uiCapability()->setUiReadOnly( true );
+    CAF_PDM_InitFieldNoDefault( &m_realizationFilterInfo, "RealizationFilterInfo", "Info" );
+    m_realizationFilterInfo.registerGetMethod( this, &RimSumoDataSource::realizationFilterInfoText );
+    m_realizationFilterInfo.uiCapability()->setUiReadOnly( true );
+    m_realizationFilterInfo.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
 
     CAF_PDM_InitFieldNoDefault( &m_vectorNames, "VectorNames", "Vector Names" );
-    m_vectorNames.uiCapability()->setUiReadOnly( true );
+    m_vectorNames.uiCapability()->setUiHidden( true );
 
     CAF_PDM_InitFieldNoDefault( &m_gridNames, "GridNames", "Grid Names" );
     m_gridNames.uiCapability()->setUiHidden( true );
@@ -132,28 +140,41 @@ std::vector<QString> RimSumoDataSource::availableRealizationIds() const
 }
 
 //--------------------------------------------------------------------------------------------------
-/// The available realizations are the source of truth. Default the selection to all of them.
+/// The available realizations are the source of truth. An empty filter selects all of them.
 //--------------------------------------------------------------------------------------------------
 void RimSumoDataSource::setAvailableRealizationIds( const std::vector<QString>& realizationIds )
 {
     m_availableRealizationIds = realizationIds;
-    m_selectedRealizationIds  = realizationIds;
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// The subset of available realizations matching the realization filter. An empty filter (or '*')
+/// selects all available realizations.
 //--------------------------------------------------------------------------------------------------
 std::vector<QString> RimSumoDataSource::selectedRealizationIds() const
 {
-    return m_selectedRealizationIds();
-}
+    const auto& available = m_availableRealizationIds();
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimSumoDataSource::setSelectedRealizationIds( const std::vector<QString>& realizationIds )
-{
-    m_selectedRealizationIds = realizationIds;
+    auto filter = m_realizationFilter();
+    if ( filter.trimmed().isEmpty() || filter.contains( '*' ) )
+    {
+        return available;
+    }
+
+    auto selectedValues = RiaStdStringTools::valuesFromRangeSelection( filter.toStdString() );
+
+    std::vector<QString> result;
+    for ( const auto& realizationId : available )
+    {
+        bool ok    = false;
+        int  value = realizationId.toInt( &ok );
+        if ( ok && selectedValues.count( value ) > 0 )
+        {
+            result.push_back( realizationId );
+        }
+    }
+
+    return result;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -226,21 +247,18 @@ void RimSumoDataSource::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder
 //--------------------------------------------------------------------------------------------------
 void RimSumoDataSource::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_vectorNames )
+    if ( field == &m_realizationFilter )
     {
-        if ( auto attr = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute ) )
+        if ( auto lineEdAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute ) )
         {
-            attr->showCheckBoxes        = false;
-            attr->showContextMenu       = false;
-            attr->showToggleAllCheckbox = false;
+            lineEdAttr->placeholderText = "E.g. 0,1,4-10,!6. Use '*' for all.";
         }
     }
-    else if ( field == &m_selectedRealizationIds )
+    else if ( field == &m_realizationFilterInfo )
     {
-        if ( auto attr = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute ) )
+        if ( auto* myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute ) )
         {
-            attr->showCheckBoxes        = true;
-            attr->showToggleAllCheckbox = true;
+            myAttr->heightHint = -1;
         }
     }
 }
@@ -270,15 +288,11 @@ void RimSumoDataSource::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
     group->add( &m_customName );
 
     auto ensembleGroup = uiOrdering.addNewGroup( "Ensemble Selection" );
-    ensembleGroup->add( &m_selectedRealizationsText );
-    ensembleGroup->add( &m_selectedRealizationIds );
+    ensembleGroup->add( &m_realizationFilter );
+    ensembleGroup->add( &m_realizationFilterInfo );
 
     auto gridGroup = uiOrdering.addNewGroup( "Grid Selection" );
     gridGroup->add( &m_selectedGridName );
-
-    auto summaryInfo = uiOrdering.addNewGroup( "Info" );
-    summaryInfo->setCollapsedByDefault();
-    summaryInfo->add( &m_vectorNames );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -295,13 +309,6 @@ QList<caf::PdmOptionItemInfo> RimSumoDataSource::calculateValueOptions( const ca
             options.push_back( caf::PdmOptionItemInfo( gridName, gridName ) );
         }
     }
-    else if ( fieldNeedingOptions == &m_selectedRealizationIds )
-    {
-        for ( const auto& realizationId : m_availableRealizationIds() )
-        {
-            options.push_back( caf::PdmOptionItemInfo( realizationId, realizationId ) );
-        }
-    }
 
     return options;
 }
@@ -315,20 +322,25 @@ void RimSumoDataSource::fieldChangedByUi( const caf::PdmFieldHandle* changedFiel
     {
         updateName();
     }
-    else if ( changedField == &m_selectedRealizationIds )
+    else if ( changedField == &m_realizationFilter )
     {
-        // Refresh editors so the Realizations label range text stays in sync with the selection.
-        updateConnectedEditors();
+        // Update any summary ensembles created from this data source, so editing the realization filter
+        // updates the realization cases and the connected plots (same behaviour as summary ensembles
+        // loaded from disk, see RimSummaryFileSetEnsemble::onFileSetChanged).
+        for ( auto ensemble : objectsWithReferringPtrFieldsOfType<RimSummaryEnsembleSumo>() )
+        {
+            ensemble->onRealizationSelectionChanged();
+        }
     }
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Compact range text for the selected ensemble realizations.
+/// Compact range text for the available ensemble realizations.
 //--------------------------------------------------------------------------------------------------
-QString RimSumoDataSource::selectedRealizationsText() const
+QString RimSumoDataSource::realizationFilterInfoText() const
 {
     std::vector<int> intValues;
-    for ( const auto& realizationId : m_selectedRealizationIds() )
+    for ( const auto& realizationId : m_availableRealizationIds() )
     {
         bool ok    = false;
         int  value = realizationId.toInt( &ok );
@@ -336,5 +348,5 @@ QString RimSumoDataSource::selectedRealizationsText() const
     }
 
     auto rangeString = RiaStdStringTools::formatRangeSelection( intValues );
-    return QString::fromStdString( rangeString );
+    return "Available realizations: " + QString::fromStdString( rangeString );
 }

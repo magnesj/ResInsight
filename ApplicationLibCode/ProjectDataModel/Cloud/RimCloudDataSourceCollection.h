@@ -62,7 +62,6 @@ private:
     caf::PdmField<QString>              m_sumoFieldName;
     caf::PdmField<QString>              m_sumoCaseId;
     caf::PdmField<std::vector<QString>> m_sumoEnsembleNames;
-    caf::PdmField<std::vector<QString>> m_sumoRealizationIds;
 
     caf::PdmField<bool>                         m_addDataSources;
     caf::PdmField<bool>                         m_addEnsembles;

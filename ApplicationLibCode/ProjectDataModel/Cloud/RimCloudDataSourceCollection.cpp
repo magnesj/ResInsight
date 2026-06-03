@@ -30,8 +30,11 @@
 
 #include "RiuPlotMainWindowTools.h"
 
+#include "cafPdmUiPropertyViewDialog.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+
+#include <QDialogButtonBox>
 
 #include <set>
 
@@ -52,9 +55,6 @@ RimCloudDataSourceCollection::RimCloudDataSourceCollection()
 
     CAF_PDM_InitFieldNoDefault( &m_sumoEnsembleNames, "SumoEnsembleNames", "Ensembles" );
     m_sumoEnsembleNames.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
-
-    CAF_PDM_InitFieldNoDefault( &m_sumoRealizationIds, "SumoRealizationIds", "Realizations" );
-    m_sumoRealizationIds.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
 
     CAF_PDM_InitFieldNoDefault( &m_addDataSources, "AddDataSources", "", "", "Add Data Sources without Ensembles" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_addDataSources );
@@ -133,18 +133,12 @@ void RimCloudDataSourceCollection::fieldChangedByUi( const caf::PdmFieldHandle* 
     {
         m_sumoCaseId = "";
         m_sumoEnsembleNames.v().clear();
-        m_sumoRealizationIds.v().clear();
 
         m_sumoConnector->requestCasesForFieldBlocking( m_sumoFieldName );
     }
     else if ( changedField == &m_sumoCaseId )
     {
         m_sumoEnsembleNames.v().clear();
-        m_sumoRealizationIds.v().clear();
-    }
-    else if ( changedField == &m_sumoEnsembleNames )
-    {
-        m_sumoRealizationIds.v().clear();
     }
     if ( changedField == &m_addEnsembles )
     {
@@ -209,28 +203,6 @@ QList<caf::PdmOptionItemInfo> RimCloudDataSourceCollection::calculateValueOption
             options.push_back( { name, name } );
         }
     }
-    else if ( fieldNeedingOptions == &m_sumoRealizationIds && !m_sumoCaseId().isEmpty() && !m_sumoEnsembleNames().empty() )
-    {
-        // The realization set may differ between ensembles; present the union of the selected ensembles.
-        auto          sumoCaseId = SumoCaseId( m_sumoCaseId );
-        std::set<int> realizations;
-        for ( const auto& ensembleName : m_sumoEnsembleNames() )
-        {
-            m_sumoConnector->requestRealizationIdsForEnsembleBlocking( sumoCaseId, ensembleName );
-            for ( const auto& realizationId : m_sumoConnector->realizationIds() )
-            {
-                bool ok    = false;
-                int  value = realizationId.toInt( &ok );
-                if ( ok ) realizations.insert( value );
-            }
-        }
-
-        for ( int realization : realizations )
-        {
-            auto realizationId = QString::number( realization );
-            options.push_back( { realizationId, realizationId } );
-        }
-    }
 
     return options;
 }
@@ -256,7 +228,6 @@ void RimCloudDataSourceCollection::defineUiOrdering( QString uiConfigName, caf::
         uiOrdering.add( &m_sumoFieldName, layout );
         uiOrdering.add( &m_sumoCaseId, layout );
         uiOrdering.add( &m_sumoEnsembleNames, layout );
-        uiOrdering.add( &m_sumoRealizationIds, layout );
 
         uiOrdering.add( &m_addDataSources, layout );
         uiOrdering.add( &m_addEnsembles, layout );
@@ -346,26 +317,12 @@ std::vector<RimSumoDataSource*> RimCloudDataSourceCollection::addDataSources()
             gridNames.push_back( gridInfo.name );
         }
 
-        // Apply the realizations selected in this collection. If none are selected, use all available.
-        std::vector<QString> selectedRealizationIds = availableRealizationIds;
-        if ( !m_sumoRealizationIds().empty() )
-        {
-            std::set<QString> chosen( m_sumoRealizationIds().begin(), m_sumoRealizationIds().end() );
-
-            selectedRealizationIds.clear();
-            for ( const auto& realizationId : availableRealizationIds )
-            {
-                if ( chosen.count( realizationId ) > 0 ) selectedRealizationIds.push_back( realizationId );
-            }
-        }
-
         auto dataSource = new RimSumoDataSource();
         dataSource->setCaseId( sumoCaseId );
         dataSource->setAssetName( m_sumoFieldName );
         dataSource->setCaseName( caseName );
         dataSource->setEnsembleName( ensembleName );
         dataSource->setAvailableRealizationIds( availableRealizationIds );
-        dataSource->setSelectedRealizationIds( selectedRealizationIds );
         dataSource->setVectorNames( vectorNames );
         dataSource->setGridNames( gridNames );
         dataSource->updateName();

@@ -225,10 +225,9 @@ void RiaSumoConnector::requestVectorNamesForEnsemble( const SumoCaseId& caseId, 
              &QNetworkReply::finished,
              [this, reply, ensembleName, caseId]()
              {
-                 if ( reply->error() == QNetworkReply::NoError )
-                 {
-                     parseVectorNames( reply, caseId, ensembleName );
-                 }
+                 // parseVectorNames handles the error case and always emits vectorNamesFinished, so the
+                 // blocking caller returns immediately instead of waiting for the request to time out.
+                 parseVectorNames( reply, caseId, ensembleName );
              } );
 }
 
@@ -260,10 +259,9 @@ void RiaSumoConnector::requestRealizationIdsForEnsemble( const SumoCaseId& caseI
              &QNetworkReply::finished,
              [this, reply, ensembleName, caseId]()
              {
-                 if ( reply->error() == QNetworkReply::NoError )
-                 {
-                     parseRealizationNumbers( reply, caseId, ensembleName );
-                 }
+                 // parseRealizationNumbers handles the error case and always emits realizationIdsFinished, so
+                 // the blocking caller returns immediately instead of waiting for the request to time out.
+                 parseRealizationNumbers( reply, caseId, ensembleName );
              } );
 }
 
@@ -477,14 +475,9 @@ void RiaSumoConnector::requestParametersBlobIdForEnsemble( const SumoCaseId& cas
              &QNetworkReply::finished,
              [this, reply, ensembleName, caseId]()
              {
-                 if ( reply->error() == QNetworkReply::NoError )
-                 {
-                     parseBlobUrl( reply, caseId, ensembleName, "", true );
-                 }
-                 else
-                 {
-                     RiaLogging::error( std::format( "Request parameters failed: : '%s'", reply->errorString() ) );
-                 }
+                 // parseBlobUrl handles the error case and always emits blobIdFinished, so the blocking
+                 // caller returns immediately instead of waiting for the request to time out.
+                 parseBlobUrl( reply, caseId, ensembleName, "", true );
              } );
 }
 
@@ -512,10 +505,9 @@ void RiaSumoConnector::requestBlobIdForEnsemble( const SumoCaseId& caseId, const
              &QNetworkReply::finished,
              [this, reply, ensembleName, caseId, vectorName]()
              {
-                 if ( reply->error() == QNetworkReply::NoError )
-                 {
-                     parseBlobUrl( reply, caseId, ensembleName, vectorName, false );  // false = vector data
-                 }
+                 // parseBlobUrl handles the error case and always emits blobIdFinished, so the blocking
+                 // caller returns immediately instead of waiting for the request to time out.
+                 parseBlobUrl( reply, caseId, ensembleName, vectorName, false );  // false = vector data
              } );
 }
 

@@ -62,6 +62,8 @@ public:
 
     void setSumoDataSource( RimSumoDataSource* sumoDataSource );
 
+    void onRealizationSelectionChanged();
+
     void                               loadSummaryData( const RifEclipseSummaryAddress& resultAddress );
     std::string                        unitName( const RifEclipseSummaryAddress& resultAddress );
     RiaDefines::EclipseUnitSystem      unitSystem() const;
@@ -86,6 +88,7 @@ private:
     void buildMetaData();
 
     void distributeParametersDataToRealizations( std::shared_ptr<arrow::Table> table );
+    void redistributeCachedDataToRealizations();
 
     static std::shared_ptr<arrow::Table> readParquetTable( const QByteArray& contents, const QString& messageTag );
 

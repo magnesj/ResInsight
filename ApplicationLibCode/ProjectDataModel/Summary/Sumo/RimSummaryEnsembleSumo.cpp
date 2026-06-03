@@ -458,6 +458,29 @@ void RimSummaryEnsembleSumo::distributeParametersDataToRealizations( std::shared
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Re-distribute already cached parquet tables to the current set of realization cases. Used after
+/// the realization cases have been rebuilt (e.g. when the realization filter changes), as the cached
+/// tables hold the data for all realizations and a re-download is not needed.
+//--------------------------------------------------------------------------------------------------
+void RimSummaryEnsembleSumo::redistributeCachedDataToRealizations()
+{
+    for ( const auto& [key, table] : m_parquetTable )
+    {
+        if ( !table ) continue;
+
+        if ( key.isSensitivityParameters )
+        {
+            distributeParametersDataToRealizations( table );
+        }
+        else
+        {
+            auto resultAddress = RifEclipseSummaryAddress::fromEclipseTextAddress( key.vectorName.toStdString() );
+            distributeDataToRealizations( resultAddress, table );
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 void RimSummaryEnsembleSumo::buildMetaData()
@@ -561,31 +584,75 @@ void RimSummaryEnsembleSumo::onLoadDataAndUpdate()
 {
     if ( m_sumoDataSource() )
     {
-        auto realizationIds = m_sumoDataSource->selectedRealizationIds();
-        if ( realizationIds.size() != m_cases.size() )
+        std::set<int> selectedRealizations;
+        for ( const auto& realizationId : m_sumoDataSource->selectedRealizationIds() )
+        {
+            bool ok    = false;
+            int  value = realizationId.toInt( &ok );
+            if ( ok ) selectedRealizations.insert( value );
+        }
+
+        std::set<int> currentRealizations;
+        for ( auto summaryCase : allSummaryCases() )
+        {
+            if ( auto sumoCase = dynamic_cast<RimSummaryCaseSumo*>( summaryCase ) )
+            {
+                currentRealizations.insert( sumoCase->realizationNumber() );
+            }
+        }
+
+        // Rebuild the realization cases whenever the selected set changes (added, removed or swapped),
+        // so editing the realizations on the data source updates the summary plot.
+        if ( selectedRealizations != currentRealizations )
         {
             m_cases.deleteChildren();
 
-            for ( auto realId : realizationIds )
+            for ( int realization : selectedRealizations )
             {
-                auto realization = new RimSummaryCaseSumo();
-                realization->setEnsemble( this );
-                realization->setRealizationName( QString( "real-%1" ).arg( realId ) );
-                realization->setRealizationNumber( realId.toInt() );
-                realization->updateAutoShortName();
+                auto realizationCase = new RimSummaryCaseSumo();
+                realizationCase->setEnsemble( this );
+                realizationCase->setRealizationName( QString( "real-%1" ).arg( realization ) );
+                realizationCase->setRealizationNumber( realization );
+                realizationCase->updateAutoShortName();
 
-                realization->setShowTreeNodes( m_cases.empty() );
+                realizationCase->setShowTreeNodes( m_cases.empty() );
 
-                m_cases.push_back( realization );
+                m_cases.push_back( realizationCase );
             }
+
+            // The realization cases were rebuilt, but the parquet tables are still cached. Push the
+            // cached data into the new cases, otherwise loadSummaryData() would skip the distribution
+            // (the cache lookup hits) and the rebuilt cases would have no values, making the plot empty.
+            redistributeCachedDataToRealizations();
         }
     }
 
     RiaSummaryTools::updateSummaryEnsembleNames();
     updateResultAddresses();
 
-    buildMetaData();
-
-    // call the base class method after data has been loaded
+    // The base class clears the child (address) nodes. Build the metadata afterwards so the available
+    // vectors remain present in the tree after the cases have been rebuilt (e.g. when editing the
+    // realization selection).
     RimSummaryEnsemble::onLoadDataAndUpdate();
+
+    buildMetaData();
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Rebuild the realization cases from the data source selection and refresh dependent plots. This
+/// mirrors RimSummaryFileSetEnsemble::onFileSetChanged, which updates the realization cases (the
+/// RimSummaryCase collection) and the connected plots when the underlying file set changes.
+//--------------------------------------------------------------------------------------------------
+void RimSummaryEnsembleSumo::onRealizationSelectionChanged()
+{
+    // Rebuild the realization cases (done in onLoadDataAndUpdate) and refresh the connected plots,
+    // mirroring RimSummaryFileSetEnsemble::onFileSetChanged.
+    //
+    // Note: we intentionally do not use addCase()/replaceCases() here. Those validate ensemble
+    // parameters, which Sumo realizations do not carry, and would raise a "case has no ensemble
+    // parameters" warning dialog.
+    loadDataAndUpdate();
+
+    RiaSummaryTools::updateConnectedPlots( this );
+    updateAllRequiredEditors();
 }
