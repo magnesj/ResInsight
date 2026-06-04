@@ -32,13 +32,13 @@ class RiaSumoConnector;
 // blob through RiaSumoConnector and parsed in memory, so there is no grid file on disk.
 //
 //==================================================================================================
-class RimEclipseCaseSumo : public RimEclipseCase
+class RimRoffCaseSumo : public RimEclipseCase
 {
     CAF_PDM_HEADER_INIT;
 
 public:
-    RimEclipseCaseSumo();
-    ~RimEclipseCaseSumo() override;
+    RimRoffCaseSumo();
+    ~RimRoffCaseSumo() override;
 
     void setSumoCaseId( const QString& sumoCaseId );
     void setEnsembleName( const QString& ensembleName );

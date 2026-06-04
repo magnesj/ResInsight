@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RimEclipseCaseSumo.h"
+#include "RimRoffCaseSumo.h"
 
 #include "RiaApplication.h"
 #include "RiaLogging.h"
@@ -36,12 +36,12 @@
 
 #include <sstream>
 
-CAF_PDM_SOURCE_INIT( RimEclipseCaseSumo, "RimEclipseCaseSumo" );
+CAF_PDM_SOURCE_INIT( RimRoffCaseSumo, "RimRoffCaseSumo" );
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimEclipseCaseSumo::RimEclipseCaseSumo()
+RimRoffCaseSumo::RimRoffCaseSumo()
 {
     CAF_PDM_InitScriptableObject( "Sumo Grid Case", ":/Case48x48.png" );
 
@@ -63,14 +63,14 @@ RimEclipseCaseSumo::RimEclipseCaseSumo()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimEclipseCaseSumo::~RimEclipseCaseSumo()
+RimRoffCaseSumo::~RimRoffCaseSumo()
 {
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEclipseCaseSumo::setSumoCaseId( const QString& sumoCaseId )
+void RimRoffCaseSumo::setSumoCaseId( const QString& sumoCaseId )
 {
     m_sumoCaseId = sumoCaseId;
 }
@@ -78,7 +78,7 @@ void RimEclipseCaseSumo::setSumoCaseId( const QString& sumoCaseId )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEclipseCaseSumo::setEnsembleName( const QString& ensembleName )
+void RimRoffCaseSumo::setEnsembleName( const QString& ensembleName )
 {
     m_ensembleName = ensembleName;
 }
@@ -86,7 +86,7 @@ void RimEclipseCaseSumo::setEnsembleName( const QString& ensembleName )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEclipseCaseSumo::setGridName( const QString& gridName )
+void RimRoffCaseSumo::setGridName( const QString& gridName )
 {
     m_gridName = gridName;
 }
@@ -94,7 +94,7 @@ void RimEclipseCaseSumo::setGridName( const QString& gridName )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEclipseCaseSumo::setRealization( int realization )
+void RimRoffCaseSumo::setRealization( int realization )
 {
     m_realization = realization;
 }
@@ -102,7 +102,7 @@ void RimEclipseCaseSumo::setRealization( int realization )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-int RimEclipseCaseSumo::realization() const
+int RimRoffCaseSumo::realization() const
 {
     return m_realization();
 }
@@ -110,7 +110,7 @@ int RimEclipseCaseSumo::realization() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimEclipseCaseSumo::openEclipseGridFile()
+bool RimRoffCaseSumo::openEclipseGridFile()
 {
     if ( eclipseCaseData() )
     {
@@ -173,7 +173,7 @@ bool RimEclipseCaseSumo::openEclipseGridFile()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RimEclipseCaseSumo::locationOnDisc() const
+QString RimRoffCaseSumo::locationOnDisc() const
 {
     // The grid is stored on Sumo, not on disk.
     return QString();
@@ -182,7 +182,7 @@ QString RimEclipseCaseSumo::locationOnDisc() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEclipseCaseSumo::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
+void RimRoffCaseSumo::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_caseUserDescription );
     uiOrdering.add( &m_displayNameOption );

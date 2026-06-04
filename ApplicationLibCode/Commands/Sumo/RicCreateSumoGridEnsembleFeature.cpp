@@ -26,7 +26,7 @@
 #include "Rim3dView.h"
 #include "RimEclipseCaseCollection.h"
 #include "RimEclipseCaseEnsemble.h"
-#include "RimEclipseCaseSumo.h"
+#include "RimRoffCaseSumo.h"
 #include "RimEclipseViewCollection.h"
 #include "RimOilField.h"
 #include "RimProject.h"
@@ -89,7 +89,7 @@ void RicCreateSumoGridEnsembleFeature::createGridEnsemble( RimSumoDataSource* da
         int  realization = realizationId.toInt( &ok );
         if ( !ok ) continue;
 
-        auto* gridCase = new RimEclipseCaseSumo();
+        auto* gridCase = new RimRoffCaseSumo();
         gridCase->setSumoCaseId( dataSource->caseId().get() );
         gridCase->setEnsembleName( dataSource->ensembleName() );
         gridCase->setGridName( gridName );
