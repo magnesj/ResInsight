@@ -210,6 +210,9 @@ bool RimRoffCaseSumo::openEclipseGridFile()
 
     results( RiaDefines::PorosityModelType::MATRIX_MODEL )->computeCellVolumes();
 
+    // Rebuild the Data Sources result folders now that the result meta data is available.
+    updateResultAddressCollection();
+
     return true;
 }
 

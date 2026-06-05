@@ -390,7 +390,22 @@ void RimSumoDataSource::updateGridCaseEnsembles()
             currentRealizations.insert( gridCase->realization() );
         }
 
-        // Remove cases (and their views) for realizations no longer selected.
+        // Add cases for newly selected realizations first, so a view displaying a removed realization
+        // can be repointed to one of these instead of being deleted.
+        for ( int realization : selectedRealizations )
+        {
+            if ( currentRealizations.find( realization ) != currentRealizations.end() ) continue;
+
+            if ( auto* gridCase = RimRoffCaseSumo::createFromDataSource( this, gridName, realization ) )
+            {
+                ensemble->addCase( gridCase );
+            }
+        }
+
+        // Remove cases for realizations no longer selected. Remember any views that displayed them, so
+        // they can be repointed to a surviving case below (a deleted case auto-nulls the view's case,
+        // which would otherwise make the view disappear, e.g. when changing 30-40 to 31-40).
+        std::vector<RimEclipseView*> orphanedViews;
         for ( auto gridCase : gridCases )
         {
             if ( selectedRealizations.find( gridCase->realization() ) != selectedRealizations.end() ) continue;
@@ -399,11 +414,7 @@ void RimSumoDataSource::updateGridCaseEnsembles()
             {
                 for ( auto view : viewColl->views() )
                 {
-                    if ( view->eclipseCase() == gridCase )
-                    {
-                        viewColl->removeView( view );
-                        delete view;
-                    }
+                    if ( view->eclipseCase() == gridCase ) orphanedViews.push_back( view );
                 }
             }
 
@@ -411,14 +422,19 @@ void RimSumoDataSource::updateGridCaseEnsembles()
             delete gridCase;
         }
 
-        // Add cases for newly selected realizations.
-        for ( int realization : selectedRealizations )
+        // Repoint orphaned views to a surviving case, or delete them if no realizations remain.
+        const auto remainingCases = ensemble->cases();
+        for ( auto view : orphanedViews )
         {
-            if ( currentRealizations.find( realization ) != currentRealizations.end() ) continue;
-
-            if ( auto* gridCase = RimRoffCaseSumo::createFromDataSource( this, gridName, realization ) )
+            if ( !remainingCases.empty() )
             {
-                ensemble->addCase( gridCase );
+                view->setEclipseCase( remainingCases.front() );
+                view->loadDataAndUpdate();
+            }
+            else if ( auto viewColl = ensemble->viewCollection() )
+            {
+                viewColl->removeView( view );
+                delete view;
             }
         }
 
