@@ -9,7 +9,7 @@ from fastapi import APIRouter, HTTPException, Path
 
 from ....services.sumo_access import GridAccess
 
-from .schemas import GridInfo
+from .schemas import GridInfo, GridPropertyInfo
 
 router = APIRouter(tags=["grids"])
 
@@ -40,3 +40,25 @@ async def get_grid_blob_url(
     except LookupError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     return url
+
+
+@router.get("/cases/{case_uuid}/ensembles/{ensemble_name}/grids/{grid_name}/realizations/{realization}/properties")
+async def get_grid_properties(
+    case_uuid: str = Path(description="Sumo case uuid"),
+    ensemble_name: str = Path(description="Ensemble name"),
+    grid_name: str = Path(description="Grid name"),
+    realization: int = Path(description="Realization id"),
+) -> list[GridPropertyInfo]:
+    """Get grid property metadata for the given case + ensemble + grid + realization."""
+    access = GridAccess.from_case_uuid(case_uuid, ensemble_name)
+    try:
+        properties = await access.get_grid_properties_async(grid_name, realization)
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return [
+        GridPropertyInfo(
+            propertyName=prop.property_name,
+            isoDateOrInterval=prop.iso_date_or_interval,
+        )
+        for prop in properties
+    ]
