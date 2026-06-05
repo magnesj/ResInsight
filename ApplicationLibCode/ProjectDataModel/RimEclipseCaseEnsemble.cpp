@@ -51,6 +51,9 @@ RimEclipseCaseEnsemble::RimEclipseCaseEnsemble()
     CAF_PDM_InitFieldNoDefault( &m_viewCollection, "ViewCollection", "Views" );
     m_viewCollection = new RimEclipseViewCollection;
 
+    // Limit the case dropdown of the ensemble views to the cases of this ensemble.
+    m_viewCollection->setEclipseCaseProvider( [this]() { return this->cases(); } );
+
     CAF_PDM_InitFieldNoDefault( &m_wellTargetMappings, "WellTargetMappings", "Well Target Mappings" );
 
     CAF_PDM_InitFieldNoDefault( &m_statisticsContourMaps, "StatisticsContourMaps", "Statistics Contour maps" );
@@ -68,6 +71,18 @@ RimEclipseCaseEnsemble::~RimEclipseCaseEnsemble()
 
     delete m_viewCollection;
     m_viewCollection = nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEclipseCaseEnsemble::initAfterRead()
+{
+    // The provider is a lambda and not serialized, so re-apply it after loading a project.
+    if ( m_viewCollection )
+    {
+        m_viewCollection->setEclipseCaseProvider( [this]() { return this->cases(); } );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------

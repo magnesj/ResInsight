@@ -85,6 +85,15 @@ RimRoffCaseSumo* RimRoffCaseSumo::createFromDataSource( RimSumoDataSource* dataS
     gridCase->setGridName( gridName );
     gridCase->setRealization( realization );
 
+    // The grid is stored on Sumo, not on disk, so there is no real grid file name. Still assign a unique
+    // synthetic grid file name: an empty one collapses all custom case names onto a single
+    // path-variable key on project save (RiaProjectFileTools), overwriting every name with the last.
+    gridCase->setGridFileName( QString( "sumo/%1/%2/realization-%3/%4.roff" )
+                                   .arg( dataSource->caseId().get() )
+                                   .arg( gridName )
+                                   .arg( realization )
+                                   .arg( gridName ) );
+
     // Name the case using grid name, asset, ensemble and realization, e.g. "Geogrid_Drogon_iter-0_Real_0".
     QString caseDisplayName = QString( "%1_%2_%3_Real_%4" )
                                   .arg( gridName, dataSource->assetName(), dataSource->ensembleName() )

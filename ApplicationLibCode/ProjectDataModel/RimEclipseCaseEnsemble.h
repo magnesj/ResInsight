@@ -75,6 +75,7 @@ public:
     void addStatisticsContourMap( RimStatisticsContourMap* statisticsContourMap ) override;
 
 protected:
+    void initAfterRead() override;
     void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
 
