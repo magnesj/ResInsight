@@ -21,10 +21,12 @@
 #include "RimEclipseCase.h"
 
 #include "cafPdmField.h"
+#include "cafPdmPtrField.h"
 
 #include <QPointer>
 
 class RiaSumoConnector;
+class RimSumoDataSource;
 
 //==================================================================================================
 //
@@ -40,12 +42,18 @@ public:
     RimRoffCaseSumo();
     ~RimRoffCaseSumo() override;
 
+    // Create a grid case for a single realization of the given grid, linked back to the data source
+    // so the case can be updated when the data source realization filter changes.
+    static RimRoffCaseSumo* createFromDataSource( RimSumoDataSource* dataSource, const QString& gridName, int realization );
+
+    void setSumoDataSource( RimSumoDataSource* dataSource );
     void setSumoCaseId( const QString& sumoCaseId );
     void setEnsembleName( const QString& ensembleName );
     void setGridName( const QString& gridName );
     void setRealization( int realization );
 
-    int realization() const;
+    QString gridName() const;
+    int     realization() const;
 
     bool openEclipseGridFile() override;
 
@@ -55,10 +63,11 @@ protected:
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
 
 private:
-    caf::PdmField<QString> m_sumoCaseId;
-    caf::PdmField<QString> m_ensembleName;
-    caf::PdmField<QString> m_gridName;
-    caf::PdmField<int>     m_realization;
+    caf::PdmPtrField<RimSumoDataSource*> m_sumoDataSource;
+    caf::PdmField<QString>               m_sumoCaseId;
+    caf::PdmField<QString>               m_ensembleName;
+    caf::PdmField<QString>               m_gridName;
+    caf::PdmField<int>                   m_realization;
 
     QPointer<RiaSumoConnector> m_sumoConnector;
 };

@@ -31,6 +31,7 @@
 #include "RigMainGrid.h"
 
 #include "RimReservoirCellResultsStorage.h"
+#include "Sumo/RimSumoDataSource.h"
 
 #include "cafPdmObjectScriptingCapability.h"
 
@@ -44,6 +45,9 @@ CAF_PDM_SOURCE_INIT( RimRoffCaseSumo, "RimRoffCaseSumo" );
 RimRoffCaseSumo::RimRoffCaseSumo()
 {
     CAF_PDM_InitScriptableObject( "Sumo Grid Case", ":/Case48x48.png" );
+
+    CAF_PDM_InitFieldNoDefault( &m_sumoDataSource, "SumoDataSource", "Sumo Data Source" );
+    m_sumoDataSource.uiCapability()->setUiHidden( true );
 
     CAF_PDM_InitFieldNoDefault( &m_sumoCaseId, "SumoCaseId", "Sumo Case Id" );
     m_sumoCaseId.uiCapability()->setUiReadOnly( true );
@@ -65,6 +69,37 @@ RimRoffCaseSumo::RimRoffCaseSumo()
 //--------------------------------------------------------------------------------------------------
 RimRoffCaseSumo::~RimRoffCaseSumo()
 {
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimRoffCaseSumo* RimRoffCaseSumo::createFromDataSource( RimSumoDataSource* dataSource, const QString& gridName, int realization )
+{
+    if ( !dataSource ) return nullptr;
+
+    auto* gridCase = new RimRoffCaseSumo();
+    gridCase->setSumoDataSource( dataSource );
+    gridCase->setSumoCaseId( dataSource->caseId().get() );
+    gridCase->setEnsembleName( dataSource->ensembleName() );
+    gridCase->setGridName( gridName );
+    gridCase->setRealization( realization );
+
+    // Name the case using grid name, asset, ensemble and realization, e.g. "Geogrid_Drogon_iter-0_Real_0".
+    QString caseDisplayName = QString( "%1_%2_%3_Real_%4" )
+                                  .arg( gridName, dataSource->assetName(), dataSource->ensembleName() )
+                                  .arg( realization );
+    gridCase->setCustomCaseName( caseDisplayName );
+
+    return gridCase;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimRoffCaseSumo::setSumoDataSource( RimSumoDataSource* dataSource )
+{
+    m_sumoDataSource = dataSource;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -97,6 +132,14 @@ void RimRoffCaseSumo::setGridName( const QString& gridName )
 void RimRoffCaseSumo::setRealization( int realization )
 {
     m_realization = realization;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimRoffCaseSumo::gridName() const
+{
+    return m_gridName();
 }
 
 //--------------------------------------------------------------------------------------------------

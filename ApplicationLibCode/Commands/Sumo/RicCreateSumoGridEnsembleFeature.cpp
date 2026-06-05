@@ -89,19 +89,10 @@ void RicCreateSumoGridEnsembleFeature::createGridEnsemble( RimSumoDataSource* da
         int  realization = realizationId.toInt( &ok );
         if ( !ok ) continue;
 
-        auto* gridCase = new RimRoffCaseSumo();
-        gridCase->setSumoCaseId( dataSource->caseId().get() );
-        gridCase->setEnsembleName( dataSource->ensembleName() );
-        gridCase->setGridName( gridName );
-        gridCase->setRealization( realization );
-
-        // Name the case using grid name, asset, ensemble and realization, e.g. "Geogrid_Drogon_iter-0_Real_0".
-        QString caseDisplayName = QString( "%1_%2_%3_Real_%4" )
-                                      .arg( gridName, dataSource->assetName(), dataSource->ensembleName() )
-                                      .arg( realization );
-        gridCase->setCustomCaseName( caseDisplayName );
-
-        eclipseCaseEnsemble->addCase( gridCase );
+        if ( auto* gridCase = RimRoffCaseSumo::createFromDataSource( dataSource, gridName, realization ) )
+        {
+            eclipseCaseEnsemble->addCase( gridCase );
+        }
     }
 
     if ( eclipseCaseEnsemble->cases().empty() )

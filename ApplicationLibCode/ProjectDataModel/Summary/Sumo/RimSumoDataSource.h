@@ -79,6 +79,9 @@ private:
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
 
+    void onRealizationFilterChanged();
+    void updateGridCaseEnsembles();
+
     QString realizationFilterInfoText() const;
 
 private:

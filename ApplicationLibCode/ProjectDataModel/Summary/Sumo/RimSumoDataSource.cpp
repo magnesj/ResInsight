@@ -20,11 +20,18 @@
 
 #include "RiaStdStringTools.h"
 
+#include "RimEclipseCaseEnsemble.h"
+#include "RimEclipseView.h"
+#include "RimEclipseViewCollection.h"
+#include "RimRoffCaseSumo.h"
 #include "RimSummaryEnsembleSumo.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTextEditor.h"
+
+#include <map>
+#include <set>
 
 CAF_PDM_SOURCE_INIT( RimSumoDataSource, "RimSumoDataSource", "RimSummarySumoDataSource", "RimSumoGridDataSource" );
 
@@ -324,13 +331,98 @@ void RimSumoDataSource::fieldChangedByUi( const caf::PdmFieldHandle* changedFiel
     }
     else if ( changedField == &m_realizationFilter )
     {
-        // Update any summary ensembles created from this data source, so editing the realization filter
-        // updates the realization cases and the connected plots (same behaviour as summary ensembles
-        // loaded from disk, see RimSummaryFileSetEnsemble::onFileSetChanged).
-        for ( auto ensemble : objectsWithReferringPtrFieldsOfType<RimSummaryEnsembleSumo>() )
+        onRealizationFilterChanged();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Propagate a change in the realization filter to the ensembles created from this data source, so
+/// editing the filter updates the realization cases (and the connected plots/views).
+//--------------------------------------------------------------------------------------------------
+void RimSumoDataSource::onRealizationFilterChanged()
+{
+    // Update any summary ensembles created from this data source (same behaviour as summary ensembles
+    // loaded from disk, see RimSummaryFileSetEnsemble::onFileSetChanged).
+    for ( auto ensemble : objectsWithReferringPtrFieldsOfType<RimSummaryEnsembleSumo>() )
+    {
+        ensemble->onRealizationSelectionChanged();
+    }
+
+    // Update any grid case ensembles created from this data source.
+    updateGridCaseEnsembles();
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Synchronize the realization grid cases (RimRoffCaseSumo) of every grid ensemble created from this
+/// data source with the current realization filter: remove cases for deselected realizations and add
+/// cases for newly selected ones. The grid name of each ensemble is preserved.
+//--------------------------------------------------------------------------------------------------
+void RimSumoDataSource::updateGridCaseEnsembles()
+{
+    std::set<int> selectedRealizations;
+    for ( const auto& realizationId : selectedRealizationIds() )
+    {
+        bool ok    = false;
+        int  value = realizationId.toInt( &ok );
+        if ( ok ) selectedRealizations.insert( value );
+    }
+
+    // Group the grid cases created from this data source by their owning ensemble.
+    std::map<RimEclipseCaseEnsemble*, std::vector<RimRoffCaseSumo*>> casesByEnsemble;
+    for ( auto gridCase : objectsWithReferringPtrFieldsOfType<RimRoffCaseSumo>() )
+    {
+        if ( auto ensemble = gridCase->firstAncestorOrThisOfType<RimEclipseCaseEnsemble>() )
         {
-            ensemble->onRealizationSelectionChanged();
+            casesByEnsemble[ensemble].push_back( gridCase );
         }
+    }
+
+    for ( auto& [ensemble, gridCases] : casesByEnsemble )
+    {
+        if ( gridCases.empty() ) continue;
+
+        // All cases in an ensemble share the same grid; keep it when adding new realizations.
+        const QString gridName = gridCases.front()->gridName();
+
+        std::set<int> currentRealizations;
+        for ( auto gridCase : gridCases )
+        {
+            currentRealizations.insert( gridCase->realization() );
+        }
+
+        // Remove cases (and their views) for realizations no longer selected.
+        for ( auto gridCase : gridCases )
+        {
+            if ( selectedRealizations.find( gridCase->realization() ) != selectedRealizations.end() ) continue;
+
+            if ( auto viewColl = ensemble->viewCollection() )
+            {
+                for ( auto view : viewColl->views() )
+                {
+                    if ( view->eclipseCase() == gridCase )
+                    {
+                        viewColl->removeView( view );
+                        delete view;
+                    }
+                }
+            }
+
+            ensemble->removeCase( gridCase );
+            delete gridCase;
+        }
+
+        // Add cases for newly selected realizations.
+        for ( int realization : selectedRealizations )
+        {
+            if ( currentRealizations.find( realization ) != currentRealizations.end() ) continue;
+
+            if ( auto* gridCase = RimRoffCaseSumo::createFromDataSource( this, gridName, realization ) )
+            {
+                ensemble->addCase( gridCase );
+            }
+        }
+
+        ensemble->updateConnectedEditors();
     }
 }
 
