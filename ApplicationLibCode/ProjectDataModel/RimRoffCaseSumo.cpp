@@ -34,6 +34,7 @@
 #include "Sumo/RimSumoDataSource.h"
 
 #include "cafPdmObjectScriptingCapability.h"
+#include "cafPdmUiTreeSelectionEditor.h"
 
 #include <sstream>
 
@@ -60,6 +61,9 @@ RimRoffCaseSumo::RimRoffCaseSumo()
 
     CAF_PDM_InitField( &m_realization, "Realization", -1, "Realization" );
     m_realization.uiCapability()->setUiReadOnly( true );
+
+    CAF_PDM_InitFieldNoDefault( &m_selectedProperties, "SelectedProperties", "Properties" );
+    m_selectedProperties.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
 
     m_sumoConnector = RiaApplication::instance()->makeSumoConnector();
 }
@@ -219,6 +223,9 @@ bool RimRoffCaseSumo::openEclipseGridFile()
 
     results( RiaDefines::PorosityModelType::MATRIX_MODEL )->computeCellVolumes();
 
+    // Import any grid properties the user has previously selected (no-op if none are selected).
+    loadSelectedProperties();
+
     // Rebuild the Data Sources result folders now that the result meta data is available.
     updateResultAddressCollection();
 
@@ -248,4 +255,166 @@ void RimRoffCaseSumo::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering
     group->add( &m_ensembleName );
     group->add( &m_gridName );
     group->add( &m_realization );
+
+    auto propertyGroup = uiOrdering.addNewGroup( "Grid Properties" );
+    propertyGroup->add( &m_selectedProperties );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QList<caf::PdmOptionItemInfo> RimRoffCaseSumo::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
+{
+    QList<caf::PdmOptionItemInfo> options;
+
+    if ( fieldNeedingOptions == &m_selectedProperties )
+    {
+        if ( m_availableProperties.empty() ) fetchAvailableProperties();
+
+        for ( const auto& [name, isoDateOrInterval] : m_availableProperties )
+        {
+            options.push_back( caf::PdmOptionItemInfo( propertyLabel( name, isoDateOrInterval ), propertyKey( name, isoDateOrInterval ) ) );
+        }
+    }
+
+    return options;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimRoffCaseSumo::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
+{
+    if ( changedField == &m_selectedProperties )
+    {
+        // Properties need the grid geometry, so make sure the grid is loaded before importing them.
+        if ( openReservoirCase() )
+        {
+            loadSelectedProperties();
+            updateResultAddressCollection();
+        }
+        updateConnectedEditors();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimRoffCaseSumo::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
+{
+    if ( field == &m_selectedProperties )
+    {
+        if ( auto attr = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute ) )
+        {
+            attr->showCheckBoxes        = true;
+            attr->showToggleAllCheckbox = true;
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimRoffCaseSumo::fetchAvailableProperties()
+{
+    m_availableProperties.clear();
+
+    if ( !m_sumoConnector ) return;
+
+    m_sumoConnector->requestGridPropertyInfoForEnsembleBlocking( SumoCaseId( m_sumoCaseId() ),
+                                                                 m_ensembleName(),
+                                                                 m_gridName(),
+                                                                 m_realization() );
+
+    for ( const auto& info : m_sumoConnector->gridPropertyInfos() )
+    {
+        // ResInsight has no handling of time intervals, so only static and single-timestamp properties are offered.
+        if ( info.isoDateOrInterval.contains( '/' ) ) continue;
+
+        m_availableProperties.push_back( { info.name, info.isoDateOrInterval } );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimRoffCaseSumo::loadSelectedProperties()
+{
+    if ( m_selectedProperties().empty() ) return;
+
+    if ( m_availableProperties.empty() ) fetchAvailableProperties();
+
+    for ( const auto& key : m_selectedProperties() )
+    {
+        for ( const auto& [name, isoDateOrInterval] : m_availableProperties )
+        {
+            if ( propertyKey( name, isoDateOrInterval ) == key )
+            {
+                loadProperty( name, isoDateOrInterval );
+                break;
+            }
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimRoffCaseSumo::loadProperty( const QString& propertyName, const QString& isoDateOrInterval )
+{
+    const auto key = propertyKey( propertyName, isoDateOrInterval );
+    if ( m_loadedPropertyKeys.count( key ) > 0 ) return true; // already imported
+
+    if ( !m_sumoConnector || !eclipseCaseData() ) return false;
+
+    QByteArray contents = m_sumoConnector->requestGridPropertyDataBlocking( SumoCaseId( m_sumoCaseId() ),
+                                                                            m_ensembleName(),
+                                                                            m_gridName(),
+                                                                            m_realization(),
+                                                                            propertyName,
+                                                                            isoDateOrInterval );
+    if ( contents.isEmpty() )
+    {
+        RiaLogging::error(
+            std::format( "Failed to download grid property '{}' from Sumo.", propertyLabel( propertyName, isoDateOrInterval ).toStdString() ) );
+        return false;
+    }
+
+    // The downloaded blob is a binary roff property file. Parse it directly from memory.
+    std::string        buffer = contents.toStdString();
+    std::istringstream stream( buffer, std::ios::binary );
+
+    // Properties without a timestamp are static, properties with a timestamp are dynamic.
+    const auto resultCategory =
+        isoDateOrInterval.isEmpty() ? RiaDefines::ResultCatType::STATIC_NATIVE : RiaDefines::ResultCatType::DYNAMIC_NATIVE;
+
+    const bool ok =
+        RifRoffFileTools::createInputProperties( stream, eclipseCaseData(), propertyLabel( propertyName, isoDateOrInterval ), resultCategory ).first;
+    if ( !ok )
+    {
+        RiaLogging::error(
+            std::format( "Failed to import grid property '{}' from Sumo.", propertyLabel( propertyName, isoDateOrInterval ).toStdString() ) );
+        return false;
+    }
+
+    m_loadedPropertyKeys.insert( key );
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimRoffCaseSumo::propertyKey( const QString& propertyName, const QString& isoDateOrInterval )
+{
+    if ( isoDateOrInterval.isEmpty() ) return propertyName;
+    return propertyName + "|" + isoDateOrInterval;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimRoffCaseSumo::propertyLabel( const QString& propertyName, const QString& isoDateOrInterval )
+{
+    if ( isoDateOrInterval.isEmpty() ) return propertyName;
+    return QString( "%1 (%2)" ).arg( propertyName, isoDateOrInterval );
 }

@@ -24,6 +24,11 @@
 #include "cafPdmPtrField.h"
 
 #include <QPointer>
+#include <QString>
+
+#include <set>
+#include <utility>
+#include <vector>
 
 class RiaSumoConnector;
 class RimSumoDataSource;
@@ -60,7 +65,20 @@ public:
     QString locationOnDisc() const override;
 
 protected:
-    void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
+    void                          defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
+    QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
+    void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+    void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
+
+private:
+    // Fetch the list of available grid properties from Sumo (static + single-timestamp; time intervals are skipped).
+    void fetchAvailableProperties();
+    // Download and import the roff data of every selected property that is not already loaded.
+    void loadSelectedProperties();
+    bool loadProperty( const QString& propertyName, const QString& isoDateOrInterval );
+
+    static QString propertyKey( const QString& propertyName, const QString& isoDateOrInterval );
+    static QString propertyLabel( const QString& propertyName, const QString& isoDateOrInterval );
 
 private:
     caf::PdmPtrField<RimSumoDataSource*> m_sumoDataSource;
@@ -68,6 +86,12 @@ private:
     caf::PdmField<QString>               m_ensembleName;
     caf::PdmField<QString>               m_gridName;
     caf::PdmField<int>                   m_realization;
+    caf::PdmField<std::vector<QString>>  m_selectedProperties;
+
+    // Transient (not persisted): the available properties fetched from Sumo, as (name, isoDateOrInterval) pairs,
+    // and the keys of the properties already imported into the grid.
+    std::vector<std::pair<QString, QString>> m_availableProperties;
+    std::set<QString>                        m_loadedPropertyKeys;
 
     QPointer<RiaSumoConnector> m_sumoConnector;
 };
