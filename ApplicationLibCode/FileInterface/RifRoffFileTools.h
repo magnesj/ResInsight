@@ -70,6 +70,10 @@ public:
 
     static bool hasGridData( const QString& filename );
 
+    // Read the first roff array whose length matches the grid cell count and return its values (with inactive
+    // cells masked). Used to fetch a single grid property from an in-memory roff blob without registering it.
+    static bool propertyValuesFromStream( std::istream& stream, RigEclipseCaseData* eclipseCase, std::vector<double>* values );
+
     static size_t computeActiveCellMatrixIndex( std::vector<int>& activeCells );
 
     static std::vector<double> computeZoneValuesFromSubgrids( const std::vector<int>& nLayers, size_t nx, size_t ny, size_t nz );

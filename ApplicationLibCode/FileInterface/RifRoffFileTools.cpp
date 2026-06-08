@@ -717,6 +717,55 @@ std::vector<double>
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool RifRoffFileTools::propertyValuesFromStream( std::istream& stream, RigEclipseCaseData* eclipseCaseData, std::vector<double>* values )
+{
+    if ( !eclipseCaseData || !eclipseCaseData->mainGrid() || !values ) return false;
+
+    auto mainGrid = eclipseCaseData->mainGrid();
+
+    const int    nx        = static_cast<int>( mainGrid->cellCountI() );
+    const int    ny        = static_cast<int>( mainGrid->cellCountJ() );
+    const int    nz        = static_cast<int>( mainGrid->cellCountK() );
+    const size_t cellCount = mainGrid->cellCount();
+
+    try
+    {
+        roff::Reader reader( stream );
+        reader.parse();
+
+        for ( const auto& [keyword, kind] : reader.getNamedArrayTypes() )
+        {
+            if ( reader.getArrayLength( keyword ) != cellCount ) continue;
+
+            std::vector<double> roffValues = readAndConvertToDouble( nx, ny, nz, keyword, kind, reader );
+            if ( roffValues.size() != cellCount ) continue;
+
+            // Set better invalid value for inactive cells: roff file has -999.
+            auto activeCellInfo = eclipseCaseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
+            for ( size_t i = 0; i < cellCount; i++ )
+            {
+                if ( !activeCellInfo->isActive( ReservoirCellIndex( mainGrid->reservoirCellIndex( i ) ) ) )
+                {
+                    roffValues[i] = HUGE_VAL;
+                }
+            }
+
+            *values = std::move( roffValues );
+            return true;
+        }
+    }
+    catch ( std::runtime_error& err )
+    {
+        RiaLogging::error( std::format( "Roff property parsing failed: {}", err.what() ) );
+        return false;
+    }
+
+    return false;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 bool RifRoffFileTools::appendNewInputPropertyResult( RigEclipseCaseData*       caseData,
                                                      const QString&            resultName,
                                                      const std::string&        keyword,
