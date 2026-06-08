@@ -5,7 +5,7 @@ Exposes endpoints for discovering and (eventually) fetching grid data from Sumo.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, HTTPException, Path, Query
 
 from ....services.sumo_access import GridAccess
 
@@ -64,14 +64,15 @@ async def get_grid_property_info_list(
     ]
 
 @router.get("/cases/{case_uuid}/ensembles/{ensemble_name}/grids/{grid_name}/realizations/{realization}/properties/{property_name}/blob_url")
-@router.get("/cases/{case_uuid}/ensembles/{ensemble_name}/grids/{grid_name}/realizations/{realization}/properties/{property_name}/timepoints/{property_iso_date_or_interval:path}/blob_url")
 async def get_grid_property_blob_url(
     case_uuid: str = Path(description="Sumo case uuid"),
     ensemble_name: str = Path(description="Ensemble name"),
     grid_name: str = Path(description="Grid name"),
     realization: int = Path(description="Realization id"),
     property_name: str = Path(description="Property name"),
-    property_iso_date_or_interval: str | None = None,
+    property_iso_date_or_interval: str | None = Query(
+        default=None, description="Time point or time interval string"
+    ),
 ) -> str:
     """Get the blob URL for a grid property."""
     access = GridAccess.from_case_uuid(case_uuid, ensemble_name)
