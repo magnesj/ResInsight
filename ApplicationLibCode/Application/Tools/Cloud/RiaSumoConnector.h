@@ -69,6 +69,15 @@ struct SumoGridInfo
     std::vector<int> realizations;
 };
 
+struct SumoGridPropertyInfo
+{
+    QString name;
+
+    // Empty for a static property. For a dynamic property this is either a single timestamp ("2018-01-01")
+    // or an interval ("2018-01-01/2019-01-01"). ResInsight currently only supports the single-timestamp form.
+    QString isoDateOrInterval;
+};
+
 //==================================================================================================
 ///
 //==================================================================================================
@@ -119,13 +128,37 @@ public:
 
     QByteArray requestGridDataBlocking( const SumoCaseId& caseId, const QString& ensembleName, const QString& gridName, int realization );
 
+    void requestGridPropertyInfoForEnsemble( const SumoCaseId& caseId, const QString& ensembleName, const QString& gridName, int realization );
+    void requestGridPropertyInfoForEnsembleBlocking( const SumoCaseId& caseId, const QString& ensembleName, const QString& gridName, int realization );
+
+    void requestGridPropertyBlobIdForEnsemble( const SumoCaseId& caseId,
+                                               const QString&    ensembleName,
+                                               const QString&    gridName,
+                                               int               realization,
+                                               const QString&    propertyName,
+                                               const QString&    isoDateOrInterval );
+    void requestGridPropertyBlobIdForEnsembleBlocking( const SumoCaseId& caseId,
+                                                       const QString&    ensembleName,
+                                                       const QString&    gridName,
+                                                       int               realization,
+                                                       const QString&    propertyName,
+                                                       const QString&    isoDateOrInterval );
+
+    QByteArray requestGridPropertyDataBlocking( const SumoCaseId& caseId,
+                                                const QString&    ensembleName,
+                                                const QString&    gridName,
+                                                int               realization,
+                                                const QString&    propertyName,
+                                                const QString&    isoDateOrInterval );
+
     std::vector<SumoAsset>    assets() const;
     std::vector<SumoCase>     cases() const;
     std::vector<QString>      ensembleNamesForCase( const SumoCaseId& caseId ) const;
     std::vector<QString>      vectorNames() const;
     std::vector<QString>      realizationIds() const;
-    std::vector<SumoGridInfo> gridInfos() const;
-    std::vector<QString>      blobUrls() const;
+    std::vector<SumoGridInfo>         gridInfos() const;
+    std::vector<SumoGridPropertyInfo> gridPropertyInfos() const;
+    std::vector<QString>              blobUrls() const;
     std::vector<SumoRedirect> blobContents() const;
 
 public slots:
@@ -135,6 +168,7 @@ public slots:
     void parseVectorNames( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName );
     void parseRealizationNumbers( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName );
     void parseGridInfo( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName );
+    void parseGridPropertyInfo( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName, const QString& gridName, int realization );
     void parseBlobUrl( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName, const QString& vectorName, bool isParameters );
     void parseBlobIds( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName, const QString& vectorName, bool isParameters );
 
@@ -154,6 +188,7 @@ signals:
     void assetsFinished();
     void realizationIdsFinished();
     void gridInfoFinished();
+    void gridPropertyInfoFinished();
 
 private:
     void addStandardHeader( QNetworkRequest& networkRequest, const QString& token, const QString& contentType );
@@ -174,6 +209,8 @@ private:
     std::vector<QString>      m_realizationIds;
     std::vector<SumoEnsemble> m_ensembleNames;
     std::vector<SumoGridInfo> m_gridInfos;
+
+    std::vector<SumoGridPropertyInfo> m_gridPropertyInfos;
 
     std::vector<QString> m_blobUrl;
 
