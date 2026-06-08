@@ -241,6 +241,12 @@ static void ecl_file_kw_load_kw( ecl_file_kw_type * file_kw , fortio_type * fort
   {
     fortio_fseek( fortio , file_kw->file_offset , SEEK_SET );
     file_kw->kw = ecl_kw_fread_alloc( fortio );
+    if (file_kw->kw == NULL)
+      /* Reading the keyword failed (e.g. a truncated or corrupt file, or a
+         stored file offset past the end of file). Leave file_kw->kw as NULL and
+         let the calling scope handle the missing keyword instead of
+         dereferencing a NULL pointer in ecl_file_kw_assert_kw(). */
+      return;
     ecl_file_kw_assert_kw( file_kw );
     inv_map_add_kw( inv_map , file_kw , file_kw->kw );
   }
