@@ -1000,7 +1000,12 @@ bool RifReaderEclipseOutput::staticResult( const QString& result, RiaDefines::Po
         for ( i = 0; i < numOccurrences; i++ )
         {
             std::vector<double> partValues;
-            RifEclipseOutputFileTools::keywordData( m_ecl_init_file, result, i, &partValues );
+            if ( !RifEclipseOutputFileTools::keywordData( m_ecl_init_file, result, i, &partValues ) )
+            {
+                // Reading the keyword failed (e.g. a truncated or corrupt file). Signal failure to the
+                // caller instead of returning a partially populated result.
+                return false;
+            }
             fileValues.insert( fileValues.end(), partValues.begin(), partValues.end() );
         }
 
