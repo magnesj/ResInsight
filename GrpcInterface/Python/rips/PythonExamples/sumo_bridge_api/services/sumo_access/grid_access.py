@@ -1,5 +1,6 @@
 from __future__ import annotations
 import asyncio
+from typing import Optional
 
 from sumo_bridge_api.lib.utils.timestamp_utils import iso_str_to_date_str
 
@@ -8,6 +9,32 @@ from .grid_types import GridInfo, GridPropertyInfo
 
 from fmu.sumo.explorer.objects import CPGrid
 from fmu.sumo.explorer import TimeFilter, TimeType
+
+def get_time_filter(time_or_interval_str: Optional[str]) -> TimeFilter:
+    """Convert a time_or_interval_str to a TimeFilter."""
+    if time_or_interval_str is None:
+        time_filter = TimeFilter(TimeType.NONE)
+
+    else:
+        timestamp_arr = time_or_interval_str.split("/", 1)
+        if len(timestamp_arr) == 0 or len(timestamp_arr) > 2:
+            raise ValueError("time_or_interval_str must contain a single timestamp or interval")
+        if len(timestamp_arr) == 1:
+            time_filter = TimeFilter(
+                TimeType.TIMESTAMP,
+                start=timestamp_arr[0],
+                end=timestamp_arr[0],
+                exact=True,
+            )
+        else:
+            time_filter = TimeFilter(
+                TimeType.INTERVAL,
+                start=timestamp_arr[0],
+                end=timestamp_arr[1],
+                exact=True,
+            )
+    return time_filter
+
 
 class GridAccess:
     """Access grid data for a given Sumo case + ensemble."""
@@ -131,3 +158,46 @@ class GridAccess:
                 )
 
         return property_info_arr
+    
+    async def get_grid_property_blob_url_async(
+        self,
+        grid_name: str,
+        realization: int,
+        property_name: str,
+        iso_date_or_interval: str | None,
+    ) -> str:
+        """Get the blob URL for a grid property."""
+        case = get_case_by_uuid(self._case_uuid)
+
+        grid_context = case.grids.filter(ensemble=self._ensemble_name, name=grid_name, realization=realization)
+        if await grid_context.length_async() == 0:
+            raise LookupError(
+                f"No grid table named '{grid_name}' found for ensemble '{self._ensemble_name}' "
+                f"in case '{self._case_uuid}', and realization {realization}"
+            )
+        
+        # Expect unique grid:
+        if len(grid_context) != 1:
+            raise ValueError(f"Expected exactly one grid with name '{grid_name}', found {len(grid_context)}")
+        
+        sumo_grid_object = grid_context[0]
+        if not isinstance(sumo_grid_object, CPGrid):
+            raise TypeError(f"Expected CPGrid, got {type(sumo_grid_object)}")
+        
+        time_filter = get_time_filter(iso_date_or_interval)
+        
+        property_context = sumo_grid_object.grid_properties.filter(name=property_name, time=time_filter)
+        if await property_context.length_async() == 0:
+            raise LookupError(
+                f"No grid property named '{property_name}' with time='{iso_date_or_interval}' found for grid '{grid_name}', ensemble '{self._ensemble_name}', case '{self._case_uuid}', and realization {realization}"
+            )
+        
+        # Expect unique property:
+        if len(property_context) != 1:
+            raise ValueError(
+                f"Expected exactly one grid property with name='{property_name}' and time='{iso_date_or_interval}', found {len(property_context)}"
+            )
+        
+        grid_property = property_context[0]
+        blob_url = grid_property.metadata["_sumo"]["blob_url"]
+        return blob_url
