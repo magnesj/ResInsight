@@ -18,6 +18,7 @@
 
 #include "RifReaderSumoGridProperty.h"
 
+#include "RiaLogging.h"
 #include "RiaSumoConnector.h"
 
 #include "RifRoffFileTools.h"
@@ -94,7 +95,12 @@ bool RifReaderSumoGridProperty::dynamicResult( const QString&                res
     auto it = m_dynamicTimestamps.find( result );
     if ( it == m_dynamicTimestamps.end() || stepIndex >= it->second.size() ) return false;
 
-    return fetchAndDecode( result, it->second[stepIndex], values );
+    // The timestamp list is aligned with the case's common time steps. An empty entry means this property has
+    // no data at that time step, so report "no data" instead of fetching another step's values.
+    const QString& isoDateOrInterval = it->second[stepIndex];
+    if ( isoDateOrInterval.isEmpty() ) return false;
+
+    return fetchAndDecode( result, isoDateOrInterval, values );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -110,10 +116,16 @@ bool RifReaderSumoGridProperty::fetchAndDecode( const QString& propertyName, con
                                                                         m_realization,
                                                                         propertyName,
                                                                         isoDateOrInterval );
+
+    RiaLogging::debug( std::format( "Sumo grid property '{}' (time '{}'): downloaded {} bytes.",
+                                    propertyName.toStdString(),
+                                    isoDateOrInterval.toStdString(),
+                                    contents.size() ) );
+
     if ( contents.isEmpty() ) return false;
 
     std::string        buffer = contents.toStdString();
     std::istringstream stream( buffer, std::ios::binary );
 
-    return RifRoffFileTools::propertyValuesFromStream( stream, m_caseData, values );
+    return RifRoffFileTools::propertyValuesFromStream( stream, m_caseData, propertyName, values );
 }

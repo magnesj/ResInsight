@@ -717,7 +717,10 @@ std::vector<double>
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifRoffFileTools::propertyValuesFromStream( std::istream& stream, RigEclipseCaseData* eclipseCaseData, std::vector<double>* values )
+bool RifRoffFileTools::propertyValuesFromStream( std::istream&        stream,
+                                                 RigEclipseCaseData*  eclipseCaseData,
+                                                 const QString&       propertyName,
+                                                 std::vector<double>* values )
 {
     if ( !eclipseCaseData || !eclipseCaseData->mainGrid() || !values ) return false;
 
@@ -733,34 +736,60 @@ bool RifRoffFileTools::propertyValuesFromStream( std::istream& stream, RigEclips
         roff::Reader reader( stream );
         reader.parse();
 
+        // Collect the arrays whose length matches the grid cell count. A Sumo property blob may contain more
+        // than one such array, so pick the one whose keyword matches the requested property name rather than
+        // blindly taking the first match (which could decode a different property).
+        std::vector<std::pair<std::string, roff::Token::Kind>> candidates;
         for ( const auto& [keyword, kind] : reader.getNamedArrayTypes() )
         {
-            if ( reader.getArrayLength( keyword ) != cellCount ) continue;
-
-            std::vector<double> roffValues = readAndConvertToDouble( nx, ny, nz, keyword, kind, reader );
-            if ( roffValues.size() != cellCount ) continue;
-
-            // Set better invalid value for inactive cells: roff file has -999.
-            auto activeCellInfo = eclipseCaseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
-            for ( size_t i = 0; i < cellCount; i++ )
-            {
-                if ( !activeCellInfo->isActive( ReservoirCellIndex( mainGrid->reservoirCellIndex( i ) ) ) )
-                {
-                    roffValues[i] = HUGE_VAL;
-                }
-            }
-
-            *values = std::move( roffValues );
-            return true;
+            if ( reader.getArrayLength( keyword ) == cellCount ) candidates.push_back( { keyword, kind } );
         }
+
+        if ( candidates.empty() ) return false;
+
+        std::string candidateNames;
+        for ( const auto& [keyword, kind] : candidates )
+        {
+            if ( !candidateNames.empty() ) candidateNames += ", ";
+            candidateNames += keyword;
+        }
+
+        auto selected = candidates.front();
+        for ( const auto& candidate : candidates )
+        {
+            if ( QString::fromStdString( candidate.first ).compare( propertyName, Qt::CaseInsensitive ) == 0 )
+            {
+                selected = candidate;
+                break;
+            }
+        }
+
+        RiaLogging::debug( std::format( "Roff property '{}': arrays matching cell count [{}], using '{}'.",
+                                        propertyName.toStdString(),
+                                        candidateNames,
+                                        selected.first ) );
+
+        std::vector<double> roffValues = readAndConvertToDouble( nx, ny, nz, selected.first, selected.second, reader );
+        if ( roffValues.size() != cellCount ) return false;
+
+        // Set better invalid value for inactive cells: roff file has -999.
+        auto activeCellInfo = eclipseCaseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
+        for ( size_t i = 0; i < cellCount; i++ )
+        {
+            if ( !activeCellInfo->isActive( ReservoirCellIndex( mainGrid->reservoirCellIndex( i ) ) ) )
+            {
+                roffValues[i] = HUGE_VAL;
+            }
+        }
+
+        *values = std::move( roffValues );
+        return true;
     }
     catch ( std::runtime_error& err )
     {
         RiaLogging::error( std::format( "Roff property parsing failed: {}", err.what() ) );
         return false;
     }
-
-    return false;
 }
 
 //--------------------------------------------------------------------------------------------------
