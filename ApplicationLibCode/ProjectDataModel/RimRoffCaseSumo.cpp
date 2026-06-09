@@ -30,6 +30,7 @@
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
 #include "RigEclipseResultAddress.h"
+#include "RigEclipseResultInfo.h"
 #include "RigMainGrid.h"
 
 #include "RimReservoirCellResultsStorage.h"
@@ -37,6 +38,11 @@
 
 #include "cafPdmObjectScriptingCapability.h"
 
+#include <QDate>
+#include <QDateTime>
+
+#include <algorithm>
+#include <map>
 #include <sstream>
 #include <vector>
 
@@ -268,29 +274,75 @@ void RimRoffCaseSumo::registerSumoGridProperties()
                                                                  m_gridName(),
                                                                  m_realization() );
 
-    // First version: only static (no timestamp) properties. Dynamic (timestamp) and interval properties are skipped.
-    std::vector<QString> staticPropertyNames;
+    // Properties without a timestamp are static. Properties with a single timestamp are dynamic (one time
+    // step per timestamp). Time intervals (the iso string contains '/') are not supported and skipped.
+    std::vector<QString>                    staticPropertyNames;
+    std::map<QString, std::vector<QString>> dynamicTimestamps; // property name -> iso timestamps
     for ( const auto& info : m_sumoConnector->gridPropertyInfos() )
     {
-        if ( info.isoDateOrInterval.isEmpty() ) staticPropertyNames.push_back( info.name );
+        if ( info.isoDateOrInterval.isEmpty() )
+        {
+            staticPropertyNames.push_back( info.name );
+        }
+        else if ( !info.isoDateOrInterval.contains( '/' ) )
+        {
+            dynamicTimestamps[info.name].push_back( info.isoDateOrInterval );
+        }
     }
 
-    if ( staticPropertyNames.empty() ) return;
+    if ( staticPropertyNames.empty() && dynamicTimestamps.empty() ) return;
 
     auto cellResults = results( RiaDefines::PorosityModelType::MATRIX_MODEL );
     if ( !cellResults ) return;
 
-    // Register the property names as static cell results so they are listed in the cell result editor. The
-    // values are not loaded here; the reader below fetches them on demand the first time they are displayed.
+    // Register the property names as cell results so they are listed in the cell result editor. The values are
+    // not loaded here; the reader below fetches them on demand the first time a property is displayed.
+
     for ( const auto& name : staticPropertyNames )
     {
         RigEclipseResultAddress resultAddress( RiaDefines::ResultCatType::STATIC_NATIVE, RiaDefines::ResultDataType::FLOAT, name );
         cellResults->createResultEntry( resultAddress, false );
     }
 
+    auto parseTimestamp = []( const QString& isoString ) -> QDateTime
+    {
+        QDateTime dateTime = QDateTime::fromString( isoString, Qt::ISODate );
+        if ( !dateTime.isValid() )
+        {
+            // Date-only string, e.g. "2018-01-01".
+            QDate date = QDate::fromString( isoString, Qt::ISODate );
+            if ( date.isValid() ) dateTime = QDateTime( date, QTime( 0, 0, 0 ) );
+        }
+        return dateTime;
+    };
+
+    for ( auto& [name, timestamps] : dynamicTimestamps )
+    {
+        std::sort( timestamps.begin(), timestamps.end() );
+        timestamps.erase( std::unique( timestamps.begin(), timestamps.end() ), timestamps.end() );
+
+        RigEclipseResultAddress resultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaDefines::ResultDataType::FLOAT, name );
+        cellResults->createResultEntry( resultAddress, false );
+
+        // One time step per timestamp. The dates drive the 3D view time slider, like the disk based cases.
+        std::vector<QDateTime> dates;
+        std::vector<int>       reportNumbers;
+        std::vector<double>    daysSinceStart;
+        for ( int i = 0; i < static_cast<int>( timestamps.size() ); i++ )
+        {
+            QDateTime date = parseTimestamp( timestamps[i] );
+            dates.push_back( date );
+            reportNumbers.push_back( i );
+            daysSinceStart.push_back( ( dates.front().isValid() && date.isValid() ) ? dates.front().daysTo( date ) : static_cast<double>( i ) );
+        }
+
+        cellResults->setTimeStepInfos( resultAddress, RigEclipseTimeStepInfo::createTimeStepInfos( dates, reportNumbers, daysSinceStart ) );
+    }
+
     auto reader =
         new RifReaderSumoGridProperty( m_sumoConnector, m_sumoCaseId(), m_ensembleName(), m_gridName(), m_realization() );
     reader->open( "", eclipseCaseData() );
     reader->setStaticProperties( staticPropertyNames );
+    reader->setDynamicProperties( dynamicTimestamps );
     cellResults->setReaderInterface( reader );
 }
