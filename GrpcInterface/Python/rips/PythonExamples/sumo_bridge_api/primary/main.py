@@ -1,7 +1,7 @@
 """Sumo Bridge API — FastAPI application.
 
 Setup:
-    pip install fastapi uvicorn fmu-sumo-explorer
+    pip install fastapi uvicorn fmu-sumo
 
 Run (from the parent ``PythonExamples`` directory):
     uvicorn sumo_bridge_api.primary.main:app --host 0.0.0.0 --port 8000 --reload
