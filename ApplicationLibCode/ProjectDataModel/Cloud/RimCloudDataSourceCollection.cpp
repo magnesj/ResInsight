@@ -25,8 +25,8 @@
 #include "RimOilField.h"
 #include "RimProject.h"
 #include "RimSummaryCaseMainCollection.h"
-#include "Sumo/RimSumoDataSource.h"
 #include "Sumo/RimSummaryEnsembleSumo.h"
+#include "Sumo/RimSumoDataSource.h"
 
 #include "RiuPlotMainWindowTools.h"
 

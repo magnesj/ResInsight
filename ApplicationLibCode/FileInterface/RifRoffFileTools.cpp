@@ -643,10 +643,9 @@ std::pair<bool, std::map<QString, QString>> RifRoffFileTools::createInputPropert
 
     if ( keywordMapping.empty() )
     {
-        RiaLogging::warning(
-            std::format( "No grid properties matching the grid cell count ({}) were imported from {}.",
-                         eclipseCaseData->mainGrid()->cellCount(),
-                         sourceName.toStdString() ) );
+        RiaLogging::warning( std::format( "No grid properties matching the grid cell count ({}) were imported from {}.",
+                                          eclipseCaseData->mainGrid()->cellCount(),
+                                          sourceName.toStdString() ) );
     }
 
     return std::make_pair( true, keywordMapping );

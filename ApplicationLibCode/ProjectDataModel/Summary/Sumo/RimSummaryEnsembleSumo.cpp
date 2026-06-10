@@ -30,8 +30,8 @@
 #include "RifEclipseSummaryAddress.h"
 
 #include "Cloud/RimCloudDataSourceCollection.h"
-#include "RimSumoDataSource.h"
 #include "RimSummaryCaseSumo.h"
+#include "RimSumoDataSource.h"
 
 #include "cafPdmObjectScriptingCapability.h"
 

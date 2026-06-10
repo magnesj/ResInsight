@@ -51,10 +51,7 @@ public:
     bool open( const QString& fileName, RigEclipseCaseData* eclipseCase ) override;
 
     bool staticResult( const QString& result, RiaDefines::PorosityModelType matrixOrFracture, std::vector<double>* values ) override;
-    bool dynamicResult( const QString&                result,
-                        RiaDefines::PorosityModelType matrixOrFracture,
-                        size_t                        stepIndex,
-                        std::vector<double>*          values ) override;
+    bool dynamicResult( const QString& result, RiaDefines::PorosityModelType matrixOrFracture, size_t stepIndex, std::vector<double>* values ) override;
 
 private:
     bool fetchAndDecode( const QString& propertyName, const QString& isoDateOrInterval, std::vector<double>* values );

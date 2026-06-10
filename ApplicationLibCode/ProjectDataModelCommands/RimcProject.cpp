@@ -43,8 +43,8 @@
 #include "RimTools.h"
 #include "RimValveTemplateCollection.h"
 #include "RimWellPathCollection.h"
-#include "Sumo/RimSumoDataSource.h"
 #include "Sumo/RimSummaryEnsembleSumo.h"
+#include "Sumo/RimSumoDataSource.h"
 
 #include "Summary/RiaSummaryTools.h"
 

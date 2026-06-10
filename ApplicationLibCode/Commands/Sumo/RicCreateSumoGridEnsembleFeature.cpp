@@ -26,10 +26,10 @@
 #include "Rim3dView.h"
 #include "RimEclipseCaseCollection.h"
 #include "RimEclipseCaseEnsemble.h"
-#include "RimRoffCaseSumo.h"
 #include "RimEclipseViewCollection.h"
 #include "RimOilField.h"
 #include "RimProject.h"
+#include "RimRoffCaseSumo.h"
 #include "RimViewNameConfig.h"
 #include "Sumo/RimSumoDataSource.h"
 
@@ -59,7 +59,7 @@ void RicCreateSumoGridEnsembleFeature::createGridEnsemble( RimSumoDataSource* da
 {
     if ( !dataSource ) return;
 
-    const QString              gridName        = dataSource->selectedGridName();
+    const QString              gridName       = dataSource->selectedGridName();
     const std::vector<QString> realizationIds = dataSource->selectedRealizationIds();
 
     if ( gridName.isEmpty() )

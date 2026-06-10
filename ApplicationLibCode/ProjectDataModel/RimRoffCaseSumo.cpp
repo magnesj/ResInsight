@@ -98,16 +98,12 @@ RimRoffCaseSumo* RimRoffCaseSumo::createFromDataSource( RimSumoDataSource* dataS
     // The grid is stored on Sumo, not on disk, so there is no real grid file name. Still assign a unique
     // synthetic grid file name: an empty one collapses all custom case names onto a single
     // path-variable key on project save (RiaProjectFileTools), overwriting every name with the last.
-    gridCase->setGridFileName( QString( "sumo/%1/%2/realization-%3/%4.roff" )
-                                   .arg( dataSource->caseId().get() )
-                                   .arg( gridName )
-                                   .arg( realization )
-                                   .arg( gridName ) );
+    gridCase->setGridFileName(
+        QString( "sumo/%1/%2/realization-%3/%4.roff" ).arg( dataSource->caseId().get() ).arg( gridName ).arg( realization ).arg( gridName ) );
 
     // Name the case using grid name, asset, ensemble and realization, e.g. "Geogrid_Drogon_iter-0_Real_0".
-    QString caseDisplayName = QString( "%1_%2_%3_Real_%4" )
-                                  .arg( gridName, dataSource->assetName(), dataSource->ensembleName() )
-                                  .arg( realization );
+    QString caseDisplayName =
+        QString( "%1_%2_%3_Real_%4" ).arg( gridName, dataSource->assetName(), dataSource->ensembleName() ).arg( realization );
     gridCase->setCustomCaseName( caseDisplayName );
 
     return gridCase;
@@ -190,15 +186,12 @@ bool RimRoffCaseSumo::openEclipseGridFile()
 
     if ( eclipseCaseData()->mainGrid()->cellCount() == 0 )
     {
-        QByteArray contents = m_sumoConnector->requestGridDataBlocking( SumoCaseId( m_sumoCaseId() ),
-                                                                        m_ensembleName(),
-                                                                        m_gridName(),
-                                                                        m_realization() );
+        QByteArray contents =
+            m_sumoConnector->requestGridDataBlocking( SumoCaseId( m_sumoCaseId() ), m_ensembleName(), m_gridName(), m_realization() );
         if ( contents.isEmpty() )
         {
-            RiaLogging::error( std::format( "Failed to download grid '{}' (realization {}) from Sumo.",
-                                            m_gridName().toStdString(),
-                                            m_realization() ) );
+            RiaLogging::error(
+                std::format( "Failed to download grid '{}' (realization {}) from Sumo.", m_gridName().toStdString(), m_realization() ) );
             return false;
         }
 
@@ -270,16 +263,13 @@ void RimRoffCaseSumo::registerSumoGridProperties()
 {
     if ( !m_sumoConnector || !eclipseCaseData() ) return;
 
-    m_sumoConnector->requestGridPropertyInfoForEnsembleBlocking( SumoCaseId( m_sumoCaseId() ),
-                                                                 m_ensembleName(),
-                                                                 m_gridName(),
-                                                                 m_realization() );
+    m_sumoConnector->requestGridPropertyInfoForEnsembleBlocking( SumoCaseId( m_sumoCaseId() ), m_ensembleName(), m_gridName(), m_realization() );
 
     // Properties without a timestamp are static. Properties with a single timestamp are dynamic (one time
     // step per timestamp). Time intervals (the iso string contains '/') are not supported and skipped.
     std::vector<QString>                 staticPropertyNames;
     std::map<QString, std::set<QString>> dynamicPropertyTimestamps; // property name -> the timestamps it has
-    std::set<QString>                    allTimestamps;             // union of timestamps across all properties
+    std::set<QString>                    allTimestamps; // union of timestamps across all properties
     for ( const auto& info : m_sumoConnector->gridPropertyInfos() )
     {
         if ( info.isoDateOrInterval.isEmpty() )
@@ -298,8 +288,7 @@ void RimRoffCaseSumo::registerSumoGridProperties()
     auto cellResults = results( RiaDefines::PorosityModelType::MATRIX_MODEL );
     if ( !cellResults ) return;
 
-    auto reader =
-        new RifReaderSumoGridProperty( m_sumoConnector, m_sumoCaseId(), m_ensembleName(), m_gridName(), m_realization() );
+    auto reader = new RifReaderSumoGridProperty( m_sumoConnector, m_sumoCaseId(), m_ensembleName(), m_gridName(), m_realization() );
     reader->open( "", eclipseCaseData() );
 
     // Register the property names as cell results so they are listed in the cell result editor. The values are

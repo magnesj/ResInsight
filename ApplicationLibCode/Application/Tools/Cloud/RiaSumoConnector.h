@@ -129,7 +129,10 @@ public:
     QByteArray requestGridDataBlocking( const SumoCaseId& caseId, const QString& ensembleName, const QString& gridName, int realization );
 
     void requestGridPropertyInfoForEnsemble( const SumoCaseId& caseId, const QString& ensembleName, const QString& gridName, int realization );
-    void requestGridPropertyInfoForEnsembleBlocking( const SumoCaseId& caseId, const QString& ensembleName, const QString& gridName, int realization );
+    void requestGridPropertyInfoForEnsembleBlocking( const SumoCaseId& caseId,
+                                                     const QString&    ensembleName,
+                                                     const QString&    gridName,
+                                                     int               realization );
 
     void requestGridPropertyBlobIdForEnsemble( const SumoCaseId& caseId,
                                                const QString&    ensembleName,
@@ -151,15 +154,15 @@ public:
                                                 const QString&    propertyName,
                                                 const QString&    isoDateOrInterval );
 
-    std::vector<SumoAsset>    assets() const;
-    std::vector<SumoCase>     cases() const;
-    std::vector<QString>      ensembleNamesForCase( const SumoCaseId& caseId ) const;
-    std::vector<QString>      vectorNames() const;
-    std::vector<QString>      realizationIds() const;
+    std::vector<SumoAsset>            assets() const;
+    std::vector<SumoCase>             cases() const;
+    std::vector<QString>              ensembleNamesForCase( const SumoCaseId& caseId ) const;
+    std::vector<QString>              vectorNames() const;
+    std::vector<QString>              realizationIds() const;
     std::vector<SumoGridInfo>         gridInfos() const;
     std::vector<SumoGridPropertyInfo> gridPropertyInfos() const;
     std::vector<QString>              blobUrls() const;
-    std::vector<SumoRedirect> blobContents() const;
+    std::vector<SumoRedirect>         blobContents() const;
 
 public slots:
     void parseAssets( QNetworkReply* reply );
