@@ -29,7 +29,10 @@ async def get_vector_list(
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     return [VectorInfo(name=n) for n in names]
 
-@router.get("/cases/{case_uuid}/ensembles/{ensemble_name}/vectors/{vector_name}/blob_url")
+
+@router.get(
+    "/cases/{case_uuid}/ensembles/{ensemble_name}/vectors/{vector_name}/blob_url"
+)
 async def get_vector_blob_url(
     case_uuid: str = Path(description="Sumo case uuid"),
     ensemble_name: str = Path(description="Ensemble name"),

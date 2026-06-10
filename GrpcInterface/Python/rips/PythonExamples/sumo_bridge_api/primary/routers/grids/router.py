@@ -13,10 +13,11 @@ from .schemas import GridInfo, GridPropertyInfo
 
 router = APIRouter(tags=["grids"])
 
+
 @router.get("/cases/{case_uuid}/ensembles/{ensemble_name}/grid_info_list")
 async def get_grid_info_list(
     case_uuid: str = Path(description="Sumo case uuid"),
-    ensemble_name: str = Path(description="Ensemble name")
+    ensemble_name: str = Path(description="Ensemble name"),
 ) -> list[GridInfo]:
     """List available grids, with their realizations, for the given case + ensemble."""
     access = GridAccess.from_case_uuid(case_uuid, ensemble_name)
@@ -26,7 +27,10 @@ async def get_grid_info_list(
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     return [GridInfo(name=g.name, realizations=g.realizations) for g in grids]
 
-@router.get("/cases/{case_uuid}/ensembles/{ensemble_name}/grids/{grid_name}/realizations/{realization}/blob_url")
+
+@router.get(
+    "/cases/{case_uuid}/ensembles/{ensemble_name}/grids/{grid_name}/realizations/{realization}/blob_url"
+)
 async def get_grid_blob_url(
     case_uuid: str = Path(description="Sumo case uuid"),
     ensemble_name: str = Path(description="Ensemble name"),
@@ -42,7 +46,9 @@ async def get_grid_blob_url(
     return url
 
 
-@router.get("/cases/{case_uuid}/ensembles/{ensemble_name}/grids/{grid_name}/realizations/{realization}/property_info_list")
+@router.get(
+    "/cases/{case_uuid}/ensembles/{ensemble_name}/grids/{grid_name}/realizations/{realization}/property_info_list"
+)
 async def get_grid_property_info_list(
     case_uuid: str = Path(description="Sumo case uuid"),
     ensemble_name: str = Path(description="Ensemble name"),
@@ -63,7 +69,10 @@ async def get_grid_property_info_list(
         for prop in properties
     ]
 
-@router.get("/cases/{case_uuid}/ensembles/{ensemble_name}/grids/{grid_name}/realizations/{realization}/properties/{property_name}/blob_url")
+
+@router.get(
+    "/cases/{case_uuid}/ensembles/{ensemble_name}/grids/{grid_name}/realizations/{realization}/properties/{property_name}/blob_url"
+)
 async def get_grid_property_blob_url(
     case_uuid: str = Path(description="Sumo case uuid"),
     ensemble_name: str = Path(description="Ensemble name"),
@@ -77,7 +86,9 @@ async def get_grid_property_blob_url(
     """Get the blob URL for a grid property."""
     access = GridAccess.from_case_uuid(case_uuid, ensemble_name)
     try:
-        url = await access.get_grid_property_blob_url_async(grid_name, realization, property_name, property_iso_date_or_interval)
+        url = await access.get_grid_property_blob_url_async(
+            grid_name, realization, property_name, property_iso_date_or_interval
+        )
     except LookupError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     return url

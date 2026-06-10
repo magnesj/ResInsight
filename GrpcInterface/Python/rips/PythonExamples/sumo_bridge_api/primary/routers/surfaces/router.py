@@ -13,6 +13,6 @@ router = APIRouter(tags=["surfaces"])
 
 @router.get("/cases/{case_uuid}/ensembles/{ensemble_name}/surfaces")
 def get_surfaces(case_uuid: str, ensemble_name: str) -> list[dict[str, str]]:
-	"""Placeholder surfaces endpoint until SurfacesAccess is implemented."""
-	_ = (case_uuid, ensemble_name)
-	return []
+    """Placeholder surfaces endpoint until SurfacesAccess is implemented."""
+    _ = (case_uuid, ensemble_name)
+    return []

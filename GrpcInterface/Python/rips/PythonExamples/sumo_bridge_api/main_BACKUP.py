@@ -66,12 +66,15 @@ def _get_case(case_id: str):
     try:
         return get_explorer().get_case_by_uuid(case_id)
     except Exception as exc:
-        raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found: {exc}")
+        raise HTTPException(
+            status_code=404, detail=f"Case '{case_id}' not found: {exc}"
+        )
 
 
 # ---------------------------------------------------------------------------
 # Health / meta
 # ---------------------------------------------------------------------------
+
 
 @app.get("/health", tags=["meta"])
 def health() -> dict[str, Any]:
@@ -82,9 +85,12 @@ def health() -> dict[str, Any]:
 # Cases
 # ---------------------------------------------------------------------------
 
+
 @app.get("/cases", tags=["cases"])
 def list_cases(
-    asset: str | None = Query(default=None, description="Filter by asset/field, e.g. 'Drogon'"),
+    asset: str | None = Query(
+        default=None, description="Filter by asset/field, e.g. 'Drogon'"
+    ),
     name: str | None = Query(default=None, description="Exact case name match"),
 ) -> list[dict[str, Any]]:
     """List Sumo cases, optionally filtered by asset and/or name."""
@@ -123,6 +129,7 @@ def get_case(case_id: str) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Ensembles / realizations
 # ---------------------------------------------------------------------------
+
 
 @app.get("/cases/{case_id}/ensembles", tags=["ensembles"])
 def list_ensembles(case_id: str) -> list[dict[str, Any]]:
@@ -183,6 +190,7 @@ def list_summary_vectors(case_id: str, ensemble_name: str) -> dict[str, Any]:
 # Surfaces
 # ---------------------------------------------------------------------------
 
+
 @app.get("/cases/{case_id}/surfaces", tags=["surfaces"])
 def list_surfaces(
     case_id: str,
@@ -229,6 +237,7 @@ def get_surface_data(
 # ---------------------------------------------------------------------------
 # Grids (3D)
 # ---------------------------------------------------------------------------
+
 
 @app.get("/cases/{case_id}/grids", tags=["grids"])
 def list_grids(
