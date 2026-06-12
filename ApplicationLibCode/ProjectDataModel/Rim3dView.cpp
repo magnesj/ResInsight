@@ -21,6 +21,7 @@
 
 #include "RiaApplication.h"
 #include "RiaFieldHandleTools.h"
+#include "RiaHtmlServer.h"
 #include "RiaOptionItemFactory.h"
 #include "RiaPreferences.h"
 #include "RiaPreferencesSystem.h"
@@ -702,6 +703,10 @@ void Rim3dView::updateDisplayModelForCurrentTimeStepAndRedraw()
     m_isCallingUpdateDisplayModelForCurrentTimestepAndRedraw = false;
 
     RimMainPlotCollection::current()->updateCurrentTimeStepInPlots();
+
+    // The current time step may change which cells are visible; let polling web pages refetch the
+    // triangle geometry.
+    RiaHtmlServer::notifyGeometryChanged();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -758,6 +763,10 @@ void Rim3dView::createDisplayModelAndRedraw()
     {
         RiuMainWindow::instance()->refreshAnimationActions();
     }
+
+    // The display model (and thus the set of visible cells) was rebuilt; let polling web pages
+    // refetch the triangle geometry.
+    RiaHtmlServer::notifyGeometryChanged();
 }
 
 //--------------------------------------------------------------------------------------------------

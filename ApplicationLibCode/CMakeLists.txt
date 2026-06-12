@@ -32,6 +32,7 @@ find_package(
              PrintSupport
              Svg
              Sql
+             HttpServer
 )
 set(QT_LIBRARIES
     Qt6::Core
@@ -45,6 +46,7 @@ set(QT_LIBRARIES
     Qt6::PrintSupport
     Qt6::Svg
     Qt6::Sql
+    Qt6::HttpServer
 )
 qt_standard_project_setup()
 
@@ -152,6 +154,7 @@ list(
   CommandFileInterface/CMakeLists_files.cmake
   CommandFileInterface/Core/CMakeLists_files.cmake
   SocketInterface/CMakeLists_files.cmake
+  HttpServer/CMakeLists_files.cmake
 )
 
 # Include source file lists from *.cmake files
@@ -411,6 +414,7 @@ target_include_directories(
          ${CMAKE_CURRENT_SOURCE_DIR}/ReservoirDataModel/SimulationFile
          ${CMAKE_CURRENT_SOURCE_DIR}/ResultStatisticsCache
          ${CMAKE_CURRENT_SOURCE_DIR}/SocketInterface
+         ${CMAKE_CURRENT_SOURCE_DIR}/HttpServer
          ${CMAKE_CURRENT_SOURCE_DIR}/UserInterface
          ${CMAKE_CURRENT_SOURCE_DIR}/UserInterface/AnalysisPlots
          ${CMAKE_CURRENT_SOURCE_DIR}/GeoMech/GeoMechDataModel
