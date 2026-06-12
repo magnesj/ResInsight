@@ -22,6 +22,9 @@
 
 #include "Cloud/RiaConnectorTools.h"
 #include "RiaArgumentParser.h"
+#ifdef ENABLE_UI_AUTOMATION
+#include "RiaAutomationServer.h"
+#endif
 #include "RiaBaseDefs.h"
 #include "RiaDefines.h"
 #include "RiaFileLogger.h"
@@ -632,6 +635,18 @@ RiaApplication::ApplicationStatus RiaGuiApplication::handleArguments( gsl::not_n
         std::string readerName = o.value( 0 ).toLower().toStdString();
         m_preferences->gridPreferences()->setGridModelReaderOverride( readerName );
     }
+
+#ifdef ENABLE_UI_AUTOMATION
+    if ( progOpt->option( "automationserver" ) )
+    {
+        cvf::Option o             = progOpt->option( "automationserver" );
+        quint16     defaultPort   = 8080;
+        quint16     requestedPort = o.valueCount() == 1 ? static_cast<quint16>( o.value( 0 ).toInt( defaultPort ) ) : defaultPort;
+
+        m_automationServer = std::make_unique<RiaAutomationServer>();
+        m_automationServer->start( requestedPort );
+    }
+#endif
 
     if ( cvf::Option o = progOpt->option( "size" ) )
     {
