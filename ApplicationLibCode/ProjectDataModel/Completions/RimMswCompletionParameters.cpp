@@ -524,12 +524,6 @@ void RimMswCompletionParameters::defineUiOrdering( QString uiConfigName, caf::Pd
 
             uiOrdering.add( &m_pressureDrop );
             uiOrdering.add( &m_lengthAndDepth );
-
-            // Custom Segment Configuration section
-            auto* segmentConfigGroup = uiOrdering.addNewGroup( "Custom Segment Configuration" );
-            segmentConfigGroup->add( &m_enforceMaxSegmentLength );
-            segmentConfigGroup->add( &m_maxSegmentLength );
-            segmentConfigGroup->add( &m_customSegmentIntervals->intervalsField() );
         }
         else
         {
@@ -561,6 +555,12 @@ void RimMswCompletionParameters::defineUiOrdering( QString uiConfigName, caf::Pd
             m_diameterRoughnessMode.uiCapability()->setUiReadOnly( isReadOnly );
             m_diameterRoughnessIntervals.uiCapability()->setUiReadOnly( isReadOnly );
         }
+
+        // Custom Segment Configuration section
+        auto* segmentConfigGroup = uiOrdering.addNewGroup( "Custom Segment Configuration" );
+        segmentConfigGroup->add( &m_enforceMaxSegmentLength );
+        segmentConfigGroup->add( &m_maxSegmentLength );
+        segmentConfigGroup->add( &m_customSegmentIntervals->intervalsField() );
     }
 
     uiOrdering.skipRemainingFields( true );
