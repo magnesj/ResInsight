@@ -28,7 +28,21 @@ jobs:
         run: |
           sudo apt-get update --option="APT::Acquire::Retries=3"
           sudo apt-get install --option="APT::Acquire::Retries=3" libxkbcommon-x11-0 libgl1-mesa-dev mesa-common-dev libglfw3-dev libglu1-mesa-dev libhdf5-dev
-          sudo apt-get install clang-tidy-19 clang-format-19
+          sudo apt-get install clang-tidy-19 clang-format-19 clang-19 llvm-19-dev libclang-19-dev ninja-build
+
+      - name: Build clazy from source (against clang/llvm-19)
+        # Ubuntu's packaged clazy is built against an older Clang that cannot
+        # parse libstdc++-14's C++23 headers. Build clazy 1.15 (requires
+        # Clang 19+) against the installed llvm-19 so it matches our compiler.
+        run: |
+          git clone --depth 1 --branch 1.15 https://github.com/KDE/clazy.git clazy-src
+          cmake -S clazy-src -B clazy-build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$HOME/clazy-install" \
+            -DLLVM_ROOT=/usr/lib/llvm-19
+          cmake --build clazy-build
+          cmake --build clazy-build --target install
+          echo "$HOME/clazy-install/bin" >> "$GITHUB_PATH"
 
       - name: Install Qt
         uses: CeetronSolutions/install-qt-action@bump-node24
@@ -67,6 +81,18 @@ jobs:
           cd build
           run-clang-tidy-19 -config-file ../ApplicationLibCode/.clang-tidy -fix files ApplicationLibCode
           run-clang-tidy-19 -config-file ../GrpcInterface/.clang-tidy -fix files GrpcInterface
+      - name: Run clazy (Qt checks, report only)
+        continue-on-error: true
+        run: |
+          cd build
+          # One process per file across all cores; clazy-standalone is otherwise
+          # single-threaded and slow over the whole tree.
+          # Skip UnitTests: gtest is only fetched for the test target, so its
+          # headers are absent on this configure-only tree.
+          find ../ApplicationLibCode -path '*/UnitTests/*' -prune -o -name '*.cpp' -print0 \
+            | xargs -0 -P "$(nproc)" -n 1 clazy-standalone -checks=level1,no-range-loop-detach,no-non-pod-global-static -p compile_commands.json
+          find ../GrpcInterface -name '*.cpp' -print0 \
+            | xargs -0 -P "$(nproc)" -n 1 clazy-standalone -checks=level1,no-range-loop-detach,no-non-pod-global-static -p compile_commands.json
       - name: Run clang-format after clang-tidy
         continue-on-error: true
         run: |
