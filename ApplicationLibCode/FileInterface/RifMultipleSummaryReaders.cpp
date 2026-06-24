@@ -18,7 +18,7 @@
 
 #include "RifMultipleSummaryReaders.h"
 
-#include "RimCalculatedSummaryCurveReader.h"
+#include "cvfAssert.h"
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -39,8 +39,8 @@ void RifMultipleSummaryReaders::addReader( std::unique_ptr<RifSummaryReaderInter
     // evaluates calculated reader first.
     auto calculatedReaderFirst = []( const auto& first, const auto& second )
     {
-        bool isFirstCalc  = dynamic_cast<RifCalculatedSummaryCurveReader*>( first.get() ) != nullptr;
-        bool isSecondCalc = dynamic_cast<RifCalculatedSummaryCurveReader*>( second.get() ) != nullptr;
+        bool isFirstCalc  = first->isCalculated();
+        bool isSecondCalc = second->isCalculated();
         if ( isFirstCalc && !isSecondCalc ) return true;
         if ( !isFirstCalc && isSecondCalc ) return false;
         return first->serialNumber() < second->serialNumber();
@@ -153,8 +153,8 @@ void RifMultipleSummaryReaders::createAndSetAddresses()
 
     auto nativeReaderFirst = []( const auto& first, const auto& second )
     {
-        bool isFirstCalc  = dynamic_cast<RifCalculatedSummaryCurveReader*>( first ) != nullptr;
-        bool isSecondCalc = dynamic_cast<RifCalculatedSummaryCurveReader*>( second ) != nullptr;
+        bool isFirstCalc  = first->isCalculated();
+        bool isSecondCalc = second->isCalculated();
         if ( isFirstCalc && !isSecondCalc ) return false;
         if ( !isFirstCalc && isSecondCalc ) return true;
         return first->serialNumber() < second->serialNumber();

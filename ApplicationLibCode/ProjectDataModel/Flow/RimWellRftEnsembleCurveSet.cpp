@@ -19,6 +19,7 @@
 #include "RimWellRftEnsembleCurveSet.h"
 
 #include "RifReaderEnsembleStatisticsRft.h"
+#include "RifReaderRftInterface.h"
 
 #include "Appearance/RimCurveSetAppearance.h"
 #include "RimEclipseCase.h"
@@ -132,7 +133,16 @@ void RimWellRftEnsembleCurveSet::updatePlot( const SignalEmitter* emitter )
 //--------------------------------------------------------------------------------------------------
 void RimWellRftEnsembleCurveSet::clearEnsembleStatistics()
 {
-    m_statisticsEclipseRftReader = std::make_unique<RifReaderEnsembleStatisticsRft>( m_ensemble(), m_eclipseCase() );
+    std::vector<RifReaderRftInterface*> rftReaders;
+    if ( m_ensemble() )
+    {
+        for ( auto summaryCase : m_ensemble()->allSummaryCases() )
+        {
+            if ( auto reader = summaryCase->rftReader() )
+                rftReaders.push_back( reader );
+        }
+    }
+    m_statisticsEclipseRftReader = std::make_unique<RifReaderEnsembleStatisticsRft>( std::move( rftReaders ), m_eclipseCase() );
 }
 
 //--------------------------------------------------------------------------------------------------

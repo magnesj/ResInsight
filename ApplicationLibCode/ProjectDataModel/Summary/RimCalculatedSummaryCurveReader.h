@@ -39,6 +39,8 @@ public:
 
     void createAndSetAddresses() override;
 
+    bool isCalculated() const override { return true; }
+
     RiaDefines::EclipseUnitSystem unitSystem() const override;
 
 private:

@@ -24,17 +24,13 @@
 #include "Well/RigEclipseWellLogExtractor.h"
 #include "Well/RigWellPath.h"
 
-#include "RimSummaryCase.h"
-#include "RimSummaryEnsemble.h"
-#include "RimTools.h"
-
 #include "cafAssert.h"
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RifReaderEnsembleStatisticsRft::RifReaderEnsembleStatisticsRft( const RimSummaryEnsemble* summaryCaseCollection, RimEclipseCase* eclipseCase )
-    : m_summaryCaseCollection( summaryCaseCollection )
+RifReaderEnsembleStatisticsRft::RifReaderEnsembleStatisticsRft( std::vector<RifReaderRftInterface*> rftReaders, RimEclipseCase* eclipseCase )
+    : m_rftReaders( std::move( rftReaders ) )
     , m_eclipseCase( eclipseCase )
 {
 }
@@ -44,16 +40,11 @@ RifReaderEnsembleStatisticsRft::RifReaderEnsembleStatisticsRft( const RimSummary
 //--------------------------------------------------------------------------------------------------
 std::set<RifEclipseRftAddress> RifReaderEnsembleStatisticsRft::eclipseRftAddresses()
 {
-    if ( !m_summaryCaseCollection ) return {};
-
     std::set<RifEclipseRftAddress> allAddresses;
-    for ( auto summaryCase : m_summaryCaseCollection->allSummaryCases() )
+    for ( auto reader : m_rftReaders )
     {
-        if ( summaryCase->rftReader() )
-        {
-            std::set<RifEclipseRftAddress> addresses = summaryCase->rftReader()->eclipseRftAddresses();
-            allAddresses.insert( addresses.begin(), addresses.end() );
-        }
+        std::set<RifEclipseRftAddress> addresses = reader->eclipseRftAddresses();
+        allAddresses.insert( addresses.begin(), addresses.end() );
     }
 
     std::set<RifEclipseRftAddress> statisticsAddresses;
@@ -84,7 +75,7 @@ std::set<RifEclipseRftAddress> RifReaderEnsembleStatisticsRft::eclipseRftAddress
 //--------------------------------------------------------------------------------------------------
 void RifReaderEnsembleStatisticsRft::values( const RifEclipseRftAddress& rftAddress, std::vector<double>* values )
 {
-    if ( !m_summaryCaseCollection ) return;
+    if ( m_rftReaders.empty() ) return;
 
     auto it = m_cachedValues.find( rftAddress );
     if ( it == m_cachedValues.end() )
@@ -102,16 +93,11 @@ void RifReaderEnsembleStatisticsRft::values( const RifEclipseRftAddress& rftAddr
 //--------------------------------------------------------------------------------------------------
 std::set<QDateTime> RifReaderEnsembleStatisticsRft::availableTimeSteps( const QString& wellName )
 {
-    if ( !m_summaryCaseCollection ) return {};
-
     std::set<QDateTime> allTimeSteps;
-    for ( auto summaryCase : m_summaryCaseCollection->allSummaryCases() )
+    for ( auto reader : m_rftReaders )
     {
-        if ( summaryCase->rftReader() )
-        {
-            std::set<QDateTime> timeSteps = summaryCase->rftReader()->availableTimeSteps( wellName );
-            allTimeSteps.insert( timeSteps.begin(), timeSteps.end() );
-        }
+        std::set<QDateTime> timeSteps = reader->availableTimeSteps( wellName );
+        allTimeSteps.insert( timeSteps.begin(), timeSteps.end() );
     }
     return allTimeSteps;
 }
@@ -122,16 +108,11 @@ std::set<QDateTime> RifReaderEnsembleStatisticsRft::availableTimeSteps( const QS
 std::set<QDateTime> RifReaderEnsembleStatisticsRft::availableTimeSteps( const QString& wellName,
                                                                         const RifEclipseRftAddress::RftWellLogChannelType& wellLogChannelName )
 {
-    if ( !m_summaryCaseCollection ) return {};
-
     std::set<QDateTime> allTimeSteps;
-    for ( auto summaryCase : m_summaryCaseCollection->allSummaryCases() )
+    for ( auto reader : m_rftReaders )
     {
-        if ( summaryCase->rftReader() )
-        {
-            std::set<QDateTime> timeSteps = summaryCase->rftReader()->availableTimeSteps( wellName, wellLogChannelName );
-            allTimeSteps.insert( timeSteps.begin(), timeSteps.end() );
-        }
+        std::set<QDateTime> timeSteps = reader->availableTimeSteps( wellName, wellLogChannelName );
+        allTimeSteps.insert( timeSteps.begin(), timeSteps.end() );
     }
     return allTimeSteps;
 }
@@ -143,16 +124,11 @@ std::set<QDateTime>
     RifReaderEnsembleStatisticsRft::availableTimeSteps( const QString&                                               wellName,
                                                         const std::set<RifEclipseRftAddress::RftWellLogChannelType>& relevantChannels )
 {
-    if ( !m_summaryCaseCollection ) return {};
-
     std::set<QDateTime> allTimeSteps;
-    for ( auto summaryCase : m_summaryCaseCollection->allSummaryCases() )
+    for ( auto reader : m_rftReaders )
     {
-        if ( summaryCase->rftReader() )
-        {
-            std::set<QDateTime> timeSteps = summaryCase->rftReader()->availableTimeSteps( wellName, relevantChannels );
-            allTimeSteps.insert( timeSteps.begin(), timeSteps.end() );
-        }
+        std::set<QDateTime> timeSteps = reader->availableTimeSteps( wellName, relevantChannels );
+        allTimeSteps.insert( timeSteps.begin(), timeSteps.end() );
     }
     return allTimeSteps;
 }
@@ -162,17 +138,11 @@ std::set<QDateTime>
 //--------------------------------------------------------------------------------------------------
 std::set<RifEclipseRftAddress::RftWellLogChannelType> RifReaderEnsembleStatisticsRft::availableWellLogChannels( const QString& wellName )
 {
-    if ( !m_summaryCaseCollection ) return {};
-
     std::set<RifEclipseRftAddress::RftWellLogChannelType> allWellLogChannels;
-    for ( auto summaryCase : m_summaryCaseCollection->allSummaryCases() )
+    for ( auto reader : m_rftReaders )
     {
-        if ( summaryCase->rftReader() )
-        {
-            std::set<RifEclipseRftAddress::RftWellLogChannelType> wellLogChannels =
-                summaryCase->rftReader()->availableWellLogChannels( wellName );
-            allWellLogChannels.insert( wellLogChannels.begin(), wellLogChannels.end() );
-        }
+        std::set<RifEclipseRftAddress::RftWellLogChannelType> wellLogChannels = reader->availableWellLogChannels( wellName );
+        allWellLogChannels.insert( wellLogChannels.begin(), wellLogChannels.end() );
     }
     return allWellLogChannels;
 }
@@ -182,16 +152,11 @@ std::set<RifEclipseRftAddress::RftWellLogChannelType> RifReaderEnsembleStatistic
 //--------------------------------------------------------------------------------------------------
 std::set<QString> RifReaderEnsembleStatisticsRft::wellNames()
 {
-    if ( !m_summaryCaseCollection ) return {};
-
     std::set<QString> allWellNames;
-    for ( auto summaryCase : m_summaryCaseCollection->allSummaryCases() )
+    for ( auto reader : m_rftReaders )
     {
-        if ( summaryCase->rftReader() )
-        {
-            std::set<QString> wellNames = summaryCase->rftReader()->wellNames();
-            allWellNames.insert( wellNames.begin(), wellNames.end() );
-        }
+        std::set<QString> wellNames = reader->wellNames();
+        allWellNames.insert( wellNames.begin(), wellNames.end() );
     }
     return allWellNames;
 }
@@ -201,7 +166,7 @@ std::set<QString> RifReaderEnsembleStatisticsRft::wellNames()
 //--------------------------------------------------------------------------------------------------
 void RifReaderEnsembleStatisticsRft::calculateStatistics( const QString& wellName, const QDateTime& timeStep )
 {
-    if ( !m_summaryCaseCollection ) return;
+    if ( m_rftReaders.empty() ) return;
 
     using ChannelType                 = RifEclipseRftAddress::RftWellLogChannelType;
     RifEclipseRftAddress pressAddress = RifEclipseRftAddress::createAddress( wellName, timeStep, ChannelType::PRESSURE );
@@ -218,11 +183,8 @@ void RifReaderEnsembleStatisticsRft::calculateStatistics( const QString& wellNam
         RiaCurveMerger<double>            curveMerger( RiaCurveDefines::InterpolationMethod::LINEAR );
         RiaWeightedMeanCalculator<size_t> dataSetSizeCalc;
 
-        for ( RimSummaryCase* summaryCase : m_summaryCaseCollection->allSummaryCases() )
+        for ( auto reader : m_rftReaders )
         {
-            auto reader = summaryCase->rftReader();
-            if ( !reader ) continue;
-
             std::vector<double> pressures;
             reader->values( pressAddress, &pressures );
 
@@ -246,11 +208,8 @@ void RifReaderEnsembleStatisticsRft::calculateStatistics( const QString& wellNam
         RiaWeightedMeanCalculator<size_t> dataSetSizeCalc;
         RifEclipseRftAddress              tvdAddress = RifEclipseRftAddress::createAddress( wellName, timeStep, ChannelType::TVD );
 
-        for ( RimSummaryCase* summaryCase : m_summaryCaseCollection->allSummaryCases() )
+        for ( auto reader : m_rftReaders )
         {
-            auto reader = summaryCase->rftReader();
-            if ( !reader ) continue;
-
             std::vector<double> pressures;
             reader->values( pressAddress, &pressures );
 

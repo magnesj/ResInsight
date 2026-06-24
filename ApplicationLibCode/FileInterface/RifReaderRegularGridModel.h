@@ -20,11 +20,12 @@
 
 #include <QString>
 
-class RimEclipseCase;
+class RigCaseCellResultsData;
+class RigEclipseCaseData;
 
 namespace RifReaderRegularGridModel
 {
-void writeCache( const QString& fileName, RimEclipseCase* eclipseCase );
-void ensureDataIsReadFromCache( const QString& fileName, RimEclipseCase* eclipseCase );
+void writeCache( const QString& fileName, RigCaseCellResultsData* rigCellResults, RigEclipseCaseData* eclipseCaseData );
+void ensureDataIsReadFromCache( const QString& fileName, RigCaseCellResultsData* rigCellResults );
 
 }; // namespace RifReaderRegularGridModel

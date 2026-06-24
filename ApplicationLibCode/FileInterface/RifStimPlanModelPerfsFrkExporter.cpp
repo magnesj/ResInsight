@@ -21,9 +21,6 @@
 #include "RiaEclipseUnitTools.h"
 #include "RiaLogging.h"
 
-#include "RimStimPlanModel.h"
-#include "RimWellPath.h"
-
 #include "Well/RigWellPath.h"
 #include "Well/RigWellPathGeometryTools.h"
 
@@ -37,9 +34,12 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifStimPlanModelPerfsFrkExporter::writeToFile( RimStimPlanModel* stimPlanModel, const QString& filepath )
+bool RifStimPlanModelPerfsFrkExporter::writeToFile( bool              isTransverse,
+                                                    double            perforationLength,
+                                                    const cvf::Vec3d& anchorPosition,
+                                                    const RigWellPath* wellPath,
+                                                    const QString&    filepath )
 {
-    RimWellPath* wellPath = stimPlanModel->wellPath();
     if ( !wellPath )
     {
         return false;
@@ -54,13 +54,10 @@ bool RifStimPlanModelPerfsFrkExporter::writeToFile( RimStimPlanModel* stimPlanMo
     QTextStream stream( &data );
     appendHeaderToStream( stream );
 
-    bool isTransverse = ( stimPlanModel->fractureOrientation() == RimStimPlanModel::FractureOrientation::TRANSVERSE_WELL_PATH ||
-                          stimPlanModel->fractureOrientation() == RimStimPlanModel::FractureOrientation::AZIMUTH );
-
     appendFractureOrientationToStream( stream, isTransverse );
 
     // Unit: meter
-    auto [topMD, bottomMD] = calculateTopAndBottomMeasuredDepth( stimPlanModel, wellPath );
+    auto [topMD, bottomMD] = calculateTopAndBottomMeasuredDepth( wellPath, perforationLength, anchorPosition );
     appendPerforationToStream( stream, 1, RiaEclipseUnitTools::meterToFeet( topMD ), RiaEclipseUnitTools::meterToFeet( bottomMD ) );
 
     appendFooterToStream( stream );
@@ -110,12 +107,11 @@ void RifStimPlanModelPerfsFrkExporter::appendFooterToStream( QTextStream& stream
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RifStimPlanModelPerfsFrkExporter::computeMeasuredDepthForPosition( const RimWellPath* wellPath, const cvf::Vec3d& position )
+double RifStimPlanModelPerfsFrkExporter::computeMeasuredDepthForPosition( const RigWellPath* wellPath, const cvf::Vec3d& position )
 {
-    const RigWellPath* wellPathGeometry = wellPath->wellPathGeometry();
 
-    const std::vector<double>& mdValuesOfWellPath  = wellPathGeometry->measuredDepths();
-    const std::vector<double>& tvdValuesOfWellPath = wellPathGeometry->trueVerticalDepths();
+    const std::vector<double>& mdValuesOfWellPath  = wellPath->measuredDepths();
+    const std::vector<double>& tvdValuesOfWellPath = wellPath->trueVerticalDepths();
     const double               targetTvd           = -position.z();
 
     std::vector<double> tvDepthValues;
@@ -154,12 +150,11 @@ double RifStimPlanModelPerfsFrkExporter::computeMeasuredDepthForPosition( const 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::pair<double, double> RifStimPlanModelPerfsFrkExporter::calculateTopAndBottomMeasuredDepth( RimStimPlanModel* stimPlanModel,
-                                                                                                RimWellPath*      wellPath )
+std::pair<double, double> RifStimPlanModelPerfsFrkExporter::calculateTopAndBottomMeasuredDepth( const RigWellPath* wellPath,
+                                                                                                double             perforationLength,
+                                                                                                const cvf::Vec3d&  anchorPosition )
 {
-    double perforationLength = stimPlanModel->perforationLength();
-
-    double anchorPositionMD = computeMeasuredDepthForPosition( wellPath, stimPlanModel->anchorPosition() );
+    double anchorPositionMD = computeMeasuredDepthForPosition( wellPath, anchorPosition );
     double topMD            = anchorPositionMD - ( perforationLength / 2.0 );
     double bottomMD         = anchorPositionMD + ( perforationLength / 2.0 );
 

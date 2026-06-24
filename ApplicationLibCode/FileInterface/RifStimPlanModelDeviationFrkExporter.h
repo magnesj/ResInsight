@@ -20,7 +20,7 @@
 
 #include <vector>
 
-class RimStimPlanModel;
+class RigWellPath;
 class QString;
 class QTextStream;
 
@@ -30,7 +30,7 @@ class QTextStream;
 class RifStimPlanModelDeviationFrkExporter
 {
 public:
-    static bool writeToFile( RimStimPlanModel* stimPlanModel, const QString& filepath );
+    static bool writeToFile( const RigWellPath* wellPath, const QString& filepath );
 
     static void fixupDepthValuesForExport( const std::vector<double>& tvdValues,
                                            const std::vector<double>& mdValues,

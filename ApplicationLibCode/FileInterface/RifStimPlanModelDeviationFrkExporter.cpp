@@ -20,9 +20,7 @@
 
 #include "RiaEclipseUnitTools.h"
 
-#include "RimStimPlanModel.h"
-#include "RimWellPath.h"
-
+#include "Well/RigWellPath.h"
 #include "Well/RigWellPathGeometryExporter.h"
 
 #include <QFile>
@@ -31,9 +29,8 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifStimPlanModelDeviationFrkExporter::writeToFile( RimStimPlanModel* stimPlanModel, const QString& filepath )
+bool RifStimPlanModelDeviationFrkExporter::writeToFile( const RigWellPath* wellPath, const QString& filepath )
 {
-    RimWellPath* wellPath = stimPlanModel->wellPath();
     if ( !wellPath )
     {
         return false;
@@ -48,13 +45,13 @@ bool RifStimPlanModelDeviationFrkExporter::writeToFile( RimStimPlanModel* stimPl
     QTextStream stream( &data );
     appendHeaderToStream( stream );
 
-    bool                showTextMdRkb = false;
-    double              mdStepSize    = 5.0;
+    double              mdStepSize = 5.0;
+    double              rkbOffset  = 0.0;
     std::vector<double> xValues;
     std::vector<double> yValues;
     std::vector<double> tvdValues;
     std::vector<double> mdValues;
-    RigWellPathGeometryExporter::computeWellPathDataForExport( wellPath, mdStepSize, xValues, yValues, tvdValues, mdValues, showTextMdRkb );
+    RigWellPathGeometryExporter::computeWellPathDataForExport( *wellPath, mdStepSize, rkbOffset, xValues, yValues, tvdValues, mdValues );
     convertFromMeterToFeet( mdValues );
     convertFromMeterToFeet( tvdValues );
 

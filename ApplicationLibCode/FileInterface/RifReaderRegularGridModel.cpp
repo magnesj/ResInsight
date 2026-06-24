@@ -31,17 +31,15 @@
 #include "RigEclipseCaseData.h"
 #include "RigEclipseResultAddress.h"
 
-#include "RimEclipseCase.h"
-
 #include <QDir>
 #include <QFileInfo>
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifReaderRegularGridModel::writeCache( const QString& fileName, RimEclipseCase* eclipseCase )
+void RifReaderRegularGridModel::writeCache( const QString& fileName, RigCaseCellResultsData* rigCellResults, RigEclipseCaseData* eclipseCaseData )
 {
-    if ( !eclipseCase ) return;
+    if ( !rigCellResults || !eclipseCaseData ) return;
 
     QFileInfo storageFileInfo( fileName );
     if ( storageFileInfo.exists() )
@@ -59,9 +57,6 @@ void RifReaderRegularGridModel::writeCache( const QString& fileName, RimEclipseC
         return;
     }
 
-    auto rigCellResults = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
-    if ( !rigCellResults ) return;
-
     auto resultNames = rigCellResults->resultNames( RiaDefines::ResultCatType::GENERATED );
 
     std::vector<QString> keywords;
@@ -71,7 +66,7 @@ void RifReaderRegularGridModel::writeCache( const QString& fileName, RimEclipseC
     }
 
     const bool writeEchoKeywords = false;
-    if ( !RifEclipseInputFileTools::exportKeywords( fileName, eclipseCase->eclipseCaseData(), keywords, writeEchoKeywords ) )
+    if ( !RifEclipseInputFileTools::exportKeywords( fileName, eclipseCaseData, keywords, writeEchoKeywords ) )
     {
         RiaLogging::error( std::format( "Error detected when writing the cache file : {}", fileName ) );
     }
@@ -80,11 +75,8 @@ void RifReaderRegularGridModel::writeCache( const QString& fileName, RimEclipseC
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifReaderRegularGridModel::ensureDataIsReadFromCache( const QString& fileName, RimEclipseCase* eclipseCase )
+void RifReaderRegularGridModel::ensureDataIsReadFromCache( const QString& fileName, RigCaseCellResultsData* rigCellResults )
 {
-    if ( !eclipseCase ) return;
-
-    auto rigCellResults = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
     if ( !rigCellResults ) return;
 
     // Early return if we have already read the data from the cache

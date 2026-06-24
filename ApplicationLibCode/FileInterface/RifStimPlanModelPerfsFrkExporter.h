@@ -22,8 +22,7 @@
 
 #include <utility>
 
-class RimStimPlanModel;
-class RimWellPath;
+class RigWellPath;
 
 class QString;
 class QTextStream;
@@ -34,11 +33,11 @@ class QTextStream;
 class RifStimPlanModelPerfsFrkExporter
 {
 public:
-    static bool writeToFile( RimStimPlanModel* stimPlanModel, const QString& filepath );
+    static bool writeToFile( bool isTransverse, double perforationLength, const cvf::Vec3d& anchorPosition, const RigWellPath* wellPath, const QString& filepath );
 
-    static std::pair<double, double> calculateTopAndBottomMeasuredDepth( RimStimPlanModel* stimPlanModel, RimWellPath* wellPath );
+    static std::pair<double, double> calculateTopAndBottomMeasuredDepth( const RigWellPath* wellPath, double perforationLength, const cvf::Vec3d& anchorPosition );
 
-    static double computeMeasuredDepthForPosition( const RimWellPath* wellPath, const cvf::Vec3d& position );
+    static double computeMeasuredDepthForPosition( const RigWellPath* wellPath, const cvf::Vec3d& position );
 
 private:
     static void appendHeaderToStream( QTextStream& stream );
