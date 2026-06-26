@@ -65,10 +65,7 @@ LoadedCase loadBruggeCase()
     return loaded;
 }
 
-void fillStaticResult( RigCaseCellResultsData*            resultsData,
-                       const RigEclipseResultAddress&      resultAddress,
-                       size_t                              valueCount,
-                       double                              value )
+void fillStaticResult( RigCaseCellResultsData* resultsData, const RigEclipseResultAddress& resultAddress, size_t valueCount, double value )
 {
     resultsData->addStaticScalarResult( RiaDefines::ResultCatType::STATIC_NATIVE, resultAddress.resultName(), false, valueCount );
 
