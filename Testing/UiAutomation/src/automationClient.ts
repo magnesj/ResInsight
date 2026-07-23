@@ -39,13 +39,13 @@ export class AutomationClient {
   constructor(private readonly request: APIRequestContext) {}
 
   async health(): Promise<{ status: string; application: string; version: string }> {
-    const response = await this.request.get("/health");
+    const response = await this.request.get("health");
     expect(response.ok()).toBeTruthy();
     return response.json();
   }
 
   async project(maxDepth?: number): Promise<PdmObject> {
-    const response = await this.request.get("/project", {
+    const response = await this.request.get("project", {
       params: maxDepth === undefined ? {} : { maxDepth },
     });
     expect(response.ok()).toBeTruthy();
@@ -53,7 +53,7 @@ export class AutomationClient {
   }
 
   async object(address: string, maxDepth?: number): Promise<PdmObject> {
-    const response = await this.request.get(`/objects/${address}`, {
+    const response = await this.request.get(`objects/${address}`, {
       params: maxDepth === undefined ? {} : { maxDepth },
     });
     expect(response.ok()).toBeTruthy();
@@ -61,7 +61,7 @@ export class AutomationClient {
   }
 
   async setField(address: string, fieldName: string, value: string): Promise<PdmObject> {
-    const response = await this.request.put(`/objects/${address}/fields/${fieldName}`, {
+    const response = await this.request.put(`objects/${address}/fields/${fieldName}`, {
       data: { value },
     });
     expect(response.ok(), await response.text()).toBeTruthy();
@@ -69,19 +69,19 @@ export class AutomationClient {
   }
 
   async views(): Promise<View[]> {
-    const response = await this.request.get("/views");
+    const response = await this.request.get("views");
     expect(response.ok()).toBeTruthy();
     return response.json();
   }
 
   async visibleCellCount(viewId: number): Promise<VisibleCellCount> {
-    const response = await this.request.get(`/views/${viewId}/visibleCellCount`);
+    const response = await this.request.get(`views/${viewId}/visibleCellCount`);
     expect(response.ok()).toBeTruthy();
     return response.json();
   }
 
   async command(command: string): Promise<CommandResponse> {
-    const response = await this.request.post("/commands", { data: { command } });
+    const response = await this.request.post("commands", { data: { command } });
     expect(response.ok(), await response.text()).toBeTruthy();
     return response.json();
   }
