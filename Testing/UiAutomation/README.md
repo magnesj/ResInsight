@@ -39,9 +39,27 @@ npm run test:smoke  # read-only smoke tests only
 | ---- | ------- |
 | `tests/smoke.spec.ts` | Read-only checks of `/health`, `/project`, `/views` and `/views/{id}/visibleCellCount`. |
 | `tests/cell-range-filter.spec.ts` | The cell-range-filter reference workflow from issue #993, creating and deleting the filter through command features. Imports a model from `TestModels` when no grid view is open. |
+| `tests/import-case.spec.ts` | Importing an EGRID case through `/cases`. Override the model with `RESINSIGHT_TEST_EGRID`. |
 | `tests/features.spec.ts` | The `/features` allow list, and the rejection of features that are not allowed or do not apply. |
 | `tests/selection.spec.ts` | Selecting objects in the project tree through `/selection`. |
 | `src/automationClient.ts` | Typed client whose shapes mirror the OpenAPI spec. |
+
+## Importing a grid case
+
+```bash
+curl -X POST http://127.0.0.1:8080/api/v1/cases \
+  -H "Content-Type: application/json" \
+  -d '{"path": "/path/to/MODEL.EGRID", "createView": true}'
+```
+
+The response reports the new case id and the ids of the views created for it:
+
+```json
+{"caseId": 0, "viewIds": [0]}
+```
+
+Paths are resolved by the application, so prefer absolute paths. Pass
+`"createView": false` to import the case without opening a view.
 
 ## Selecting objects
 
@@ -59,11 +77,6 @@ valid for the lifetime of the object, so read them from `/project` in the same
 test rather than hard-coding them.
 
 ## Invoking commands
-
-Two mechanisms exist, and they cover different things.
-
-`POST /commands` runs the command-file (RICF) vocabulary, the same verbs command
-files and the Python interface use, for example `loadCase` and `createView`.
 
 `POST /features` triggers a command feature, the action behind a context menu
 entry. Features act on the tree selection, so select first:

@@ -19,13 +19,15 @@
 #include "RiaAutomationServer.h"
 
 #include "RiaAutomationJson.h"
+#include "RiaImportEclipseCaseTools.h"
 #include "RiaLogging.h"
+#include "RiaPreferencesGrid.h"
 #include "RiaVersionInfo.h"
 
-#include "RicfCommandObject.h"
-#include "RifcCommandFileReader.h"
+#include "RifReaderSettings.h"
 
 #include "Rim3dView.h"
+#include "RimCase.h"
 #include "RimGridView.h"
 #include "RimProject.h"
 
@@ -34,12 +36,10 @@
 #include "cafCmdFeature.h"
 #include "cafCmdFeatureManager.h"
 #include "cafPdmAbstractFieldScriptingCapability.h"
-#include "cafPdmDefaultObjectFactory.h"
 #include "cafPdmFieldHandle.h"
 #include "cafPdmObject.h"
 #include "cafPdmObjectHandle.h"
 #include "cafPdmScriptIOMessages.h"
-#include "cafPdmScriptResponse.h"
 #include "cafPdmUiItem.h"
 #include "cafPdmUiObjectHandle.h"
 #include "cafPdmValueField.h"
@@ -58,8 +58,6 @@
 #include <QJsonObject>
 #include <QTextStream>
 #include <QUrlQuery>
-
-#include <algorithm>
 
 using StatusCode = QHttpServerResponder::StatusCode;
 
@@ -227,53 +225,6 @@ static QHttpServerResponse setScriptableField( caf::PdmObjectHandle* object, con
     }
 
     return makeErrorResponse( StatusCode::NotFound, "Field not found", fieldName );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-static QHttpServerResponse executeCommandText( const QString& commandText )
-{
-    QString                  mutableText = commandText;
-    QTextStream              stream( &mutableText, QIODevice::ReadOnly );
-    caf::PdmScriptIOMessages parseMessages;
-
-    std::vector<RicfCommandObject*> commands =
-        RicfCommandFileReader::readCommands( stream, caf::PdmDefaultObjectFactory::instance(), &parseMessages );
-
-    QStringList parseErrors;
-    for ( const auto& message : parseMessages.m_messages )
-    {
-        if ( message.first == caf::PdmScriptIOMessages::MESSAGE_ERROR ) parseErrors.append( message.second );
-    }
-    if ( commands.empty() && !parseErrors.isEmpty() )
-    {
-        return makeErrorResponse( StatusCode::BadRequest, "Could not parse command", parseErrors.join( "; " ) );
-    }
-
-    QJsonArray                     responseMessages;
-    caf::PdmScriptResponse::Status worstStatus = caf::PdmScriptResponse::COMMAND_OK;
-    for ( RicfCommandObject* command : commands )
-    {
-        caf::PdmScriptResponse response = command->execute();
-        for ( const QString& message : response.messages() )
-        {
-            responseMessages.append( message );
-        }
-        worstStatus = std::max( worstStatus, response.status() );
-        delete command;
-    }
-
-    QString statusText = "ok";
-    if ( worstStatus == caf::PdmScriptResponse::COMMAND_WARNING ) statusText = "warning";
-    if ( worstStatus == caf::PdmScriptResponse::COMMAND_ERROR ) statusText = "error";
-
-    QJsonObject json;
-    json["status"]   = statusText;
-    json["messages"] = responseMessages;
-
-    const StatusCode code = worstStatus == caf::PdmScriptResponse::COMMAND_ERROR ? StatusCode::InternalServerError : StatusCode::Ok;
-    return makeJsonResponse( json, code );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -489,7 +440,9 @@ void RiaAutomationServer::registerRoutes()
                        return makeJsonResponse( json );
                    } );
 
-    server->route( "/api/v1/commands",
+    // Import an Eclipse grid file. Uses the same import path as the file menu, with the time step
+    // filter dialog disabled so nothing blocks waiting for input.
+    server->route( "/api/v1/cases",
                    QHttpServerRequest::Method::Post,
                    []( const QHttpServerRequest& request )
                    {
@@ -497,14 +450,37 @@ void RiaAutomationServer::registerRoutes()
                        QJsonDocument   document = QJsonDocument::fromJson( request.body(), &parseError );
                        if ( parseError.error != QJsonParseError::NoError || !document.isObject() )
                        {
-                           return makeErrorResponse( StatusCode::BadRequest, "Request body must be a JSON object with a 'command'" );
+                           return makeErrorResponse( StatusCode::BadRequest, "Request body must be a JSON object with a 'path'" );
                        }
 
-                       const QString commandText = document.object().value( "command" ).toString();
-                       if ( commandText.isEmpty() )
+                       const QJsonObject body = document.object();
+                       const QString     path = body.value( "path" ).toString();
+                       if ( path.isEmpty() ) return makeErrorResponse( StatusCode::BadRequest, "Missing 'path'" );
+
+                       const bool createView = body.value( "createView" ).toBool( true );
+
+                       RifReaderSettings readerSettings = RiaPreferencesGrid::current()->readerSettings();
+                       const int         caseId = RiaImportEclipseCaseTools::openEclipseCaseFromFile( path, createView, readerSettings );
+                       if ( caseId < 0 )
                        {
-                           return makeErrorResponse( StatusCode::BadRequest, "Missing 'command' text" );
+                           return makeErrorResponse( StatusCode::BadRequest, "Could not import grid case", path );
                        }
-                       return executeCommandText( commandText );
+
+                       QJsonArray viewIds;
+                       if ( RimProject* project = RimProject::current() )
+                       {
+                           for ( Rim3dView* view : project->allViews() )
+                           {
+                               if ( view && view->ownerCase() && view->ownerCase()->caseId() == caseId )
+                               {
+                                   viewIds.append( view->id() );
+                               }
+                           }
+                       }
+
+                       QJsonObject json;
+                       json["caseId"]  = caseId;
+                       json["viewIds"] = viewIds;
+                       return makeJsonResponse( json );
                    } );
 }

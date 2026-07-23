@@ -41,9 +41,9 @@ export interface FeatureResponse {
   selection: PdmObject[];
 }
 
-export interface CommandResponse {
-  status: "ok" | "warning" | "error";
-  messages?: string[];
+export interface ImportedCase {
+  caseId: number;
+  viewIds: number[];
 }
 
 export class AutomationClient {
@@ -120,8 +120,10 @@ export class AutomationClient {
     return response.json();
   }
 
-  async command(command: string): Promise<CommandResponse> {
-    const response = await this.request.post("commands", { data: { command } });
+  // Import an Eclipse grid file (.EGRID/.GRID). Paths are resolved by the server, so pass an
+  // absolute one.
+  async importCase(path: string, createView = true): Promise<ImportedCase> {
+    const response = await this.request.post("cases", { data: { path, createView } });
     expect(response.ok(), await response.text()).toBeTruthy();
     return response.json();
   }

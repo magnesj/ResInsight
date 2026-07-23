@@ -26,12 +26,15 @@ async function ensureGridView(client: AutomationClient): Promise<View> {
   const existing = await client.views();
   if (existing.length > 0) return existing[0];
 
-  await client.command(`loadCase(path="${fallbackModel}")`);
-  await client.command("createView(caseId=0)");
+  const imported = await client.importCase(fallbackModel);
+  expect(imported.viewIds.length, `Could not open a grid view from ${fallbackModel}`).toBeGreaterThan(
+    0,
+  );
 
   const views = await client.views();
-  expect(views.length, `Could not open a grid view from ${fallbackModel}`).toBeGreaterThan(0);
-  return views[0];
+  const view = views.find((candidate) => candidate.id === imported.viewIds[0]);
+  expect(view, "The imported case reported a view that is not listed").toBeDefined();
+  return view!;
 }
 
 test("manipulating a cell range filter updates the visible cell count", async ({ request }) => {

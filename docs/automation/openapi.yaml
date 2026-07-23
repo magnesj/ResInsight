@@ -34,8 +34,12 @@ tags:
     description: Inspection of the open project tree and PDM objects.
   - name: views
     description: 3D view state used to assert UI outcomes.
-  - name: commands
-    description: Execution of ResInsight commands to drive UI workflows.
+  - name: cases
+    description: Import of grid cases.
+  - name: selection
+    description: The project tree selection that command features act on.
+  - name: features
+    description: Invocation of the command features behind the context menus.
 
 paths:
   /health:
@@ -289,41 +293,37 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /commands:
+  /cases:
     post:
-      tags: [commands]
-      summary: Execute one or more ResInsight commands.
+      tags: [cases]
+      summary: Import an Eclipse grid case from file.
       description: >-
-        Accepts a command in the ResInsight command-file (RICF) text format. The
-        same command vocabulary used by command files and the Python interface
-        is available, which lets a test create, manipulate and delete project
-        objects.
-      operationId: executeCommand
+        Imports a grid file (.EGRID/.GRID) through the same path as the file
+        menu, with the time step filter dialog disabled so nothing waits for
+        input. Paths are resolved by the application, so absolute paths are
+        recommended.
+      operationId: importCase
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CommandRequest"
+              $ref: "#/components/schemas/ImportCaseRequest"
       responses:
         "200":
-          description: The command executed (possibly with non-fatal messages).
+          description: The case was imported.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CommandResponse"
+                $ref: "#/components/schemas/ImportedCase"
         "400":
-          description: The command text could not be parsed.
+          description: >-
+            The body was malformed, or the file does not exist or could not be
+            read as a grid case.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-        "500":
-          description: The command failed during execution.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CommandResponse"
 
 components:
   parameters:
@@ -475,26 +475,30 @@ components:
           items:
             $ref: "#/components/schemas/PdmObject"
 
-    CommandRequest:
+    ImportCaseRequest:
       type: object
-      required: [command]
+      required: [path]
       properties:
-        command:
+        path:
           type: string
-          description: Command(s) in ResInsight command-file (RICF) text format.
-          example: setTimeStep(viewId=1, timeStep=2)
+          description: Path to the grid file to import.
+          example: /models/BRUGGE_0000.EGRID
+        createView:
+          type: boolean
+          default: true
+          description: Whether to create a 3D view for the imported case.
 
-    CommandResponse:
+    ImportedCase:
       type: object
-      required: [status]
+      required: [caseId, viewIds]
       properties:
-        status:
-          type: string
-          enum: [ok, warning, error]
-        messages:
+        caseId:
+          type: integer
+        viewIds:
           type: array
+          description: Ids of the views belonging to the imported case.
           items:
-            type: string
+            type: integer
 
     Error:
       type: object
