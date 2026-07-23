@@ -181,6 +181,54 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /selection:
+    get:
+      tags: [selection]
+      summary: List the objects currently selected in the project tree.
+      operationId: getSelection
+      responses:
+        "200":
+          description: The selected objects, without children.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PdmObject"
+    put:
+      tags: [selection]
+      summary: Select an object in the project tree.
+      description: >-
+        Selects the object the same way a user click does, so the property
+        editor and the active view follow along. This is the state many context
+        menu commands act on.
+      operationId: setSelection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SelectionRequest"
+      responses:
+        "200":
+          description: The object that was selected.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PdmObject"
+        "400":
+          description: The body was malformed, or the object cannot be selected.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: No object with the given address exists.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /commands:
     post:
       tags: [commands]
@@ -324,6 +372,14 @@ components:
         totalCellCount:
           type: integer
           format: int64
+
+    SelectionRequest:
+      type: object
+      required: [address]
+      properties:
+        address:
+          type: string
+          description: Address of the object to select, as reported in PdmObject.address.
 
     CommandRequest:
       type: object

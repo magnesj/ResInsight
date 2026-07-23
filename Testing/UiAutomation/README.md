@@ -39,4 +39,20 @@ npm run test:smoke  # read-only smoke tests only
 | ---- | ------- |
 | `tests/smoke.spec.ts` | Read-only checks of `/health`, `/project`, `/views` and `/views/{id}/visibleCellCount`. |
 | `tests/cell-range-filter.spec.ts` | The cell-range-filter reference workflow from issue #993. The end-to-end create/delete lifecycle is marked `fixme` until the corresponding `/commands` vocabulary is available. |
+| `tests/selection.spec.ts` | Selecting objects in the project tree through `/selection`. |
 | `src/automationClient.ts` | Typed client whose shapes mirror the OpenAPI spec. |
+
+## Selecting objects
+
+Many ResInsight commands act on the current project tree selection. Select an
+object by its address, as reported in the `/project` tree:
+
+```bash
+curl -X PUT http://127.0.0.1:8080/api/v1/selection \
+  -H "Content-Type: application/json" \
+  -d '{"address": "2525203073120"}'
+```
+
+`GET /selection` returns the objects currently selected. Addresses are only
+valid for the lifetime of the object, so read them from `/project` in the same
+test rather than hard-coding them.

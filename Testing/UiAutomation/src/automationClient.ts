@@ -80,6 +80,20 @@ export class AutomationClient {
     return response.json();
   }
 
+  // Objects currently selected in the project tree.
+  async selection(): Promise<PdmObject[]> {
+    const response = await this.request.get("selection");
+    expect(response.ok()).toBeTruthy();
+    return response.json();
+  }
+
+  // Select an object in the project tree, as a user click would.
+  async setSelection(address: string): Promise<PdmObject> {
+    const response = await this.request.put("selection", { data: { address } });
+    expect(response.ok(), await response.text()).toBeTruthy();
+    return response.json();
+  }
+
   async command(command: string): Promise<CommandResponse> {
     const response = await this.request.post("commands", { data: { command } });
     expect(response.ok(), await response.text()).toBeTruthy();

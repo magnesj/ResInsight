@@ -29,15 +29,20 @@
 #include "RimGridView.h"
 #include "RimProject.h"
 
+#include "Riu3DMainWindowTools.h"
+
 #include "cafPdmAbstractFieldScriptingCapability.h"
 #include "cafPdmDefaultObjectFactory.h"
 #include "cafPdmFieldHandle.h"
+#include "cafPdmObject.h"
 #include "cafPdmObjectHandle.h"
 #include "cafPdmScriptIOMessages.h"
 #include "cafPdmScriptResponse.h"
+#include "cafPdmUiItem.h"
 #include "cafPdmUiObjectHandle.h"
 #include "cafPdmValueField.h"
 #include "cafPdmXmlObjectHandle.h"
+#include "cafSelectionManager.h"
 
 #include "cvfArray.h"
 
@@ -348,6 +353,48 @@ void RiaAutomationServer::registerRoutes()
                            }
                        }
                        return makeErrorResponse( StatusCode::NotFound, "No grid view with the given id" );
+                   } );
+
+    server->route( "/api/v1/selection",
+                   QHttpServerRequest::Method::Get,
+                   []()
+                   {
+                       QJsonArray selected;
+                       for ( caf::PdmUiItem* item : caf::SelectionManager::instance()->selectedItems() )
+                       {
+                           if ( auto* object = dynamic_cast<caf::PdmObjectHandle*>( item ) )
+                           {
+                               selected.append( RiaAutomationJson::pdmObjectToJson( object, 0 ) );
+                           }
+                       }
+                       return makeJsonResponse( selected );
+                   } );
+
+    // Select an object in the project tree the same way a user click does, so the property editor
+    // and the active view follow along.
+    server->route( "/api/v1/selection",
+                   QHttpServerRequest::Method::Put,
+                   []( const QHttpServerRequest& request )
+                   {
+                       QJsonParseError parseError;
+                       QJsonDocument   document = QJsonDocument::fromJson( request.body(), &parseError );
+                       if ( parseError.error != QJsonParseError::NoError || !document.isObject() )
+                       {
+                           return makeErrorResponse( StatusCode::BadRequest, "Request body must be a JSON object with an 'address'" );
+                       }
+
+                       const QString         address = document.object().value( "address" ).toString();
+                       caf::PdmObjectHandle* object  = RiaAutomationJson::findObjectByAddress( address );
+                       if ( !object ) return makeErrorResponse( StatusCode::NotFound, "Object not found", address );
+
+                       auto* pdmObject = dynamic_cast<caf::PdmObject*>( object );
+                       if ( !pdmObject )
+                       {
+                           return makeErrorResponse( StatusCode::BadRequest, "Object cannot be selected", address );
+                       }
+
+                       Riu3DMainWindowTools::selectAsCurrentItem( pdmObject );
+                       return makeJsonResponse( RiaAutomationJson::pdmObjectToJson( object, 0 ) );
                    } );
 
     server->route( "/api/v1/commands",
