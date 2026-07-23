@@ -23,7 +23,7 @@
 #include "Cloud/RiaConnectorTools.h"
 #include "RiaArgumentParser.h"
 #ifdef ENABLE_UI_AUTOMATION
-#include "RiaAutomationServer.h"
+#include "../Automation/RiaAutomationServer.h"
 #endif
 #include "RiaBaseDefs.h"
 #include "RiaDefines.h"
