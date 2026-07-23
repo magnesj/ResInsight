@@ -229,6 +229,66 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /features:
+    get:
+      tags: [features]
+      summary: List the command features automation may invoke.
+      description: >-
+        Only an explicit allow list is reachable. Many features open modal
+        dialogs, which would block the server with no user present to dismiss
+        them, so features are enabled one by one after being checked.
+      operationId: getFeatures
+      responses:
+        "200":
+          description: The allowed features and whether each applies to the current selection.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommandFeature"
+    post:
+      tags: [features]
+      summary: Invoke a command feature.
+      description: >-
+        Triggers the same action as the corresponding context menu entry.
+        Features act on the project tree selection, so set it with
+        PUT /selection first.
+      operationId: invokeFeature
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FeatureRequest"
+      responses:
+        "200":
+          description: The feature was invoked.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FeatureResponse"
+        "400":
+          description: The request body was malformed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: >-
+            The feature is not on the allow list. Unknown command ids are
+            reported this way as well.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: The feature cannot be executed for the current selection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /commands:
     post:
       tags: [commands]
@@ -380,6 +440,40 @@ components:
         address:
           type: string
           description: Address of the object to select, as reported in PdmObject.address.
+
+    CommandFeature:
+      type: object
+      required: [commandId, canExecute]
+      properties:
+        commandId:
+          type: string
+          example: RicNewCellRangeFilterFeature
+        canExecute:
+          type: boolean
+          description: Whether the feature applies to the current selection.
+
+    FeatureRequest:
+      type: object
+      required: [commandId]
+      properties:
+        commandId:
+          type: string
+          description: Id of the command feature, as reported by GET /features.
+          example: RicNewCellRangeFilterFeature
+
+    FeatureResponse:
+      type: object
+      required: [commandId, selection]
+      properties:
+        commandId:
+          type: string
+        selection:
+          type: array
+          description: >-
+            The selection after the feature ran. Features that create an object
+            select it, so the new object is reported here.
+          items:
+            $ref: "#/components/schemas/PdmObject"
 
     CommandRequest:
       type: object

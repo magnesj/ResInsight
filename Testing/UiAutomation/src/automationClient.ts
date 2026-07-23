@@ -30,6 +30,17 @@ export interface VisibleCellCount {
   totalCellCount?: number;
 }
 
+export interface CommandFeature {
+  commandId: string;
+  canExecute: boolean;
+}
+
+export interface FeatureResponse {
+  commandId: string;
+  // Features that create an object select it, so the new object shows up here.
+  selection: PdmObject[];
+}
+
 export interface CommandResponse {
   status: "ok" | "warning" | "error";
   messages?: string[];
@@ -90,6 +101,21 @@ export class AutomationClient {
   // Select an object in the project tree, as a user click would.
   async setSelection(address: string): Promise<PdmObject> {
     const response = await this.request.put("selection", { data: { address } });
+    expect(response.ok(), await response.text()).toBeTruthy();
+    return response.json();
+  }
+
+  // Command features automation is allowed to invoke, and whether each one applies to the
+  // current selection.
+  async features(): Promise<CommandFeature[]> {
+    const response = await this.request.get("features");
+    expect(response.ok()).toBeTruthy();
+    return response.json();
+  }
+
+  // Invoke a command feature. Features act on the tree selection, so call setSelection() first.
+  async invokeFeature(commandId: string): Promise<FeatureResponse> {
+    const response = await this.request.post("features", { data: { commandId } });
     expect(response.ok(), await response.text()).toBeTruthy();
     return response.json();
   }

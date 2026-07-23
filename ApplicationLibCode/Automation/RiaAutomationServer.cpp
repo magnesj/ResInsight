@@ -31,6 +31,8 @@
 
 #include "Riu3DMainWindowTools.h"
 
+#include "cafCmdFeature.h"
+#include "cafCmdFeatureManager.h"
 #include "cafPdmAbstractFieldScriptingCapability.h"
 #include "cafPdmDefaultObjectFactory.h"
 #include "cafPdmFieldHandle.h"
@@ -143,6 +145,41 @@ bool RiaAutomationServer::isRunning() const
 quint16 RiaAutomationServer::listenPort() const
 {
     return m_listenPort;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Command features that automation is allowed to invoke.
+///
+/// Features are GUI actions, and a substantial number of them open modal dialogs. A dialog raised
+/// from a request handler blocks the event loop with nobody present to dismiss it, leaving both the
+/// request and the application hanging. Only features verified not to open dialogs are listed here.
+/// Extend the list deliberately, after checking the implementation.
+//--------------------------------------------------------------------------------------------------
+static const QStringList& allowedCommandFeatures()
+{
+    static const QStringList features = { "RicNewCellRangeFilterFeature",
+                                          "RicNewRangeFilterSliceIFeature",
+                                          "RicNewRangeFilterSliceJFeature",
+                                          "RicNewRangeFilterSliceKFeature",
+                                          "RicNewCellIndexFilterFeature",
+                                          "RicDeleteItemFeature" };
+    return features;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+static QJsonArray currentSelectionToJson()
+{
+    QJsonArray selected;
+    for ( caf::PdmUiItem* item : caf::SelectionManager::instance()->selectedItems() )
+    {
+        if ( auto* object = dynamic_cast<caf::PdmObjectHandle*>( item ) )
+        {
+            selected.append( RiaAutomationJson::pdmObjectToJson( object, 0 ) );
+        }
+    }
+    return selected;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -355,20 +392,7 @@ void RiaAutomationServer::registerRoutes()
                        return makeErrorResponse( StatusCode::NotFound, "No grid view with the given id" );
                    } );
 
-    server->route( "/api/v1/selection",
-                   QHttpServerRequest::Method::Get,
-                   []()
-                   {
-                       QJsonArray selected;
-                       for ( caf::PdmUiItem* item : caf::SelectionManager::instance()->selectedItems() )
-                       {
-                           if ( auto* object = dynamic_cast<caf::PdmObjectHandle*>( item ) )
-                           {
-                               selected.append( RiaAutomationJson::pdmObjectToJson( object, 0 ) );
-                           }
-                       }
-                       return makeJsonResponse( selected );
-                   } );
+    server->route( "/api/v1/selection", QHttpServerRequest::Method::Get, []() { return makeJsonResponse( currentSelectionToJson() ); } );
 
     // Select an object in the project tree the same way a user click does, so the property editor
     // and the active view follow along.
@@ -393,8 +417,76 @@ void RiaAutomationServer::registerRoutes()
                            return makeErrorResponse( StatusCode::BadRequest, "Object cannot be selected", address );
                        }
 
+                       // Sync the tree view so the property editor and active view follow along.
+                       // This is best effort: it does nothing when the object is not present in a
+                       // visible tree view, which is why the selection itself is set explicitly
+                       // below. Command features read the selection manager, not the tree.
                        Riu3DMainWindowTools::selectAsCurrentItem( pdmObject );
+
+                       if ( caf::PdmUiObjectHandle* uiObject = object->uiCapability() )
+                       {
+                           caf::SelectionManager::instance()->setSelectedItem( uiObject );
+                       }
+
                        return makeJsonResponse( RiaAutomationJson::pdmObjectToJson( object, 0 ) );
+                   } );
+
+    server->route( "/api/v1/features",
+                   QHttpServerRequest::Method::Get,
+                   []()
+                   {
+                       QJsonArray features;
+                       for ( const QString& commandId : allowedCommandFeatures() )
+                       {
+                           QJsonObject entry;
+                           entry["commandId"]  = commandId;
+                           entry["canExecute"] = false;
+
+                           if ( caf::CmdFeature* feature = caf::CmdFeatureManager::instance()->getCommandFeature( commandId.toStdString() ) )
+                           {
+                               feature->refreshEnabledState();
+                               entry["canExecute"] = feature->canFeatureBeExecuted();
+                           }
+                           features.append( entry );
+                       }
+                       return makeJsonResponse( features );
+                   } );
+
+    // Invoke a command feature, the same action a context menu entry triggers. Features act on the
+    // current tree selection, so set it with PUT /selection first.
+    server->route( "/api/v1/features",
+                   QHttpServerRequest::Method::Post,
+                   []( const QHttpServerRequest& request )
+                   {
+                       QJsonParseError parseError;
+                       QJsonDocument   document = QJsonDocument::fromJson( request.body(), &parseError );
+                       if ( parseError.error != QJsonParseError::NoError || !document.isObject() )
+                       {
+                           return makeErrorResponse( StatusCode::BadRequest, "Request body must be a JSON object with a 'commandId'" );
+                       }
+
+                       const QString commandId = document.object().value( "commandId" ).toString();
+                       if ( !allowedCommandFeatures().contains( commandId ) )
+                       {
+                           return makeErrorResponse( StatusCode::Forbidden, "Command feature is not enabled for automation", commandId );
+                       }
+
+                       caf::CmdFeature* feature = caf::CmdFeatureManager::instance()->getCommandFeature( commandId.toStdString() );
+                       if ( !feature ) return makeErrorResponse( StatusCode::NotFound, "Unknown command feature", commandId );
+
+                       feature->refreshEnabledState();
+                       if ( !feature->canFeatureBeExecuted() )
+                       {
+                           return makeErrorResponse( StatusCode::Conflict, "Feature cannot be executed for the current selection", commandId );
+                       }
+
+                       feature->actionTriggered( false );
+
+                       // Features that create an object select it, so the new object is reported here.
+                       QJsonObject json;
+                       json["commandId"] = commandId;
+                       json["selection"] = currentSelectionToJson();
+                       return makeJsonResponse( json );
                    } );
 
     server->route( "/api/v1/commands",

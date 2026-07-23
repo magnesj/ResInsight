@@ -38,7 +38,8 @@ npm run test:smoke  # read-only smoke tests only
 | File | Purpose |
 | ---- | ------- |
 | `tests/smoke.spec.ts` | Read-only checks of `/health`, `/project`, `/views` and `/views/{id}/visibleCellCount`. |
-| `tests/cell-range-filter.spec.ts` | The cell-range-filter reference workflow from issue #993. The end-to-end create/delete lifecycle is marked `fixme` until the corresponding `/commands` vocabulary is available. |
+| `tests/cell-range-filter.spec.ts` | The cell-range-filter reference workflow from issue #993, creating and deleting the filter through command features. Imports a model from `TestModels` when no grid view is open. |
+| `tests/features.spec.ts` | The `/features` allow list, and the rejection of features that are not allowed or do not apply. |
 | `tests/selection.spec.ts` | Selecting objects in the project tree through `/selection`. |
 | `src/automationClient.ts` | Typed client whose shapes mirror the OpenAPI spec. |
 
@@ -56,3 +57,32 @@ curl -X PUT http://127.0.0.1:8080/api/v1/selection \
 `GET /selection` returns the objects currently selected. Addresses are only
 valid for the lifetime of the object, so read them from `/project` in the same
 test rather than hard-coding them.
+
+## Invoking commands
+
+Two mechanisms exist, and they cover different things.
+
+`POST /commands` runs the command-file (RICF) vocabulary, the same verbs command
+files and the Python interface use, for example `loadCase` and `createView`.
+
+`POST /features` triggers a command feature, the action behind a context menu
+entry. Features act on the tree selection, so select first:
+
+```bash
+curl -X PUT http://127.0.0.1:8080/api/v1/selection \
+  -H "Content-Type: application/json" -d '{"address": "2835701592096"}'
+
+curl -X POST http://127.0.0.1:8080/api/v1/features \
+  -H "Content-Type: application/json" \
+  -d '{"commandId": "RicNewCellRangeFilterFeature"}'
+```
+
+Features that create an object select it, so the response reports the new object
+and its address.
+
+Only features on an allow list can be invoked. Many of the several hundred
+features open modal dialogs, and a dialog raised from a request handler blocks
+the application with nobody present to dismiss it. `GET /features` lists what is
+enabled, together with whether each one applies to the current selection. To
+enable another feature, check that its implementation opens no dialog and add it
+to `allowedCommandFeatures()` in `RiaAutomationServer.cpp`.
