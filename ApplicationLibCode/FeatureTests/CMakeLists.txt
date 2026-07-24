@@ -15,8 +15,11 @@ set(SOURCE_FEATURETEST_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaFeatureTestTreeView.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaFeatureTestTreeView.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicFeatureSweepDenylist.h
+    ${CMAKE_CURRENT_LIST_DIR}/RicFeatureExecutionRunner.h
+    ${CMAKE_CURRENT_LIST_DIR}/RicFeatureExecutionRunner.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicFeatureSweep-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicFeatureExecutionSweep-Test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RicFeatureSubprocessSweep-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicDeleteWellPathFeature-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicNewViewFeature-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicCloseCaseFeature-Test.cpp

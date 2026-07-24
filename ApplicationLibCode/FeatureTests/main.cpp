@@ -22,6 +22,8 @@
 #include "RiaQuantityInfoTools.h"
 #include "RiaRegressionTestRunner.h"
 
+#include "RicFeatureExecutionRunner.h"
+
 #include "cafCmdFeatureManager.h"
 #include "cafPdmDefaultObjectFactory.h"
 
@@ -29,6 +31,8 @@
 
 #include <QApplication>
 #include <QLocale>
+
+#include <string>
 
 #ifdef WIN32
 #include <windows.h>
@@ -80,6 +84,28 @@ int main( int argc, char** argv )
 
     QLocale::setDefault( QLocale( QLocale::English, QLocale::UnitedStates ) );
     setlocale( LC_NUMERIC, "C" );
+
+    // Child mode for the subprocess sweep: execute a single feature and exit without running any
+    // gtest cases. The parent (RicFeatureSubprocessSweep-Test.cpp) spawns one child per feature, so a
+    // feature that aborts on a failed CVF_ASSERT/CAF_ASSERT, or hangs, only takes down its own
+    // process and is attributed to that feature id.
+    const std::string execSwitch = RicFeatureExecutionRunner::featureExecSwitch;
+    for ( int i = 1; i < argc; ++i )
+    {
+        const std::string arg = argv[i];
+        if ( arg.rfind( execSwitch, 0 ) == 0 )
+        {
+            const std::string commandId = arg.substr( execSwitch.size() );
+            const bool        ok        = RicFeatureExecutionRunner::executeFeature( commandId );
+
+            // Close the project before RiaGuiApplication is destroyed. Tearing down a live project
+            // (cases, views) during application destruction crashes, which would make every child
+            // look like a crashing feature.
+            RicFeatureExecutionRunner::releaseModel();
+
+            return ok ? 0 : 1;
+        }
+    }
 
     testing::InitGoogleTest( &argc, argv );
     int result = RUN_ALL_TESTS();
