@@ -204,7 +204,8 @@ ExtractionCurveType* RicWellLogTools::addExtractionCurve( RimWellLogTrack*      
 
     RiaDefines::DepthUnitType defaultDepthUnit = RiaDefines::DepthUnitType::UNIT_METER;
 
-    if ( auto eclipseCase = dynamic_cast<RimEclipseCase*>( caseToApply ) )
+    // A case can be part of the project without being opened, in which case it has no case data yet.
+    if ( auto eclipseCase = dynamic_cast<RimEclipseCase*>( caseToApply ); eclipseCase && eclipseCase->eclipseCaseData() )
     {
         defaultDepthUnit = RiaDefines::fromEclipseUnit( eclipseCase->eclipseCaseData()->unitsType() );
     }

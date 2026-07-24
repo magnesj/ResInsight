@@ -536,7 +536,7 @@ void RimEclipseContourMapView::fieldChangedByUi( const caf::PdmFieldHandle* chan
 
     if ( changedField == &m_showAxisLines )
     {
-        viewer()->showEdgeTickMarksXY( true, m_showAxisLines() );
+        if ( viewer() ) viewer()->showEdgeTickMarksXY( true, m_showAxisLines() );
         scheduleCreateDisplayModelAndRedraw();
     }
     else if ( changedField == backgroundColorField() )
