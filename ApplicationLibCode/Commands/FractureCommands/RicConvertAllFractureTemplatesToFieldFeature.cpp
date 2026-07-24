@@ -48,6 +48,7 @@ CAF_CMD_SOURCE_INIT( RicConvertAllFractureTemplatesToFieldFeature, "RicConvertAl
 void RicConvertAllFractureTemplatesToFieldFeature::onActionTriggered( bool isChecked )
 {
     RimFractureTemplateCollection* fracTempColl = caf::firstAncestorOfTypeFromSelectedObject<RimFractureTemplateCollection>();
+    if ( !fracTempColl ) return;
 
     std::vector<RimEllipseFractureTemplate*> ellipseFracTemplates = fracTempColl->descendantsIncludingThisOfType<RimEllipseFractureTemplate>();
 
