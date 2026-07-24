@@ -37,7 +37,8 @@
 ///
 /// These features are tree-driven: with a single object selected they toggle the objectToggleField
 /// of that object's tree children (see RicToggleItemsFeatureImpl). Because the feature-test
-/// executable has no RiuMainWindow, the tree is supplied by RiaFeatureTestTreeView, which registers a
+/// main window project tree is not populated with the model built here, the tree is supplied by
+/// RiaFeatureTestTreeView, which registers a
 /// headless project tree view via RiaFeatureCommandContext.
 ///
 /// The well path collection is used as the selected object: its tree children are the well paths,

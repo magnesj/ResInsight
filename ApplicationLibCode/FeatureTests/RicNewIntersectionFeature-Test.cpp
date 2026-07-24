@@ -34,7 +34,7 @@
 ///
 /// These exercise the active-view path of the harness: RiaFeatureTestModelBuilder sets the active
 /// reservoir view when it builds an Eclipse model, so features that resolve their context from the
-/// active view have a valid context without a RiuMainWindow.
+/// active view have a valid context without depending on the project tree selection.
 //--------------------------------------------------------------------------------------------------
 class RicNewIntersectionFeatureTest : public ::testing::Test
 {

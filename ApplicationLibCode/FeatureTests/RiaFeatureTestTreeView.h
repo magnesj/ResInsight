@@ -33,8 +33,10 @@ class PdmUiTreeView;
 /// Tree-dependent features (e.g. the RicToggleItems*Feature family) resolve the children of the
 /// selected object through RicToggleItemsFeatureImpl::findTreeView(), which first consults
 /// RiaFeatureCommandContext for an externally supplied caf::PdmUiTreeView before falling back to the
-/// RiuMainWindow project tree. The feature-test executable has no RiuMainWindow (and no OpenGL
-/// context), so this helper supplies a stand-alone tree view instead, making those features testable.
+/// RiuMainWindow project tree. RiaGuiApplication::initialize() does create the main window, but its
+/// project tree is not populated with the models these tests build, so findTreeView() does not
+/// resolve the selected item. This helper supplies a stand-alone tree view rooted at the project
+/// instead, which makes those features testable and keeps the tree deterministic.
 ///
 /// The tree view eagerly builds the full tree ordering for its root at construction, so add every
 /// object the test needs before creating the helper. The command-context registration is cleared and

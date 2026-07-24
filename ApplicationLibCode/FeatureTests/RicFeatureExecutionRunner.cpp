@@ -19,6 +19,7 @@
 #include "RicFeatureExecutionRunner.h"
 
 #include "RiaFeatureTestModelBuilder.h"
+#include "RiaViewRedrawScheduler.h"
 #include "RicFeatureSweepDenylist.h"
 
 #include "RimEclipseCase.h"
@@ -33,6 +34,7 @@
 #include "cafPdmUiItem.h"
 #include "cafSelectionManager.h"
 
+#include <QAction>
 #include <QApplication>
 #include <QTimer>
 #include <QWidget>
@@ -179,8 +181,32 @@ bool RicFeatureExecutionRunner::executeFeature( const std::string& commandId )
         std::cout << "[exec] " << scenario.name << " : " << commandId << std::endl;
 
         ModalDialogWatchdog watchdog;
-        feature->actionTriggered( false );
-        QApplication::processEvents();
+
+        // Trigger through the QAction rather than calling actionTriggered() directly. Features that
+        // read caf::CmdFeature::userData() get it from qobject_cast<QAction*>( sender() ), which
+        // asserts when the slot is invoked as a plain function call. Going through the action is also
+        // how the application itself invokes a feature.
+        if ( QAction* action = feature->action() )
+        {
+            action->trigger();
+        }
+        else
+        {
+            feature->actionTriggered( false );
+        }
+
+        // Deliberately do NOT pump the event loop here.
+        //
+        // RiaGuiApplication::initialize() creates and shows the main window, so the 3D viewer widgets
+        // exist and Qt has paint events queued for them. Offscreen there is no OpenGL context, and
+        // caf::Viewer::paintGL() dereferences the null context, which shows up as an access violation
+        // blamed on whichever feature happened to run. Measured: with processEvents() the cell-filter
+        // features all crash; without it they pass. Discarding the scheduled redraws is not enough,
+        // because the paint events come from Qt rather than from RiaViewRedrawScheduler.
+        //
+        // Exercising real rendering requires the software-GL tier, not this one, so drop the pending
+        // redraws and leave the event loop alone.
+        RiaViewRedrawScheduler::instance()->clearViewsScheduledForUpdate();
 
         if ( RimProject::current() == nullptr ) return false;
     }
