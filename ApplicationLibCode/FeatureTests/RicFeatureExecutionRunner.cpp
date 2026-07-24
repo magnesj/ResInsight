@@ -38,6 +38,8 @@
 #include "cafPdmObjectHandle.h"
 #include "cafPdmPointer.h"
 #include "cafPdmUiItem.h"
+#include "cafPdmUiObjectHandle.h"
+#include "cafPdmXmlObjectHandle.h"
 #include "cafSelectionManager.h"
 
 #include <QAction>
@@ -46,46 +48,15 @@
 #include <QWidget>
 
 #include <iostream>
+#include <set>
 #include <vector>
 
 namespace
 {
-enum class ScenarioKind
-{
-    ECLIPSE_CASE,
-    ECLIPSE_VIEW,
-    WELL_PATH,
-    SUMMARY_CASE,
-    GEOMECH_CASE,
-    GEOMECH_VIEW,
-    POLYGON
-};
-
-struct Scenario
-{
-    const char*  name;
-    ScenarioKind kind;
-};
-
-// Only populated scenarios are executed. Executing a feature with an empty selection is not
-// meaningful and mostly trips preconditions.
-//
-// The list covers one object per domain, because a feature is only executed under a scenario where
-// it reports itself enabled. With Eclipse selections alone, every summary, GeoMech and polygon
-// feature reports itself disabled and is silently never exercised.
-const std::vector<Scenario>& executionScenarios()
-{
-    static const std::vector<Scenario> scenarios = {
-        { "EclipseCase", ScenarioKind::ECLIPSE_CASE },
-        { "EclipseView", ScenarioKind::ECLIPSE_VIEW },
-        { "WellPath", ScenarioKind::WELL_PATH },
-        { "SummaryCase", ScenarioKind::SUMMARY_CASE },
-        { "GeoMechCase", ScenarioKind::GEOMECH_CASE },
-        { "GeoMechView", ScenarioKind::GEOMECH_VIEW },
-        { "Polygon", ScenarioKind::POLYGON },
-    };
-    return scenarios;
-}
+// At most this many selections are executed per feature. A feature that is enabled for a whole class
+// of objects would otherwise run dozens of times, which costs runtime and multiplies destructive side
+// effects without finding much more. Hitting the cap is logged rather than passing silently.
+constexpr size_t maxExecutionsPerFeature = 3;
 
 //--------------------------------------------------------------------------------------------------
 /// Closes any modal dialog that appears while a feature is executing.
@@ -126,6 +97,8 @@ caf::PdmPointer<caf::PdmObjectHandle> s_eclipseViewGuard;
 caf::PdmPointer<caf::PdmObjectHandle> s_wellPathGuard;
 bool                                  s_modelBuilt = false;
 
+void collectSelectionCandidates();
+
 void rebuildModel()
 {
     caf::SelectionManager::instance()->clearAll();
@@ -135,6 +108,8 @@ void rebuildModel()
     s_eclipseViewGuard = s_model.eclipseView;
     s_wellPathGuard    = s_model.wellPath;
     s_modelBuilt       = true;
+
+    collectSelectionCandidates();
 }
 
 bool modelNeedsRebuild()
@@ -147,48 +122,64 @@ bool modelNeedsRebuild()
     return false;
 }
 
-// Select the objects for a scenario. Returns false if the scenario cannot be represented (e.g. the
-// model failed to build), in which case the caller skips it.
-bool applySelection( ScenarioKind kind )
+// One object per distinct class in the project, held through dangling-safe pointers so a feature that
+// deletes objects does not leave the list pointing at freed memory.
+std::vector<caf::PdmPointer<caf::PdmObjectHandle>> s_candidates;
+
+//--------------------------------------------------------------------------------------------------
+/// Collect the objects to use as selections, by walking the project.
+///
+/// Command features dispatch on the type of the selected object, so one instance per class is enough
+/// and keeps the list to a size that can be tried exhaustively for every feature. Walking the tree
+/// rather than hand-picking a few objects is what reaches the collections, sub-collections and
+/// definition objects that most features are actually written against.
+//--------------------------------------------------------------------------------------------------
+void collectSelectionCandidates()
+{
+    s_candidates.clear();
+
+    RimProject* project = RimProject::current();
+    if ( !project ) return;
+
+    std::set<QString> seenClasses;
+    for ( caf::PdmObjectHandle* object : project->descendantsIncludingThisOfType<caf::PdmObjectHandle>() )
+    {
+        if ( !object ) continue;
+
+        // Ask for the capabilities directly. The uiCapability() and xmlCapability() accessors assert
+        // when the capability is missing rather than returning null, so they cannot be used to test
+        // for it, and not every object in the project has both.
+        auto* xmlCapability = object->capability<caf::PdmXmlObjectHandle>();
+        auto* uiCapability  = object->capability<caf::PdmUiObjectHandle>();
+        if ( !xmlCapability || !uiCapability ) continue;
+
+        if ( seenClasses.insert( xmlCapability->classKeyword() ).second )
+        {
+            s_candidates.push_back( object );
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Select a candidate object, and make the view it belongs to the active one.
+///
+/// Many features read the active view instead of the selection, so the two are kept consistent:
+/// selecting something inside the GeoMech view must not leave the Eclipse view active.
+//--------------------------------------------------------------------------------------------------
+bool applySelection( caf::PdmObjectHandle* object )
 {
     caf::SelectionManager::instance()->clearAll();
 
-    caf::PdmUiItem* item = nullptr;
+    if ( !object ) return false;
 
-    // Many features read the active view instead of the selection, so keep the two consistent.
-    RimGridView* activeView = s_model.eclipseView;
+    auto* uiCapability = object->capability<caf::PdmUiObjectHandle>();
+    if ( !uiCapability ) return false;
 
-    switch ( kind )
-    {
-        case ScenarioKind::ECLIPSE_CASE:
-            item = s_model.eclipseCase;
-            break;
-        case ScenarioKind::ECLIPSE_VIEW:
-            item = s_model.eclipseView;
-            break;
-        case ScenarioKind::WELL_PATH:
-            item = s_model.wellPath;
-            break;
-        case ScenarioKind::SUMMARY_CASE:
-            item = s_model.summaryCase;
-            break;
-        case ScenarioKind::GEOMECH_CASE:
-            item       = s_model.geoMechCase;
-            activeView = s_model.geoMechView;
-            break;
-        case ScenarioKind::GEOMECH_VIEW:
-            item       = s_model.geoMechView;
-            activeView = s_model.geoMechView;
-            break;
-        case ScenarioKind::POLYGON:
-            item = s_model.polygon;
-            break;
-    }
-
-    if ( !item ) return false;
+    RimGridView* activeView = object->firstAncestorOrThisOfType<RimGridView>();
+    if ( !activeView ) activeView = s_model.eclipseView;
 
     RiaApplication::instance()->setActiveReservoirView( activeView );
-    caf::SelectionManager::instance()->setSelectedItem( item );
+    caf::SelectionManager::instance()->setSelectedItem( uiCapability );
     return true;
 }
 } // namespace
@@ -203,19 +194,40 @@ bool RicFeatureExecutionRunner::executeFeature( const std::string& commandId )
     caf::CmdFeature* feature = caf::CmdFeatureManager::instance()->getCommandFeature( commandId );
     if ( !feature ) return false;
 
-    for ( const Scenario& scenario : executionScenarios() )
+    if ( modelNeedsRebuild() ) rebuildModel();
+
+    size_t executionCount = 0;
+
+    for ( size_t i = 0; i < s_candidates.size(); ++i )
     {
+        // A previously executed feature may have deleted objects or closed the project. Rebuilding
+        // invalidates the candidate list, so rebuild it too and restart from the same index.
         if ( modelNeedsRebuild() ) rebuildModel();
 
-        if ( !applySelection( scenario.kind ) ) continue;
+        caf::PdmObjectHandle* candidate = s_candidates[i].p();
+        if ( !candidate ) continue;
 
-        // Re-resolve after a rebuild; the feature instance itself is owned by the manager and stable,
-        // but the enabled state depends on the selection just applied.
+        auto* candidateXml = candidate->capability<caf::PdmXmlObjectHandle>();
+        if ( !candidateXml ) continue;
+        const QString candidateName = candidateXml->classKeyword();
+
+        if ( !applySelection( candidate ) ) continue;
+
+        // The enabled state depends on the selection just applied. Note this call is itself part of
+        // what is being tested: a feature whose isCommandEnabled() crashes is a defect too.
         if ( !feature->canFeatureBeExecuted() ) continue;
+
+        if ( executionCount >= maxExecutionsPerFeature )
+        {
+            std::cout << "[capped] " << commandId << " is enabled for more than " << maxExecutionsPerFeature
+                      << " object types; remaining ones are not executed" << std::endl;
+            break;
+        }
+        ++executionCount;
 
         // Attribution line: printed and flushed before execution so a hard crash in a child process
         // still identifies the culprit in the captured output.
-        std::cout << "[exec] " << scenario.name << " : " << commandId << std::endl;
+        std::cout << "[exec] " << candidateName.toStdString() << " : " << commandId << std::endl;
 
         ModalDialogWatchdog watchdog;
 
