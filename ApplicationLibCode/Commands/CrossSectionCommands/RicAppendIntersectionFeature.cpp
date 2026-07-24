@@ -37,17 +37,32 @@ CAF_CMD_SOURCE_INIT( RicAppendIntersectionFeature, "RicAppendIntersectionFeature
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool RicAppendIntersectionFeature::isCommandEnabled() const
+{
+    return selectedIntersectionCollection() != nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RicAppendIntersectionFeature::onActionTriggered( bool isChecked )
 {
-    const auto collection = caf::SelectionManager::instance()->objectsByType<caf::PdmObjectHandle>();
-    CVF_ASSERT( collection.size() == 1 );
-
-    RimIntersectionCollection* intersectionCollection = collection[0]->firstAncestorOrThisOfType<RimIntersectionCollection>();
-
-    CVF_ASSERT( intersectionCollection );
+    RimIntersectionCollection* intersectionCollection = selectedIntersectionCollection();
+    if ( !intersectionCollection ) return;
 
     RicAppendIntersectionFeatureCmd* cmd = new RicAppendIntersectionFeatureCmd( intersectionCollection );
     caf::CmdExecCommandManager::instance()->processExecuteCommand( cmd );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimIntersectionCollection* RicAppendIntersectionFeature::selectedIntersectionCollection()
+{
+    const auto collection = caf::SelectionManager::instance()->objectsByType<caf::PdmObjectHandle>();
+    if ( collection.size() != 1 ) return nullptr;
+
+    return collection[0]->firstAncestorOrThisOfType<RimIntersectionCollection>();
 }
 
 //--------------------------------------------------------------------------------------------------
