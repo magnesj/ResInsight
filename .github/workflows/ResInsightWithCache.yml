@@ -283,15 +283,16 @@ jobs:
           cmakebuild/ResInsight-featuretests
 
       # Runs every registered Ric*Feature in its own child process, so a feature that crashes or
-      # hangs is isolated and reported against its own command id. One process per feature is far
-      # too slow for every push, so this is limited to the nightly schedule.
+      # hangs is isolated and reported against its own command id. That is far too slow for every
+      # push, so it is limited to the nightly schedule, and it is split into ctest shards that run
+      # in parallel.
       - name: Run Command Feature Execution Sweep
         if: matrix.config.execute-unit-tests && github.event_name == 'schedule'
         shell: bash
-        env:
-          QT_QPA_PLATFORM: offscreen
         run: |
-          cmakebuild/ResInsight-featuretests --gtest_also_run_disabled_tests --gtest_filter='*FeatureSubprocessExecutionTest*'
+          # enable_testing() is called in ApplicationLibCode, so the tests are registered in that
+          # part of the build tree rather than at the top level.
+          ctest --test-dir cmakebuild/ApplicationLibCode/FeatureTests -R ResInsight-featuresweep -j 4 --output-on-failure
 
       - name: (Python) Build Python module
         if: matrix.config.build-python-module

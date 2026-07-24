@@ -170,3 +170,32 @@ set_tests_properties(
   ResInsight-featuretests PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
                                      TIMEOUT 1800
 )
+
+# The execution sweep starts one child process per registered Ric*Feature, which
+# takes minutes when run serially. Register it as a set of GoogleTest shards
+# instead, so ctest -j runs them in parallel while every feature still gets its
+# own child process and its own test case.
+#
+# Each shard is a full application process and each child is another one, so
+# raise the shard count only as far as the machine has memory for.
+set(RESINSIGHT_FEATURE_SWEEP_SHARDS
+    4
+    CACHE STRING
+          "Number of parallel shards for the command feature execution sweep"
+)
+
+math(EXPR RI_LAST_SWEEP_SHARD "${RESINSIGHT_FEATURE_SWEEP_SHARDS} - 1")
+foreach(shardIndex RANGE ${RI_LAST_SWEEP_SHARD})
+  add_test(NAME ResInsight-featuresweep-${shardIndex}
+           COMMAND ResInsight-featuretests --gtest_also_run_disabled_tests
+                   --gtest_filter=*FeatureSubprocessExecutionTest*
+  )
+  set_tests_properties(
+    ResInsight-featuresweep-${shardIndex}
+    PROPERTIES
+      ENVIRONMENT
+      "QT_QPA_PLATFORM=offscreen;GTEST_TOTAL_SHARDS=${RESINSIGHT_FEATURE_SWEEP_SHARDS};GTEST_SHARD_INDEX=${shardIndex}"
+      TIMEOUT
+      1800
+  )
+endforeach()
