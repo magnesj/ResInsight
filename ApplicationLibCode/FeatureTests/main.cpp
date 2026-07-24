@@ -95,6 +95,11 @@ int main( int argc, char** argv )
         const std::string arg = argv[i];
         if ( arg.rfind( execSwitch, 0 ) == 0 )
         {
+            // Unbuffered stdout: a failing CAF_ASSERT prints the file and line with std::printf and
+            // then calls std::abort(), which does not flush. Buffered output would drop exactly the
+            // message identifying where the child died.
+            setvbuf( stdout, nullptr, _IONBF, 0 );
+
             const std::string commandId = arg.substr( execSwitch.size() );
             const bool        ok        = RicFeatureExecutionRunner::executeFeature( commandId );
 
