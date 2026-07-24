@@ -23,19 +23,8 @@
 
 #include "RimProject.h"
 
-#include "cafCmdFeature.h"
-#include "cafFactory.h"
-
 #include <string>
 #include <vector>
-
-namespace
-{
-std::vector<std::string> allRegisteredFeatureIds()
-{
-    return caf::Factory<caf::CmdFeature, std::string>::instance()->allKeys();
-}
-} // namespace
 
 //--------------------------------------------------------------------------------------------------
 /// Executes each feature in this process against synthetic selections, asserting that execution does
@@ -74,5 +63,5 @@ TEST_P( FeatureExecutionTest, DISABLED_ExecuteWhenEnabledDoesNotCrash )
 
 INSTANTIATE_TEST_SUITE_P( AllFeatures,
                           FeatureExecutionTest,
-                          ::testing::ValuesIn( allRegisteredFeatureIds() ),
+                          ::testing::ValuesIn( RicFeatureExecutionRunner::allRegisteredFeatureIds() ),
                           []( const testing::TestParamInfo<std::string>& info ) { return info.param; } );

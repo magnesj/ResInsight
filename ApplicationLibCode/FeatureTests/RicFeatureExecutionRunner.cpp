@@ -22,13 +22,19 @@
 #include "RiaViewRedrawScheduler.h"
 #include "RicFeatureSweepDenylist.h"
 
+#include "RiaApplication.h"
+
+#include "Polygons/RimPolygon.h"
 #include "RimEclipseCase.h"
+#include "RimGeoMechCase.h"
 #include "RimGridView.h"
 #include "RimProject.h"
+#include "RimSummaryCase.h"
 #include "RimWellPath.h"
 
 #include "cafCmdFeature.h"
 #include "cafCmdFeatureManager.h"
+#include "cafFactory.h"
 #include "cafPdmObjectHandle.h"
 #include "cafPdmPointer.h"
 #include "cafPdmUiItem.h"
@@ -48,7 +54,11 @@ enum class ScenarioKind
 {
     ECLIPSE_CASE,
     ECLIPSE_VIEW,
-    WELL_PATH
+    WELL_PATH,
+    SUMMARY_CASE,
+    GEOMECH_CASE,
+    GEOMECH_VIEW,
+    POLYGON
 };
 
 struct Scenario
@@ -59,12 +69,20 @@ struct Scenario
 
 // Only populated scenarios are executed. Executing a feature with an empty selection is not
 // meaningful and mostly trips preconditions.
+//
+// The list covers one object per domain, because a feature is only executed under a scenario where
+// it reports itself enabled. With Eclipse selections alone, every summary, GeoMech and polygon
+// feature reports itself disabled and is silently never exercised.
 const std::vector<Scenario>& executionScenarios()
 {
     static const std::vector<Scenario> scenarios = {
         { "EclipseCase", ScenarioKind::ECLIPSE_CASE },
         { "EclipseView", ScenarioKind::ECLIPSE_VIEW },
         { "WellPath", ScenarioKind::WELL_PATH },
+        { "SummaryCase", ScenarioKind::SUMMARY_CASE },
+        { "GeoMechCase", ScenarioKind::GEOMECH_CASE },
+        { "GeoMechView", ScenarioKind::GEOMECH_VIEW },
+        { "Polygon", ScenarioKind::POLYGON },
     };
     return scenarios;
 }
@@ -111,7 +129,7 @@ bool                                  s_modelBuilt = false;
 void rebuildModel()
 {
     caf::SelectionManager::instance()->clearAll();
-    s_model = RiaFeatureTestModelBuilder::combinedModel();
+    s_model = RiaFeatureTestModelBuilder::richModel();
 
     s_eclipseCaseGuard = s_model.eclipseCase;
     s_eclipseViewGuard = s_model.eclipseView;
@@ -136,6 +154,10 @@ bool applySelection( ScenarioKind kind )
     caf::SelectionManager::instance()->clearAll();
 
     caf::PdmUiItem* item = nullptr;
+
+    // Many features read the active view instead of the selection, so keep the two consistent.
+    RimGridView* activeView = s_model.eclipseView;
+
     switch ( kind )
     {
         case ScenarioKind::ECLIPSE_CASE:
@@ -147,10 +169,25 @@ bool applySelection( ScenarioKind kind )
         case ScenarioKind::WELL_PATH:
             item = s_model.wellPath;
             break;
+        case ScenarioKind::SUMMARY_CASE:
+            item = s_model.summaryCase;
+            break;
+        case ScenarioKind::GEOMECH_CASE:
+            item       = s_model.geoMechCase;
+            activeView = s_model.geoMechView;
+            break;
+        case ScenarioKind::GEOMECH_VIEW:
+            item       = s_model.geoMechView;
+            activeView = s_model.geoMechView;
+            break;
+        case ScenarioKind::POLYGON:
+            item = s_model.polygon;
+            break;
     }
 
     if ( !item ) return false;
 
+    RiaApplication::instance()->setActiveReservoirView( activeView );
     caf::SelectionManager::instance()->setSelectedItem( item );
     return true;
 }
@@ -217,6 +254,14 @@ bool RicFeatureExecutionRunner::executeFeature( const std::string& commandId )
     std::cout << executionCompleteMarker << " " << commandId << std::endl;
 
     return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<std::string> RicFeatureExecutionRunner::allRegisteredFeatureIds()
+{
+    return caf::Factory<caf::CmdFeature, std::string>::instance()->allKeys();
 }
 
 //--------------------------------------------------------------------------------------------------

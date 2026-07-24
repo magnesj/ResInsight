@@ -34,11 +34,6 @@
 
 namespace
 {
-std::vector<std::string> allRegisteredFeatureIds()
-{
-    return caf::Factory<caf::CmdFeature, std::string>::instance()->allKeys();
-}
-
 // Generous enough for a feature that loads the mock Eclipse model in a cold process, short enough
 // that a genuinely hung feature does not stall the sweep.
 constexpr int featureTimeoutMs = 120000;
@@ -115,5 +110,5 @@ TEST_P( FeatureSubprocessExecutionTest, DISABLED_ExecuteInIsolationDoesNotCrash 
 
 INSTANTIATE_TEST_SUITE_P( AllFeatures,
                           FeatureSubprocessExecutionTest,
-                          ::testing::ValuesIn( allRegisteredFeatureIds() ),
+                          ::testing::ValuesIn( RicFeatureExecutionRunner::allRegisteredFeatureIds() ),
                           []( const testing::TestParamInfo<std::string>& info ) { return info.param; } );
