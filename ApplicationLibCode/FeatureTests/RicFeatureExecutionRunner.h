@@ -19,6 +19,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 //==================================================================================================
 /// Executes a single Ric*Feature against synthetic selections.
@@ -47,6 +48,10 @@ constexpr const char* executionCompleteMarker = "[feature-execution-complete]";
 // or hangs never returns at all - that is precisely what subprocess isolation is for. Denylisted
 // features return true without being executed.
 bool executeFeature( const std::string& commandId );
+
+// The command ids of all registered Ric*Feature commands. Shared by both sweeps: defining it in each
+// of them breaks the unity build, where the two files end up in one translation unit.
+std::vector<std::string> allRegisteredFeatureIds();
 
 // Drop the shared model and clear the selection. Call when a suite of features has been executed.
 void releaseModel();
