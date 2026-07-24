@@ -177,9 +177,14 @@ set_tests_properties(
 # own child process and its own test case.
 #
 # Each shard is a full application process and each child is another one, so
-# raise the shard count only as far as the machine has memory for.
+# raise the shard count only as far as the machine has memory for. Measured on a
+# 32 core machine: 4 shards 103 s, 8 shards 62 s, 20 shards 61 s. Going past 8
+# buys no wall clock time but doubles the CPU spent, because the shards then
+# become unbalanced. GoogleTest splits by test index while the cost per feature
+# varies a lot, so one shard draws the expensive features and the run waits for
+# it while the others sit idle.
 set(RESINSIGHT_FEATURE_SWEEP_SHARDS
-    4
+    8
     CACHE STRING
           "Number of parallel shards for the command feature execution sweep"
 )
