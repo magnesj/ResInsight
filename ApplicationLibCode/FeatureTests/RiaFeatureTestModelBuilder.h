@@ -21,6 +21,7 @@
 class RimEclipseCase;
 class RimGeoMechCase;
 class RimGridView;
+class RimPolygon;
 class RimSummaryCase;
 class RimWellPath;
 
@@ -39,6 +40,7 @@ struct FeatureTestModel
     RimSummaryCase* summaryCase = nullptr;
     RimGeoMechCase* geoMechCase = nullptr;
     RimGridView*    geoMechView = nullptr;
+    RimPolygon*     polygon     = nullptr;
 };
 
 class RiaFeatureTestModelBuilder
@@ -64,4 +66,9 @@ public:
     // A GeoMech case with a 3D view, loaded from the small VTK (.pvd) model in the unit test data.
     // The view is made the active reservoir view. Returns an empty model if the case fails to load.
     static FeatureTestModel geoMechCase();
+
+    // Everything above in one project: Eclipse case and view, well path, summary case, GeoMech case
+    // and view, and a polygon. Used by the execution sweep so features from every domain find a
+    // selection they accept. The Eclipse view is left as the active reservoir view.
+    static FeatureTestModel richModel();
 };

@@ -22,6 +22,8 @@
 #include "RiaDefines.h"
 #include "RiaImportEclipseCaseTools.h"
 
+#include "Polygons/RimPolygon.h"
+#include "Polygons/RimPolygonCollection.h"
 #include "RimEclipseCase.h"
 #include "RimEclipseView.h"
 #include "RimGeoMechCase.h"
@@ -31,6 +33,7 @@
 #include "RimOilField.h"
 #include "RimProject.h"
 #include "RimSummaryCaseMainCollection.h"
+#include "RimTools.h"
 #include "RimWellPath.h"
 #include "RimWellPathCollection.h"
 
@@ -70,6 +73,50 @@ RimWellPath* addWellPathWithGeometry( const QString& name )
     oilField->wellPathCollection()->addWellPath( wellPath );
 
     return wellPath;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Add an in-memory summary case with a single field vector. Does not close the project, so it can be
+/// composed with the other builders.
+//--------------------------------------------------------------------------------------------------
+RimSummaryCase* addSummaryCase( const QString& name )
+{
+    RimOilField* oilField = RimProject::current()->activeOilField();
+    if ( !oilField || !oilField->summaryCaseMainCollection() ) return nullptr;
+
+    auto* mockCase = new RimMockSummaryCase;
+    mockCase->setName( name );
+
+    const std::vector<time_t> timeSteps = { 0, 86400, 172800 };
+    const std::vector<double> values    = { 1.0, 2.0, 3.0 };
+    mockCase->addVector( RifEclipseSummaryAddress::fieldAddress( "FOPT" ), timeSteps, values );
+
+    oilField->summaryCaseMainCollection()->addCase( mockCase );
+
+    return mockCase;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Load the small VTK (.pvd) GeoMech model from the unit test data. Does not close the project.
+/// Returns the case, with its first view in geoMechView when one was created.
+//--------------------------------------------------------------------------------------------------
+RimGeoMechCase* addGeoMechCase( RimGridView** geoMechView )
+{
+    const QString fileName = QString( "%1/RifVtkReader/model.pvd" ).arg( TEST_DATA_DIR );
+    if ( !RiaApplication::instance()->openOdbCaseFromFile( fileName ) ) return nullptr;
+
+    RimOilField* oilField = RimProject::current()->activeOilField();
+    if ( !oilField || !oilField->geoMechModels() ) return nullptr;
+
+    std::vector<RimGeoMechCase*> cases = oilField->geoMechModels()->cases();
+    if ( cases.empty() ) return nullptr;
+
+    if ( geoMechView && !cases.front()->geoMechViews.empty() )
+    {
+        *geoMechView = cases.front()->geoMechViews[0];
+    }
+
+    return cases.front();
 }
 } // namespace
 
@@ -150,21 +197,7 @@ FeatureTestModel RiaFeatureTestModelBuilder::summaryCase()
 
     FeatureTestModel model;
 
-    RimOilField* oilField = RimProject::current()->activeOilField();
-    if ( oilField && oilField->summaryCaseMainCollection() )
-    {
-        auto* mockCase = new RimMockSummaryCase;
-        mockCase->setName( "TestSummaryCase" );
-
-        // A single field vector with a few time steps, enough for plot/curve features to have data.
-        const std::vector<time_t> timeSteps = { 0, 86400, 172800 };
-        const std::vector<double> values    = { 1.0, 2.0, 3.0 };
-        mockCase->addVector( RifEclipseSummaryAddress::fieldAddress( "FOPT" ), timeSteps, values );
-
-        oilField->summaryCaseMainCollection()->addCase( mockCase );
-
-        model.summaryCase = mockCase;
-    }
+    model.summaryCase = addSummaryCase( "TestSummaryCase" );
 
     return model;
 }
@@ -178,28 +211,34 @@ FeatureTestModel RiaFeatureTestModelBuilder::geoMechCase()
 
     FeatureTestModel model;
 
-    // openOdbCaseFromFile handles all GeoMech formats, including VTK (.pvd). It creates the case and
-    // a view, loads the data and adds the case to the GeoMech model collection.
-    const QString fileName = QString( "%1/RifVtkReader/model.pvd" ).arg( TEST_DATA_DIR );
-    if ( !RiaApplication::instance()->openOdbCaseFromFile( fileName ) ) return model;
+    model.geoMechCase = addGeoMechCase( &model.geoMechView );
 
-    RimOilField* oilField = RimProject::current()->activeOilField();
-    if ( oilField && oilField->geoMechModels() )
+    // Features in this domain read the active view rather than the selection.
+    if ( model.geoMechView ) RiaApplication::instance()->setActiveReservoirView( model.geoMechView );
+
+    return model;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+FeatureTestModel RiaFeatureTestModelBuilder::richModel()
+{
+    // Starts from the Eclipse model, which closes the project and sets the active view.
+    FeatureTestModel model = eclipseCaseWithResults();
+
+    model.wellPath    = addWellPathWithGeometry( "TestWellPath" );
+    model.summaryCase = addSummaryCase( "TestSummaryCase" );
+    model.geoMechCase = addGeoMechCase( &model.geoMechView );
+
+    if ( RimPolygonCollection* polygonCollection = RimTools::polygonCollection() )
     {
-        std::vector<RimGeoMechCase*> cases = oilField->geoMechModels()->cases();
-        if ( !cases.empty() )
-        {
-            model.geoMechCase = cases.front();
-
-            if ( !cases.front()->geoMechViews.empty() )
-            {
-                model.geoMechView = cases.front()->geoMechViews[0];
-
-                // Features in this domain read the active view rather than the selection.
-                RiaApplication::instance()->setActiveReservoirView( model.geoMechView );
-            }
-        }
+        model.polygon = polygonCollection->appendUserDefinedPolygon();
     }
+
+    // Loading the GeoMech case makes its view active. Most features expect the Eclipse view, so put
+    // it back; callers that want the GeoMech view active set it explicitly.
+    if ( model.eclipseView ) RiaApplication::instance()->setActiveReservoirView( model.eclipseView );
 
     return model;
 }
