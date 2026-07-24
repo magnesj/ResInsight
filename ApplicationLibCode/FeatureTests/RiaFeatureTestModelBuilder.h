@@ -19,6 +19,7 @@
 #pragma once
 
 class RimEclipseCase;
+class RimGeoMechCase;
 class RimGridView;
 class RimSummaryCase;
 class RimWellPath;
@@ -36,6 +37,8 @@ struct FeatureTestModel
     RimGridView*    eclipseView = nullptr;
     RimWellPath*    wellPath    = nullptr;
     RimSummaryCase* summaryCase = nullptr;
+    RimGeoMechCase* geoMechCase = nullptr;
+    RimGridView*    geoMechView = nullptr;
 };
 
 class RiaFeatureTestModelBuilder
@@ -57,4 +60,8 @@ public:
     // An in-memory summary case (RimMockSummaryCase) with a single field vector, added to the active
     // oil field's summary case main collection. No .SMSPEC file is read.
     static FeatureTestModel summaryCase();
+
+    // A GeoMech case with a 3D view, loaded from the small VTK (.pvd) model in the unit test data.
+    // The view is made the active reservoir view. Returns an empty model if the case fails to load.
+    static FeatureTestModel geoMechCase();
 };

@@ -24,6 +24,9 @@
 
 #include "RimEclipseCase.h"
 #include "RimEclipseView.h"
+#include "RimGeoMechCase.h"
+#include "RimGeoMechModels.h"
+#include "RimGeoMechView.h"
 #include "RimMockSummaryCase.h"
 #include "RimOilField.h"
 #include "RimProject.h"
@@ -32,6 +35,8 @@
 #include "RimWellPathCollection.h"
 
 #include "RifEclipseSummaryAddress.h"
+
+#include "RiaTestDataDirectory.h"
 
 #include "Well/RigWellPath.h"
 
@@ -159,6 +164,41 @@ FeatureTestModel RiaFeatureTestModelBuilder::summaryCase()
         oilField->summaryCaseMainCollection()->addCase( mockCase );
 
         model.summaryCase = mockCase;
+    }
+
+    return model;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+FeatureTestModel RiaFeatureTestModelBuilder::geoMechCase()
+{
+    closeProject();
+
+    FeatureTestModel model;
+
+    // openOdbCaseFromFile handles all GeoMech formats, including VTK (.pvd). It creates the case and
+    // a view, loads the data and adds the case to the GeoMech model collection.
+    const QString fileName = QString( "%1/RifVtkReader/model.pvd" ).arg( TEST_DATA_DIR );
+    if ( !RiaApplication::instance()->openOdbCaseFromFile( fileName ) ) return model;
+
+    RimOilField* oilField = RimProject::current()->activeOilField();
+    if ( oilField && oilField->geoMechModels() )
+    {
+        std::vector<RimGeoMechCase*> cases = oilField->geoMechModels()->cases();
+        if ( !cases.empty() )
+        {
+            model.geoMechCase = cases.front();
+
+            if ( !cases.front()->geoMechViews.empty() )
+            {
+                model.geoMechView = cases.front()->geoMechViews[0];
+
+                // Features in this domain read the active view rather than the selection.
+                RiaApplication::instance()->setActiveReservoirView( model.geoMechView );
+            }
+        }
     }
 
     return model;
