@@ -257,6 +257,14 @@ bool RicFeatureExecutionRunner::executeFeature( const std::string& commandId )
         // redraws and leave the event loop alone.
         RiaViewRedrawScheduler::instance()->clearViewsScheduledForUpdate();
 
+        // Force a rebuild before the next selection, so every execution starts from an identical
+        // model. Without this, a destructive feature leaves debris that makes a later execution fail
+        // for reasons that have nothing to do with the object then selected: deleting an intersection
+        // result definition and then a GeoMech view aborts, while deleting the view on a clean model
+        // is fine. Order dependent failures like that are false reports, and the guards below cannot
+        // catch them because they only track the few objects they name.
+        s_modelBuilt = false;
+
         if ( RimProject::current() == nullptr ) return false;
     }
 
