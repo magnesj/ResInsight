@@ -67,6 +67,12 @@ inline const std::map<std::string, std::string>& featureSweepDenylist()
         { "RicEditPreferencesFeature", "opens the modal preferences dialog" },
         { "RicThemeColorEditorFeature", "opens a modal color-editor dialog" },
         { "RicShowMemoryCleanupDialogFeature", "opens a modal memory-cleanup dialog" },
+
+        // Requires a rendering 3D viewer. The offscreen platform plugin creates the viewer widget but
+        // no OpenGL context, so drawing dereferences a null context in caf::Viewer::paintGL(). These
+        // work in the real application and belong in a software-OpenGL test tier.
+        { "RicTogglePerspectiveViewFeature", "changes the projection of the active viewer, which needs an OpenGL context" },
+        { "RicNewContourMapViewFeature", "creates and draws a new 3D view, which needs an OpenGL context" },
     };
     return deny;
 }
