@@ -274,6 +274,25 @@ jobs:
           ls cmakebuild/${{ matrix.config.ri-unit-test-path }}
           cmakebuild/${{ matrix.config.ri-unit-test-path }}
 
+      - name: Run Command Feature Tests
+        if: matrix.config.execute-unit-tests
+        shell: bash
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          cmakebuild/ResInsight-featuretests
+
+      # Runs every registered Ric*Feature in its own child process, so a feature that crashes or
+      # hangs is isolated and reported against its own command id. One process per feature is far
+      # too slow for every push, so this is limited to the nightly schedule.
+      - name: Run Command Feature Execution Sweep
+        if: matrix.config.execute-unit-tests && github.event_name == 'schedule'
+        shell: bash
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          cmakebuild/ResInsight-featuretests --gtest_also_run_disabled_tests --gtest_filter='*FeatureSubprocessExecutionTest*'
+
       - name: (Python) Build Python module
         if: matrix.config.build-python-module
         shell: bash
