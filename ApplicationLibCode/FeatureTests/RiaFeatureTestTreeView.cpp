@@ -33,8 +33,8 @@ RiaFeatureTestTreeView::RiaFeatureTestTreeView( caf::PdmUiItem* rootItem )
     caf::PdmUiItem* root = rootItem ? rootItem : RimProject::current();
     m_treeView->setPdmItem( root );
 
-    // Register the tree view so RicToggleItemsFeatureImpl::findTreeView() picks it up instead of
-    // looking for a (non-existent) RiuMainWindow project tree.
+    // Register the tree view so RicToggleItemsFeatureImpl::findTreeView() picks it up instead of the
+    // main window project tree, which is not populated with the models built by these tests.
     RiaFeatureCommandContext::instance()->setObject( m_treeView.get() );
 }
 
