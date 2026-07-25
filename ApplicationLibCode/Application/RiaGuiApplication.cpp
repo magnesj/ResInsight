@@ -575,6 +575,23 @@ void RiaGuiApplication::initialize()
         RiaLogging::appendLoggerInstance( std::move( logger ) );
     }
 
+    if ( isHeadless() )
+    {
+        // The message panels are never shown in headless mode, so also write to stdout to make batch runs diagnosable
+        auto stdLogger = std::make_unique<RiaStdOutLogger>();
+
+        if ( m_logLevelFromCommandLine.has_value() )
+        {
+            stdLogger->setLevel( m_logLevelFromCommandLine.value() );
+        }
+        else
+        {
+            stdLogger->setLevel( int( RiaLogging::logLevelBasedOnPreferences() ) );
+        }
+
+        RiaLogging::appendLoggerInstance( std::move( stdLogger ) );
+    }
+
     {
         auto logFolder  = QDir::homePath() + "/.resinsight/logs";
         auto fileLogger = std::make_unique<RiaFileLogger>( logFolder.toStdString() );
@@ -1305,7 +1322,13 @@ void RiaGuiApplication::showFormattedTextInMessageBoxOrConsole( const QString& t
     // A modal dialog would hang a headless batch run
     if ( isHeadless() )
     {
-        std::cout << text.toStdString();
+        const std::string stdText = text.toStdString();
+        std::cout << stdText;
+
+        // Make sure the text ends with a newline and reaches the console even if the application aborts later
+        if ( stdText.empty() || stdText.back() != '\n' ) std::cout << '\n';
+        std::cout.flush();
+
         return;
     }
 
