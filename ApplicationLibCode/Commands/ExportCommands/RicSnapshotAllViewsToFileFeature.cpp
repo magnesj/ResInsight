@@ -40,6 +40,9 @@
 #include "RigFemResultPosEnum.h"
 
 #include "cafUtils.h"
+#include "cafViewer.h"
+
+#include "cvfOpenGLContextGroup.h"
 
 #include <QAction>
 #include <QClipboard>
@@ -147,6 +150,17 @@ void RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( const QS
             absoluteFileName = caf::Utils::constructFullFileName( absSnapshotPath, fileName + "_Statistics", ".png" );
             RicSnapshotViewToFileFeature::saveSnapshotAs( absoluteFileName, img );
         }
+    }
+
+    if ( !viewsForSnapshot.empty() )
+    {
+        // The OpenGL strings are populated when the first context is initialized, which for hidden viewers happens
+        // inside the first snapshot grab. Useful to verify that the expected renderer (e.g. software/llvmpipe) is used.
+        const cvf::OpenGLInfo glInfo = caf::Viewer::contextGroup()->info();
+        RiaLogging::info( std::format( "OpenGL used for snapshots: {} / {} / {}",
+                                       glInfo.version().toStdString(),
+                                       glInfo.vendor().toStdString(),
+                                       glInfo.renderer().toStdString() ) );
     }
 }
 
