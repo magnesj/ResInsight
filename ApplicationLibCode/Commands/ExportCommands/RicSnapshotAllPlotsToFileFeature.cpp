@@ -28,11 +28,14 @@
 #include "RicSnapshotFilenameGenerator.h"
 #include "RicSnapshotViewToFileFeature.h"
 
+#include "RiuPlotMainWindow.h"
 #include "RiuPlotMainWindowTools.h"
+#include "RiuTools.h"
 
 #include "cafUtils.h"
 
 #include <QAction>
+#include <QApplication>
 #include <QClipboard>
 #include <QDebug>
 #include <QDir>
@@ -138,6 +141,20 @@ std::expected<void, QString> RicSnapshotAllPlotsToFileFeature::exportSnapshotOfP
         if ( !snapshotPath.mkpath( "." ) )
         {
             return std::unexpected( QString( "Not able to create snapshot folder %1" ).arg( snapshotFolderName ) );
+        }
+    }
+
+    // RiaGuiApplication::instance() asserts when running as a console application, where command files can also
+    // trigger this export
+    if ( RiaGuiApplication::isRunning() )
+    {
+        if ( RiuPlotMainWindow* plotWindow = RiaGuiApplication::instance()->mainPlotWindow(); plotWindow && !plotWindow->isVisible() )
+        {
+            // In headless mode the plot window has never been shown, so the dock widgets and plot widgets have never
+            // been laid out. Deliver the deferred resize events so all plot widgets get their proper sizes before
+            // rendering.
+            RiuTools::sendDeferredResizeEvents( plotWindow );
+            QApplication::processEvents();
         }
     }
 

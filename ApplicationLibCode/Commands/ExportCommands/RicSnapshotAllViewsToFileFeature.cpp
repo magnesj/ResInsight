@@ -34,6 +34,7 @@
 #include "RicSnapshotViewToFileFeature.h"
 
 #include "Riu3DMainWindowTools.h"
+#include "RiuMainWindow.h"
 #include "RiuViewer.h"
 
 #include "RigFemResultPosEnum.h"
@@ -175,6 +176,16 @@ std::expected<void, QString> RicSnapshotAllViewsToFileFeature::exportSnapshotOfV
         {
             return std::unexpected( QString( "Not able to create snapshot folder %1" ).arg( snapshotFolderName ) );
         }
+    }
+
+    if ( RiuMainWindow* mainWnd = RiuMainWindow::instance(); mainWnd && !mainWnd->isVisible() )
+    {
+        // When running headless with a hidden main window, Qt selects the global share context for the OpenGL context
+        // of the first rendered view widget. The dock widget activation below gives the main window a native window
+        // handle, making Qt select a new share context for the view widgets rendered later, which asserts in
+        // cvfqt::OpenGLWidget::initializeGL() as the contexts do not share resources. Create the native window up
+        // front so the share context selection is identical for all view widgets.
+        mainWnd->createWinId();
     }
 
     RiaApplication::instance()->setActiveReservoirView( riv );
