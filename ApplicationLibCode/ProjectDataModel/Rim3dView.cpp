@@ -73,6 +73,8 @@
 #include "cvfTransform.h"
 #include "cvfViewport.h"
 
+#include <QResizeEvent>
+
 #include <climits>
 
 namespace caf
@@ -537,6 +539,15 @@ QImage Rim3dView::captureSnapshot( int width, int height )
             // adjust for possible display DPI scaling
             const auto ratio = m_viewer->displayScalingRatio();
             m_viewer->layoutWidget()->setFixedSize( (int)( 1.0 * width / ratio ), (int)( 1.0 * height / ratio ) );
+
+            if ( !m_viewer->layoutWidget()->isVisible() )
+            {
+                // Hidden widgets defer resize events (Qt::WA_PendingResizeEvent), so the layout never propagates the
+                // new size to the GL widget. Deliver the resize synchronously so grabFramebuffer() renders at the
+                // requested size when running headless.
+                QResizeEvent resizeEvent( m_viewer->layoutWidget()->size(), orgSize );
+                QCoreApplication::sendEvent( m_viewer->layoutWidget(), &resizeEvent );
+            }
 
             image = m_viewer->snapshotImage();
 
