@@ -29,11 +29,13 @@
 #include "RiuMultiPlotBook.h"
 #include "RiuPlotMainWindow.h"
 #include "RiuPlotMainWindowTools.h"
+#include "RiuTools.h"
 
 #include "cafPdmFieldReorderCapability.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiToolButtonEditor.h"
 
+#include <QApplication>
 #include <QPaintDevice>
 #include <QRegularExpression>
 
@@ -650,7 +652,28 @@ QImage RimMultiPlot::captureSnapshot( int width, int height )
 
     QSize orgViewSize = m_viewer->size();
 
-    image = RimViewWindow::internalCaptureSnapshot( m_dockWidget, m_viewer->bookWidget(), width, height );
+    if ( !m_viewer->isVisible() && width > 0 && height > 0 )
+    {
+        // QWidget::render() used by internalCaptureSnapshot() creates and lays out the whole hidden top level window as
+        // part of the first render, which reverts the plot sizes established below. Use the resolution independent
+        // rendering also used for PDF export instead, based on the page sizes set up by the resize below.
+        m_viewer->setFixedSize( width, height );
+        RiuTools::sendDeferredResizeEvents( m_viewer );
+        QApplication::processEvents();
+        RiuTools::sendDeferredResizeEvents( m_viewer );
+
+        QPixmap pix( width, height );
+        pix.fill( Qt::white );
+        m_viewer->renderTo( &pix );
+        image = pix.toImage();
+
+        m_viewer->setMinimumSize( 0, 0 );
+        m_viewer->setMaximumSize( QWIDGETSIZE_MAX, QWIDGETSIZE_MAX );
+    }
+    else
+    {
+        image = RimViewWindow::internalCaptureSnapshot( m_dockWidget, m_viewer->bookWidget(), width, height );
+    }
 
     m_viewer->resize( orgViewSize );
     doUpdateLayout();
