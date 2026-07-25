@@ -14,8 +14,13 @@ using the --headless command line option. Software OpenGL rendering is used, so 
   alongside ResInsight.exe by windeployqt.
 
 - Linux: LIBGL_ALWAYS_SOFTWARE=1 is set automatically, using the system Mesa llvmpipe driver.
-  A display server is still required by Qt to create OpenGL contexts. On a machine without a
-  display server, run under xvfb:
+  A display server is still required by Qt to create OpenGL contexts. The bundled launcher script
+  detects this: when DISPLAY is not set and --headless is given, it automatically wraps the
+  application in xvfb-run (requires the xvfb package):
+
+  ./resinsight --headless --project MyProject.rsp --savesnapshots all
+
+  When starting the ResInsight binary directly without a display server, run under xvfb manually:
 
   xvfb-run -a ./ResInsight --headless --project MyProject.rsp --savesnapshots all
 
