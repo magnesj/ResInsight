@@ -57,7 +57,11 @@ void RicSnapshotAllPlotsToFileFeature::saveAllPlots()
     QString snapshotFolderName = app->createAbsolutePathFromProjectRelativePath( "snapshots" );
 
     // save using existing plot sizes
-    exportSnapshotOfPlotsIntoFolder( snapshotFolderName, -1, -1, true /* activateWidget */ );
+    if ( auto result = exportSnapshotOfPlotsIntoFolder( snapshotFolderName, -1, -1, true /* activateWidget */ ); !result )
+    {
+        RiaLogging::error( result.error().toStdString() );
+        return;
+    }
 
     QString text = QString( "Exported snapshots to folder : \n%1" ).arg( snapshotFolderName );
     RiaLogging::info( text.toStdString() );
@@ -66,53 +70,75 @@ void RicSnapshotAllPlotsToFileFeature::saveAllPlots()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicSnapshotAllPlotsToFileFeature::exportSnapshotOfPlotsIntoFolder( const QString& snapshotFolderName,
-                                                                        int            width,
-                                                                        int            height,
-                                                                        bool           activateWidget,
-                                                                        const QString& prefix,
-                                                                        int            viewId,
-                                                                        const QString& preferredFileSuffix /*=".png"*/ )
+std::expected<void, QString> RicSnapshotAllPlotsToFileFeature::exportSnapshotOfPlotsIntoFolder( const QString& snapshotFolderName,
+                                                                                                int            width,
+                                                                                                int            height,
+                                                                                                bool           activateWidget,
+                                                                                                const QString& prefix,
+                                                                                                int            viewId,
+                                                                                                const QString& preferredFileSuffix /*=".png"*/ )
 {
     RiaApplication* app = RiaApplication::instance();
 
     RimProject* proj = app->project();
-    if ( !proj ) return;
+    if ( !proj ) return std::unexpected( QString( "No project available" ) );
 
     QDir snapshotPath( snapshotFolderName );
     if ( !snapshotPath.exists() )
     {
-        if ( !snapshotPath.mkpath( "." ) ) return;
+        if ( !snapshotPath.mkpath( "." ) )
+        {
+            return std::unexpected( QString( "Not able to create snapshot folder %1" ).arg( snapshotFolderName ) );
+        }
     }
+
+    size_t attemptedSnapshotCount = 0;
+    size_t failedSnapshotCount    = 0;
 
     std::vector<RimViewWindow*> viewWindows = RimMainPlotCollection::current()->descendantsIncludingThisOfType<RimViewWindow>();
     for ( auto viewWindow : viewWindows )
     {
         if ( viewWindow->isMainDockedWindow() && viewWindow->viewWidget() && ( viewId == -1 || viewId == viewWindow->id() ) )
         {
-            exportSnapshotOfPlot( viewWindow, snapshotPath.absolutePath(), width, height, activateWidget, prefix, preferredFileSuffix );
+            attemptedSnapshotCount++;
+
+            // The error is logged by saveSnapshotAs, only the number of failures is needed here
+            if ( !exportSnapshotOfPlot( viewWindow, snapshotPath.absolutePath(), width, height, activateWidget, prefix, preferredFileSuffix ) )
+            {
+                failedSnapshotCount++;
+            }
         }
     }
+
+    if ( failedSnapshotCount > 0 )
+    {
+        return std::unexpected( QString( "Failed to export %1 of %2 plot snapshots" ).arg( failedSnapshotCount ).arg( attemptedSnapshotCount ) );
+    }
+
+    return {};
 }
 
 //--------------------------------------------------------------------------------------------------
 /// Export a snapshot of a single plot window into the given folder. The folder is created if it does not exist.
 /// <= 0 for width and height means to use the existing size
 //--------------------------------------------------------------------------------------------------
-void RicSnapshotAllPlotsToFileFeature::exportSnapshotOfPlot( RimViewWindow* viewWindow,
-                                                             const QString& snapshotFolderName,
-                                                             int            width,
-                                                             int            height,
-                                                             bool           activateWidget,
-                                                             const QString& prefix,
-                                                             const QString& preferredFileSuffix )
+std::expected<void, QString> RicSnapshotAllPlotsToFileFeature::exportSnapshotOfPlot( RimViewWindow* viewWindow,
+                                                                                     const QString& snapshotFolderName,
+                                                                                     int            width,
+                                                                                     int            height,
+                                                                                     bool           activateWidget,
+                                                                                     const QString& prefix,
+                                                                                     const QString& preferredFileSuffix )
 {
-    if ( !viewWindow ) return;
+    if ( !viewWindow ) return std::unexpected( QString( "No plot to create a snapshot from" ) );
 
     QDir snapshotPath( snapshotFolderName );
     if ( !snapshotPath.exists() )
     {
-        if ( !snapshotPath.mkpath( "." ) ) return;
+        if ( !snapshotPath.mkpath( "." ) )
+        {
+            return std::unexpected( QString( "Not able to create snapshot folder %1" ).arg( snapshotFolderName ) );
+        }
     }
 
     QString fileName = RicSnapshotFilenameGenerator::generateSnapshotFileName( viewWindow );
@@ -131,7 +157,7 @@ void RicSnapshotAllPlotsToFileFeature::exportSnapshotOfPlot( RimViewWindow* view
 
     QString absoluteFileName = caf::Utils::constructFullFileName( snapshotPath.absolutePath(), fileName, preferredFileSuffix );
 
-    RicSnapshotViewToFileFeature::saveSnapshotAs( absoluteFileName, viewWindow, width, height );
+    return RicSnapshotViewToFileFeature::saveSnapshotAs( absoluteFileName, viewWindow, width, height );
 }
 
 //--------------------------------------------------------------------------------------------------

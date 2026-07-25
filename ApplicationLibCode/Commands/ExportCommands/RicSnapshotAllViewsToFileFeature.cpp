@@ -64,7 +64,11 @@ void RicSnapshotAllViewsToFileFeature::saveAllViews()
     // Save images in snapshot catalog relative to project directory
     QString snapshotFolderName = app->createAbsolutePathFromProjectRelativePath( "snapshots" );
 
-    exportSnapshotOfViewsIntoFolder( snapshotFolderName );
+    if ( auto result = exportSnapshotOfViewsIntoFolder( snapshotFolderName ); !result )
+    {
+        RiaLogging::error( result.error().toStdString() );
+        return;
+    }
 
     QString text = QString( "Exported snapshots to folder : \n%1" ).arg( snapshotFolderName );
     RiaLogging::info( text.toStdString() );
@@ -74,20 +78,23 @@ void RicSnapshotAllViewsToFileFeature::saveAllViews()
 /// Export snapshots of a given view (or viewId == -1 for all views) for the given case (or caseId == -1 for all cases)
 /// <= 0 for width and height means to use the existing view size
 //--------------------------------------------------------------------------------------------------
-void RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( const QString& snapshotFolderName,
-                                                                        int            width,
-                                                                        int            height,
-                                                                        const QString& prefix,
-                                                                        int            caseId,
-                                                                        int            viewId )
+std::expected<void, QString> RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( const QString& snapshotFolderName,
+                                                                                                int            width,
+                                                                                                int            height,
+                                                                                                const QString& prefix,
+                                                                                                int            caseId,
+                                                                                                int            viewId )
 {
     RimProject* project = RimProject::current();
-    if ( project == nullptr ) return;
+    if ( project == nullptr ) return std::unexpected( QString( "No project available" ) );
 
     QDir snapshotPath( snapshotFolderName );
     if ( !snapshotPath.exists() )
     {
-        if ( !snapshotPath.mkpath( "." ) ) return;
+        if ( !snapshotPath.mkpath( "." ) )
+        {
+            return std::unexpected( QString( "Not able to create snapshot folder %1" ).arg( snapshotFolderName ) );
+        }
     }
 
     std::vector<Rim3dView*> viewsForSnapshot;
@@ -116,9 +123,12 @@ void RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( const QS
 
     RiaLogging::info( std::format( "Exporting snapshot of all views to {}", snapshotFolderName ) );
 
+    size_t failedSnapshotCount = 0;
+
     for ( auto riv : viewsForSnapshot )
     {
-        exportSnapshotOfView( riv, snapshotPath.absolutePath(), width, height, prefix );
+        // The error is logged by saveSnapshotAs, only the number of failures is needed here
+        if ( !exportSnapshotOfView( riv, snapshotPath.absolutePath(), width, height, prefix ) ) failedSnapshotCount++;
     }
 
     if ( !viewsForSnapshot.empty() )
@@ -131,28 +141,40 @@ void RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( const QS
                                        glInfo.vendor().toStdString(),
                                        glInfo.renderer().toStdString() ) );
     }
+
+    if ( failedSnapshotCount > 0 )
+    {
+        return std::unexpected(
+            QString( "Failed to export %1 of %2 view snapshots" ).arg( failedSnapshotCount ).arg( viewsForSnapshot.size() ) );
+    }
+
+    return {};
 }
 
 //--------------------------------------------------------------------------------------------------
 /// Export a snapshot of a single view into the given folder. The folder is created if it does not exist.
 /// <= 0 for width and height means to use the existing view size
 //--------------------------------------------------------------------------------------------------
-void RicSnapshotAllViewsToFileFeature::exportSnapshotOfView( Rim3dView*     riv,
-                                                             const QString& snapshotFolderName,
-                                                             int            width,
-                                                             int            height,
-                                                             const QString& prefix )
+std::expected<void, QString> RicSnapshotAllViewsToFileFeature::exportSnapshotOfView( Rim3dView*     riv,
+                                                                                     const QString& snapshotFolderName,
+                                                                                     int            width,
+                                                                                     int            height,
+                                                                                     const QString& prefix )
 {
-    if ( !riv ) return;
+    if ( !riv ) return std::unexpected( QString( "No view to create a snapshot from" ) );
 
+    // Views without a viewer are not displayed and are skipped, not treated as a failure
     RiuViewer* viewer = riv->viewer();
-    if ( !viewer ) return;
-    if ( !viewer->ownerViewWindow() ) return;
+    if ( !viewer ) return {};
+    if ( !viewer->ownerViewWindow() ) return {};
 
     QDir snapshotPath( snapshotFolderName );
     if ( !snapshotPath.exists() )
     {
-        if ( !snapshotPath.mkpath( "." ) ) return;
+        if ( !snapshotPath.mkpath( "." ) )
+        {
+            return std::unexpected( QString( "Not able to create snapshot folder %1" ).arg( snapshotFolderName ) );
+        }
     }
 
     RiaApplication::instance()->setActiveReservoirView( riv );
@@ -173,7 +195,7 @@ void RicSnapshotAllViewsToFileFeature::exportSnapshotOfView( Rim3dView*     riv,
 
     QString absoluteFileName = caf::Utils::constructFullFileName( snapshotPath.absolutePath(), fileName, ".png" );
 
-    RicSnapshotViewToFileFeature::saveSnapshotAs( absoluteFileName, riv, width, height );
+    return RicSnapshotViewToFileFeature::saveSnapshotAs( absoluteFileName, riv, width, height );
 }
 
 //--------------------------------------------------------------------------------------------------
