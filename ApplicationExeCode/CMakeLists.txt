@@ -228,8 +228,9 @@ if(UNIX AND NOT APPLE)
 endif()
 
 if(MSVC)
-  # Delay-load opengl32.dll so that the statically linked OpenGL calls can be redirected to the
-  # software rasterizer opengl32sw.dll in headless mode, see riaDelayLoadHook in RiaMainTools.cpp
+  # Delay-load opengl32.dll so that the statically linked OpenGL calls can be
+  # redirected to the software rasterizer opengl32sw.dll in headless mode, see
+  # riaDelayLoadHook in RiaMainTools.cpp
   target_link_libraries(ResInsight PRIVATE delayimp)
   target_link_options(ResInsight PRIVATE /DELAYLOAD:opengl32.dll)
 endif()
@@ -416,10 +417,13 @@ if(RESINSIGHT_PRIVATE_INSTALL)
       POST_EXCLUDE_REGEXES ".*system32/.*\\.dll"
     )
 
-    # The software OpenGL rasterizer is loaded dynamically (used by --headless), so it is not
-    # picked up by the RUNTIME_DEPENDENCIES scan above
-    install(FILES $<TARGET_FILE_DIR:ResInsight>/opengl32sw.dll
-            DESTINATION ${RESINSIGHT_INSTALL_FOLDER} OPTIONAL)
+    # The software OpenGL rasterizer is loaded dynamically (used by --headless),
+    # so it is not picked up by the RUNTIME_DEPENDENCIES scan above
+    install(
+      FILES $<TARGET_FILE_DIR:ResInsight>/opengl32sw.dll
+      DESTINATION ${RESINSIGHT_INSTALL_FOLDER}
+      OPTIONAL
+    )
   endif()
 
   if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
