@@ -935,6 +935,8 @@ RiaApplication::ApplicationStatus RiaGuiApplication::handleArguments( cvf::Progr
             snapshotFolder = snapshotFolderFromCommandLine;
         }
 
+        QStringList snapshotErrors;
+
         if ( snapshotPlots )
         {
             auto mainPlotWnd = mainPlotWindow();
@@ -948,7 +950,9 @@ RiaApplication::ApplicationStatus RiaGuiApplication::handleArguments( cvf::Progr
 
                 processEvents();
 
-                RicSnapshotAllPlotsToFileFeature::exportSnapshotOfPlotsIntoFolder( snapshotFolder, snapshotWidth, snapshotHeight );
+                auto result =
+                    RicSnapshotAllPlotsToFileFeature::exportSnapshotOfPlotsIntoFolder( snapshotFolder, snapshotWidth, snapshotHeight );
+                if ( !result ) snapshotErrors.push_back( result.error() );
             }
         }
 
@@ -963,7 +967,8 @@ RiaApplication::ApplicationStatus RiaGuiApplication::handleArguments( cvf::Progr
 
             processEvents();
 
-            RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( snapshotFolder, snapshotWidth, snapshotHeight );
+            auto result = RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( snapshotFolder, snapshotWidth, snapshotHeight );
+            if ( !result ) snapshotErrors.push_back( result.error() );
         }
 
         auto mainPlotWnd = mainPlotWindow();
@@ -973,6 +978,14 @@ RiaApplication::ApplicationStatus RiaGuiApplication::handleArguments( cvf::Progr
         }
 
         if ( RiuMainWindow::instance() ) RiuMainWindow::instance()->loadWinGeoAndDockToolBarLayout();
+
+        if ( !snapshotErrors.empty() )
+        {
+            // Report a non-zero exit code, as a batch run with missing images is otherwise indistinguishable from success
+            RiaLogging::error( snapshotErrors.join( ". " ).toStdString() );
+
+            return ApplicationStatus::EXIT_WITH_ERROR;
+        }
 
         return ApplicationStatus::EXIT_COMPLETED;
     }

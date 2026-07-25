@@ -75,20 +75,23 @@ void RicSnapshotAllViewsToFileFeature::saveAllViews()
 /// Export snapshots of a given view (or viewId == -1 for all views) for the given case (or caseId == -1 for all cases)
 /// <= 0 for width and height means to use the existing view size
 //--------------------------------------------------------------------------------------------------
-void RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( const QString& snapshotFolderName,
-                                                                        int            width,
-                                                                        int            height,
-                                                                        const QString& prefix,
-                                                                        int            caseId,
-                                                                        int            viewId )
+std::expected<void, QString> RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( const QString& snapshotFolderName,
+                                                                                                int            width,
+                                                                                                int            height,
+                                                                                                const QString& prefix,
+                                                                                                int            caseId,
+                                                                                                int            viewId )
 {
     RimProject* project = RimProject::current();
-    if ( project == nullptr ) return;
+    if ( project == nullptr ) return std::unexpected( QString( "No project available" ) );
 
     QDir snapshotPath( snapshotFolderName );
     if ( !snapshotPath.exists() )
     {
-        if ( !snapshotPath.mkpath( "." ) ) return;
+        if ( !snapshotPath.mkpath( "." ) )
+        {
+            return std::unexpected( QString( "Not able to create snapshot folder %1" ).arg( snapshotFolderName ) );
+        }
     }
 
     std::vector<Rim3dView*> viewsForSnapshot;
@@ -118,6 +121,8 @@ void RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( const QS
     const QString absSnapshotPath = snapshotPath.absolutePath();
     RiaLogging::info( std::format( "Exporting snapshot of all views to {}", snapshotFolderName ) );
 
+    size_t failedSnapshotCount = 0;
+
     for ( auto riv : viewsForSnapshot )
     {
         RiuViewer* viewer = riv->viewer();
@@ -142,13 +147,20 @@ void RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( const QS
 
         QString absoluteFileName = caf::Utils::constructFullFileName( absSnapshotPath, fileName, ".png" );
 
-        RicSnapshotViewToFileFeature::saveSnapshotAs( absoluteFileName, riv, width, height );
+        // The error is logged by saveSnapshotAs, only the number of failures is needed here
+        if ( !RicSnapshotViewToFileFeature::saveSnapshotAs( absoluteFileName, riv, width, height ) ) failedSnapshotCount++;
 
         if ( RimGridView* rigv = dynamic_cast<RimGridView*>( riv ) )
         {
-            QImage img       = rigv->overlayInfoConfig()->statisticsDialogScreenShotImage();
-            absoluteFileName = caf::Utils::constructFullFileName( absSnapshotPath, fileName + "_Statistics", ".png" );
-            RicSnapshotViewToFileFeature::saveSnapshotAs( absoluteFileName, img );
+            QImage img = rigv->overlayInfoConfig()->statisticsDialogScreenShotImage();
+
+            // The statistics image is empty unless the statistics dialog has been shown, so a missing image here is
+            // expected and not treated as a failure
+            if ( !img.isNull() )
+            {
+                absoluteFileName = caf::Utils::constructFullFileName( absSnapshotPath, fileName + "_Statistics", ".png" );
+                RicSnapshotViewToFileFeature::saveSnapshotAs( absoluteFileName, img );
+            }
         }
     }
 
@@ -162,6 +174,14 @@ void RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( const QS
                                        glInfo.vendor().toStdString(),
                                        glInfo.renderer().toStdString() ) );
     }
+
+    if ( failedSnapshotCount > 0 )
+    {
+        return std::unexpected(
+            QString( "Failed to export %1 of %2 view snapshots" ).arg( failedSnapshotCount ).arg( viewsForSnapshot.size() ) );
+    }
+
+    return {};
 }
 
 //--------------------------------------------------------------------------------------------------
