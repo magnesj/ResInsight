@@ -158,12 +158,30 @@
 ///
 //==================================================================================================
 
+bool RiaGuiApplication::sm_headlessMode = false;
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 bool RiaGuiApplication::isRunning()
 {
     return dynamic_cast<RiaGuiApplication*>( RiaApplication::instance() ) != nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaGuiApplication::enableHeadlessMode()
+{
+    sm_headlessMode = true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RiaGuiApplication::isHeadless()
+{
+    return sm_headlessMode;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -284,6 +302,9 @@ QString RiaGuiApplication::promptForProjectSaveAsFileName() const
 //--------------------------------------------------------------------------------------------------
 bool RiaGuiApplication::askUserToSaveModifiedProject()
 {
+    // A modal dialog would hang a headless batch run
+    if ( isHeadless() ) return true;
+
     if ( RiaPreferencesSystem::current()->showProjectChangedDialog() && caf::PdmUiModelChangeDetector::instance()->isModelChanged() )
     {
         QMessageBox msgBox( activeMainWindow() );
@@ -548,6 +569,9 @@ RiaDefines::RINavigationPolicy RiaGuiApplication::navigationPolicy() const
 void RiaGuiApplication::initialize()
 {
     RiaApplication::initialize();
+
+    // Progress dialogs would pop up windows and can block a headless batch run
+    if ( isHeadless() ) caf::ProgressInfoStatic::setEnabled( false );
 
     applyGuiPreferences( nullptr );
 
@@ -931,8 +955,11 @@ RiaApplication::ApplicationStatus RiaGuiApplication::handleArguments( cvf::Progr
             auto mainPlotWnd = mainPlotWindow();
             if ( mainPlotWnd )
             {
-                mainPlotWnd->show();
-                mainPlotWnd->raise();
+                if ( !isHeadless() )
+                {
+                    mainPlotWnd->show();
+                    mainPlotWnd->raise();
+                }
 
                 processEvents();
 
@@ -943,8 +970,11 @@ RiaApplication::ApplicationStatus RiaGuiApplication::handleArguments( cvf::Progr
         if ( snapshotViews )
         {
             auto mainWnd = RiuMainWindow::instance();
-            mainWnd->show();
-            mainWnd->raise();
+            if ( !isHeadless() )
+            {
+                mainWnd->show();
+                mainWnd->raise();
+            }
 
             processEvents();
 
@@ -1063,7 +1093,7 @@ RiuMainWindow* RiaGuiApplication::getOrCreateAndShowMainWindow()
     {
         createMainWindow();
     }
-    else
+    else if ( !isHeadless() )
     {
         m_mainWindow->show();
 
@@ -1141,7 +1171,7 @@ void RiaGuiApplication::createMainWindow()
     m_mainWindow->setDefaultWindowSize();
     m_mainWindow->setDefaultToolbarVisibility();
     m_mainWindow->loadWinGeoAndDockToolBarLayout();
-    m_mainWindow->showWindow();
+    if ( !isHeadless() ) m_mainWindow->showWindow();
 
     // if there is an existing logger, reconnect to it
 
@@ -1199,18 +1229,21 @@ RiuPlotMainWindow* RiaGuiApplication::getOrCreateAndShowMainPlotWindow()
         }
     }
 
-    if ( m_mainPlotWindow->isMinimized() )
+    if ( !isHeadless() )
     {
-        m_mainPlotWindow->showNormal();
-        m_mainPlotWindow->update();
-    }
-    else
-    {
-        m_mainPlotWindow->show();
-    }
+        if ( m_mainPlotWindow->isMinimized() )
+        {
+            m_mainPlotWindow->showNormal();
+            m_mainPlotWindow->update();
+        }
+        else
+        {
+            m_mainPlotWindow->show();
+        }
 
-    m_mainPlotWindow->raise();
-    m_mainPlotWindow->activateWindow();
+        m_mainPlotWindow->raise();
+        m_mainPlotWindow->activateWindow();
+    }
 
     return m_mainPlotWindow.get();
 }
@@ -1339,6 +1372,13 @@ void RiaGuiApplication::clearAllSelections()
 //--------------------------------------------------------------------------------------------------
 void RiaGuiApplication::showFormattedTextInMessageBoxOrConsole( const QString& text )
 {
+    // A modal dialog would hang a headless batch run
+    if ( isHeadless() )
+    {
+        std::cout << text.toStdString();
+        return;
+    }
+
     // Create a message dialog with cut/paste friendly text
     QDialog dlg( widgetToUseAsParent() );
     dlg.setModal( true );
@@ -1444,9 +1484,9 @@ void RiaGuiApplication::onProjectOpened()
         if ( !m_mainPlotWindow )
         {
             createMainPlotWindow();
-            m_mainPlotWindow->show();
+            if ( !isHeadless() ) m_mainPlotWindow->show();
         }
-        else
+        else if ( !isHeadless() )
         {
             m_mainPlotWindow->show();
             m_mainPlotWindow->raise();
@@ -1478,7 +1518,7 @@ void RiaGuiApplication::onProjectOpened()
     // Make sure to process events before this function to avoid strange Qt crash
     RiuPlotMainWindowTools::refreshToolbars();
 
-    if ( m_project->showPlotWindow() && m_project->showPlotWindowOnTop() )
+    if ( m_project->showPlotWindow() && m_project->showPlotWindowOnTop() && !isHeadless() )
     {
         m_mainPlotWindow->raise();
         m_mainPlotWindow->activateWindow();
