@@ -45,18 +45,6 @@
 #include <unistd.h>
 #endif
 
-#ifdef WIN32
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
-
-#include <delayimp.h>
-#endif
-
 #include <signal.h>
 
 #include <exception>
@@ -92,31 +80,6 @@ void riaFilteredMessageHandler( QtMsgType type, const QMessageLogContext& contex
 }
 } // namespace
 
-#ifdef WIN32
-//--------------------------------------------------------------------------------------------------
-/// In headless mode Qt creates its OpenGL context using the software rasterizer opengl32sw.dll
-/// (Qt::AA_UseSoftwareOpenGL), while the statically linked OpenGL calls in the visualization
-/// framework would go to the system opengl32.dll where no context is current, causing an endless
-/// loop in glGetError(). opengl32.dll is therefore delay-loaded (see CMakeLists.txt) and redirected
-/// here to the same software rasterizer.
-//--------------------------------------------------------------------------------------------------
-FARPROC WINAPI riaDelayLoadHook( unsigned dliNotify, PDelayLoadInfo pdli )
-{
-    if ( dliNotify == dliNotePreLoadLibrary && RiaGuiApplication::isHeadless() &&
-         _stricmp( pdli->szDll, "opengl32.dll" ) == 0 )
-    {
-        if ( HMODULE softwareOpenGl = LoadLibraryW( L"opengl32sw.dll" ) )
-        {
-            return reinterpret_cast<FARPROC>( softwareOpenGl );
-        }
-    }
-
-    return nullptr;
-}
-
-extern "C" const PfnDliHook __pfnDliNotifyHook2 = riaDelayLoadHook;
-#endif
-
 RiaApplication* createApplication( int& argc, char* argv[] )
 {
     bool isHeadless = false;
@@ -139,14 +102,7 @@ RiaApplication* createApplication( int& argc, char* argv[] )
 
     if ( isHeadless )
     {
-        // Use software OpenGL rendering so 3D views can be rendered without a GPU. On Windows this
-        // makes Qt load opengl32sw.dll (Mesa llvmpipe). Must be set before the QApplication exists.
-        QApplication::setAttribute( Qt::AA_UseSoftwareOpenGL );
-#ifndef WIN32
-        // On Linux the attribute has no effect, force Mesa software rendering instead
-        qputenv( "LIBGL_ALWAYS_SOFTWARE", "1" );
-#endif
-        RiaGuiApplication::enableHeadlessMode();
+        RiaMainTools::enableHeadlessRendering();
     }
 
 #ifdef ENABLE_GRPC

@@ -229,7 +229,7 @@ endif()
 
 if(MSVC)
   # Delay-load opengl32.dll so that the statically linked OpenGL calls can be redirected to the
-  # software rasterizer opengl32sw.dll in headless mode, see riaDelayLoadHook in RiaMain.cpp
+  # software rasterizer opengl32sw.dll in headless mode, see riaDelayLoadHook in RiaMainTools.cpp
   target_link_libraries(ResInsight PRIVATE delayimp)
   target_link_options(ResInsight PRIVATE /DELAYLOAD:opengl32.dll)
 endif()
