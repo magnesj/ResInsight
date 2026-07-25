@@ -19,6 +19,7 @@
 #include "RiaMainTools.h"
 #include "RiaBaseDefs.h"
 #include "RiaFileLogger.h"
+#include "RiaGuiApplication.h"
 #include "RiaLogging.h"
 #include "RiaOpenTelemetryManager.h"
 #include "RiaRegressionTestRunner.h"
@@ -59,6 +60,43 @@
 #ifndef __APPLE__
 #include <ucontext.h>
 #endif
+#endif
+
+#ifdef WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <windows.h>
+
+#include <delayimp.h>
+#endif
+
+#ifdef WIN32
+//--------------------------------------------------------------------------------------------------
+/// In headless mode Qt creates its OpenGL context using the software rasterizer opengl32sw.dll
+/// (Qt::AA_UseSoftwareOpenGL), while the statically linked OpenGL calls in the visualization
+/// framework would go to the system opengl32.dll where no context is current, causing an endless
+/// loop in glGetError(). opengl32.dll is therefore delay-loaded (see CMakeLists.txt) and redirected
+/// here to the same software rasterizer.
+//--------------------------------------------------------------------------------------------------
+FARPROC WINAPI riaDelayLoadHook( unsigned dliNotify, PDelayLoadInfo pdli )
+{
+    if ( dliNotify == dliNotePreLoadLibrary && RiaGuiApplication::isHeadless() &&
+         _stricmp( pdli->szDll, "opengl32.dll" ) == 0 )
+    {
+        if ( HMODULE softwareOpenGl = LoadLibraryW( L"opengl32sw.dll" ) )
+        {
+            return reinterpret_cast<FARPROC>( softwareOpenGl );
+        }
+    }
+
+    return nullptr;
+}
+
+extern "C" const PfnDliHook __pfnDliNotifyHook2 = riaDelayLoadHook;
 #endif
 
 namespace internal
@@ -385,6 +423,24 @@ void deleteStaleSettingsLockFiles()
 
         qDebug() << logMessage;
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Configure software OpenGL rendering for headless mode, allowing 3D views to be rendered and
+/// grabbed without a GPU and without showing any windows. Must be called before the QApplication
+/// object is created.
+//--------------------------------------------------------------------------------------------------
+void enableHeadlessRendering()
+{
+    // Use software OpenGL rendering so 3D views can be rendered without a GPU. On Windows this
+    // makes Qt load opengl32sw.dll (Mesa llvmpipe). Must be set before the QApplication exists.
+    QApplication::setAttribute( Qt::AA_UseSoftwareOpenGL );
+#ifndef WIN32
+    // On Linux the attribute has no effect, force Mesa software rendering instead
+    qputenv( "LIBGL_ALWAYS_SOFTWARE", "1" );
+#endif
+
+    RiaGuiApplication::enableHeadlessMode();
 }
 
 } // namespace RiaMainTools

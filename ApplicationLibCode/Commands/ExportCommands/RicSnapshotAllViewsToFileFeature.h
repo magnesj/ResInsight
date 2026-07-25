@@ -19,6 +19,8 @@
 
 #include "cafCmdFeature.h"
 
+#include <expected>
+
 //==================================================================================================
 ///
 //==================================================================================================
@@ -29,12 +31,13 @@ class RicSnapshotAllViewsToFileFeature : public caf::CmdFeature
 public:
     static void saveAllViews();
 
-    static void exportSnapshotOfViewsIntoFolder( const QString& snapshotFolderName,
-                                                 int            width  = -1,
-                                                 int            height = -1,
-                                                 const QString& prefix = "",
-                                                 int            caseId = -1,
-                                                 int            viewId = -1 );
+    // Returns an error description if one or more views could not be exported
+    static std::expected<void, QString> exportSnapshotOfViewsIntoFolder( const QString& snapshotFolderName,
+                                                                         int            width  = -1,
+                                                                         int            height = -1,
+                                                                         const QString& prefix = "",
+                                                                         int            caseId = -1,
+                                                                         int            viewId = -1 );
 
 protected:
     void onActionTriggered( bool isChecked ) override;

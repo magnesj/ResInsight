@@ -257,7 +257,9 @@ void RicAdvancedSnapshotExportFeature::exportViewVariationsToFolder( RimGridView
             QString absoluteFileName = caf::Utils::constructFullFileName( folder, fileName, ".png" );
 
             QApplication::processEvents();
-            RicSnapshotViewToFileFeature::saveSnapshotAs( absoluteFileName, rimView );
+
+            // Errors are logged by saveSnapshotAs
+            (void)RicSnapshotViewToFileFeature::saveSnapshotAs( absoluteFileName, rimView );
         }
         else
         {
@@ -295,7 +297,9 @@ void RicAdvancedSnapshotExportFeature::exportViewVariationsToFolder( RimGridView
                 QString absoluteFileName = caf::Utils::constructFullFileName( folder, fileName, ".png" );
 
                 QApplication::processEvents();
-                RicSnapshotViewToFileFeature::saveSnapshotAs( absoluteFileName, rimView );
+
+                // Errors are logged by saveSnapshotAs
+                (void)RicSnapshotViewToFileFeature::saveSnapshotAs( absoluteFileName, rimView );
             }
 
             rimView->cellFilterCollection()->removeFilter( rangeFilter );

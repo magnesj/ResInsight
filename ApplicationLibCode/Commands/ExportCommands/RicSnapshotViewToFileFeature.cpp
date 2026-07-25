@@ -48,36 +48,50 @@ CAF_CMD_SOURCE_INIT( RicSnapshotViewToFileFeature, "RicSnapshotViewToFileFeature
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicSnapshotViewToFileFeature::saveSnapshotAs( const QString& fileName, RimViewWindow* viewWindow, int width, int height )
+std::expected<void, QString>
+    RicSnapshotViewToFileFeature::saveSnapshotAs( const QString& fileName, RimViewWindow* viewWindow, int width, int height )
 {
     auto* plotWindow = dynamic_cast<RimPlotWindow*>( viewWindow );
     if ( plotWindow && fileName.endsWith( ".pdf" ) )
     {
         savePlotPdfReportAs( fileName, plotWindow );
+        return {};
     }
     else if ( viewWindow )
     {
         QImage image = viewWindow->captureSnapshot( width, height );
-        saveSnapshotAs( fileName, image );
+        return saveSnapshotAs( fileName, image );
     }
+
+    return std::unexpected( QString( "No view window to create a snapshot from" ) );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicSnapshotViewToFileFeature::saveSnapshotAs( const QString& fileName, const QImage& image )
+std::expected<void, QString> RicSnapshotViewToFileFeature::saveSnapshotAs( const QString& fileName, const QImage& image )
 {
-    if ( !image.isNull() )
+    if ( image.isNull() )
     {
-        if ( image.save( fileName ) )
-        {
-            RiaLogging::info( std::format( "Exported snapshot image to {}", fileName ) );
-        }
-        else
-        {
-            RiaLogging::error( std::format( "Error when trying to export snapshot image to {}", fileName ) );
-        }
+        // No image is captured if the 3D view has no valid OpenGL context, typically seen when running headless on a
+        // platform without support for offscreen rendering
+        const QString errorText = QString( "No snapshot image was captured for %1" ).arg( fileName );
+        RiaLogging::error( errorText.toStdString() );
+
+        return std::unexpected( errorText );
     }
+
+    if ( !image.save( fileName ) )
+    {
+        const QString errorText = QString( "Error when trying to export snapshot image to %1" ).arg( fileName );
+        RiaLogging::error( errorText.toStdString() );
+
+        return std::unexpected( errorText );
+    }
+
+    RiaLogging::info( std::format( "Exported snapshot image to {}", fileName ) );
+
+    return {};
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -147,7 +161,8 @@ void RicSnapshotViewToFileFeature::saveViewWindowToFile( RimViewWindow* viewWind
         }
         else
         {
-            RicSnapshotViewToFileFeature::saveSnapshotAs( fileName, viewWindow->snapshotWindowContent() );
+            // Errors are logged by saveSnapshotAs
+            (void)RicSnapshotViewToFileFeature::saveSnapshotAs( fileName, viewWindow->snapshotWindowContent() );
         }
     }
 }
@@ -160,7 +175,8 @@ void RicSnapshotViewToFileFeature::saveImageToFile( const QImage& image, const Q
     QString fileName = generateSaveFileName( defaultFileBaseName, false );
     if ( !fileName.isEmpty() )
     {
-        RicSnapshotViewToFileFeature::saveSnapshotAs( fileName, image );
+        // Errors are logged by saveSnapshotAs
+        (void)RicSnapshotViewToFileFeature::saveSnapshotAs( fileName, image );
     }
 }
 

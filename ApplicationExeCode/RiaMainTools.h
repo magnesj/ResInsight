@@ -22,4 +22,5 @@ namespace RiaMainTools
 void initializeSingletons();
 void releaseSingletonAndFactoryObjects();
 void deleteStaleSettingsLockFiles();
+void enableHeadlessRendering();
 }; // namespace RiaMainTools

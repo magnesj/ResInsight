@@ -35,11 +35,15 @@
 #include "RicSnapshotViewToFileFeature.h"
 
 #include "Riu3DMainWindowTools.h"
+#include "RiuMainWindow.h"
 #include "RiuViewer.h"
 
 #include "RigFemResultPosEnum.h"
 
 #include "cafUtils.h"
+#include "cafViewer.h"
+
+#include "cvfOpenGLContextGroup.h"
 
 #include <QAction>
 #include <QClipboard>
@@ -62,7 +66,11 @@ void RicSnapshotAllViewsToFileFeature::saveAllViews()
     // Save images in snapshot catalog relative to project directory
     QString snapshotFolderName = app->createAbsolutePathFromProjectRelativePath( "snapshots" );
 
-    exportSnapshotOfViewsIntoFolder( snapshotFolderName );
+    if ( auto result = exportSnapshotOfViewsIntoFolder( snapshotFolderName ); !result )
+    {
+        RiaLogging::error( result.error().toStdString() );
+        return;
+    }
 
     QString text = QString( "Exported snapshots to folder : \n%1" ).arg( snapshotFolderName );
     RiaLogging::info( text.toStdString() );
@@ -72,20 +80,23 @@ void RicSnapshotAllViewsToFileFeature::saveAllViews()
 /// Export snapshots of a given view (or viewId == -1 for all views) for the given case (or caseId == -1 for all cases)
 /// <= 0 for width and height means to use the existing view size
 //--------------------------------------------------------------------------------------------------
-void RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( const QString& snapshotFolderName,
-                                                                        int            width,
-                                                                        int            height,
-                                                                        const QString& prefix,
-                                                                        int            caseId,
-                                                                        int            viewId )
+std::expected<void, QString> RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( const QString& snapshotFolderName,
+                                                                                                int            width,
+                                                                                                int            height,
+                                                                                                const QString& prefix,
+                                                                                                int            caseId,
+                                                                                                int            viewId )
 {
     RimProject* project = RimProject::current();
-    if ( project == nullptr ) return;
+    if ( project == nullptr ) return std::unexpected( QString( "No project available" ) );
 
     QDir snapshotPath( snapshotFolderName );
     if ( !snapshotPath.exists() )
     {
-        if ( !snapshotPath.mkpath( "." ) ) return;
+        if ( !snapshotPath.mkpath( "." ) )
+        {
+            return std::unexpected( QString( "Not able to create snapshot folder %1" ).arg( snapshotFolderName ) );
+        }
     }
 
     std::vector<Rim3dView*> viewsForSnapshot;
@@ -115,6 +126,18 @@ void RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( const QS
     const QString absSnapshotPath = snapshotPath.absolutePath();
     RiaLogging::info( std::format( "Exporting snapshot of all views to {}", snapshotFolderName ) );
 
+    if ( RiuMainWindow* mainWnd = RiuMainWindow::instance(); mainWnd && !mainWnd->isVisible() )
+    {
+        // When running headless with a hidden main window, Qt selects the global share context for the OpenGL context
+        // of the first rendered view widget. The dock widget activation in the loop below gives the main window a
+        // native window handle, making Qt select a new share context for the remaining view widgets, which asserts in
+        // cvfqt::OpenGLWidget::initializeGL() as the contexts do not share resources. Create the native window up
+        // front so the share context selection is identical for all view widgets.
+        mainWnd->createWinId();
+    }
+
+    size_t failedSnapshotCount = 0;
+
     for ( auto riv : viewsForSnapshot )
     {
         RiuViewer* viewer = riv->viewer();
@@ -139,15 +162,41 @@ void RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( const QS
 
         QString absoluteFileName = caf::Utils::constructFullFileName( absSnapshotPath, fileName, ".png" );
 
-        RicSnapshotViewToFileFeature::saveSnapshotAs( absoluteFileName, riv, width, height );
+        // The error is logged by saveSnapshotAs, only the number of failures is needed here
+        if ( !RicSnapshotViewToFileFeature::saveSnapshotAs( absoluteFileName, riv, width, height ) ) failedSnapshotCount++;
 
         if ( RimGridView* rigv = dynamic_cast<RimGridView*>( riv ) )
         {
-            QImage img       = rigv->overlayInfoConfig()->statisticsDialogScreenShotImage();
-            absoluteFileName = caf::Utils::constructFullFileName( absSnapshotPath, fileName + "_Statistics", ".png" );
-            RicSnapshotViewToFileFeature::saveSnapshotAs( absoluteFileName, img );
+            QImage img = rigv->overlayInfoConfig()->statisticsDialogScreenShotImage();
+
+            // The statistics image is empty unless the statistics dialog has been shown, so a missing image here is
+            // expected and not treated as a failure
+            if ( !img.isNull() )
+            {
+                absoluteFileName = caf::Utils::constructFullFileName( absSnapshotPath, fileName + "_Statistics", ".png" );
+                (void)RicSnapshotViewToFileFeature::saveSnapshotAs( absoluteFileName, img );
+            }
         }
     }
+
+    if ( !viewsForSnapshot.empty() )
+    {
+        // The OpenGL strings are populated when the first context is initialized, which for hidden viewers happens
+        // inside the first snapshot grab. Useful to verify that the expected renderer (e.g. software/llvmpipe) is used.
+        const cvf::OpenGLInfo glInfo = caf::Viewer::contextGroup()->info();
+        RiaLogging::info( std::format( "OpenGL used for snapshots: {} / {} / {}",
+                                       glInfo.version().toStdString(),
+                                       glInfo.vendor().toStdString(),
+                                       glInfo.renderer().toStdString() ) );
+    }
+
+    if ( failedSnapshotCount > 0 )
+    {
+        return std::unexpected(
+            QString( "Failed to export %1 of %2 view snapshots" ).arg( failedSnapshotCount ).arg( viewsForSnapshot.size() ) );
+    }
+
+    return {};
 }
 
 //--------------------------------------------------------------------------------------------------

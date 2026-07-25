@@ -20,6 +20,8 @@
 
 #include "cafCmdFeature.h"
 
+#include <expected>
+
 class RimViewWindow;
 
 //==================================================================================================
@@ -32,13 +34,14 @@ class RicSnapshotAllPlotsToFileFeature : public caf::CmdFeature
 public:
     static void saveAllPlots();
 
-    static void exportSnapshotOfPlotsIntoFolder( const QString& snapshotFolderName,
-                                                 int            width               = -1,
-                                                 int            height              = -1,
-                                                 bool           activateWidget      = false,
-                                                 const QString& prefix              = "",
-                                                 int            viewId              = -1,
-                                                 const QString& preferredFileSuffix = ".png" );
+    // Returns an error description if one or more plots could not be exported
+    static std::expected<void, QString> exportSnapshotOfPlotsIntoFolder( const QString& snapshotFolderName,
+                                                                         int            width               = -1,
+                                                                         int            height              = -1,
+                                                                         bool           activateWidget      = false,
+                                                                         const QString& prefix              = "",
+                                                                         int            viewId              = -1,
+                                                                         const QString& preferredFileSuffix = ".png" );
 
 protected:
     void onActionTriggered( bool isChecked ) override;
