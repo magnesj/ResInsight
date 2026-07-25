@@ -101,6 +101,8 @@ caf::PdmScriptResponse RicfExportSnapshots::execute()
     {
         absolutePathToSnapshotDir = RiaApplication::instance()->createAbsolutePathFromProjectRelativePath( "snapshots" );
     }
+    QStringList snapshotErrors;
+
     if ( m_type == RicfExportSnapshots::SnapshotsType::VIEWS || m_type == RicfExportSnapshots::SnapshotsType::ALL )
     {
         if ( RiaRegressionTestRunner::instance()->isRunningRegressionTests() )
@@ -110,12 +112,13 @@ caf::PdmScriptResponse RicfExportSnapshots::execute()
             height            = defaultSize.height();
         }
 
-        RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( absolutePathToSnapshotDir,
-                                                                           width,
-                                                                           height,
-                                                                           m_prefix,
-                                                                           m_caseId(),
-                                                                           m_viewId() );
+        auto result = RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( absolutePathToSnapshotDir,
+                                                                                         width,
+                                                                                         height,
+                                                                                         m_prefix,
+                                                                                         m_caseId(),
+                                                                                         m_viewId() );
+        if ( !result ) snapshotErrors.push_back( result.error() );
     }
     if ( m_type == RicfExportSnapshots::SnapshotsType::PLOTS || m_type == RicfExportSnapshots::SnapshotsType::ALL )
     {
@@ -133,13 +136,19 @@ caf::PdmScriptResponse RicfExportSnapshots::execute()
 
         QString fileSuffix = ".png";
         if ( m_plotOutputFormat == PlotOutputFormat::PDF ) fileSuffix = ".pdf";
-        RicSnapshotAllPlotsToFileFeature::exportSnapshotOfPlotsIntoFolder( absolutePathToSnapshotDir,
-                                                                           width,
-                                                                           height,
-                                                                           activateWidget,
-                                                                           m_prefix,
-                                                                           m_viewId(),
-                                                                           fileSuffix );
+        auto result = RicSnapshotAllPlotsToFileFeature::exportSnapshotOfPlotsIntoFolder( absolutePathToSnapshotDir,
+                                                                                         width,
+                                                                                         height,
+                                                                                         activateWidget,
+                                                                                         m_prefix,
+                                                                                         m_viewId(),
+                                                                                         fileSuffix );
+        if ( !result ) snapshotErrors.push_back( result.error() );
+    }
+
+    if ( !snapshotErrors.empty() )
+    {
+        return caf::PdmScriptResponse( caf::PdmScriptResponse::COMMAND_ERROR, snapshotErrors.join( ". " ) );
     }
 
     return caf::PdmScriptResponse();
