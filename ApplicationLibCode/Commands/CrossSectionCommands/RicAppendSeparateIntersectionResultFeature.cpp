@@ -35,18 +35,32 @@ CAF_CMD_SOURCE_INIT( RicAppendSeparateIntersectionResultFeature, "RicAppendSepar
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool RicAppendSeparateIntersectionResultFeature::isCommandEnabled() const
+{
+    return selectedIntersectionResultsDefinitionCollection() != nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RicAppendSeparateIntersectionResultFeature::onActionTriggered( bool isChecked )
 {
-    const auto collection = caf::SelectionManager::instance()->objectsByType<caf::PdmObjectHandle>();
-    CVF_ASSERT( collection.size() == 1 );
-
-    RimIntersectionResultsDefinitionCollection* intersectionResCollection =
-        collection[0]->firstAncestorOrThisOfType<RimIntersectionResultsDefinitionCollection>();
-
-    CVF_ASSERT( intersectionResCollection );
+    RimIntersectionResultsDefinitionCollection* intersectionResCollection = selectedIntersectionResultsDefinitionCollection();
+    if ( !intersectionResCollection ) return;
 
     RicAppendSeparateIntersectionResultFeatureCmd* cmd = new RicAppendSeparateIntersectionResultFeatureCmd( intersectionResCollection );
     caf::CmdExecCommandManager::instance()->processExecuteCommand( cmd );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimIntersectionResultsDefinitionCollection* RicAppendSeparateIntersectionResultFeature::selectedIntersectionResultsDefinitionCollection()
+{
+    const auto collection = caf::SelectionManager::instance()->objectsByType<caf::PdmObjectHandle>();
+    if ( collection.size() != 1 ) return nullptr;
+
+    return collection[0]->firstAncestorOrThisOfType<RimIntersectionResultsDefinitionCollection>();
 }
 
 //--------------------------------------------------------------------------------------------------

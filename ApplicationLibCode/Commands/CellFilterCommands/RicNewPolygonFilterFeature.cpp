@@ -104,8 +104,11 @@ void RicNewPolygonFilterFeature::onActionTriggered( bool isChecked )
         return;
     }
 
-    // If a case-level Data Filter Collection is selected, add polygon filters there.
-    auto* dataCollection = caf::SelectionManager::instance()->selectedItemOfType<RimDataFilterCollection>();
+    // If a case-level Data Filter Collection is the target, add polygon filters there. Resolve it the
+    // same way as every other cell filter feature, so that right clicking an Eclipse case creates the
+    // filter on the case rather than silently putting it in the active view's collection. The "Data
+    // Filters" node is hidden while empty, so the case node is what the user right clicks.
+    auto* dataCollection = RicCellFilterFeatureTools::selectedDataFilterCollection();
     if ( dataCollection )
     {
         if ( polygons.empty() ) polygons.push_back( nullptr );

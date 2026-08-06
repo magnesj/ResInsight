@@ -62,12 +62,26 @@ void RicDeleteItemExec::redo()
             m_commandData.m_deletedObjectAsXml = xmlObj( obj )->writeObjectToXmlString();
         }
 
+        caf::PdmObjectHandle* parentObj = listField->ownerObject();
+
+        // Detach the object and refresh the editors before deleting it, so that nothing can reach it
+        // while its destructor runs.
+        //
+        // A destructor can re-enter the user interface. Deleting a 3D view removes its dock widget,
+        // the dock area then activates a sibling, and that selection change both repaints the project
+        // tree and rebuilds the property editor. The tree asks each of its nodes for a name, and the
+        // property editor walks project->allViews() to build the comparison view option list, which
+        // also asks every view for its name. The object being deleted has already lost its derived
+        // part by then, so producing its name calls a pure virtual function and aborts.
+        //
+        // erase() only detaches the object from the field, it does not delete it, so the object is
+        // still valid while the editors are refreshed. After the refresh no editor holds a node for
+        // it, and it is no longer reachable through the project.
+        listField->erase( m_commandData.m_indexToObject );
+        parentObj->uiCapability()->updateConnectedEditors();
+
         delete obj;
 
-        listField->erase( m_commandData.m_indexToObject );
-
-        caf::PdmObjectHandle* parentObj = listField->ownerObject();
-        parentObj->uiCapability()->updateConnectedEditors();
         parentObj->onChildDeleted( listField, referringObjects );
     }
 }
