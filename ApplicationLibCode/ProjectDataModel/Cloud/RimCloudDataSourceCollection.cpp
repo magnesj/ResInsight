@@ -114,6 +114,15 @@ void RimCloudDataSourceCollection::createEnsemblesFromSelectedDataSources( const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimCloudDataSourceCollection::addSumoDataSource( RimSummarySumoDataSource* dataSource )
+{
+    if ( !dataSource ) return;
+    m_sumoDataSources.push_back( dataSource );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimCloudDataSourceCollection::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     // The Cloud API server controls are independent of the Sumo connection, so handle them before the
