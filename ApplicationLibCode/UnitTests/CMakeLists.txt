@@ -156,6 +156,7 @@ set(SOURCE_UNITTEST_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimMockSummaryCase-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimSummaryCalculation-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaConnectorTools-Test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RiaSumoConnector-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigWellTargetMappingTools-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicWellPathExportMswGeometryPath-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicMswBranchBuilder-Test.cpp
