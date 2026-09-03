@@ -33,19 +33,10 @@ CAF_CMD_SOURCE_INIT( RicNewWellPathListTargetFeature, "RicNewWellPathListTargetF
 //--------------------------------------------------------------------------------------------------
 bool RicNewWellPathListTargetFeature::isCommandEnabled() const
 {
+    const auto selectedTargets = caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
+    if ( !selectedTargets.empty() )
     {
-        const auto attributes = caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>();
-        if ( !attributes.empty() )
-        {
-            return false;
-        }
-    }
-    {
-        const auto selectedTargets = caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>( caf::SelectionManager::FIRST_LEVEL );
-        if ( !selectedTargets.empty() )
-        {
-            return true;
-        }
+        return true;
     }
 
     return false;
@@ -56,7 +47,7 @@ bool RicNewWellPathListTargetFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicNewWellPathListTargetFeature::onActionTriggered( bool isChecked )
 {
-    const auto selectedTargets = caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>( caf::SelectionManager::FIRST_LEVEL );
+    const auto selectedTargets = caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
     if ( !selectedTargets.empty() )
     {
         RimWellPathTarget*      firstTarget = selectedTargets.front();
@@ -128,7 +119,7 @@ void RicNewWellPathListTargetFeature::onActionTriggered( bool isChecked )
         return;
     }
 
-    const auto geomDefs = caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>( caf::SelectionManager::FIRST_LEVEL );
+    const auto geomDefs = caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>();
     if ( !geomDefs.empty() )
     {
         RimWellPathGeometryDef*         wellGeomDef   = geomDefs[0];
@@ -170,7 +161,7 @@ void RicNewWellPathListTargetFeature::onActionTriggered( bool isChecked )
 //--------------------------------------------------------------------------------------------------
 void RicNewWellPathListTargetFeature::setupActionLook( QAction* actionToSetup )
 {
-    const auto selectedTargets = caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>( caf::SelectionManager::FIRST_LEVEL );
+    const auto selectedTargets = caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
     if ( !selectedTargets.empty() )
     {
         auto                    firstTarget = selectedTargets.front();

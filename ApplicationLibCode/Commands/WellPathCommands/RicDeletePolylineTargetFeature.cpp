@@ -32,7 +32,7 @@ CAF_CMD_SOURCE_INIT( RicDeletePolylineTargetFeature, "RicDeletePolylineTargetFea
 //--------------------------------------------------------------------------------------------------
 bool RicDeletePolylineTargetFeature::isCommandEnabled() const
 {
-    const auto objects = caf::SelectionManager::instance()->objectsByType<RimPolylineTarget>( caf::SelectionManager::FIRST_LEVEL );
+    const auto objects = caf::SelectionManager::instance()->objectsByType<RimPolylineTarget>();
     return !objects.empty();
 }
 
@@ -41,7 +41,7 @@ bool RicDeletePolylineTargetFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicDeletePolylineTargetFeature::onActionTriggered( bool isChecked )
 {
-    const auto targets = caf::SelectionManager::instance()->objectsByType<RimPolylineTarget>( caf::SelectionManager::FIRST_LEVEL );
+    const auto targets = caf::SelectionManager::instance()->objectsByType<RimPolylineTarget>();
     if ( !targets.empty() )
     {
         RimPolylinePickerInterface* polylineDef = targets[0]->firstAncestorOrThisOfTypeAsserted<RimPolylinePickerInterface>();

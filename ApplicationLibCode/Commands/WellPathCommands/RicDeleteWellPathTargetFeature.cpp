@@ -32,8 +32,7 @@ CAF_CMD_SOURCE_INIT( RicDeleteWellPathTargetFeature, "RicDeleteWellPathTargetFea
 //--------------------------------------------------------------------------------------------------
 bool RicDeleteWellPathTargetFeature::isCommandEnabled() const
 {
-    const auto targets =
-        caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>( caf::SelectionManager::SelectionLevel::FIRST_LEVEL );
+    const auto targets = caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
     return !targets.empty();
 }
 
@@ -42,8 +41,7 @@ bool RicDeleteWellPathTargetFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicDeleteWellPathTargetFeature::onActionTriggered( bool isChecked )
 {
-    const auto targets =
-        caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>( caf::SelectionManager::SelectionLevel::FIRST_LEVEL );
+    const auto targets = caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
     if ( !targets.empty() )
     {
         RimWellPathGeometryDef* wellGeomDef = targets[0]->firstAncestorOrThisOfTypeAsserted<RimWellPathGeometryDef>();
