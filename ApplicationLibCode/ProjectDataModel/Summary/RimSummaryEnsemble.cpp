@@ -867,8 +867,8 @@ void RimSummaryEnsemble::computeMinMax( const RifEclipseSummaryAddress& address 
     // realizations and/or long time series). Use multiple threads to speed up the initial computation of min/max
     // values. The HDF5-backed reader is not thread safe, so multi-threading is disabled for that reader type.
     // https://github.com/OPM/ResInsight/issues/14669
-    const bool canUseMultipleThreads =
-        RiaPreferencesSummary::current()->summaryDataReader() != RiaPreferencesSummary::SummaryReaderMode::HDF5_OPM_COMMON;
+    const bool canUseMultipleThreads = RiaPreferencesSummary::current()->summaryDataReader() !=
+                                       RiaPreferencesSummary::SummaryReaderMode::HDF5_OPM_COMMON;
 
     const int numberOfThreads = canUseMultipleThreads ? RiaOpenMPTools::availableThreadCount() : 1;
 
