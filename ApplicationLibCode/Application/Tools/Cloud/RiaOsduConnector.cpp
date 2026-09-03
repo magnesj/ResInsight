@@ -26,10 +26,76 @@
 #include <QJsonObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QRegularExpression>
 
 #include <limits>
 
 #include "cafAssert.h"
+
+namespace
+{
+//--------------------------------------------------------------------------------------------------
+/// Parse an OSDU UnitOfMeasure reference id (e.g. "data:reference-data--UnitOfMeasure:ft:") and return
+/// the multiplier that converts the value into meters. Returns 1.0 (and sets recognized=false) when the
+/// id is empty or the symbol is unknown, so callers can log a single warning at the call site.
+//--------------------------------------------------------------------------------------------------
+double unitOfMeasureToMeters( const QString& unitId, bool* recognized = nullptr )
+{
+    if ( recognized ) *recognized = false;
+
+    QString symbol;
+    if ( unitId.endsWith( ':' ) )
+    {
+        int lastColon = unitId.lastIndexOf( ':', unitId.length() - 2 );
+        if ( lastColon >= 0 ) symbol = unitId.mid( lastColon + 1, unitId.length() - lastColon - 2 );
+    }
+    if ( symbol.isEmpty() ) return 1.0;
+
+    if ( symbol.compare( "m", Qt::CaseInsensitive ) == 0 )
+    {
+        if ( recognized ) *recognized = true;
+        return 1.0;
+    }
+    if ( symbol.compare( "ft", Qt::CaseInsensitive ) == 0 )
+    {
+        if ( recognized ) *recognized = true;
+        return 0.3048;
+    }
+    return 1.0;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Extract the linear unit factor (-> meters) from a persistableReferenceCrs JSON string by scanning
+/// the embedded WKT. The PROJCS WKT places the projection's linear UNIT after the nested angular GEOGCS
+/// UNIT, so the last `UNIT["name", factor]` token is the linear one. Falls back to 1.0 on any parse
+/// failure or for non-projected CRSs.
+//--------------------------------------------------------------------------------------------------
+double linearCrsUnitToMeters( const QString& persistableReferenceCrs )
+{
+    if ( persistableReferenceCrs.isEmpty() ) return 1.0;
+
+    QJsonDocument doc = QJsonDocument::fromJson( persistableReferenceCrs.toUtf8() );
+    if ( !doc.isObject() ) return 1.0;
+
+    QJsonObject obj = doc.object();
+    QString     wkt = obj["wkt"].toString();
+    if ( wkt.isEmpty() ) wkt = obj["lateBoundCRS"].toObject()["wkt"].toString();
+    if ( wkt.isEmpty() ) return 1.0;
+    if ( !wkt.startsWith( "PROJCS", Qt::CaseInsensitive ) ) return 1.0;
+
+    QRegularExpression re( "UNIT\\[\"[^\"]+\"\\s*,\\s*([0-9.eE+\\-]+)\\]" );
+    auto               matches = re.globalMatch( wkt );
+    double             factor  = 1.0;
+    while ( matches.hasNext() )
+    {
+        QRegularExpressionMatch m  = matches.next();
+        bool                    ok = false;
+        double                  v  = m.captured( 1 ).toDouble( &ok );
+        if ( ok ) factor = v;
+    }
+    return factor;
+}
+} // namespace
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -80,6 +146,7 @@ void RiaOsduConnector::clearCachedData()
     m_wellLogs.clear();
     m_parquetData.clear();
     m_parquetErrors.clear();
+    m_wellSurfaceLocations.clear();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -383,8 +450,16 @@ void RiaOsduConnector::parseWellboresByFieldId( QNetworkReply* reply, const QStr
                     QString verticalMeasurementId = vma["VerticalMeasurementID"].toString();
                     if ( verticalMeasurementId == defaultVerticalMeasurementId )
                     {
-                        double verticalMeasurement = vma["VerticalMeasurement"].toDouble( 0.0 );
-                        datumElevation             = verticalMeasurement;
+                        double  verticalMeasurement = vma["VerticalMeasurement"].toDouble( 0.0 );
+                        QString unitId              = vma["VerticalMeasurementUnitOfMeasureID"].toString();
+                        bool    unitRecognized      = false;
+                        double  factor              = unitOfMeasureToMeters( unitId, &unitRecognized );
+                        if ( !unitRecognized && !unitId.isEmpty() )
+                        {
+                            RiaLogging::warning(
+                                QString( "Unrecognized datum elevation unit '%1' for well bore '%2'; assuming meters." ).arg( unitId ).arg( name ) );
+                        }
+                        datumElevation = verticalMeasurement * factor;
                     }
                 }
 
@@ -394,6 +469,8 @@ void RiaOsduConnector::parseWellboresByFieldId( QNetworkReply* reply, const QStr
                     datumElevation = 0.0;
                 }
 
+                // Wellbore records typically do not carry SpatialLocation; the surface point lives on the parent
+                // Well record. Surface easting/northing/crs are populated separately via requestWellSurfaceLocationBlocking.
                 m_wellbores[fieldId].push_back( OsduWellbore{ id, kind, name, wellId, fieldId, datumElevation } );
             }
         }
@@ -431,6 +508,7 @@ void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply, const QString&
                 QString id   = resultObj["id"].toString();
                 QString kind = resultObj["kind"].toString();
                 QString existenceKind;
+                QString crs;
 
                 // Safely extract existenceKind from nested data object
                 QJsonObject dataObj = resultObj["data"].toObject();
@@ -439,7 +517,40 @@ void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply, const QString&
                     existenceKind = dataObj["ExistenceKind"].toString();
                 }
 
-                m_wellboreTrajectories[wellboreId].push_back( OsduWellboreTrajectory{ id, kind, wellboreId, existenceKind } );
+                QJsonObject spatialLocation = dataObj["SpatialLocation"].toObject();
+                QJsonObject ingested        = spatialLocation["AsIngestedCoordinates"].toObject();
+                if ( !ingested.isEmpty() )
+                {
+                    crs = ingested["persistableReferenceCrs"].toString();
+                }
+
+                // The MD entry in AvailableTrajectoryStationProperties advertises a length unit that the parquet
+                // values are stored in. Treat it as the canonical length unit for the geometric columns
+                // (MD/TVD/X/Y) and use it to derive a multiplier into meters, so downstream code can combine the
+                // trajectory with surface origin and datum elevation (which are stored as meters).
+                //
+                // Note: in real-world OSDU records the X/Y entries sometimes advertise a different unit than
+                // MD/TVD (e.g. "dega" while the values are clearly meters/feet). Trusting MD's unit and applying
+                // it uniformly to all four columns gives the right result for those datasets too.
+                QString    mdUnitId;
+                QJsonArray availableProps = dataObj["AvailableTrajectoryStationProperties"].toArray();
+                for ( const QJsonValue& propValue : availableProps )
+                {
+                    QJsonObject propObj = propValue.toObject();
+                    if ( propObj["Name"].toString() == "MD" )
+                    {
+                        mdUnitId = propObj["StationPropertyUnitID"].toString();
+                        break;
+                    }
+                }
+                bool   unitRecognized = false;
+                double unitToMeters   = unitOfMeasureToMeters( mdUnitId, &unitRecognized );
+                if ( !unitRecognized && !mdUnitId.isEmpty() )
+                {
+                    RiaLogging::warning( QString( "Unrecognized MD unit '%1' for trajectory %2; assuming meters." ).arg( mdUnitId ).arg( id ) );
+                }
+
+                m_wellboreTrajectories[wellboreId].push_back( OsduWellboreTrajectory{ id, kind, wellboreId, existenceKind, crs, unitToMeters } );
             }
         }
 
@@ -749,4 +860,85 @@ void RiaOsduConnector::cancelRequestForId( const QString& id )
             it->second->abort();
         }
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaOsduConnector::WellSurfaceLocation RiaOsduConnector::requestWellSurfaceLocationBlocking( const QString& wellId )
+{
+    if ( wellId.isEmpty() ) return {};
+
+    // OSDU stores record references with a trailing colon (e.g. "data:master-data--Well:abcd:"). The storage
+    // API expects the id without it.
+    QString recordId = wellId;
+    while ( recordId.endsWith( ':' ) )
+        recordId.chop( 1 );
+
+    {
+        QMutexLocker lock( &m_mutex );
+        auto         it = m_wellSurfaceLocations.find( recordId );
+        if ( it != m_wellSurfaceLocations.end() ) return it->second;
+    }
+
+    QString token = requestTokenBlocking();
+    QString url   = m_server + "/api/storage/v2/records/" + recordId;
+
+    QNetworkRequest networkRequest;
+    networkRequest.setUrl( QUrl( url ) );
+    addStandardHeader( networkRequest, token, m_dataPartitionId, RiaCloudDefines::contentTypeJson() );
+
+    QNetworkReply* reply = m_networkAccessManager->get( networkRequest );
+
+    QEventLoop loop;
+    connect( reply, &QNetworkReply::finished, &loop, &QEventLoop::quit );
+    loop.exec();
+
+    WellSurfaceLocation location;
+
+    if ( reply->error() == QNetworkReply::NoError )
+    {
+        QByteArray    body            = reply->readAll();
+        QJsonDocument doc             = QJsonDocument::fromJson( body );
+        QJsonObject   data            = doc.object()["data"].toObject();
+        QJsonObject   spatialLocation = data["SpatialLocation"].toObject();
+        QJsonObject   ingested        = spatialLocation["AsIngestedCoordinates"].toObject();
+
+        if ( !ingested.isEmpty() )
+        {
+            location.crs             = ingested["persistableReferenceCrs"].toString();
+            const double crsToMeters = linearCrsUnitToMeters( location.crs );
+            QJsonArray   features    = ingested["features"].toArray();
+            if ( !features.isEmpty() )
+            {
+                QJsonArray coordinates = features[0].toObject()["geometry"].toObject()["coordinates"].toArray();
+                if ( coordinates.size() >= 2 )
+                {
+                    // CRS WKT may declare a non-meter linear unit (e.g. US survey foot for state-plane CRSs).
+                    // Convert here so downstream code can rely on the surface origin always being meters.
+                    location.easting  = coordinates[0].toDouble() * crsToMeters;
+                    location.northing = coordinates[1].toDouble() * crsToMeters;
+                    location.isValid  = true;
+                }
+            }
+        }
+
+        if ( !location.isValid )
+        {
+            RiaLogging::warning( QString( "No SpatialLocation found on Well record '%1'." ).arg( recordId ) );
+        }
+    }
+    else
+    {
+        RiaLogging::error( QString( "Failed to download Well record '%1': %2" ).arg( recordId ).arg( reply->errorString() ) );
+    }
+
+    reply->deleteLater();
+
+    {
+        QMutexLocker lock( &m_mutex );
+        m_wellSurfaceLocations[recordId] = location;
+    }
+
+    return location;
 }
