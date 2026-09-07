@@ -436,6 +436,8 @@ PdmChildArrayFieldHandle* PdmUiTreeViewEditor::currentChildArrayFieldHandle()
 //--------------------------------------------------------------------------------------------------
 void PdmUiTreeViewEditor::selectAsCurrentItem( const PdmUiItem* uiItem )
 {
+    if ( !m_treeView || !m_treeViewModel || !m_filterModel ) return;
+
     QModelIndex index        = m_treeViewModel->findModelIndex( uiItem );
     QModelIndex indexForItem = m_filterModel->mapFromSource( index );
 
