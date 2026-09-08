@@ -159,8 +159,8 @@ PdmUiTreeViewEditor::PdmUiTreeViewEditor()
 //--------------------------------------------------------------------------------------------------
 PdmUiTreeViewEditor::~PdmUiTreeViewEditor()
 {
-    m_treeView->removeEventFilter( this );
-    m_treeViewModel->setPdmItemRoot( nullptr );
+    if ( m_treeView ) m_treeView->removeEventFilter( this );
+    if ( m_treeViewModel ) m_treeViewModel->setPdmItemRoot( nullptr );
 
     delete m_mainWidget;
     m_mainWidget = nullptr;
