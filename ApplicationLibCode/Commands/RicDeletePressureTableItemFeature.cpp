@@ -31,7 +31,7 @@ CAF_CMD_SOURCE_INIT( RicDeletePressureTableItemFeature, "RicDeletePressureTableI
 //--------------------------------------------------------------------------------------------------
 bool RicDeletePressureTableItemFeature::isCommandEnabled() const
 {
-    auto objects = caf::SelectionManager::instance()->objectsByType<RimPressureTableItem>( caf::SelectionManager::FIRST_LEVEL );
+    auto objects = caf::SelectionManager::instance()->objectsByType<RimPressureTableItem>();
     return !objects.empty();
 }
 
@@ -40,7 +40,7 @@ bool RicDeletePressureTableItemFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicDeletePressureTableItemFeature::onActionTriggered( bool isChecked )
 {
-    auto objects = caf::SelectionManager::instance()->objectsByType<RimPressureTableItem>( caf::SelectionManager::FIRST_LEVEL );
+    auto objects = caf::SelectionManager::instance()->objectsByType<RimPressureTableItem>();
     if ( !objects.empty() )
     {
         RimPressureTable* pressureTable = objects[0]->firstAncestorOrThisOfTypeAsserted<RimPressureTable>();

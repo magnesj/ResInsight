@@ -147,22 +147,6 @@ void PdmUiTableView::enableHeaderText( bool enable )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void PdmUiTableView::setTableSelectionLevel( int selectionLevel )
-{
-    m_listViewEditor->setTableSelectionLevel( selectionLevel );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void PdmUiTableView::setRowSelectionLevel( int selectionLevel )
-{
-    m_listViewEditor->setRowSelectionLevel( selectionLevel );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 PdmObjectHandle* PdmUiTableView::pdmObjectFromModelIndex( const QModelIndex& mi )
 {
     return m_listViewEditor->pdmObjectFromModelIndex( mi );
