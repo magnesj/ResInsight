@@ -62,7 +62,7 @@ TEST( PdmUiTreeViewEditorTest, CreateWidgetAndVerifyEmptyState )
     ASSERT_TRUE( editor.treeView() != nullptr );
 
     // No item is bound yet, so no valid model index should be found
-    SimpleObj obj;
+    SimpleObj   obj;
     QModelIndex mi = editor.findModelIndex( &obj );
     EXPECT_FALSE( mi.isValid() );
 
