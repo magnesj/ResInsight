@@ -269,7 +269,8 @@ void caf::Viewer::setupRenderingSequence()
 //--------------------------------------------------------------------------------------------------
 void caf::Viewer::deleteFboOpenGLResources()
 {
-    // The OpenGL resources can be deleted at any time. CeeViz does not delete resources for FBOs, so delete them manually
+    // The OpenGL resources can be deleted at any time. CeeViz does not delete resources for FBOs, so delete them
+    // manually
     //
     // Callers (onWidgetOpenGLAboutToBeShutdown()/onWidgetOpenGLReinitialized()) are responsible for making sure the
     // correct OpenGL context is current before calling this function, so we don't do it here.
