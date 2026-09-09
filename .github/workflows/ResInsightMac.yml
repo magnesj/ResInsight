@@ -153,7 +153,7 @@ jobs:
           dir: "${{ github.workspace }}/Qt/"
           cache: false
           setup-python: false
-          modules: "qtnetworkauth qthttpserver"
+          modules: "qtnetworkauth qthttpserver qtwebsockets"
 
       - name: vcpkg bootstrap
         run: |
