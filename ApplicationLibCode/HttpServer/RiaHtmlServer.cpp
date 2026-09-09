@@ -60,6 +60,7 @@
 #include <QIcon>
 #include <QImage>
 #include <QPixmap>
+#include <QTcpServer>
 #include <QUrlQuery>
 #include <QVariantList>
 #include <QVariantMap>
@@ -446,6 +447,8 @@ bool RiaHtmlServer::start( quint16 preferredPort )
     // Try the preferred port, then fall back to a small range if it is taken.
     for ( quint16 candidate = preferredPort; candidate < preferredPort + 20; ++candidate )
     {
+#if QT_VERSION < QT_VERSION_CHECK( 6, 8, 0 )
+        // QAbstractHttpServer::listen() was available up to and including Qt 6.7.
         quint16 boundPort = m_httpServer->listen( QHostAddress::LocalHost, candidate );
         if ( boundPort != 0 )
         {
@@ -453,6 +456,17 @@ bool RiaHtmlServer::start( quint16 preferredPort )
             RiaLogging::info( QString( "HTML project browser started. Open %1 in a web browser." ).arg( url() ).toStdString() );
             return true;
         }
+#else
+        // From Qt 6.8, QAbstractHttpServer::listen() was replaced by bind(), which requires an
+        // already listening QTcpServer. Ownership of tcpServer is transferred to m_httpServer on success.
+        auto tcpServer = std::make_unique<QTcpServer>();
+        if ( tcpServer->listen( QHostAddress::LocalHost, candidate ) && m_httpServer->bind( tcpServer.get() ) )
+        {
+            m_port = tcpServer.release()->serverPort();
+            RiaLogging::info( QString( "HTML project browser started. Open %1 in a web browser." ).arg( url() ).toStdString() );
+            return true;
+        }
+#endif
     }
 
     RiaLogging::warning( "Failed to start the HTML project browser. No free port found." );
