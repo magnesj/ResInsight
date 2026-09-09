@@ -36,7 +36,7 @@ jobs:
           version: 6.7.0
           dir: "${{ github.workspace }}/Qt/"
           cache: true
-          modules: "qtnetworkauth"
+          modules: "qtnetworkauth qthttpserver"
 
       - name: vcpkg bootstrap
         run: ThirdParty/vcpkg/bootstrap-vcpkg.sh
