@@ -534,13 +534,30 @@ void RiuMainWindowBase::slotForceUpdateAllViewers()
         QWidget* widget = view->viewWidget();
         if ( widget && widget->isVisible() )
         {
-            // TEMPORARY (#14714 investigation): disabled while testing whether the root cause is
-            // the ADS reparenting itself (see DockAreaWidget.cpp::detachWidget() patch). Keeping
-            // only the logging here so this test is isolated from the widget-level nudges.
+            // TEMPORARY (#14714 investigation): user reports that with the ADS reparenting-skip
+            // patch in place, only the *first* time a previously-hidden tab becomes visible shows a
+            // black window -- subsequent hide/show cycles for the same widget render correctly.
+            // This matches a known QOpenGLWidget quirk: a repaint requested synchronously right when
+            // the widget becomes visible can occur before Qt has fully established the on-screen
+            // surface for that widget, so the content never reaches the screen. Defer the repaint
+            // to the next event loop iteration (after Qt has finished processing the show), using a
+            // QPointer to guard against the widget being deleted before the deferred call runs.
             RiaLogging::debug(
-                QString( "  viewer widget=%1 visible, no nudge applied (isolating ADS-level fix test)" ).arg( (quint64)widget ).toStdString() );
-            widget->update();
-            widget->repaint();
+                QString( "  viewer widget=%1 visible, scheduling deferred update()+repaint()" ).arg( (quint64)widget ).toStdString() );
+            QPointer<QWidget> guardedWidget( widget );
+            QTimer::singleShot( 0,
+                                this,
+                                [guardedWidget]()
+                                {
+                                    if ( guardedWidget )
+                                    {
+                                        RiaLogging::debug( QString( "  deferred update()+repaint() firing for viewer widget=%1" )
+                                                               .arg( (quint64)guardedWidget.data() )
+                                                               .toStdString() );
+                                        guardedWidget->update();
+                                        guardedWidget->repaint();
+                                    }
+                                } );
         }
     }
 }
