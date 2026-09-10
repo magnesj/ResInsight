@@ -46,6 +46,7 @@
 #include "cvfDynamicUniformSet.h"
 #include "cvfFramebufferObject.h"
 #include "cvfHitItemCollection.h"
+#include "cvfLogManager.h"
 #include "cvfModel.h"
 #include "cvfOpenGLCapabilities.h"
 #include "cvfOpenGLUtils.h"
@@ -77,6 +78,7 @@
 #include <QPainter>
 
 #include <cmath>
+#include <cstdint>
 
 namespace caf
 {
@@ -182,6 +184,11 @@ caf::Viewer::Viewer( QWidget* parent )
 //--------------------------------------------------------------------------------------------------
 caf::Viewer::~Viewer()
 {
+    CVF_LOG_DEBUG( CVF_GET_LOGGER( "cee.caf.viewer" ),
+                    cvf::String( "Viewer::~Viewer() this=%1 cvfOpenGLContext=%2" )
+                        .arg( (cvf::int64)(intptr_t)this )
+                        .arg( (cvf::int64)(intptr_t)cvfOpenGLContext() ) );
+
     if ( m_layoutWidget ) m_layoutWidget->deleteLater();
 }
 
@@ -270,6 +277,11 @@ void caf::Viewer::setupRenderingSequence()
 void caf::Viewer::deleteFboOpenGLResources()
 {
     // The OpenGL resources can be deleted at any time. CeeViz does not delete resources for FBOs, so delete them manually
+
+    CVF_LOG_DEBUG( CVF_GET_LOGGER( "cee.caf.viewer" ),
+                    cvf::String( "Viewer::deleteFboOpenGLResources() this=%1 cvfOpenGLContext=%2" )
+                        .arg( (cvf::int64)(intptr_t)this )
+                        .arg( (cvf::int64)(intptr_t)cvfOpenGLContext() ) );
 
     if ( m_offscreenFbo.notNull() )
     {
@@ -781,7 +793,20 @@ void caf::Viewer::resizeGL( int width, int height )
     width      = (int)( ratio * width );
     height     = (int)( ratio * height );
 
-    if ( width < 1 || height < 1 ) return;
+    CVF_LOG_DEBUG( CVF_GET_LOGGER( "cee.caf.viewer" ),
+                    cvf::String( "Viewer::resizeGL() this=%1 width=%2 height=%3 prevOffscreenW=%4 prevOffscreenH=%5" )
+                        .arg( (cvf::int64)(intptr_t)this )
+                        .arg( width )
+                        .arg( height )
+                        .arg( m_offscreenViewportWidth )
+                        .arg( m_offscreenViewportHeight ) );
+
+    if ( width < 1 || height < 1 )
+    {
+        CVF_LOG_DEBUG( CVF_GET_LOGGER( "cee.caf.viewer" ),
+                        cvf::String( "Viewer::resizeGL() this=%1 SKIPPED due to non-positive size" ).arg( (cvf::int64)(intptr_t)this ) );
+        return;
+    }
 
     if ( m_offscreenFbo.notNull() )
     {
@@ -821,6 +846,13 @@ bool caf::Viewer::isPerfInfoHudEnabled()
 //--------------------------------------------------------------------------------------------------
 void caf::Viewer::paintGL()
 {
+    CVF_LOG_DEBUG( CVF_GET_LOGGER( "cee.caf.viewer" ),
+                    cvf::String( "Viewer::paintGL() ENTRY this=%1 isVisible=%2 renderingSequenceNull=%3 canRender=%4" )
+                        .arg( (cvf::int64)(intptr_t)this )
+                        .arg( isVisible() ? "true" : "false" )
+                        .arg( m_renderingSequence.isNull() ? "true" : "false" )
+                        .arg( canRender() ? "true" : "false" ) );
+
     cvf::ref<cvf::OpenGLContext> myOglContext = cvfOpenGLContext();
     CVF_CHECK_OGL( myOglContext.p() );
     CVF_ASSERT( myOglContext->isContextValid() );
@@ -837,6 +869,17 @@ void caf::Viewer::paintGL()
         QColor bgClr( 128, 128, 128 );
         painter.fillRect( rect(), bgClr );
         return;
+    }
+
+    if ( m_offscreenFbo.notNull() && ( m_offscreenViewportWidth != thisSize.width() || m_offscreenViewportHeight != thisSize.height() ) )
+    {
+        CVF_LOG_DEBUG( CVF_GET_LOGGER( "cee.caf.viewer" ),
+                        cvf::String( "Viewer::paintGL() this=%1 SIZE MISMATCH widgetSize=%2x%3 offscreenFboSize=%4x%5" )
+                            .arg( (cvf::int64)(intptr_t)this )
+                            .arg( thisSize.width() )
+                            .arg( thisSize.height() )
+                            .arg( m_offscreenViewportWidth )
+                            .arg( m_offscreenViewportHeight ) );
     }
 
     // If Qt overlay painting is enabled, paint to an QImage, and set it to the cvf::OverlayImage
@@ -936,6 +979,12 @@ void caf::Viewer::onWidgetOpenGLReady()
     QOpenGLContext* myQtOpenGLContext = context();
     CVF_ASSERT( myQtOpenGLContext );
     CVF_ASSERT( myQtOpenGLContext->isValid() );
+
+    CVF_LOG_DEBUG( CVF_GET_LOGGER( "cee.caf.viewer" ),
+                    cvf::String( "Viewer::onWidgetOpenGLReady() this=%1 cvfOpenGLContext=%2 qtOpenGLContext=%3" )
+                        .arg( (cvf::int64)(intptr_t)this )
+                        .arg( (cvf::int64)(intptr_t)cvfOpenGLContext() )
+                        .arg( (cvf::int64)(intptr_t)myQtOpenGLContext ) );
 
     // Connect to signal so we get notified when Qt's OpenGL context is about to be destroyed
     connect( myQtOpenGLContext, &QOpenGLContext::aboutToBeDestroyed, this, &Viewer::deleteFboOpenGLResources );
