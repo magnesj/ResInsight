@@ -651,6 +651,22 @@ bool caf::Viewer::calculateNearFarPlanes( const cvf::Rendering* rendering,
 //--------------------------------------------------------------------------------------------------
 bool caf::Viewer::event( QEvent* e )
 {
+    // TEMPORARY (#14714 investigation): trace parent/visibility lifecycle events to pin down exactly
+    // what happens around the first time a previously-hidden viewer widget is shown.
+    if ( e &&
+         ( e->type() == QEvent::ParentChange || e->type() == QEvent::ParentAboutToChange || e->type() == QEvent::Show ||
+           e->type() == QEvent::Hide || e->type() == QEvent::WinIdChange || e->type() == QEvent::ShowToParent ||
+           e->type() == QEvent::HideToParent ) )
+    {
+        CVF_LOG_DEBUG( CVF_GET_LOGGER( "cee.caf.viewer" ),
+                        cvf::String( "Viewer::event() this=%1 type=%2 parent=%3 winId=%4 isVisible=%5" )
+                            .arg( (cvf::int64)(intptr_t)this )
+                            .arg( (int)e->type() )
+                            .arg( (cvf::int64)(intptr_t)parentWidget() )
+                            .arg( (cvf::int64)(intptr_t)internalWinId() )
+                            .arg( isVisible() ? "true" : "false" ) );
+    }
+
     if ( e && m_navigationPolicy.notNull() && m_navigationPolicyEnabled )
     {
         switch ( e->type() )
