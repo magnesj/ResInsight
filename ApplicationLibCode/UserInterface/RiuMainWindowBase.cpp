@@ -20,6 +20,7 @@
 
 #include "RiaApplication.h"
 #include "RiaDefines.h"
+#include "RiaLogging.h"
 #include "RiaPreferences.h"
 #include "RiaPreferencesSystem.h"
 #include "RiaRegressionTestRunner.h"
@@ -79,6 +80,26 @@ RiuMainWindowBase::RiuMainWindowBase()
     ads::CDockManager::setAutoHideConfigFlags( ads::CDockManager::DefaultAutoHideConfig );
     m_dockManager = new ads::CDockManager( this );
     m_dockManager->setStyleSheet( "" );
+
+    // TEMPORARY (#14714 investigation): whenever any dock widget is added to this window's dock
+    // manager (e.g. a "Messages" log panel, property view, etc.), also listen for its visibility
+    // changes so we can force a repaint of all 3D viewers when that happens. See
+    // slotForceUpdateAllViewers() for details on the suspected Qt/ADS compositing bug this targets.
+    connect( m_dockManager,
+             &ads::CDockManager::dockWidgetAdded,
+             this,
+             [this]( ads::CDockWidget* dockWidget )
+             { connect( dockWidget, &ads::CDockWidget::visibilityChanged, this, &RiuMainWindowBase::slotForceUpdateAllViewers ); } );
+
+    // TEMPORARY (#14714 investigation): also hook into every dock area's currentChanged signal,
+    // which fires unconditionally whenever the user switches tabs within a tabbed dock area (e.g.
+    // switching between two 3D views stacked in the same tab area). This is a more direct signal
+    // than CDockWidget::visibilityChanged, which may not reliably fire for this scenario.
+    connect( m_dockManager,
+             &ads::CDockManager::dockAreaCreated,
+             this,
+             [this]( ads::CDockAreaWidget* dockArea )
+             { connect( dockArea, &ads::CDockAreaWidget::currentChanged, this, [this]( int ) { slotForceUpdateAllViewers(); } ); } );
 
     if ( RiaPreferences::current()->useUndoRedo() && RiaPreferencesSystem::current()->isFeatureEnabled( "undo-redo-view" ) )
     {
@@ -473,6 +494,58 @@ void RiuMainWindowBase::slotDockViewerClosed()
             viewWindow->setShowWindow( false );
             viewWindow->removeWindowFromDock();
             viewWindow->updateConnectedEditors();
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// TEMPORARY (#14714 investigation): forces a repaint of all currently visible 3D viewer widgets.
+/// Connected to the visibilityChanged() signal of every dock widget in this main window (see
+/// constructor), so this runs whenever ANY dock widget (e.g. the "Messages" log panel) is shown or
+/// hidden -- not just the 3D-view dock widgets themselves. This is a workaround experiment for a
+/// suspected Qt/ADS widget-compositing bug where sibling QOpenGLWidgets can go black after a
+/// neighboring dock widget's visibility changes.
+//--------------------------------------------------------------------------------------------------
+void RiuMainWindowBase::slotForceUpdateAllViewers()
+{
+    ads::CDockWidget*     dockWidget = dynamic_cast<ads::CDockWidget*>( sender() );
+    ads::CDockAreaWidget* dockArea   = dynamic_cast<ads::CDockAreaWidget*>( sender() );
+    if ( dockWidget )
+    {
+        RiaLogging::debug( QString( "slotForceUpdateAllViewers() triggered by dockWidget=%1 visible=%2" )
+                               .arg( dockWidget->objectName() )
+                               .arg( dockWidget->isVisible() )
+                               .toStdString() );
+    }
+    else if ( dockArea )
+    {
+        RiaLogging::debug( QString( "slotForceUpdateAllViewers() triggered by dockArea=%1 currentIndex=%2" )
+                               .arg( dockArea->objectName() )
+                               .arg( dockArea->currentIndex() )
+                               .toStdString() );
+    }
+    else
+    {
+        RiaLogging::debug( "slotForceUpdateAllViewers() triggered by unknown sender" );
+    }
+
+    for ( auto view : viewWindows() )
+    {
+        QWidget* widget = view->viewWidget();
+        if ( widget && widget->isVisible() )
+        {
+            // Plain update()/repaint() and a resize-nudge were both reported insufficient to
+            // un-black the viewer (see #14714 investigation). Try a stronger nudge: a full
+            // hide()+show() cycle. This is a commonly reported workaround for QOpenGLWidget
+            // becoming black after being reparented/hidden-shown within a tabbed container, as it
+            // forces Qt to fully reinitialize (not just resize) the widget's internal backing
+            // store/FBO on the next show().
+            RiaLogging::debug(
+                QString( "  forcing hide()+show()+update()+repaint() on viewer widget=%1" ).arg( (quint64)widget ).toStdString() );
+            widget->hide();
+            widget->show();
+            widget->update();
+            widget->repaint();
         }
     }
 }
