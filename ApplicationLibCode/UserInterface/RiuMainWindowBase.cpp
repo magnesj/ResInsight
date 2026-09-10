@@ -534,16 +534,11 @@ void RiuMainWindowBase::slotForceUpdateAllViewers()
         QWidget* widget = view->viewWidget();
         if ( widget && widget->isVisible() )
         {
-            // Plain update()/repaint() and a resize-nudge were both reported insufficient to
-            // un-black the viewer (see #14714 investigation). Try a stronger nudge: a full
-            // hide()+show() cycle. This is a commonly reported workaround for QOpenGLWidget
-            // becoming black after being reparented/hidden-shown within a tabbed container, as it
-            // forces Qt to fully reinitialize (not just resize) the widget's internal backing
-            // store/FBO on the next show().
+            // TEMPORARY (#14714 investigation): disabled while testing whether the root cause is
+            // the ADS reparenting itself (see DockAreaWidget.cpp::detachWidget() patch). Keeping
+            // only the logging here so this test is isolated from the widget-level nudges.
             RiaLogging::debug(
-                QString( "  forcing hide()+show()+update()+repaint() on viewer widget=%1" ).arg( (quint64)widget ).toStdString() );
-            widget->hide();
-            widget->show();
+                QString( "  viewer widget=%1 visible, no nudge applied (isolating ADS-level fix test)" ).arg( (quint64)widget ).toStdString() );
             widget->update();
             widget->repaint();
         }
