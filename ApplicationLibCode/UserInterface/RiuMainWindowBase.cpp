@@ -91,6 +91,16 @@ RiuMainWindowBase::RiuMainWindowBase()
              [this]( ads::CDockWidget* dockWidget )
              { connect( dockWidget, &ads::CDockWidget::visibilityChanged, this, &RiuMainWindowBase::slotForceUpdateAllViewers ); } );
 
+    // TEMPORARY (#14714 investigation): also hook into every dock area's currentChanged signal,
+    // which fires unconditionally whenever the user switches tabs within a tabbed dock area (e.g.
+    // switching between two 3D views stacked in the same tab area). This is a more direct signal
+    // than CDockWidget::visibilityChanged, which may not reliably fire for this scenario.
+    connect( m_dockManager,
+             &ads::CDockManager::dockAreaCreated,
+             this,
+             [this]( ads::CDockAreaWidget* dockArea )
+             { connect( dockArea, &ads::CDockAreaWidget::currentChanged, this, [this]( int ) { slotForceUpdateAllViewers(); } ); } );
+
     if ( RiaPreferences::current()->useUndoRedo() && RiaPreferencesSystem::current()->isFeatureEnabled( "undo-redo-view" ) )
     {
         m_undoView = new QUndoView( this );
@@ -498,11 +508,26 @@ void RiuMainWindowBase::slotDockViewerClosed()
 //--------------------------------------------------------------------------------------------------
 void RiuMainWindowBase::slotForceUpdateAllViewers()
 {
-    ads::CDockWidget* dockWidget = dynamic_cast<ads::CDockWidget*>( sender() );
-    RiaLogging::debug( QString( "slotForceUpdateAllViewers() triggered by dockWidget=%1 visible=%2" )
-                           .arg( dockWidget ? dockWidget->objectName() : "?" )
-                           .arg( dockWidget ? dockWidget->isVisible() : -1 )
-                           .toStdString() );
+    ads::CDockWidget*     dockWidget = dynamic_cast<ads::CDockWidget*>( sender() );
+    ads::CDockAreaWidget* dockArea   = dynamic_cast<ads::CDockAreaWidget*>( sender() );
+    if ( dockWidget )
+    {
+        RiaLogging::debug( QString( "slotForceUpdateAllViewers() triggered by dockWidget=%1 visible=%2" )
+                               .arg( dockWidget->objectName() )
+                               .arg( dockWidget->isVisible() )
+                               .toStdString() );
+    }
+    else if ( dockArea )
+    {
+        RiaLogging::debug( QString( "slotForceUpdateAllViewers() triggered by dockArea=%1 currentIndex=%2" )
+                               .arg( dockArea->objectName() )
+                               .arg( dockArea->currentIndex() )
+                               .toStdString() );
+    }
+    else
+    {
+        RiaLogging::debug( "slotForceUpdateAllViewers() triggered by unknown sender" );
+    }
 
     for ( auto view : viewWindows() )
     {
