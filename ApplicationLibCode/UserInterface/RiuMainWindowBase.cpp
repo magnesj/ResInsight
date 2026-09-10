@@ -54,6 +54,7 @@
 #include <QLabel>
 #include <QMenu>
 #include <QMessageBox>
+#include <QOpenGLWidget>
 #include <QSettings>
 #include <QTextEdit>
 #include <QTimer>
@@ -537,17 +538,23 @@ void RiuMainWindowBase::slotForceUpdateAllViewers()
             // TEMPORARY (#14714 investigation): user reports that with the ADS reparenting-skip
             // patch in place, only the *first* time a previously-hidden tab becomes visible shows a
             // black window -- subsequent hide/show cycles for the same widget render correctly.
-            // This matches a known QOpenGLWidget quirk: a repaint requested synchronously right when
-            // the widget becomes visible can occur before Qt has fully established the on-screen
-            // surface for that widget, so the content never reaches the screen. Defer the repaint
-            // to the next event loop iteration (after Qt has finished processing the show), using a
-            // QPointer to guard against the widget being deleted before the deferred call runs.
+            // Note that view->viewWidget() returns a wrapping *container* QWidget (e.g.
+            // caf::Viewer::layoutWidget()), not the actual QOpenGLWidget itself. Requesting a
+            // repaint on the container may not reliably force the embedded QOpenGLWidget's own
+            // composeAndFlush step to run, so explicitly find and nudge the real QOpenGLWidget
+            // child too. Defer both to the next event loop iteration (after Qt has finished
+            // processing the show), using QPointer to guard against deletion in the meantime.
             RiaLogging::debug(
                 QString( "  viewer widget=%1 visible, scheduling deferred update()+repaint()" ).arg( (quint64)widget ).toStdString() );
-            QPointer<QWidget> guardedWidget( widget );
+            QPointer<QWidget>       guardedWidget( widget );
+            QPointer<QOpenGLWidget> guardedGlWidget( widget->findChild<QOpenGLWidget*>() );
+            if ( !guardedGlWidget && qobject_cast<QOpenGLWidget*>( widget ) )
+            {
+                guardedGlWidget = qobject_cast<QOpenGLWidget*>( widget );
+            }
             QTimer::singleShot( 0,
                                 this,
-                                [guardedWidget]()
+                                [guardedWidget, guardedGlWidget]()
                                 {
                                     if ( guardedWidget )
                                     {
@@ -556,6 +563,15 @@ void RiuMainWindowBase::slotForceUpdateAllViewers()
                                                                .toStdString() );
                                         guardedWidget->update();
                                         guardedWidget->repaint();
+                                    }
+                                    if ( guardedGlWidget && guardedGlWidget != guardedWidget )
+                                    {
+                                        RiaLogging::debug( QString( "  deferred update()+repaint() firing for embedded "
+                                                                    "QOpenGLWidget=%1" )
+                                                               .arg( (quint64)guardedGlWidget.data() )
+                                                               .toStdString() );
+                                        guardedGlWidget->update();
+                                        guardedGlWidget->repaint();
                                     }
                                 } );
         }
