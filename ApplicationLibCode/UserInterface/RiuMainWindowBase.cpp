@@ -534,19 +534,16 @@ void RiuMainWindowBase::slotForceUpdateAllViewers()
         QWidget* widget = view->viewWidget();
         if ( widget && widget->isVisible() )
         {
-            // Plain update()/repaint() alone was reported to be insufficient to un-black the
-            // viewer (see #14714 investigation). Try a stronger nudge: briefly resize the widget by
-            // one pixel and back. QOpenGLWidget reallocates its internal FBO/backing store on
-            // resize, which is a common workaround for Qt/ADS widget-compositing staleness after a
-            // sibling dock widget's visibility changes (e.g. reparenting during a tab switch).
-            QSize originalSize = widget->size();
-            RiaLogging::debug( QString( "  forcing resize-nudge + update()+repaint() on viewer widget=%1 size=%2x%3" )
-                                   .arg( (quint64)widget )
-                                   .arg( originalSize.width() )
-                                   .arg( originalSize.height() )
-                                   .toStdString() );
-            widget->resize( originalSize.width() + 1, originalSize.height() );
-            widget->resize( originalSize );
+            // Plain update()/repaint() and a resize-nudge were both reported insufficient to
+            // un-black the viewer (see #14714 investigation). Try a stronger nudge: a full
+            // hide()+show() cycle. This is a commonly reported workaround for QOpenGLWidget
+            // becoming black after being reparented/hidden-shown within a tabbed container, as it
+            // forces Qt to fully reinitialize (not just resize) the widget's internal backing
+            // store/FBO on the next show().
+            RiaLogging::debug(
+                QString( "  forcing hide()+show()+update()+repaint() on viewer widget=%1" ).arg( (quint64)widget ).toStdString() );
+            widget->hide();
+            widget->show();
             widget->update();
             widget->repaint();
         }
