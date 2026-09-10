@@ -20,6 +20,7 @@
 
 #include "RiaApplication.h"
 #include "RiaDefines.h"
+#include "RiaLogging.h"
 #include "RiaPreferences.h"
 #include "RiaPreferencesSystem.h"
 #include "RiaRegressionTestRunner.h"
@@ -497,11 +498,18 @@ void RiuMainWindowBase::slotDockViewerClosed()
 //--------------------------------------------------------------------------------------------------
 void RiuMainWindowBase::slotForceUpdateAllViewers()
 {
+    ads::CDockWidget* dockWidget = dynamic_cast<ads::CDockWidget*>( sender() );
+    RiaLogging::debug( QString( "slotForceUpdateAllViewers() triggered by dockWidget=%1 visible=%2" )
+                           .arg( dockWidget ? dockWidget->objectName() : "?" )
+                           .arg( dockWidget ? dockWidget->isVisible() : -1 )
+                           .toStdString() );
+
     for ( auto view : viewWindows() )
     {
         QWidget* widget = view->viewWidget();
         if ( widget && widget->isVisible() )
         {
+            RiaLogging::debug( QString( "  forcing update()+repaint() on viewer widget=%1" ).arg( (quint64)widget ).toStdString() );
             widget->update();
             widget->repaint();
         }
