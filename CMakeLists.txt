@@ -61,6 +61,18 @@ if(RESINSIGHT_VCPKG_PROFILE)
                  "${_resinsight_vcpkg_manifest_dir}/vcpkg-configuration.json"
                  COPYONLY)
 
+  # overlay-ports/overlay-triplets entries (e.g. "ThirdParty/vcpkg-overlay-ports")
+  # are resolved by vcpkg relative to the directory vcpkg-configuration.json
+  # lives in. Since the copy above now lives under the build tree instead of
+  # the source root, rewrite those repo-relative "ThirdParty/..." paths to
+  # absolute paths so they still resolve to the real source tree.
+  file(READ "${_resinsight_vcpkg_manifest_dir}/vcpkg-configuration.json"
+       _resinsight_vcpkg_profile_json)
+  string(REPLACE "\"ThirdParty/" "\"${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/"
+                 _resinsight_vcpkg_profile_json "${_resinsight_vcpkg_profile_json}")
+  file(WRITE "${_resinsight_vcpkg_manifest_dir}/vcpkg-configuration.json"
+       "${_resinsight_vcpkg_profile_json}")
+
   set(VCPKG_MANIFEST_DIR "${_resinsight_vcpkg_manifest_dir}" CACHE PATH "" FORCE)
 endif()
 
