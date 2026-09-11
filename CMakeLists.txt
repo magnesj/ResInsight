@@ -24,22 +24,24 @@ include(FetchContent)
 set(CMAKE_FIND_PACKAGE_TARGETS_GLOBAL TRUE)
 
 # Select an alternate vcpkg-configuration.json without renaming/copying any
-# tracked file. The vcpkg toolchain (ThirdParty/vcpkg/scripts/buildsystems/vcpkg.cmake)
-# defaults VCPKG_MANIFEST_DIR to CMAKE_SOURCE_DIR only when it is not already
-# defined, and it must see the final value before project() below triggers
-# toolchain-file processing. Setting VCPKG_MANIFEST_DIR here, before project(),
-# is what makes this work -- CMakeLists.txt code below project() runs too late.
+# tracked file. The vcpkg toolchain
+# (ThirdParty/vcpkg/scripts/buildsystems/vcpkg.cmake) defaults
+# VCPKG_MANIFEST_DIR to CMAKE_SOURCE_DIR only when it is not already defined,
+# and it must see the final value before project() below triggers toolchain-file
+# processing. Setting VCPKG_MANIFEST_DIR here, before project(), is what makes
+# this work -- CMakeLists.txt code below project() runs too late.
 #
 # A profile's vcpkg-configuration file is expected at
 # "vcpkg-configuration-${RESINSIGHT_VCPKG_PROFILE}.json" in the source root,
 # e.g. vcpkg-configuration-rhel8.json for -DRESINSIGHT_VCPKG_PROFILE=rhel8.
 # vcpkg.json is copied alongside it so both manifest files live in the same
-# directory, as vcpkg requires; the copy is regenerated on every configure so
-# it can never drift from the root vcpkg.json.
+# directory, as vcpkg requires; the copy is regenerated on every configure so it
+# can never drift from the root vcpkg.json.
 set(RESINSIGHT_VCPKG_PROFILE
     ""
-    CACHE STRING
-    "Optional vcpkg-configuration profile, e.g. 'rhel8' to use vcpkg-configuration-rhel8.json"
+    CACHE
+      STRING
+      "Optional vcpkg-configuration profile, e.g. 'rhel8' to use vcpkg-configuration-rhel8.json"
 )
 if(RESINSIGHT_VCPKG_PROFILE)
   set(_resinsight_vcpkg_profile_config
@@ -47,21 +49,28 @@ if(RESINSIGHT_VCPKG_PROFILE)
   )
   if(NOT EXISTS "${_resinsight_vcpkg_profile_config}")
     message(
-      FATAL_ERROR
-        "RESINSIGHT_VCPKG_PROFILE='${RESINSIGHT_VCPKG_PROFILE}' but "
-        "${_resinsight_vcpkg_profile_config} does not exist")
+      FATAL_ERROR "RESINSIGHT_VCPKG_PROFILE='${RESINSIGHT_VCPKG_PROFILE}' but "
+                  "${_resinsight_vcpkg_profile_config} does not exist"
+    )
   endif()
 
   set(_resinsight_vcpkg_manifest_dir
-      "${CMAKE_BINARY_DIR}/vcpkg-manifest-${RESINSIGHT_VCPKG_PROFILE}")
+      "${CMAKE_BINARY_DIR}/vcpkg-manifest-${RESINSIGHT_VCPKG_PROFILE}"
+  )
   file(MAKE_DIRECTORY "${_resinsight_vcpkg_manifest_dir}")
-  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/vcpkg.json"
-                 "${_resinsight_vcpkg_manifest_dir}/vcpkg.json" COPYONLY)
-  configure_file("${_resinsight_vcpkg_profile_config}"
-                 "${_resinsight_vcpkg_manifest_dir}/vcpkg-configuration.json"
-                 COPYONLY)
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg.json"
+    "${_resinsight_vcpkg_manifest_dir}/vcpkg.json" COPYONLY
+  )
+  configure_file(
+    "${_resinsight_vcpkg_profile_config}"
+    "${_resinsight_vcpkg_manifest_dir}/vcpkg-configuration.json" COPYONLY
+  )
 
-  set(VCPKG_MANIFEST_DIR "${_resinsight_vcpkg_manifest_dir}" CACHE PATH "" FORCE)
+  set(VCPKG_MANIFEST_DIR
+      "${_resinsight_vcpkg_manifest_dir}"
+      CACHE PATH "" FORCE
+  )
 endif()
 
 project(ResInsight)
