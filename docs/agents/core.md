@@ -61,6 +61,23 @@ ResInsight includes Python integration via gRPC when `RESINSIGHT_ENABLE_GRPC=ON`
 - **Testing**: Cross-platform automated testing on RHEL, Ubuntu, and Windows 11
 - **Build Configuration**: Key option `RESINSIGHT_TREAT_WARNINGS_AS_ERRORS` available in CMake presets
 
+## UI Automation and UI Testing
+
+For UI-level testing (for example create/edit/delete range filter and verify visible cells), use a shared automation architecture that supports both CI tests and AI tooling:
+
+- **Automation transport**: expose a localhost-only automation API from ResInsight using `Qt Http Server` (`qthttpserver`).
+- **Automation client/test runner**: use `Playwright` to call the automation API and assert outcomes.
+
+This combines both requested use cases in one solution:
+- deterministic UI workflow tests in CI
+- the same UI operations available to AI tooling
+
+### Alternatives Considered
+
+- **Qt Test only (`QTest`)**: good for in-process widget tests, but less suitable as a reusable interface for external AI tooling.
+- **Squish**: strong GUI automation, but adds commercial licensing/maintenance overhead.
+- **Playwright only (no in-app API)**: strong runner/assertions, but desktop Qt event targeting becomes brittle without a stable in-app automation surface.
+
 ## Common File Locations
 
 - Main CMake configuration: `/workspace/CMakeLists.txt`
