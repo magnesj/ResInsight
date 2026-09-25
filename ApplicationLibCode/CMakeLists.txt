@@ -168,8 +168,8 @@ list(APPEND CPP_SOURCES ${CODE_SOURCE_FILES})
 #
 # Odb api
 #
-# NOTE: definition applied further down via target_compile_definitions(),
-# after the ApplicationLibCode target has been created.
+# NOTE: definition applied further down via target_compile_definitions(), after
+# the ApplicationLibCode target has been created.
 
 #
 # OpenVDS
@@ -179,14 +179,14 @@ if(RESINSIGHT_ENABLE_OPENVDS)
   list(APPEND RI_PRIVATE_INCLUDES ${RESINSIGHT_OPENVDS_API_DIR}/include)
 
   set(OPENVDS_FILES FileInterface/RifOpenVDSReader.cpp
-                     FileInterface/RifOpenVDSReader.h
+                    FileInterface/RifOpenVDSReader.h
   )
   list(APPEND CPP_SOURCES ${OPENVDS_FILES})
 
   # Scope USE_OPENVDS to only the files that reference it (the reader itself,
-  # plus the handful of consumer files below), instead of add_definitions()
-  # for the whole directory/target, so toggling this option only recompiles
-  # these specific files.
+  # plus the handful of consumer files below), instead of add_definitions() for
+  # the whole directory/target, so toggling this option only recompiles these
+  # specific files.
   set_source_files_properties(
     ${OPENVDS_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/ProjectDataModel/Seismic/RimSeismicData.cpp
@@ -255,10 +255,10 @@ list(APPEND ALL_SOURCE_FILES ${CPP_SOURCES} ${QRC_FILES})
 
 add_library(${PROJECT_NAME} OBJECT ${ALL_SOURCE_FILES})
 
-# NOTE: ENABLE_GRPC and USE_ODB_API only affect a handful of thin UI/glue
-# files inside this monolithic target. Scope the defines to just those files
-# via set_source_files_properties() rather than target_compile_definitions()
-# (which would force a rebuild of every file in this target when toggled).
+# NOTE: ENABLE_GRPC and USE_ODB_API only affect a handful of thin UI/glue files
+# inside this monolithic target. Scope the defines to just those files via
+# set_source_files_properties() rather than target_compile_definitions() (which
+# would force a rebuild of every file in this target when toggled).
 if(RESINSIGHT_ENABLE_GRPC)
   set_source_files_properties(
     ${CMAKE_CURRENT_SOURCE_DIR}/Application/RiaPreferences.cpp

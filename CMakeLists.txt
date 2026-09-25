@@ -266,8 +266,8 @@ if(NOT ${RESINSIGHT_ODB_API_DIR} EQUAL "")
   )
   # NOTE: USE_ODB_API (and the platform source defines it implies) is applied
   # with target_compile_definitions() on the specific targets that need it,
-  # instead of add_definitions() here, so toggling this option does not force
-  # a full rebuild of the whole project (see ApplicationLibCode, Commands,
+  # instead of add_definitions() here, so toggling this option does not force a
+  # full rebuild of the whole project (see ApplicationLibCode, Commands,
   # GeoMechDataModel and ApplicationExeCode CMakeLists.txt).
 endif()
 
@@ -312,8 +312,8 @@ if(RESINSIGHT_ENABLE_GRPC)
   )
   # NOTE: ENABLE_GRPC is applied with target_compile_definitions() on the
   # specific targets that need it, instead of add_definitions() here, so
-  # toggling this option does not force a full rebuild of the whole project
-  # (see ApplicationLibCode, ApplicationExeCode and GrpcInterface CMakeLists.txt).
+  # toggling this option does not force a full rebuild of the whole project (see
+  # ApplicationLibCode, ApplicationExeCode and GrpcInterface CMakeLists.txt).
 endif()
 
 # ##############################################################################
