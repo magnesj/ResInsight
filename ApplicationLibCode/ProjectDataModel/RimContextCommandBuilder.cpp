@@ -76,6 +76,7 @@
 #include "RimFlowDiagSolution.h"
 #include "RimFlowPlotCollection.h"
 #include "RimFractureTemplateCollection.h"
+#include "RimGenericViewCollection.h"
 #include "RimGeoMechCase.h"
 #include "RimGeoMechCellColors.h"
 #include "RimGeoMechContourMapViewCollection.h"
@@ -337,6 +338,7 @@ caf::CmdFeatureMenuBuilder RimContextCommandBuilder::commandsFromSelection()
         }
         else if ( dynamic_cast<RimWellPathCollection*>( firstUiItem ) )
         {
+            menuBuilder << "RicNewGenericDataViewFeature";
             menuBuilder << "RicNewEditableWellPathFeature";
             menuBuilder << "RicPasteModeledWellPathFeature";
             menuBuilder << "RicCreateEnsembleWellLogFeature";
@@ -894,6 +896,11 @@ caf::CmdFeatureMenuBuilder RimContextCommandBuilder::commandsFromSelection()
         else if ( dynamic_cast<RimSeismicViewCollection*>( firstUiItem ) )
         {
             menuBuilder << "RicNewSeismicViewFeature";
+        }
+        else if ( dynamic_cast<RimGenericViewCollection*>( firstUiItem ) )
+        {
+            menuBuilder << "RicNewViewFeature";
+            menuBuilder << "RicNewGenericDataViewFeature";
         }
         else if ( dynamic_cast<RimAnnotationCollection*>( firstUiItem ) || dynamic_cast<RimAnnotationGroupCollection*>( firstUiItem ) )
         {
