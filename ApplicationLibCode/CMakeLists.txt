@@ -168,22 +168,27 @@ list(APPEND CPP_SOURCES ${CODE_SOURCE_FILES})
 #
 # Odb api
 #
-if(RESINSIGHT_USE_ODB_API)
-  add_definitions(-DUSE_ODB_API)
-endif()
+# NOTE: USE_ODB_API is defined further down via target_compile_definitions().
 
 #
 # OpenVDS
 #
 if(RESINSIGHT_ENABLE_OPENVDS)
   message(STATUS "OpenVDS support enabled")
-  add_definitions(-DUSE_OPENVDS)
   list(APPEND RI_PRIVATE_INCLUDES ${RESINSIGHT_OPENVDS_API_DIR}/include)
 
-  list(APPEND CPP_SOURCES FileInterface/RifOpenVDSReader.cpp
-       FileInterface/RifOpenVDSReader.h
+  set(OPENVDS_FILES FileInterface/RifOpenVDSReader.cpp
+                     FileInterface/RifOpenVDSReader.h
   )
+  list(APPEND CPP_SOURCES ${OPENVDS_FILES})
 
+  # Scope USE_OPENVDS to the files that need it, so toggling it doesn't
+  # trigger a full rebuild of the target.
+  set_source_files_properties(
+    ${OPENVDS_FILES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/ProjectDataModel/Seismic/RimSeismicData.cpp
+    PROPERTIES COMPILE_DEFINITIONS USE_OPENVDS
+  )
 endif()
 
 #
@@ -206,8 +211,20 @@ if(RESINSIGHT_FOUND_HDF5)
 
   list(APPEND CPP_SOURCES ${HDF5_FILES})
 
-  add_definitions(-DUSE_HDF5)
-  add_definitions(-DH5_BUILT_AS_DYNAMIC_LIB)
+  # Scope USE_HDF5/H5_BUILT_AS_DYNAMIC_LIB to the files that need it, so
+  # toggling this option doesn't trigger a full rebuild of the target.
+  set_source_files_properties(
+    ${HDF5_FILES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/FileInterface/RifReaderEclipseSummary.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/FileInterface/RifReaderEclipseOutput.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Application/RiaPreferencesSummary.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SocketInterface/RiaPropertyDataCommands.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ProjectDataModel/RimEmCase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ProjectDataModel/RimEclipseResultDefinition.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ProjectDataModel/RimEclipseResultCase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ProjectDataModel/Summary/RimSummaryCaseMainCollection.cpp
+    PROPERTIES COMPILE_DEFINITIONS "USE_HDF5;H5_BUILT_AS_DYNAMIC_LIB"
+  )
 
   if(MSVC)
     list(APPEND RI_PRIVATE_INCLUDES ${RESINSIGHT_HDF5_DIR}/include)
@@ -232,6 +249,25 @@ qt_add_resources(QRC_FILES Application/Resources/ApplicationLibCode.qrc)
 list(APPEND ALL_SOURCE_FILES ${CPP_SOURCES} ${QRC_FILES})
 
 add_library(${PROJECT_NAME} OBJECT ${ALL_SOURCE_FILES})
+
+# NOTE: Scope ENABLE_GRPC/USE_ODB_API to the few files that use them, so
+# toggling these options doesn't trigger a full rebuild of this target.
+if(RESINSIGHT_ENABLE_GRPC)
+  set_source_files_properties(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Application/RiaPreferences.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ProjectDataModel/RimContextCommandBuilder.cpp
+    PROPERTIES COMPILE_DEFINITIONS ENABLE_GRPC
+  )
+endif()
+
+if(RESINSIGHT_USE_ODB_API)
+  set_source_files_properties(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Application/RiaPreferences.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ProjectDataModel/RimContextCommandBuilder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/UserInterface/RiuMainWindow.cpp
+    PROPERTIES COMPILE_DEFINITIONS USE_ODB_API
+  )
+endif()
 
 option(RESINSIGHT_ENABLE_DYNAMIC_DEOPTIMALIZATION
        "Ensable Dynamic Deoptimalization" OFF
