@@ -18,7 +18,13 @@
 
 #include "RiuWellImportWizard.h"
 
+#include "RiaDefines.h"
 #include "RiaStringListSerializer.h"
+
+#include "RigEclipseCaseData.h"
+
+#include "RimEclipseCase.h"
+#include "RimProject.h"
 
 #include <QAbstractTableModel>
 #include <QObject>
@@ -596,6 +602,36 @@ WellSummaryPage::WellSummaryPage( RiaOsduConnector* osduConnector, QWidget* pare
 
     layout->addLayout( existenceFilterLayout );
 
+    // Target unit system: the OSDU trajectory parquet is converted to this unit before storing the well path.
+    // Default to the unit system of the first grid case in the project so the imported well path matches the
+    // case's coordinate frame; fall back to Meters when no Eclipse case is loaded.
+    QHBoxLayout* unitLayout = new QHBoxLayout;
+    unitLayout->addWidget( new QLabel( "Target unit system:", this ) );
+    m_targetUnitComboBox = new QComboBox( this );
+    m_targetUnitComboBox->addItem( "Meters", 1.0 );
+    m_targetUnitComboBox->addItem( "Feet", 0.3048 );
+
+    int defaultUnitIndex = 0;
+    if ( auto* project = RimProject::current() )
+    {
+        for ( RimCase* gridCase : project->allGridCases() )
+        {
+            auto* eclipseCase = dynamic_cast<RimEclipseCase*>( gridCase );
+            if ( eclipseCase && eclipseCase->eclipseCaseData() )
+            {
+                if ( eclipseCase->eclipseCaseData()->unitsType() == RiaDefines::EclipseUnitSystem::UNITS_FIELD )
+                {
+                    defaultUnitIndex = 1;
+                }
+                break;
+            }
+        }
+    }
+    m_targetUnitComboBox->setCurrentIndex( defaultUnitIndex );
+    unitLayout->addWidget( m_targetUnitComboBox );
+    unitLayout->addStretch();
+    layout->addLayout( unitLayout );
+
     m_textEdit = new QTextEdit( this );
     m_textEdit->setReadOnly( true );
     layout->addWidget( m_textEdit );
@@ -608,6 +644,7 @@ WellSummaryPage::WellSummaryPage( RiaOsduConnector* osduConnector, QWidget* pare
 
     connect( m_showAllRadioButton, SIGNAL( toggled( bool ) ), this, SLOT( onFilterChanged() ) );
     connect( m_showActualRadioButton, SIGNAL( toggled( bool ) ), this, SLOT( onFilterChanged() ) );
+    connect( m_targetUnitComboBox, SIGNAL( currentIndexChanged( int ) ), this, SLOT( onFilterChanged() ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -712,13 +749,20 @@ void WellSummaryPage::updateSummaryDisplay()
             {
                 if ( shouldIncludeTrajectory( w.existenceKind ) )
                 {
-                    QString wellboreTrajectoryId = w.id;
+                    QString      wellboreTrajectoryId = w.id;
+                    auto         location             = m_osduConnector->requestWellSurfaceLocationBlocking( wellbore.value().wellId );
+                    const double targetUnitToMeters   = m_targetUnitComboBox->currentData().toDouble();
                     wiz->addWellInfo( { .name                 = wellbore.value().name,
                                         .wellId               = wellbore.value().wellId,
                                         .wellboreId           = w.wellboreId,
                                         .wellboreTrajectoryId = wellboreTrajectoryId,
                                         .existenceKind        = w.existenceKind,
-                                        .datumElevation       = wellbore.value().datumElevation } );
+                                        .datumElevation       = wellbore.value().datumElevation,
+                                        .surfaceEasting       = location.easting,
+                                        .surfaceNorthing      = location.northing,
+                                        .crs                  = location.crs,
+                                        .unitToMeters         = w.unitToMeters,
+                                        .targetUnitToMeters   = targetUnitToMeters } );
                     includedCount++;
                 }
             }
