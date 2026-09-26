@@ -27,6 +27,7 @@
 #include "RiaFileLogger.h"
 #include "RiaFilePathTools.h"
 #include "RiaFontCache.h"
+#include "RiaHtmlServer.h"
 #include "RiaImportEclipseCaseTools.h"
 #include "RiaLogging.h"
 #include "RiaOpenTelemetryManager.h"
@@ -180,6 +181,7 @@ RiaGuiApplication::RiaGuiApplication( int& argc, char** argv )
     , RiaApplication()
     , m_mainWindow( nullptr )
     , m_mainPlotWindow( nullptr )
+    , m_htmlServer( nullptr )
 {
     setWindowIcon( QIcon( ":/AppLogo48x48.png" ) );
 
@@ -552,6 +554,9 @@ void RiaGuiApplication::initialize()
     }
 
     m_socketServer = new RiaSocketServer( this );
+
+    m_htmlServer = new RiaHtmlServer( this );
+    m_htmlServer->start();
 }
 
 //--------------------------------------------------------------------------------------------------
