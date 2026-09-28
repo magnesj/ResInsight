@@ -35,8 +35,12 @@
 #include "RimCellRangeFilter.h"
 #include "RimDataFilterCollection.h"
 #include "RimEclipsePropertyFilter.h"
+#include "RimEclipseResultAddress.h"
 #include "RimEclipseResultCase.h"
 #include "RimEclipseResultDefinition.h"
+#include "RimGridCalculation.h"
+#include "RimGridCalculationCollection.h"
+#include "RimGridCalculationVariable.h"
 #include "RimProject.h"
 #include "RimReservoirGridEnsemble.h"
 
@@ -343,6 +347,134 @@ TEST( RimStatisticsContourMapTest, StaticResultWithDynamicFilterProducesResultsP
 
     // The filter's visible cells differ per time step (SWAT changes), so the aggregated PORO results differ too
     EXPECT_GT( countDifferentValues( resultAtFirstStep, resultAtLastStep ), 0u );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// A GENERATED result (from a grid calculation) only reports as dynamic once it has actually been
+/// computed for the case backing the contour map's result definition: RimEclipseResultDefinition::
+/// hasDynamicResult() inspects the case's currently loaded in-memory result entry, which does not
+/// exist before the calculation has run for that case in this session. Since
+/// RimStatisticsContourMap::selectedTimeSteps() collapses to a single time step whenever the mapped
+/// result is not (yet) reported as dynamic, the disk cache validity key computed from
+/// selectedTimeSteps() can differ between "cache written after computing" and "cache checked on a
+/// fresh session before computing", explaining why the disk cache is always rejected for GENERATED
+/// results.
+//--------------------------------------------------------------------------------------------------
+TEST( RimStatisticsContourMapTest, GeneratedDynamicResultIsNotReportedAsDynamicBeforeItIsComputed )
+{
+    auto ensemble = createSyntheticDynamicFilterEnsemble();
+    ASSERT_TRUE( ensemble != nullptr );
+
+    RimEclipseCase* primaryCase = ensemble->cases().front();
+
+    RimGridCalculation calculation;
+    calculation.setExpression( "GenSwat := x" );
+    auto* variable = dynamic_cast<RimGridCalculationVariable*>( calculation.addVariable( "x" ) );
+    ASSERT_TRUE( variable != nullptr );
+
+    RimEclipseResultAddress sourceAddress;
+    sourceAddress.setEclipseCase( primaryCase );
+    sourceAddress.setResultType( RiaDefines::ResultCatType::DYNAMIC_NATIVE );
+    sourceAddress.setResultName( RiaResultNames::swat() );
+    variable->setEclipseResultAddress( sourceAddress );
+
+    auto* destinationEnsembleField =
+        dynamic_cast<caf::PdmPtrField<RimReservoirGridEnsemble*>*>( calculation.findField( "DestinationEnsemble" ) );
+    ASSERT_TRUE( destinationEnsembleField != nullptr );
+    destinationEnsembleField->setValue( ensemble.get() );
+
+    auto* map = addPoroContourMap( ensemble.get(), GridImportMode::SHARED_GRID );
+    ASSERT_TRUE( map != nullptr );
+
+    auto* resultDefinitionField = dynamic_cast<caf::PdmChildField<RimEclipseResultDefinition*>*>( map->findField( "ResultDefinition" ) );
+    ASSERT_TRUE( resultDefinitionField != nullptr );
+    ( *resultDefinitionField )()->setResultType( RiaDefines::ResultCatType::GENERATED );
+    ( *resultDefinitionField )()->setResultVariable( "GenSwat" );
+
+    // The synthetic fixture's unified restart file has 13 time steps (indices 0..12)
+    const int lastTimeStep = 12;
+
+    auto* selectedTimeStepsField = dynamic_cast<caf::PdmField<std::vector<int>>*>( map->findField( "SelectedTimeSteps" ) );
+    ASSERT_TRUE( selectedTimeStepsField != nullptr );
+    selectedTimeStepsField->setValue( { 0, lastTimeStep } );
+
+    // Before the calculation has ever run for the primary case, the GENERATED result does not exist in memory yet,
+    // so it is (incorrectly) not reported as dynamic, and selectedTimeSteps() collapses to a single time step.
+    EXPECT_FALSE( ( *resultDefinitionField )()->hasDynamicResult() );
+    EXPECT_EQ( ( std::vector<int>{ 0 } ), map->selectedTimeSteps() );
+
+    ASSERT_TRUE( calculation.calculateForCases( { primaryCase }, nullptr, std::nullopt, true ) );
+
+    // Once the calculation has run for the primary case, the same GENERATED result is now correctly reported as
+    // dynamic, and selectedTimeSteps() reports the full user selection.
+    EXPECT_TRUE( ( *resultDefinitionField )()->hasDynamicResult() );
+    EXPECT_EQ( ( std::vector<int>{ 0, lastTimeStep } ), map->selectedTimeSteps() );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// ensureResultsComputed() is the entry point used when a view needs data, and checks the disk cache
+/// before falling back to a full recomputation. It must make the GENERATED result known for the
+/// primary case before that cache check, otherwise selectedTimeSteps() (and therefore the cache
+/// validity key) is unstable across sessions, and a valid cache is always rejected.
+//--------------------------------------------------------------------------------------------------
+TEST( RimStatisticsContourMapTest, EnsureResultsComputedMakesGeneratedResultDynamicBeforeCacheCheck )
+{
+    auto ensemble = createSyntheticDynamicFilterEnsemble();
+    ASSERT_TRUE( ensemble != nullptr );
+
+    RimProject* project = RimProject::current();
+    ASSERT_TRUE( project != nullptr );
+
+    auto* calculation = dynamic_cast<RimGridCalculation*>( project->gridCalculationCollection()->addCalculation( false ) );
+    ASSERT_TRUE( calculation != nullptr );
+    calculation->setExpression( "GenSwat := x" );
+    auto* variable = dynamic_cast<RimGridCalculationVariable*>( calculation->addVariable( "x" ) );
+    ASSERT_TRUE( variable != nullptr );
+
+    RimEclipseCase* primaryCase = ensemble->cases().front();
+
+    RimEclipseResultAddress sourceAddress;
+    sourceAddress.setEclipseCase( primaryCase );
+    sourceAddress.setResultType( RiaDefines::ResultCatType::DYNAMIC_NATIVE );
+    sourceAddress.setResultName( RiaResultNames::swat() );
+    variable->setEclipseResultAddress( sourceAddress );
+
+    auto* destinationEnsembleField =
+        dynamic_cast<caf::PdmPtrField<RimReservoirGridEnsemble*>*>( calculation->findField( "DestinationEnsemble" ) );
+    ASSERT_TRUE( destinationEnsembleField != nullptr );
+    destinationEnsembleField->setValue( ensemble.get() );
+
+    auto* map = addPoroContourMap( ensemble.get(), GridImportMode::SHARED_GRID );
+    ASSERT_TRUE( map != nullptr );
+
+    auto* resultDefinitionField = dynamic_cast<caf::PdmChildField<RimEclipseResultDefinition*>*>( map->findField( "ResultDefinition" ) );
+    ASSERT_TRUE( resultDefinitionField != nullptr );
+    ( *resultDefinitionField )()->setResultType( RiaDefines::ResultCatType::GENERATED );
+    ( *resultDefinitionField )()->setResultVariable( "GenSwat" );
+
+    // The synthetic fixture's unified restart file has 13 time steps (indices 0..12)
+    const int lastTimeStep = 12;
+
+    auto* selectedTimeStepsField = dynamic_cast<caf::PdmField<std::vector<int>>*>( map->findField( "SelectedTimeSteps" ) );
+    ASSERT_TRUE( selectedTimeStepsField != nullptr );
+    selectedTimeStepsField->setValue( { 0, lastTimeStep } );
+
+    // Sanity check: before anything has run, the GENERATED result is not yet known on the primary case
+    EXPECT_FALSE( ( *resultDefinitionField )()->hasDynamicResult() );
+
+    map->ensureResultsComputed();
+
+    // ensureResultsComputed() must make the primary case's GENERATED result known before checking the cache, so
+    // selectedTimeSteps() (and therefore the cache validity key) is stable across sessions.
+    EXPECT_TRUE( ( *resultDefinitionField )()->hasDynamicResult() );
+    EXPECT_EQ( ( std::vector<int>{ 0, lastTimeStep } ), map->selectedTimeSteps() );
+
+    const auto resultAtFirstStep = map->result( 0, RimStatisticsContourMap::StatisticsType::MEAN );
+    const auto resultAtLastStep  = map->result( 1, RimStatisticsContourMap::StatisticsType::MEAN );
+    EXPECT_GT( countValidValues( resultAtFirstStep ), 0u );
+    EXPECT_GT( countValidValues( resultAtLastStep ), 0u );
+
+    project->gridCalculationCollection()->deleteCalculation( calculation );
 }
 
 namespace

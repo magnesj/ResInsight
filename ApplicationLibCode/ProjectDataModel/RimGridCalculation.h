@@ -149,6 +149,9 @@ private:
     bool            allSourceCasesAreEqualToDestinationCase() const;
     void            onEditNonVisibleResultAddressButtonPressed();
 
+    bool                         isAggregationExpression() const;
+    std::vector<RimEclipseCase*> casesToCalculate() const;
+
     static std::pair<bool, QStringList> createStatisticsText( const std::vector<std::vector<double>>& values );
 
 private:

@@ -50,6 +50,8 @@
 #include "RimEclipseContourMapProjection.h"
 #include "RimEclipseResultCase.h"
 #include "RimEclipseResultDefinition.h"
+#include "RimGridCalculation.h"
+#include "RimGridCalculationCollection.h"
 #include "RimProject.h"
 #include "RimReservoirGridEnsemble.h"
 #include "RimSimWellInViewCollection.h"
@@ -88,6 +90,26 @@ void applyDataFilterVisibility( RigEclipseContourMapProjection& projection, RimC
     if ( !dataFilter ) return;
 
     projection.setCellVisibility( RimCellFilterTools::computeReservoirCellVisibility( dataFilter, eCase, timeStepIndex ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// A GENERATED result produced by a grid calculation only exists in memory, and each realization is
+/// opened, processed and closed again in turn to keep memory usage bounded for large ensembles. The
+/// calculated values are therefore lost again as soon as the case is closed, and must be recomputed
+/// for this realization while it is open here rather than relying on a calculation run beforehand.
+//--------------------------------------------------------------------------------------------------
+void ensureGeneratedResultIsComputed( const RimEclipseResultDefinition* resultDefinition, RimEclipseCase* eCase )
+{
+    if ( !resultDefinition || resultDefinition->resultType() != RiaDefines::ResultCatType::GENERATED ) return;
+
+    auto project = RimProject::current();
+    if ( !project ) return;
+
+    RimGridCalculation* calculation = project->gridCalculationCollection()->findCalculation( resultDefinition->resultVariable() );
+    if ( !calculation ) return;
+
+    const bool evaluateDependentCalculations = true;
+    calculation->calculateForCases( { eCase }, nullptr, std::nullopt, evaluateDependentCalculations );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -775,6 +797,15 @@ void RimStatisticsContourMap::computeStatisticsForMaps( const std::vector<RimSta
                 auto activeCellInfo  = eclipseCaseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
                 auto resultData      = eclipseCaseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
 
+                // A GENERATED result (a grid calculation) is not stored on disk, so it must be (re)computed for this
+                // realization while it is open here - it will otherwise be missing once a later realization is
+                // opened and this one has been closed again.
+                for ( auto& ctx : contexts )
+                {
+                    if ( !ctx.active ) continue;
+                    ensureGeneratedResultIsComputed( ctx.map->m_resultDefinition(), eCase );
+                }
+
                 // Make sure at least one dynamic result this case needs is loaded before asking for its time step
                 // dates: allTimeStepDatesFromEclipseReader() and the loaded-result based fallback below both only
                 // report the full time step count once such a result is known.
@@ -1061,6 +1092,17 @@ void RimStatisticsContourMap::ensureResultsComputed()
     // computed in this session. It is created by computeStatisticsForMaps(), and is never cleared.
     // Use the Compute button to force a recomputation after changing settings.
     if ( m_contourMapGrid ) return;
+
+    // A GENERATED result only reports as dynamic once it has actually been computed for a case (see
+    // ensureGeneratedResultIsComputed() above), and the disk cache validity key depends on that
+    // classification through selectedTimeSteps(). Without this, a fresh session (where the calculation
+    // has not yet run for the primary case) would compute a different cache key than the one stored
+    // when the cache was written, and the cache would always be rejected. Ensure it is known for the
+    // primary case before checking the cache, so the key is stable between save and load.
+    if ( RimEclipseCase* primaryCase = eclipseCase() )
+    {
+        if ( primaryCase->ensureReservoirCaseIsOpen() ) ensureGeneratedResultIsComputed( m_resultDefinition(), primaryCase );
+    }
 
     if ( loadCachedResults() ) return;
 

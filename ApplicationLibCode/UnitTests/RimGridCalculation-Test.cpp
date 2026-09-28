@@ -18,12 +18,22 @@
 
 #include "gtest/gtest.h"
 
-#include "RimGridCalculation.h"
+#include "RiaDefines.h"
+#include "RiaTestDataDirectory.h"
 
+#include "RigCaseCellResultsData.h"
+#include "RigEclipseResultAddress.h"
+
+#include "RimEclipseResultAddress.h"
 #include "RimEclipseResultCase.h"
+#include "RimGridCalculation.h"
+#include "RimGridCalculationVariable.h"
 #include "RimReservoirGridEnsemble.h"
 
 #include "cafPdmPtrField.h"
+
+#include <QDir>
+#include <QFile>
 
 #include <cmath>
 #include <limits>
@@ -137,4 +147,109 @@ TEST( RimGridCalculationTest, RemoveDependentObjectsForCaseNotOpened )
     ASSERT_TRUE( notOpenedCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL ) == nullptr );
 
     calculation.removeDependentObjects();
+}
+
+namespace
+{
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimEclipseResultCase* openBruggeRealizationForCalculation( const QString& realizationFolder, const QString& fileName )
+{
+    QDir baseFolder( TEST_MODEL_DIR );
+    if ( !baseFolder.cd( QString( "Case_with_10_timesteps/%1" ).arg( realizationFolder ) ) ) return nullptr;
+
+    QString filePath = baseFolder.absoluteFilePath( fileName );
+    if ( !QFile::exists( filePath ) ) return nullptr;
+
+    auto eclipseCase = std::make_unique<RimEclipseResultCase>();
+    eclipseCase->setCaseInfo( realizationFolder, filePath );
+    if ( !eclipseCase->openEclipseGridFile() ) return nullptr;
+
+    return eclipseCase.release();
+}
+} // namespace
+
+//--------------------------------------------------------------------------------------------------
+/// A plain per-cell expression can be recomputed lazily for a single realization when its result is
+/// actually needed (e.g. by an ensemble statistics contour map), so clicking "Calculate" for an ensemble
+/// destination must not eagerly recompute it for every realization: only the ensemble's main case is
+/// touched.
+//--------------------------------------------------------------------------------------------------
+TEST( RimGridCalculationTest, EnsembleDestinationWithPlainExpressionOnlyCalculatesMainCase )
+{
+    RimReservoirGridEnsemble ensemble;
+    auto*                    firstCase  = openBruggeRealizationForCalculation( "Real0", "BRUGGE_0000.EGRID" );
+    auto*                    secondCase = openBruggeRealizationForCalculation( "Real10", "BRUGGE_0010.EGRID" );
+    ASSERT_TRUE( firstCase != nullptr );
+    ASSERT_TRUE( secondCase != nullptr );
+    ensemble.addCase( firstCase );
+    ensemble.addCase( secondCase );
+
+    RimGridCalculation calculation;
+    calculation.setExpression( "MyCalc := x + 1" );
+    auto* variable = dynamic_cast<RimGridCalculationVariable*>( calculation.addVariable( "x" ) );
+    ASSERT_TRUE( variable != nullptr );
+
+    RimEclipseResultAddress sourceAddress;
+    sourceAddress.setEclipseCase( firstCase );
+    sourceAddress.setResultType( RiaDefines::ResultCatType::STATIC_NATIVE );
+    sourceAddress.setResultName( "PORO" );
+    variable->setEclipseResultAddress( sourceAddress );
+
+    auto* destinationEnsembleField =
+        dynamic_cast<caf::PdmPtrField<RimReservoirGridEnsemble*>*>( calculation.findField( "DestinationEnsemble" ) );
+    ASSERT_TRUE( destinationEnsembleField != nullptr );
+    destinationEnsembleField->setValue( &ensemble );
+
+    ASSERT_TRUE( calculation.calculate() );
+
+    const RigEclipseResultAddress resAddr( RiaDefines::ResultCatType::GENERATED, "MyCalc" );
+    EXPECT_TRUE( firstCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->hasResultEntry( resAddr ) );
+
+    // The second realization's result is not computed, since only the ensemble's main case is needed
+    ASSERT_TRUE( secondCase->eclipseCaseData() != nullptr );
+    EXPECT_FALSE( secondCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->hasResultEntry( resAddr ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// An aggregation expression's result is the per-realization summary itself, and cannot be produced
+/// later for a single realization at a time. Clicking "Calculate" for an ensemble destination must
+/// therefore still compute it for every realization.
+//--------------------------------------------------------------------------------------------------
+TEST( RimGridCalculationTest, EnsembleDestinationWithAggregationExpressionCalculatesAllCases )
+{
+    RimReservoirGridEnsemble ensemble;
+    auto*                    firstCase  = openBruggeRealizationForCalculation( "Real0", "BRUGGE_0000.EGRID" );
+    auto*                    secondCase = openBruggeRealizationForCalculation( "Real10", "BRUGGE_0010.EGRID" );
+    ASSERT_TRUE( firstCase != nullptr );
+    ASSERT_TRUE( secondCase != nullptr );
+    ensemble.addCase( firstCase );
+    ensemble.addCase( secondCase );
+
+    RimGridCalculation calculation;
+    calculation.setExpression( "MyCalc := sum(x)" );
+    auto* variable = dynamic_cast<RimGridCalculationVariable*>( calculation.addVariable( "x" ) );
+    ASSERT_TRUE( variable != nullptr );
+
+    RimEclipseResultAddress sourceAddress;
+    sourceAddress.setEclipseCase( firstCase );
+    sourceAddress.setResultType( RiaDefines::ResultCatType::STATIC_NATIVE );
+    sourceAddress.setResultName( "PORO" );
+    variable->setEclipseResultAddress( sourceAddress );
+
+    auto* destinationEnsembleField =
+        dynamic_cast<caf::PdmPtrField<RimReservoirGridEnsemble*>*>( calculation.findField( "DestinationEnsemble" ) );
+    ASSERT_TRUE( destinationEnsembleField != nullptr );
+    destinationEnsembleField->setValue( &ensemble );
+
+    ASSERT_TRUE( calculation.calculate() );
+
+    const RigEclipseResultAddress resAddr( RiaDefines::ResultCatType::GENERATED, "MyCalc" );
+    EXPECT_TRUE( firstCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->hasResultEntry( resAddr ) );
+
+    // An aggregation expression's result cannot be produced lazily for a single realization, so every
+    // realization must be computed eagerly
+    ASSERT_TRUE( secondCase->eclipseCaseData() != nullptr );
+    EXPECT_TRUE( secondCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->hasResultEntry( resAddr ) );
 }

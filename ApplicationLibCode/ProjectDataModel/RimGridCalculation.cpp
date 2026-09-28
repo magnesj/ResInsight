@@ -227,7 +227,9 @@ RimGridCalculationVariable* RimGridCalculation::createVariable()
 //--------------------------------------------------------------------------------------------------
 bool RimGridCalculation::calculate()
 {
-    CloseCasesOpenedForCalculation closeCasesWhenFinished( sourceAndDestinationCases( *this, outputEclipseCases() ) );
+    const std::vector<RimEclipseCase*> calculationCases = casesToCalculate();
+
+    CloseCasesOpenedForCalculation closeCasesWhenFinished( sourceAndDestinationCases( *this, calculationCases ) );
 
     const bool useCellFilterView = ( m_filterType() == FilterType::CELL_FILTER_VIEW ) && m_cellFilterView() != nullptr;
     const bool useDataFilter     = ( m_filterType() == FilterType::DATA_FILTER );
@@ -250,7 +252,7 @@ bool RimGridCalculation::calculate()
         if ( inputCase && !inputCase->eclipseCaseData() ) inputCase->ensureReservoirCaseIsOpen();
     }
 
-    for ( auto calculationCase : outputEclipseCases() )
+    for ( auto calculationCase : calculationCases )
     {
         if ( !calculationCase ) continue;
 
@@ -337,7 +339,7 @@ bool RimGridCalculation::calculate()
     }
 
     bool evaluateDependentCalculations = true;
-    return calculateForCases( outputEclipseCases(), inputValueVisibilityFilter.p(), timeSteps, evaluateDependentCalculations );
+    return calculateForCases( calculationCases, inputValueVisibilityFilter.p(), timeSteps, evaluateDependentCalculations );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -725,6 +727,35 @@ bool RimGridCalculation::allSourceCasesAreEqualToDestinationCase() const
 }
 
 //--------------------------------------------------------------------------------------------------
+/// An aggregation expression (sum/avg/min/max/count) reduces a case's cell values down to a single
+/// scalar value per case, and is used to build a per-realization summary across an ensemble. This is
+/// the only kind of ensemble calculation whose result cannot be produced later, on demand, for a single
+/// realization at a time - all other (per-cell) expressions can be recomputed lazily for one
+/// realization when its result is actually needed (e.g. by an ensemble statistics contour map).
+//--------------------------------------------------------------------------------------------------
+bool RimGridCalculation::isAggregationExpression() const
+{
+    return m_expression().contains( "sum" ) || m_expression().contains( "avg" ) || m_expression().contains( "min" ) ||
+           m_expression().contains( "max" ) || m_expression().contains( "count" );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Clicking "Calculate" for an ensemble destination with a plain per-cell expression does not need to
+/// eagerly (re)compute the result for every single realization: each realization is opened, computed
+/// and closed in turn when its result is actually needed (e.g. by an ensemble statistics contour map),
+/// so doing the same expensive work again here would be redundant. Only compute for the full ensemble
+/// when the result cannot be produced this way, i.e. for an aggregation expression whose output is the
+/// per-realization summary itself.
+//--------------------------------------------------------------------------------------------------
+std::vector<RimEclipseCase*> RimGridCalculation::casesToCalculate() const
+{
+    const bool calculateForEnsemble = m_destinationEnsemble() || m_additionalCasesType == AdditionalCasesType::ENSEMBLE;
+    if ( calculateForEnsemble && !isAggregationExpression() ) return { destinationCase() };
+
+    return outputEclipseCases();
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 RigEclipseResultAddress RimGridCalculation::outputAddress() const
@@ -1025,9 +1056,7 @@ bool RimGridCalculation::calculateForCases( const std::vector<RimEclipseCase*>& 
     }
 
     const bool isMultipleCasesPresent   = calculationCases.size() > 1;
-    const bool hasAggregationExpression = m_expression().contains( "sum" ) || m_expression().contains( "avg" ) ||
-                                          m_expression().contains( "min" ) || m_expression().contains( "max" ) ||
-                                          m_expression().contains( "count" );
+    const bool hasAggregationExpression = isAggregationExpression();
 
     // If multiple cases are present, release memory after data is extracted to avoid memory issues.
     m_releaseMemoryAfterDataIsExtracted = isMultipleCasesPresent;
