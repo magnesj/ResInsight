@@ -210,16 +210,18 @@ set(LINK_LIBRARIES
 
 if(RESINSIGHT_ENABLE_GRPC)
   list(APPEND LINK_LIBRARIES GrpcInterface)
-  target_compile_definitions(ResInsight PRIVATE ENABLE_GRPC)
+
+  # Scope ENABLE_GRPC to the one file that needs it, so toggling this
+  # option doesn't trigger a full rebuild of the ResInsight target.
+  set_source_files_properties(
+    ${CMAKE_CURRENT_SOURCE_DIR}/RiaMain.cpp
+    PROPERTIES COMPILE_DEFINITIONS ENABLE_GRPC
+  )
 endif()
 
 if(RESINSIGHT_USE_ODB_API)
   target_compile_definitions(ResInsight PRIVATE USE_ODB_API)
   list(APPEND LINK_LIBRARIES RifOdbReader)
-endif()
-
-if(RESINSIGHT_ENABLE_OPENVDS)
-  add_definitions(-DUSE_OPENVDS)
 endif()
 
 target_link_libraries(ResInsight PRIVATE ${LINK_LIBRARIES})

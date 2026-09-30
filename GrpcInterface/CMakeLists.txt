@@ -203,8 +203,11 @@ add_library(
   ${SOURCE_GROUP_SOURCE_FILES}
   ${GRPC_HEADER_FILES} ${GRPC_CPP_SOURCES})
 
-# PUBLIC so targets linking GrpcInterface get ENABLE_GRPC automatically.
-target_compile_definitions(${PROJECT_NAME} PUBLIC ENABLE_GRPC)
+# PRIVATE: consumers that need ENABLE_GRPC on specific files must scope it
+# themselves via set_source_files_properties(), otherwise toggling
+# RESINSIGHT_ENABLE_GRPC would force a full rebuild of every target that
+# links GrpcInterface (see ApplicationExeCode/CMakeLists.txt for an example).
+target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_GRPC)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
