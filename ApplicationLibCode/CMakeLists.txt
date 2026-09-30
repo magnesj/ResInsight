@@ -178,12 +178,12 @@ if(RESINSIGHT_ENABLE_OPENVDS)
   list(APPEND RI_PRIVATE_INCLUDES ${RESINSIGHT_OPENVDS_API_DIR}/include)
 
   set(OPENVDS_FILES FileInterface/RifOpenVDSReader.cpp
-                     FileInterface/RifOpenVDSReader.h
+                    FileInterface/RifOpenVDSReader.h
   )
   list(APPEND CPP_SOURCES ${OPENVDS_FILES})
 
-  # Scope USE_OPENVDS to the files that need it, so toggling it doesn't
-  # trigger a full rebuild of the target.
+  # Scope USE_OPENVDS to the files that need it, so toggling it doesn't trigger
+  # a full rebuild of the target.
   set_source_files_properties(
     ${OPENVDS_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/ProjectDataModel/Seismic/RimSeismicData.cpp

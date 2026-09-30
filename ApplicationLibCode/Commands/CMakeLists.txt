@@ -75,8 +75,8 @@ find_package(Eigen3 REQUIRED)
 
 add_library(${PROJECT_NAME} OBJECT ${COMMAND_CODE_SOURCE_FILES})
 
-# NOTE: Scope USE_OPENVDS/USE_ODB_API to the files that use them, so
-# toggling these options doesn't trigger a full rebuild of this target.
+# NOTE: Scope USE_OPENVDS/USE_ODB_API to the files that use them, so toggling
+# these options doesn't trigger a full rebuild of this target.
 if(RESINSIGHT_ENABLE_OPENVDS)
   set_source_files_properties(
     ${CMAKE_CURRENT_SOURCE_DIR}/SeismicCommands/RicImportSeismicFeature.cpp
