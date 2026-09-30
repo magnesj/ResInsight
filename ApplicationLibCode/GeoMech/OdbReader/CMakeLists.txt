@@ -4,9 +4,9 @@ if(MSVC)
   add_definitions(-DHKS_NT)
   add_definitions(-DABQ_WIN86_64)
   # Required for the ODB API headers (e.g. omi_types.h) to typedef int64/
-  # uint64, which are used unconditionally further down the include chain
-  # (e.g. cow_BtreeCompare.h, atr_translate.h) -- without it those types are
-  # left undefined, causing syntax errors.
+  # uint64, which are used unconditionally further down the include chain (e.g.
+  # cow_BtreeCompare.h, atr_translate.h) -- without it those types are left
+  # undefined, causing syntax errors.
   add_definitions(-D_WINDOWS_SOURCE)
 else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -w -Wno-deprecated")

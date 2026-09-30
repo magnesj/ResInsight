@@ -211,11 +211,11 @@ set(LINK_LIBRARIES
 if(RESINSIGHT_ENABLE_GRPC)
   list(APPEND LINK_LIBRARIES GrpcInterface)
 
-  # Scope ENABLE_GRPC to the one file that needs it, so toggling this
-  # option doesn't trigger a full rebuild of the ResInsight target.
+  # Scope ENABLE_GRPC to the one file that needs it, so toggling this option
+  # doesn't trigger a full rebuild of the ResInsight target.
   set_source_files_properties(
-    ${CMAKE_CURRENT_SOURCE_DIR}/RiaMain.cpp
-    PROPERTIES COMPILE_DEFINITIONS ENABLE_GRPC
+    ${CMAKE_CURRENT_SOURCE_DIR}/RiaMain.cpp PROPERTIES COMPILE_DEFINITIONS
+                                                       ENABLE_GRPC
   )
 endif()
 
