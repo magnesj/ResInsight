@@ -175,7 +175,6 @@ list(APPEND CPP_SOURCES ${CODE_SOURCE_FILES})
 #
 if(RESINSIGHT_ENABLE_OPENVDS)
   message(STATUS "OpenVDS support enabled")
-  list(APPEND RI_PRIVATE_INCLUDES ${RESINSIGHT_OPENVDS_API_DIR}/include)
 
   set(OPENVDS_FILES FileInterface/RifOpenVDSReader.cpp
                      FileInterface/RifOpenVDSReader.h
@@ -188,6 +187,17 @@ if(RESINSIGHT_ENABLE_OPENVDS)
     ${OPENVDS_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/ProjectDataModel/Seismic/RimSeismicData.cpp
     PROPERTIES COMPILE_DEFINITIONS USE_OPENVDS
+  )
+
+  # Only RifOpenVDSReader.cpp includes the OpenVDS SDK headers directly, so
+  # scope the include directory to that one file instead of adding it to
+  # RI_PRIVATE_INCLUDES (which would apply it target-wide, via
+  # target_include_directories(), and force a full rebuild of every file in
+  # this target -- and of UnitTests/FeatureTests, which reuse
+  # RI_PRIVATE_INCLUDES -- whenever RESINSIGHT_ENABLE_OPENVDS is toggled).
+  set_source_files_properties(
+    ${CMAKE_CURRENT_SOURCE_DIR}/FileInterface/RifOpenVDSReader.cpp
+    PROPERTIES INCLUDE_DIRECTORIES ${RESINSIGHT_OPENVDS_API_DIR}/include
   )
 endif()
 
@@ -227,10 +237,26 @@ if(RESINSIGHT_FOUND_HDF5)
   )
 
   if(MSVC)
-    list(APPEND RI_PRIVATE_INCLUDES ${RESINSIGHT_HDF5_DIR}/include)
+    set(RI_HDF5_INCLUDE_DIRS ${RESINSIGHT_HDF5_DIR}/include)
   else()
-    list(APPEND RI_PRIVATE_INCLUDES ${HDF5_INCLUDE_DIRS})
+    set(RI_HDF5_INCLUDE_DIRS ${HDF5_INCLUDE_DIRS})
   endif() # MSVC
+
+  # Only the HDF5_FILES themselves, plus RifReaderEclipseOutput.cpp and
+  # RimEmCase.cpp (which #include "H5Cpp.h" directly), need the HDF5 SDK
+  # include directory. The other consumer files above only call wrapper APIs
+  # guarded by USE_HDF5 without including HDF5 headers, so scope the include
+  # directory to just these files instead of adding it to
+  # RI_PRIVATE_INCLUDES (which would apply it target-wide, via
+  # target_include_directories(), and force a full rebuild of every file in
+  # this target -- and of UnitTests/FeatureTests, which reuse
+  # RI_PRIVATE_INCLUDES -- whenever RESINSIGHT_ENABLE_HDF5 is toggled).
+  set_source_files_properties(
+    ${HDF5_FILES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/FileInterface/RifReaderEclipseOutput.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ProjectDataModel/RimEmCase.cpp
+    PROPERTIES INCLUDE_DIRECTORIES "${RI_HDF5_INCLUDE_DIRS}"
+  )
 endif()
 
 #
@@ -373,7 +399,6 @@ target_include_directories(
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Commands
           ${CMAKE_CURRENT_SOURCE_DIR}/Commands/EclipseCommands
           ${CMAKE_CURRENT_SOURCE_DIR}/ProjectDataModelCommands/CommandRouter
-          ${RI_PRIVATE_INCLUDES}
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
          ${CMAKE_CURRENT_SOURCE_DIR}/Adm
          ${CMAKE_CURRENT_SOURCE_DIR}/Application
