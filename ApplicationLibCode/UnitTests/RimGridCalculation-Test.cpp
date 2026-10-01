@@ -24,10 +24,15 @@
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseResultAddress.h"
 
+#include "RimEclipseCellColors.h"
 #include "RimEclipseResultAddress.h"
 #include "RimEclipseResultCase.h"
+#include "RimEclipseResultDefinition.h"
+#include "RimEclipseView.h"
 #include "RimGridCalculation.h"
+#include "RimGridCalculationCollection.h"
 #include "RimGridCalculationVariable.h"
+#include "RimProject.h"
 #include "RimReservoirGridEnsemble.h"
 
 #include "cafPdmPtrField.h"
@@ -252,4 +257,68 @@ TEST( RimGridCalculationTest, EnsembleDestinationWithAggregationExpressionCalcul
     // realization must be computed eagerly
     ASSERT_TRUE( secondCase->eclipseCaseData() != nullptr );
     EXPECT_TRUE( secondCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->hasResultEntry( resAddr ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Reproduces stepping through ensemble realizations in a view that lives directly under the ensemble
+/// (e.g. created via RimReservoirGridEnsemble::addView()) rather than as a child of one specific
+/// RimEclipseCase. Such a view's currently displayed Eclipse Case has an empty reservoirViews() /
+/// contourMapViews(), since the view is not one of its children. Switching the view's Eclipse Case to a
+/// realization must still make a GENERATED result selectable and computed for that realization.
+//--------------------------------------------------------------------------------------------------
+TEST( RimGridCalculationTest, SwitchingEnsembleViewCaseRecomputesGeneratedResult )
+{
+    auto  ensemble   = std::make_unique<RimReservoirGridEnsemble>();
+    auto* firstCase  = openBruggeRealizationForCalculation( "Real0", "BRUGGE_0000.EGRID" );
+    auto* secondCase = openBruggeRealizationForCalculation( "Real10", "BRUGGE_0010.EGRID" );
+    ASSERT_TRUE( firstCase != nullptr );
+    ASSERT_TRUE( secondCase != nullptr );
+    ensemble->addCase( firstCase );
+    ensemble->addCase( secondCase );
+
+    // RimGridCalculationCollection::ensureGeneratedResultsAreComputed() looks up the calculation via
+    // RimProject::current()->gridCalculationCollection(), so the calculation must be registered there
+    // (as it would be in the real application) rather than kept as a standalone local object.
+    RimProject* project = RimProject::current();
+    ASSERT_TRUE( project != nullptr );
+
+    auto* calculation = dynamic_cast<RimGridCalculation*>( project->gridCalculationCollection()->addCalculation( false ) );
+    ASSERT_TRUE( calculation != nullptr );
+    calculation->setExpression( "MyCalc := x + 1" );
+    auto* variable = dynamic_cast<RimGridCalculationVariable*>( calculation->addVariable( "x" ) );
+    ASSERT_TRUE( variable != nullptr );
+
+    RimEclipseResultAddress sourceAddress;
+    sourceAddress.setEclipseCase( firstCase );
+    sourceAddress.setResultType( RiaDefines::ResultCatType::STATIC_NATIVE );
+    sourceAddress.setResultName( "PORO" );
+    variable->setEclipseResultAddress( sourceAddress );
+
+    auto* destinationEnsembleField =
+        dynamic_cast<caf::PdmPtrField<RimReservoirGridEnsemble*>*>( calculation->findField( "DestinationEnsemble" ) );
+    ASSERT_TRUE( destinationEnsembleField != nullptr );
+    destinationEnsembleField->setValue( ensemble.get() );
+
+    auto* view = new RimEclipseView();
+    view->setEclipseCase( firstCase );
+    ensemble->addView( view );
+
+    view->cellResult()->setResultType( RiaDefines::ResultCatType::GENERATED );
+    view->cellResult()->setResultVariable( "MyCalc" );
+
+    view->loadDataAndUpdate();
+
+    const RigEclipseResultAddress resAddr( RiaDefines::ResultCatType::GENERATED, "MyCalc" );
+    EXPECT_TRUE( firstCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->hasResultEntry( resAddr ) );
+    EXPECT_TRUE( view->cellResult()->hasResult() );
+
+    // Step to the second realization, as if selected from the Eclipse Case dropdown
+    view->setEclipseCase( secondCase );
+    view->loadDataAndUpdate();
+
+    ASSERT_TRUE( secondCase->eclipseCaseData() != nullptr );
+    EXPECT_TRUE( secondCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->hasResultEntry( resAddr ) );
+    EXPECT_TRUE( view->cellResult()->hasResult() );
+
+    project->gridCalculationCollection()->deleteCalculation( calculation );
 }

@@ -1314,8 +1314,10 @@ void RimEclipseView::onLoadDataAndUpdate()
     // is lost again once the case is closed (see RimGridCalculation::casesToCalculate). The cell-result selection
     // dropdown also only lists GENERATED results already present in this case's result catalog. Recompute every
     // grid calculation targeting this case so its results are both selectable and up to date, whether this view
-    // was just created for the realization or stepped to it via the Eclipse Case dropdown.
-    if ( firstAncestorOfType<RimReservoirGridEnsemble>() )
+    // was just created for the realization or stepped to it via the Eclipse Case dropdown. The case's ensemble is
+    // used rather than the view's own ancestry, as a "global view" (e.g. created from the project's generic view
+    // collection) is not necessarily a descendant of the ensemble even though its Eclipse Case is a realization.
+    if ( eclipseCase()->ensemble() )
     {
         RimGridCalculationCollection::ensureGeneratedResultsAreComputed( eclipseCase() );
     }
