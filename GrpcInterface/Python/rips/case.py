@@ -35,35 +35,44 @@ result
 
 """
 
-import grpc
 import uuid
-from typing import List, Tuple
 
 import Case_pb2
 import Case_pb2_grpc
 import Commands_pb2 as Cmd
-import PdmObject_pb2 as PdmObject_pb2
 import Definitions_pb2
-
-import Properties_pb2
-import Properties_pb2_grpc
+import grpc
 import NNCProperties_pb2
 import NNCProperties_pb2_grpc
-from .resinsight_classes import (
-    Case as Case,
-    EclipseCase as EclipseCase,
-    GeoMechCase as GeoMechCase,
-    Reservoir as Reservoir,
-    WellBoreStabilityPlot as WellBoreStabilityPlot,
-    WbsParameters as WbsParameters,
-)
+import PdmObject_pb2 as PdmObject_pb2
+import Properties_pb2
+import Properties_pb2_grpc
+
+import rips.project  # full name import due to circular dependency
 
 from .grid import Grid as Grid
-from .project import Project as Project
 from .pdmobject import add_method
-from .view import View as View
+from .project import Project as Project
+from .resinsight_classes import (
+    Case as Case,
+)
+from .resinsight_classes import (
+    EclipseCase as EclipseCase,
+)
+from .resinsight_classes import (
+    GeoMechCase as GeoMechCase,
+)
+from .resinsight_classes import (
+    Reservoir as Reservoir,
+)
+from .resinsight_classes import (
+    WbsParameters as WbsParameters,
+)
+from .resinsight_classes import (
+    WellBoreStabilityPlot as WellBoreStabilityPlot,
+)
 from .simulation_well import SimulationWell
-import rips.project  # full name import due to circular dependency
+from .view import View as View
 
 
 @add_method(Case)
@@ -142,14 +151,14 @@ def grid(self, index: int = 0) -> Grid:
 
 
 @add_method(Case)
-def grids(self) -> List[Grid]:
+def grids(self) -> list[Grid]:
     """Get a list of all rips Grid objects in the case
 
     Returns:
         List of :class:`rips.grid.Grid`
     """
     grid_list = []
-    for i in range(0, self.__grid_count()):
+    for i in range(self.__grid_count()):
         grid_list.append(Grid(i, self, self.channel()))
     return grid_list
 
@@ -313,7 +322,7 @@ def distance_to_closest_fault(self, x: float, y: float, z: float):
 
 
 @add_method(Case)
-def reservoir_depth_range(self) -> Tuple[float, float]:
+def reservoir_depth_range(self) -> tuple[float, float]:
     """Get the reservoir depth range
 
     Returns:
@@ -1341,12 +1350,12 @@ def set_nnc_connections_values(
 @add_method(Reservoir)
 def grid_property_for_positions(
     self,
-    positions: List[List[float]],
+    positions: list[list[float]],
     property_type: str,
     property_name: str,
     time_step: int,
     porosity_model: str = "MATRIX_MODEL",
-) -> List[float]:
+) -> list[float]:
     shared_uuid = uuid.uuid4()
     coordinate_x = "{}_{}".format(shared_uuid, "coordinate_x")
     coordinate_y = "{}_{}".format(shared_uuid, "coordinate_y")
@@ -1393,7 +1402,7 @@ def grid_property_for_positions(
 @add_method(Reservoir)
 def export_corner_point_grid(
     self,
-) -> Tuple[List[float], List[float], List[int], int, int, int]:
+) -> tuple[list[float], list[float], list[int], int, int, int]:
     """Export corner point grid data from case
 
     Returns:
@@ -1443,9 +1452,9 @@ def replace_corner_point_grid(
     nx: int,
     ny: int,
     nz: int,
-    coord: List[float],
-    zcorn: List[float],
-    actnum: List[int],
+    coord: list[float],
+    zcorn: list[float],
+    actnum: list[int],
 ):
     """Replace the current case grid with new corner point grid geometry
 

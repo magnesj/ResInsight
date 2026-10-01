@@ -1,8 +1,9 @@
 ######################################################################
 # This script creates a regular surface for each case
 ######################################################################
-import rips
 import math
+
+import rips
 
 
 def create_x_surface(nx, ny):
@@ -46,7 +47,7 @@ if resinsight is not None:
         origin_x = bbox.min_x
         origin_y = bbox.min_y
 
-        name = "{} surface".format(c.name)
+        name = f"{c.name} surface"
 
         nx = 200
         ny = 100

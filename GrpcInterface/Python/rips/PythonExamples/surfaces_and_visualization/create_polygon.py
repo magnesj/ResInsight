@@ -28,8 +28,8 @@ if resinsight is not None:
 
         polygon_collection = resinsight.project.descendants(rips.PolygonCollection)[0]
         p = polygon_collection.create_polygon(
-            name="{} bounding box".format(c.name), coordinates=coordinates
+            name=f"{c.name} bounding box", coordinates=coordinates
         )
-        print("Coordinates for {}:".format(p.name))
+        print(f"Coordinates for {p.name}:")
         for coord in p.coordinates:
             print(coord)

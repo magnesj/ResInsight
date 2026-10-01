@@ -6,34 +6,31 @@ creating connections to ResInsight
 """
 
 from __future__ import annotations
-import os
-import socket
-import logging
-import time
-import tempfile
-import signal
-import sys
-import json
-import subprocess
 
-import grpc
+import json
+import logging
+import os
+import signal
+import socket
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
 
 import App_pb2
 import App_pb2_grpc
 import Commands_pb2
 import Commands_pb2_grpc
+import grpc
+import RiaVersionInfo
 from Definitions_pb2 import Empty
 
-import RiaVersionInfo
-
+from .exception import RipsError
+from .generated.generated_classes import CommandRouter
+from .grpc_retry_interceptor import RetryOnRpcErrorClientInterceptor
 from .project import Project
 from .retry_policy import ExponentialBackoffRetryPolicy
-from .grpc_retry_interceptor import RetryOnRpcErrorClientInterceptor
-from .generated.generated_classes import CommandRouter
-from .exception import RipsError
-
-from typing import List, Optional, Tuple
-from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -107,8 +104,8 @@ class Instance:
         console: bool = False,
         launch_port: int = 0,
         init_timeout: int = 300,
-        command_line_parameters: List[str] = [],
-    ) -> Optional[Instance]:
+        command_line_parameters: list[str] = [],
+    ) -> Instance | None:
         """Launch a new Instance of ResInsight. This requires the environment variable
         RESINSIGHT_EXECUTABLE to be set or the parameter resinsight_executable to be provided.
         The RESINSIGHT_GRPC_PORT environment variable can be set to an alternative port number.
@@ -165,7 +162,7 @@ class Instance:
         logger.info("Trying to launch %s", resinsight_executable)
         with tempfile.TemporaryDirectory() as tmp_dir_path:
             port_number_file = tmp_dir_path + "/portnumber.txt"
-            parameters: List[str] = [
+            parameters: list[str] = [
                 resinsight_executable,
                 "--server",
                 str(requested_port),
@@ -177,7 +174,7 @@ class Instance:
                 parameters.append("--console")
 
             # Stringify all parameters
-            for i in range(0, len(parameters)):
+            for i in range(len(parameters)):
                 parameters[i] = str(parameters[i])
 
             process = subprocess.Popen(parameters)
@@ -196,7 +193,7 @@ class Instance:
         return None
 
     @staticmethod
-    def find(start_port: int = 50051, end_port: int = 50071) -> Optional[Instance]:
+    def find(start_port: int = 50051, end_port: int = 50071) -> Instance | None:
         """Search for an existing Instance of ResInsight by testing ports.
 
         By default we search from port 50051 to 50071 or if the environment
@@ -227,7 +224,7 @@ class Instance:
     def __execute_command(self, **command_params):
         return self.commands.Execute(Commands_pb2.CommandParams(**command_params))
 
-    def __check_version(self) -> Tuple[bool, bool]:
+    def __check_version(self) -> tuple[bool, bool]:
         try:
             major_version_ok = self.major_version() == int(
                 RiaVersionInfo.RESINSIGHT_MAJOR_VERSION
@@ -292,7 +289,7 @@ class Instance:
 
         retry_policy = ExponentialBackoffRetryPolicy()
         if self.launched:
-            for num_tries in range(0, retry_policy.num_retries()):
+            for num_tries in range(retry_policy.num_retries()):
                 connection_ok, version_ok = self.__check_version()
                 if connection_ok:
                     break

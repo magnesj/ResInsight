@@ -4,24 +4,21 @@
 The ResInsight project module
 """
 
-import grpc
 import uuid
+
+import Commands_pb2
+import grpc
+import KeyValueStore_pb2
+import KeyValueStore_pb2_grpc
+import Project_pb2_grpc
+from Definitions_pb2 import Empty
 
 from .case import Case
 from .gridcasegroup import GridCaseGroup
 from .pdmobject import add_method, add_static_method
 from .plot import Plot as Plot
+from .resinsight_classes import PlotWindow, Project, Reservoir, SummaryCase, WellPath
 from .view import View
-
-import Commands_pb2
-from Definitions_pb2 import Empty
-import Project_pb2_grpc
-import KeyValueStore_pb2_grpc
-import KeyValueStore_pb2
-
-from .resinsight_classes import Project, PlotWindow, WellPath, SummaryCase, Reservoir
-
-from typing import Optional, List
 
 
 @add_method(Project)
@@ -87,7 +84,7 @@ def load_case(self: Project, path: str, grid_only: bool = False) -> Reservoir:
 
 
 @add_method(Project)
-def selected_cases(self) -> List[Case]:
+def selected_cases(self) -> list[Case]:
     """Get a list of all grid cases selected in the project tree
 
     Returns:
@@ -101,7 +98,7 @@ def selected_cases(self) -> List[Case]:
 
 
 @add_method(Project)
-def cases(self: Project) -> List[Reservoir]:
+def cases(self: Project) -> list[Reservoir]:
     """Get a list of all grid cases in the project
 
     Returns:
@@ -111,7 +108,7 @@ def cases(self: Project) -> List[Reservoir]:
 
 
 @add_method(Project)
-def case(self: Project, case_id: int) -> Optional[Reservoir]:
+def case(self: Project, case_id: int) -> Reservoir | None:
     """Get a specific grid case from the provided case Id
 
     Arguments:
@@ -441,9 +438,9 @@ def create_corner_point_grid(
     nx: int,
     ny: int,
     nz: int,
-    coord: List[float],
-    zcorn: List[float],
-    actnum: List[int],
+    coord: list[float],
+    zcorn: list[float],
+    actnum: list[int],
 ):
     """Creates a corner point grid from given parameters.
 
