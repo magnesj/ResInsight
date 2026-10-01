@@ -19,9 +19,7 @@ if resinsight is not None:
 
         for idx, cell in enumerate(cells):
             print(
-                "Selected cell: [{}, {}, {}] grid: {}".format(
-                    cell.ijk.i + 1, cell.ijk.j + 1, cell.ijk.k + 1, cell.grid_index
-                )
+                f"Selected cell: [{cell.ijk.i + 1}, {cell.ijk.j + 1}, {cell.ijk.k + 1}] grid: {cell.grid_index}"
             )
 
             # Get the grid and dimensions
@@ -39,9 +37,7 @@ if resinsight is not None:
             cell_centers = grid.cell_centers()
             cell_center = cell_centers[cell_index]
             print(
-                "Cell center: [{}, {}, {}]".format(
-                    cell_center.x, cell_center.y, cell_center.z
-                )
+                f"Cell center: [{cell_center.x}, {cell_center.y}, {cell_center.z}]"
             )
 
             # Print the cell corners
@@ -62,7 +58,5 @@ if resinsight is not None:
                     "DYNAMIC_NATIVE", "SOIL", tidx
                 )
                 print(
-                    "SOIL: {} ({}.{}.{})".format(
-                        soil_results[idx], timestep.year, timestep.month, timestep.day
-                    )
+                    f"SOIL: {soil_results[idx]} ({timestep.year}.{timestep.month}.{timestep.day})"
                 )
