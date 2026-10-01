@@ -395,3 +395,51 @@ jobs:
     - name: Publish Python package to pypi
       # https://docs.pypi.org/trusted-publishers/adding-a-publisher/
       uses: pypa/gh-action-pypi-publish@release/v1
+
+  publish-dev-build:
+    name: Publish dev build to distribution repo
+    needs: build
+    runs-on: ubuntu-24.04
+    # This job publishes a rolling pre-release of the `dev` binaries to the
+    # magnesj/ResInsight-dev-builds repository, giving users a permanent,
+    # unauthenticated download URL served by GitHub's CDN (see
+    # https://github.com/magnesj/ResInsight/issues/1093). Restricted to
+    # magnesj/ResInsight so it only runs in the personal fork that owns the
+    # DEV_BUILDS_TOKEN secret and the distribution repo.
+    if: >-
+      github.repository == 'magnesj/ResInsight' &&
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/dev'
+    concurrency:
+      group: publish-dev-build
+      cancel-in-progress: true
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+
+      - name: Package assets
+        shell: bash
+        run: |
+          set -e
+          mkdir dist
+          for d in artifacts/ResInsight-*/; do
+            name=$(basename "$d" | tr ' ' '-')
+            (cd "$d" && zip -qr "$GITHUB_WORKSPACE/dist/${name}.zip" .)
+          done
+          ls -l dist
+
+      - name: Update rolling release in builds repo
+        env:
+          GH_TOKEN: ${{ secrets.DEV_BUILDS_TOKEN }}
+          GH_REPO: magnesj/ResInsight-dev-builds
+          TAG: dev-latest
+        run: |
+          set -e
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --prerelease --title "ResInsight dev build" --notes "Rolling build"
+          fi
+          gh release edit "$TAG" \
+            --notes "Built from magnesj/ResInsight@${GITHUB_SHA::8} on $(date -u +%Y-%m-%dT%H:%MZ)"
+          gh release upload "$TAG" dist/* --clobber
