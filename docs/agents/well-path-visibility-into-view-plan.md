@@ -1,6 +1,6 @@
 # Plan: Move well path visibility into the view, remove the global well path checkbox
 
-Reference: #14768 "Add well path in view" (fixes #14764). That PR adds `RimWellPathInView` /
+Reference: OPM/ResInsight#14768 "Add well path in view" (fixes OPM/ResInsight#14764). That PR adds `RimWellPathInView` /
 `RimWellPathInViewCollection` (a per-view mirror of `RimWellPathCollection`, modeled on the
 Polygon/PolygonInView pattern) and wires it into `RivWellPathPartMgr::isWellPathEnabled()` and
 `RimGeneric3dView::computeDomainBoundingBox()` as an *additional* visibility gate. It is explicitly
@@ -10,7 +10,7 @@ checked everywhere. This document plans the remaining work: finish the UI integr
 per-view checkbox the single source of truth, remove the global checkbox, and audit every other
 consumer of the global flag (including the Python/pdm-scripting surface).
 
-## 1. Current state (as of PR #14768)
+## 1. Current state (as of PR OPM/ResInsight#14768)
 
 * `RimWellPathInView` / `RimWellPathInViewCollection` exist and sync from
   `RimWellPathCollection` via `RimNestedMirrorCollectionInView`, same as
@@ -47,10 +47,10 @@ override and no per-polygon global checkbox; visibility lives solely in `RimPoly
 
 ## 3. Phased implementation plan
 
-### Phase A — Finish view-tree integration (builds on #14768)
+### Phase A — Finish view-tree integration (builds on OPM/ResInsight#14768)
 1. Confirm/verify `RimEclipseView`, `RimGeoMechView`, `RimGridView`, `RimGeneric3dView` all add
    `wellPathInViewCollection()` to `defineUiTreeOrdering()` next to (not instead of) the existing
-   `wellCollection()`/global node — already done in #14768 for Eclipse/GeoMech/Generic3d.
+   `wellCollection()`/global node — already done in OPM/ResInsight#14768 for Eclipse/GeoMech/Generic3d.
 2. Double check `RimSeismicView` / `Rim2dIntersectionView` / contour map views: they only picked up
    the `#include "RiaViewDefines.h"` header move, not an actual `m_wellPathInViewCollection` — decide
    per view type whether well paths are rendered there at all; if yes, they need the same wiring as
@@ -87,7 +87,7 @@ override and no per-polygon global checkbox; visibility lives solely in `RimPoly
    (`RicToggleItemsFeatureTest` fixture) to toggle the per-view `RimWellPathInView` items instead of
    `RimWellPath` directly — needs a `Rim3dView` in the test fixture (there is already
    `RiaFeatureTestModelBuilder`; check whether it creates a view, otherwise extend it).
-2. Update/extend `RimWellPathInViewCollection-Test.cpp` (added in #14768) with cases for multi-view
+2. Update/extend `RimWellPathInViewCollection-Test.cpp` (added in OPM/ResInsight#14768) with cases for multi-view
    independence of the *rendering* path (already covered at the collection level) plus the new
    consumers from Phase B once they're converted (measurement linking, export-completions default
    selection).
@@ -171,7 +171,7 @@ Findings from auditing the scripting surface:
 
 ## 5. Suggested PR breakdown
 
-1. PR 1 (this repo's #14768, already open): land `RimWellPathInView`/`RimWellPathInViewCollection`
+1. PR 1 (this repo's OPM/ResInsight#14768, already open): land `RimWellPathInView`/`RimWellPathInViewCollection`
    plumbing, additive only, no behavior change for users.
 2. PR 2: Phase A finish + Phase B rendering/measurement-linking call sites (items with a view
    context) + Phase C tests for those.
