@@ -3,11 +3,10 @@ import uuid
 from .pdmobject import add_method
 from .project import Project
 from .resinsight_classes import RegularSurface
-from typing import List
 
 
 @add_method(RegularSurface)
-def set_property(self: RegularSurface, name: str, values: List[float]) -> None:
+def set_property(self: RegularSurface, name: str, values: list[float]) -> None:
     """Sets a property on a regular surface.
 
     Arguments:
