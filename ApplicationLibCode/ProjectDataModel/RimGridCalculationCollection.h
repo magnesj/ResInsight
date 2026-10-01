@@ -21,6 +21,9 @@
 #include "RimGridCalculation.h"
 #include "RimUserDefinedCalculationCollection.h"
 
+class RimEclipseCase;
+class RimEclipseResultDefinition;
+
 //==================================================================================================
 ///
 ///
@@ -38,6 +41,9 @@ public:
     std::vector<RimGridCalculation*> sortedGridCalculations() const;
     std::vector<RimGridCalculation*> dependentCalculations( RimGridCalculation* sourceCalculation ) const;
     RimGridCalculation*              findCalculation( const QString& calculationName ) const;
+
+    static void ensureGeneratedResultIsComputed( const RimEclipseResultDefinition* resultDefinition, RimEclipseCase* eclipseCase );
+    static void ensureGeneratedResultsAreComputed( RimEclipseCase* eclipseCase );
 
 private:
     bool dependentCalculationsRecursively( RimGridCalculation* sourceCalculation, std::vector<RimGridCalculation*>& calculations ) const;

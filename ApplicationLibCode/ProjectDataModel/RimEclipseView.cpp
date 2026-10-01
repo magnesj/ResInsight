@@ -77,6 +77,7 @@
 #include "RimFracture.h"
 #include "RimFractureTemplateCollection.h"
 #include "RimGeoMechResultDefinition.h"
+#include "RimGridCalculationCollection.h"
 #include "RimGridCollection.h"
 #include "RimGridCrossPlotDataSet.h"
 #include "RimGridView.h"
@@ -1308,6 +1309,17 @@ void RimEclipseView::onLoadDataAndUpdate()
     if ( !eclipseCase() ) return;
 
     CAF_ASSERT( cellResult() != nullptr );
+
+    // A GENERATED result for an ensemble realization is only held in memory while that particular case is open, and
+    // is lost again once the case is closed (see RimGridCalculation::casesToCalculate). The cell-result selection
+    // dropdown also only lists GENERATED results already present in this case's result catalog. Recompute every
+    // grid calculation targeting this case so its results are both selectable and up to date, whether this view
+    // was just created for the realization or stepped to it via the Eclipse Case dropdown.
+    if ( firstAncestorOfType<RimReservoirGridEnsemble>() )
+    {
+        RimGridCalculationCollection::ensureGeneratedResultsAreComputed( eclipseCase() );
+    }
+
     cellResult()->loadResult();
 
     CAF_ASSERT( cellEdgeResult() != nullptr );

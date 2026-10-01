@@ -20,7 +20,10 @@
 
 #include "RiaLogging.h"
 #include "RigEclipseResultAddress.h"
+#include "RimEclipseCase.h"
+#include "RimEclipseResultDefinition.h"
 #include "RimGridCalculation.h"
+#include "RimProject.h"
 
 #include "cafPdmUiGroup.h"
 #include "cafPdmUiTreeSelectionEditor.h"
@@ -167,4 +170,51 @@ bool RimGridCalculationCollection::dependentCalculationsRecursively( RimGridCalc
 void RimGridCalculationCollection::initAfterRead()
 {
     rebuildCaseMetaData();
+}
+
+//--------------------------------------------------------------------------------------------------
+/// A GENERATED result produced by a grid calculation only exists in memory for the realization it was
+/// computed for. Ensemble realizations are opened, used and closed on demand (see RimGridCalculation::
+/// casesToCalculate), so the result may not have been computed for this particular case yet. Recompute it
+/// here for the given case if a matching calculation is found, so the result is available whenever a view
+/// or contour map is created/opened for an ensemble realization.
+//--------------------------------------------------------------------------------------------------
+void RimGridCalculationCollection::ensureGeneratedResultIsComputed( const RimEclipseResultDefinition* resultDefinition,
+                                                                    RimEclipseCase*                   eclipseCase )
+{
+    if ( !resultDefinition || resultDefinition->resultType() != RiaDefines::ResultCatType::GENERATED ) return;
+    if ( !eclipseCase ) return;
+
+    auto project = RimProject::current();
+    if ( !project ) return;
+
+    RimGridCalculation* calculation = project->gridCalculationCollection()->findCalculation( resultDefinition->resultVariable() );
+    if ( !calculation ) return;
+
+    const bool evaluateDependentCalculations = true;
+    calculation->calculateForCases( { eclipseCase }, nullptr, std::nullopt, evaluateDependentCalculations );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// The cell-result selection dropdown only lists GENERATED result names already present in the given
+/// case's result catalog (see RigCaseCellResultsData::resultNames). For an ensemble realization that has
+/// not been opened before, that catalog is empty, so no calculated result can even be selected. Recompute
+/// every grid calculation whose destination includes this case, so its result becomes selectable and its
+/// data available as soon as the case is opened (e.g. when stepping through realizations in a view).
+//--------------------------------------------------------------------------------------------------
+void RimGridCalculationCollection::ensureGeneratedResultsAreComputed( RimEclipseCase* eclipseCase )
+{
+    if ( !eclipseCase ) return;
+
+    auto project = RimProject::current();
+    if ( !project ) return;
+
+    for ( auto gridCalculation : project->gridCalculationCollection()->sortedGridCalculations() )
+    {
+        auto outputCases = gridCalculation->outputEclipseCases();
+        if ( std::find( outputCases.begin(), outputCases.end(), eclipseCase ) == outputCases.end() ) continue;
+
+        const bool evaluateDependentCalculations = true;
+        gridCalculation->calculateForCases( { eclipseCase }, nullptr, std::nullopt, evaluateDependentCalculations );
+    }
 }

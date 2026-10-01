@@ -93,26 +93,6 @@ void applyDataFilterVisibility( RigEclipseContourMapProjection& projection, RimC
 }
 
 //--------------------------------------------------------------------------------------------------
-/// A GENERATED result produced by a grid calculation only exists in memory, and each realization is
-/// opened, processed and closed again in turn to keep memory usage bounded for large ensembles. The
-/// calculated values are therefore lost again as soon as the case is closed, and must be recomputed
-/// for this realization while it is open here rather than relying on a calculation run beforehand.
-//--------------------------------------------------------------------------------------------------
-void ensureGeneratedResultIsComputed( const RimEclipseResultDefinition* resultDefinition, RimEclipseCase* eCase )
-{
-    if ( !resultDefinition || resultDefinition->resultType() != RiaDefines::ResultCatType::GENERATED ) return;
-
-    auto project = RimProject::current();
-    if ( !project ) return;
-
-    RimGridCalculation* calculation = project->gridCalculationCollection()->findCalculation( resultDefinition->resultVariable() );
-    if ( !calculation ) return;
-
-    const bool evaluateDependentCalculations = true;
-    calculation->calculateForCases( { eCase }, nullptr, std::nullopt, evaluateDependentCalculations );
-}
-
-//--------------------------------------------------------------------------------------------------
 /// Generate one result per selected time step if the mapped property is dynamic or the active data
 /// filter is dynamic (its visible cells then differ per time step, even for a static property).
 /// Otherwise generate a single, time-independent result.
@@ -803,7 +783,7 @@ void RimStatisticsContourMap::computeStatisticsForMaps( const std::vector<RimSta
                 for ( auto& ctx : contexts )
                 {
                     if ( !ctx.active ) continue;
-                    ensureGeneratedResultIsComputed( ctx.map->m_resultDefinition(), eCase );
+                    RimGridCalculationCollection::ensureGeneratedResultIsComputed( ctx.map->m_resultDefinition(), eCase );
                 }
 
                 // Make sure at least one dynamic result this case needs is loaded before asking for its time step
@@ -1101,7 +1081,8 @@ void RimStatisticsContourMap::ensureResultsComputed()
     // primary case before checking the cache, so the key is stable between save and load.
     if ( RimEclipseCase* primaryCase = eclipseCase() )
     {
-        if ( primaryCase->ensureReservoirCaseIsOpen() ) ensureGeneratedResultIsComputed( m_resultDefinition(), primaryCase );
+        if ( primaryCase->ensureReservoirCaseIsOpen() )
+            RimGridCalculationCollection::ensureGeneratedResultIsComputed( m_resultDefinition(), primaryCase );
     }
 
     if ( loadCachedResults() ) return;
