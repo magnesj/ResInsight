@@ -6,25 +6,23 @@ in a timeline-based event system. Events can be perforation events, valve events
 tubing changes, well state changes, and production/injection control changes.
 """
 
-from typing import Any, Dict
 from datetime import date, datetime
+from typing import Any
 
-from .pdmobject import add_method
-from .resinsight_classes import Case
 from .generated.generated_classes import (
     KeywordEvent,
     WellEventKeyword,
     WellEventTimeline,
 )
+from .pdmobject import add_method
+from .resinsight_classes import Case
 
 
 def _format_date(event_date: str | date | datetime) -> str:
     """Convert date to ISO format string (YYYY-MM-DD)."""
     if isinstance(event_date, str):
         return event_date
-    elif isinstance(event_date, datetime):
-        return event_date.strftime("%Y-%m-%d")
-    elif isinstance(event_date, date):
+    elif isinstance(event_date, datetime) or isinstance(event_date, date):
         return event_date.strftime("%Y-%m-%d")
     else:
         raise TypeError(
@@ -38,7 +36,7 @@ def add_well_keyword_event(
     event_date: str | date | datetime,
     well_path: Any,
     keyword_name: str,
-    keyword_data: Dict[str, Any],
+    keyword_data: dict[str, Any],
 ) -> WellEventKeyword:
     """Add a well keyword event with arbitrary keyword data.
 
@@ -161,7 +159,7 @@ def add_keyword_event(
     self: WellEventTimeline,
     event_date: str | date | datetime,
     keyword_name: str,
-    keyword_data: Dict[str, Any],
+    keyword_data: dict[str, Any],
 ) -> KeywordEvent:
     """Add a schedule-level keyword event (not tied to a specific well path).
 

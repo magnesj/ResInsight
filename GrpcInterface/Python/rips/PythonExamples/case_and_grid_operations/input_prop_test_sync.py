@@ -3,9 +3,10 @@
 # Meaning it completes reading each result before calculating the derived result
 # See InputPropTestAsync for how to do this asynchronously instead.
 ########################################################################################
-import rips
 import time
+
 import grpc
+import rips
 
 resinsight = rips.Instance.find()
 start = time.time()
