@@ -467,13 +467,13 @@ jobs:
             gh release create "$TAG" --prerelease --title "ResInsight dev build" --notes "Rolling build"
           fi
           run_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          asset_list=$(cd dist && for f in *.zip; do echo "- $f"; done)
           notes=$(cat <<EOF
           Built from magnesj/ResInsight@${GITHUB_SHA::8} on $(date -u +%Y-%m-%dT%H:%MZ)
           Source build job: $run_url
 
-          Published assets (renamed from their CI build names):
-          - ResInsight-Ubuntu.zip  (CI build "Ubuntu 24.04 gcc")
-          - ResInsight-Windows.zip (CI build "Windows_2022_qt_610")
+          Published assets:
+          $asset_list
           EOF
           )
           gh release edit "$TAG" --notes "$notes"
