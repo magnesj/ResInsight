@@ -60,11 +60,12 @@ env:
 
 Push to the branch the job is scoped to (normally `dev`). The job should
 create (first run) or update (subsequent runs) the `dev-latest` pre-release
-in the distribution repository, with assets named after each build
-configuration, e.g.:
+in the distribution repository, with assets renamed to stable, CI-agnostic
+names (the release description documents which CI build configuration each
+asset was packaged from and links back to the source build job), e.g.:
 
 ```
-https://github.com/<your-account>/<project>-dev-builds/releases/download/dev-latest/ResInsight-Ubuntu-24.04-gcc.zip
+https://github.com/<your-account>/<project>-dev-builds/releases/download/dev-latest/ResInsight-Ubuntu.zip
 ```
 
 ## Notes

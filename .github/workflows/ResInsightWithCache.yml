@@ -423,13 +423,26 @@ jobs:
           path: artifacts
 
       - name: Package assets
+        # Only the Ubuntu gcc and Windows builds are published; the Ubuntu
+        # clang-19 build exists for CI coverage only and is intentionally
+        # dropped here. Each CI artifact is renamed to a stable, source-name
+        # that doesn't encode the CI configuration name.
         shell: bash
         run: |
           set -e
           mkdir dist
-          for d in artifacts/ResInsight-*/; do
-            name=$(basename "$d" | tr ' ' '-')
-            (cd "$d" && zip -qr "$GITHUB_WORKSPACE/dist/${name}.zip" .)
+          declare -A artifact_map=(
+            ["ResInsight-Ubuntu 24.04 gcc"]="ResInsight-Ubuntu"
+            ["ResInsight-Windows_2022_qt_610"]="ResInsight-Windows"
+          )
+          for source_name in "${!artifact_map[@]}"; do
+            dest_name="${artifact_map[$source_name]}"
+            d="artifacts/$source_name"
+            if [ ! -d "$d" ]; then
+              echo "::error::Expected artifact directory '$d' not found"
+              exit 1
+            fi
+            (cd "$d" && zip -qr "$GITHUB_WORKSPACE/dist/${dest_name}.zip" .)
           done
           ls -l dist
 
@@ -443,6 +456,15 @@ jobs:
           if ! gh release view "$TAG" >/dev/null 2>&1; then
             gh release create "$TAG" --prerelease --title "ResInsight dev build" --notes "Rolling build"
           fi
-          gh release edit "$TAG" \
-            --notes "Built from magnesj/ResInsight@${GITHUB_SHA::8} on $(date -u +%Y-%m-%dT%H:%MZ)"
+          run_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          notes=$(cat <<EOF
+          Built from magnesj/ResInsight@${GITHUB_SHA::8} on $(date -u +%Y-%m-%dT%H:%MZ)
+          Source build job: $run_url
+
+          Published assets (renamed from their CI build names):
+          - ResInsight-Ubuntu.zip  (CI build "Ubuntu 24.04 gcc")
+          - ResInsight-Windows.zip (CI build "Windows_2022_qt_610")
+          EOF
+          )
+          gh release edit "$TAG" --notes "$notes"
           gh release upload "$TAG" dist/* --clobber
