@@ -25,6 +25,10 @@ jobs:
         config:
           - {
               name: "Windows_2022_qt_610",
+              # Published to the dev-builds distribution repo as
+              # <dist-name>.zip (see the publish-dev-build job below). Left
+              # empty for configs that should not be published there.
+              dist-name: "ResInsight-Windows",
               os: windows-2022,
               cc: "cl",
               cxx: "cl",
@@ -41,6 +45,7 @@ jobs:
             }
           - {
               name: "Ubuntu 24.04 gcc",
+              dist-name: "ResInsight-Ubuntu",
               os: ubuntu-24.04,
               cc: "gcc-14",
               cxx: "g++-14",
@@ -57,6 +62,7 @@ jobs:
             }
           - {
               name: "Ubuntu 24.04 clang-19",
+              dist-name: "",
               os: ubuntu-24.04,
               cc: "clang-19",
               cxx: "clang++-19",
@@ -369,7 +375,12 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: ResInsight-${{ matrix.config.name }}
+          # Configs with a non-empty matrix.config.dist-name are uploaded
+          # under a dist-<dist-name> artifact name, which the publish-dev-build
+          # job below uses directly as the published asset name. Configs
+          # without a dist-name (e.g. the clang-19 CI-only build) keep the
+          # old descriptive name and are not published.
+          name: ${{ matrix.config.dist-name != '' && format('dist-{0}', matrix.config.dist-name) || format('ResInsight-{0}', matrix.config.name) }}
           path: ${{ runner.workspace }}/ResInsight/cmakebuild/install
           retention-days: 5
 
@@ -423,25 +434,24 @@ jobs:
           path: artifacts
 
       - name: Package assets
-        # Only the Ubuntu gcc and Windows builds are published; the Ubuntu
-        # clang-19 build exists for CI coverage only and is intentionally
-        # dropped here. Each CI artifact is renamed to a stable, source-name
-        # that doesn't encode the CI configuration name.
+        # Only configs with a dist-name in the build matrix (uploaded above
+        # as dist-<dist-name>) are published; the Ubuntu clang-19 build has
+        # no dist-name and is intentionally skipped here. The published zip
+        # name is taken directly from the matrix-defined dist-name, so there
+        # is no separate CI-name-to-dist-name translation to keep in sync.
         shell: bash
         run: |
           set -e
           mkdir dist
-          declare -A artifact_map=(
-            ["ResInsight-Ubuntu 24.04 gcc"]="ResInsight-Ubuntu"
-            ["ResInsight-Windows_2022_qt_610"]="ResInsight-Windows"
-          )
-          for source_name in "${!artifact_map[@]}"; do
-            dest_name="${artifact_map[$source_name]}"
-            d="artifacts/$source_name"
-            if [ ! -d "$d" ]; then
-              echo "::error::Expected artifact directory '$d' not found"
-              exit 1
-            fi
+          shopt -s nullglob
+          dirs=(artifacts/dist-*/)
+          if [ ${#dirs[@]} -eq 0 ]; then
+            echo "::error::No dist-* artifact directories found"
+            exit 1
+          fi
+          for d in "${dirs[@]}"; do
+            dest_name=$(basename "$d")
+            dest_name=${dest_name#dist-}
             (cd "$d" && zip -qr "$GITHUB_WORKSPACE/dist/${dest_name}.zip" .)
           done
           ls -l dist
