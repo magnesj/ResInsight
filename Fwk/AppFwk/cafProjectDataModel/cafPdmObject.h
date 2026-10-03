@@ -48,6 +48,8 @@ class QXmlStreamWriter;
 #include "cafPdmXmlObjectHandle.h"
 #include "cafPdmXmlObjectHandleMacros.h"
 
+#include <concepts>
+
 namespace caf
 {
 class PdmFieldHandle;
@@ -151,6 +153,14 @@ class PdmObjectCapability;
 
 namespace caf
 {
+class PdmObject;
+
+/// Concept satisfied by any class publicly derived from PdmObject. Used to constrain the
+/// macro-free init template methods so misuse produces a clear "constraints not satisfied"
+/// diagnostic instead of a deep template error.
+template <typename T>
+concept PdmObjectDerived = std::derived_from<T, PdmObject>;
+
 class PdmObject : public PdmObjectHandle, public PdmXmlObjectHandle, public PdmUiObjectHandle
 {
 public:
@@ -205,6 +215,136 @@ public:
     /// Does the same as the above method, but omits the default value.
     /// Consider this method private. Please use the CAF_PDM_InitFieldNoDefault() macro instead.
     void addFieldUiNoDefault( PdmFieldHandle* field, const QString& keyword, PdmUiItemInfo* fieldDescription );
+
+    /// Macro-free alternative to CAF_PDM_InitObject.
+    ///
+    /// The DerivedClass template parameter ensures each class gets its own unique
+    /// static PdmUiItemInfo instance (stored as a function-local static in each
+    /// template instantiation). All instances of the same DerivedClass share the
+    /// same static item info, matching the behavior of the macro.
+    ///
+    /// Example:
+    /// @code
+    ///   MyClass::MyClass()
+    ///   {
+    ///       initPdmObject<MyClass>( "UI Name", ":/icon.png", "Tooltip", "WhatsThis" );
+    ///   }
+    /// @endcode
+    template <PdmObjectDerived DerivedClass>
+    void initPdmObject( const QString& uiName,
+                        const QString& iconResourceName = {},
+                        const QString& toolTip          = {},
+                        const QString& whatsThis        = {} )
+    {
+        this->isInheritedFromPdmUiObject();
+        this->isInheritedFromPdmXmlSerializable();
+        this->registerClassKeyword( classKeyword() );
+
+        static caf::PdmUiItemInfo objectDescription( uiName, iconResourceName, toolTip, whatsThis );
+        this->setUiItemInfo( &objectDescription );
+    }
+
+    /// Macro-free alternative to CAF_PDM_InitField.
+    ///
+    /// The DerivedClass and Keyword template parameters together ensure each
+    /// (class, field-keyword) pair gets its own unique static PdmUiItemInfo.
+    /// The Keyword non-type template parameter also enables compile-time
+    /// validation that the keyword is a valid XML element name.
+    ///
+    /// Example:
+    /// @code
+    ///   MyClass::MyClass()
+    ///   {
+    ///       initField<MyClass, caf::PdmKeyword{ "MyField" }>( &m_field, 42, "UI Name" );
+    ///   }
+    /// @endcode
+    template <PdmObjectDerived DerivedClass, caf::PdmKeyword Keyword, typename FieldDataType>
+    void initField( PdmField<FieldDataType>* field,
+                    const FieldDataType&     defaultValue,
+                    const QString&           uiName,
+                    const QString&           iconResourceName = {},
+                    const QString&           toolTip          = {},
+                    const QString&           whatsThis        = {} )
+    {
+        static_assert( isFirstCharacterValidInXmlKeyword( Keyword.value ), "First character in keyword is invalid" );
+        static_assert( !isFirstThreeCharactersXml( Keyword.value ), "Keyword starts with invalid sequence xml" );
+        static_assert( isValidXmlKeyword( Keyword.value ), "Detected invalid character in keyword" );
+
+        // Compile/link-time guard mirroring CAF_PDM_InitField: ensures CAF_PDM_HEADER_INIT and
+        // CAF_PDM_SOURCE_INIT were added to DerivedClass. Missing HEADER_INIT yields a compile
+        // error (no such member); missing SOURCE_INIT yields a link error referencing this symbol.
+        static bool checkingThePresenceOfHeaderAndSourceInitMacros =
+            DerivedClass::Error_You_forgot_to_add_the_macro_CAF_PDM_XML_HEADER_INIT_and_or_CAF_PDM_XML_SOURCE_INIT_to_your_cpp_file_for_this_class();
+        Q_UNUSED( checkingThePresenceOfHeaderAndSourceInitMacros )
+
+        this->isInheritedFromPdmUiObject();
+        this->isInheritedFromPdmXmlSerializable();
+
+        addXmlCapabilityToField( field );
+        addUiCapabilityToField( field );
+        configureCapabilities( field );
+        registerClassWithField( classKeyword(), field );
+
+        static caf::PdmUiItemInfo fieldDescription( uiName, iconResourceName, toolTip, whatsThis, Keyword.value );
+        addFieldUi( field, QString( Keyword.value ), defaultValue, &fieldDescription );
+    }
+
+    /// Overload of initField() for PdmField<AppEnum<T>> that accepts a raw enum value as the default,
+    /// matching the convenience provided by CAF_PDM_InitField (which dispatches via overload resolution
+    /// on addFieldUi). Without this overload, callers would have to write
+    /// `AppEnum<MyEnum>{ MyEnum::Value }` for the default.
+    template <PdmObjectDerived DerivedClass, caf::PdmKeyword Keyword, typename EnumType>
+    void initField( PdmField<AppEnum<EnumType>>* field,
+                    const EnumType&              defaultValue,
+                    const QString&               uiName,
+                    const QString&               iconResourceName = {},
+                    const QString&               toolTip          = {},
+                    const QString&               whatsThis        = {} )
+    {
+        initField<DerivedClass, Keyword>( field, AppEnum<EnumType>( defaultValue ), uiName, iconResourceName, toolTip, whatsThis );
+    }
+
+    /// Macro-free alternative to CAF_PDM_InitFieldNoDefault.
+    ///
+    /// Like initField(), but does not assign a default value to the field.
+    /// See initField() documentation for usage details.
+    ///
+    /// Example:
+    /// @code
+    ///   MyClass::MyClass()
+    ///   {
+    ///       initFieldNoDefault<MyClass, caf::PdmKeyword{ "MyField" }>( &m_field, "UI Name" );
+    ///   }
+    /// @endcode
+    template <PdmObjectDerived DerivedClass, caf::PdmKeyword Keyword, typename FieldType>
+    void initFieldNoDefault( FieldType*     field,
+                             const QString& uiName,
+                             const QString& iconResourceName = {},
+                             const QString& toolTip          = {},
+                             const QString& whatsThis        = {} )
+    {
+        static_assert( isFirstCharacterValidInXmlKeyword( Keyword.value ), "First character in keyword is invalid" );
+        static_assert( !isFirstThreeCharactersXml( Keyword.value ), "Keyword starts with invalid sequence xml" );
+        static_assert( isValidXmlKeyword( Keyword.value ), "Detected invalid character in keyword" );
+
+        // Compile/link-time guard mirroring CAF_PDM_InitFieldNoDefault: ensures CAF_PDM_HEADER_INIT
+        // and CAF_PDM_SOURCE_INIT were added to DerivedClass. Missing HEADER_INIT yields a compile
+        // error (no such member); missing SOURCE_INIT yields a link error referencing this symbol.
+        static bool checkingThePresenceOfHeaderAndSourceInitMacros =
+            DerivedClass::Error_You_forgot_to_add_the_macro_CAF_PDM_XML_HEADER_INIT_and_or_CAF_PDM_XML_SOURCE_INIT_to_your_cpp_file_for_this_class();
+        Q_UNUSED( checkingThePresenceOfHeaderAndSourceInitMacros )
+
+        this->isInheritedFromPdmUiObject();
+        this->isInheritedFromPdmXmlSerializable();
+
+        addXmlCapabilityToField( field );
+        addUiCapabilityToField( field );
+        configureCapabilities( field );
+        registerClassWithField( classKeyword(), field );
+
+        static caf::PdmUiItemInfo fieldDescription( uiName, iconResourceName, toolTip, whatsThis, Keyword.value );
+        addFieldUiNoDefault( field, QString( Keyword.value ), &fieldDescription );
+    }
 
 protected:
     PdmObjectHandle* doCopyObject() const override;
