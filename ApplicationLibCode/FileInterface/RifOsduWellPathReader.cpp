@@ -110,7 +110,12 @@ std::pair<cvf::ref<RigWellPath>, QString> RifOsduWellPathReader::parseCsv( const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::pair<cvf::ref<RigWellPath>, QString> RifOsduWellPathReader::readWellPathData( const QByteArray& content, double datumElevation )
+std::pair<cvf::ref<RigWellPath>, QString> RifOsduWellPathReader::readWellPathData( const QByteArray& content,
+                                                                                   double            datumElevation,
+                                                                                   double            surfaceEasting,
+                                                                                   double            surfaceNorthing,
+                                                                                   double            unitToMeters,
+                                                                                   double            targetUnitToMeters )
 {
     arrow::MemoryPool* pool = arrow::default_memory_pool();
 
@@ -168,17 +173,26 @@ std::pair<cvf::ref<RigWellPath>, QString> RifOsduWellPathReader::readWellPathDat
         std::vector<cvf::Vec3d> wellPathPoints;
         std::vector<double>     measuredDepths;
 
+        // Convert OSDU values to meters (the surface origin is already meters), then scale into the user-
+        // selected target unit system. The trajectory's TVD column is referenced to its vertical CRS
+        // (typically EPSG:5715 / MSL Depth, positive = down), so Z = -TVD without adding the wellbore
+        // datum elevation — that would otherwise shift the imported well path above the simulation well
+        // path by the RKB elevation. The datum is still stored on RigWellPath as metadata for plots.
+        const double targetScale = ( targetUnitToMeters != 0.0 ) ? 1.0 / targetUnitToMeters : 1.0;
+
         for ( size_t i = 0; i < firstSize; i++ )
         {
-            cvf::Vec3d point( readValues[X][i], readValues[Y][i], -readValues[TVD][i] + datumElevation );
-            double     md = readValues[MD][i];
+            const double xMeters  = readValues[X][i] * unitToMeters + surfaceEasting;
+            const double yMeters  = readValues[Y][i] * unitToMeters + surfaceNorthing;
+            const double zMeters  = -readValues[TVD][i] * unitToMeters;
+            const double mdMeters = readValues[MD][i] * unitToMeters;
 
-            wellPathPoints.push_back( point );
-            measuredDepths.push_back( md );
+            wellPathPoints.push_back( cvf::Vec3d( xMeters * targetScale, yMeters * targetScale, zMeters * targetScale ) );
+            measuredDepths.push_back( mdMeters * targetScale );
         }
 
         auto wellPath = cvf::make_ref<RigWellPath>( wellPathPoints, measuredDepths );
-        wellPath->setDatumElevation( datumElevation );
+        wellPath->setDatumElevation( datumElevation * targetScale );
         return { wellPath, "" };
     }
 
