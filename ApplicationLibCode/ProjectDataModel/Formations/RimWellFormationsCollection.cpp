@@ -23,6 +23,8 @@
 
 #include "RiuMessageDialog.h"
 
+#include "cafCmdFeatureMenuBuilder.h"
+
 #include <QFileInfo>
 
 CAF_PDM_SOURCE_INIT( RimWellFormationsCollection, "WellFormationsCollection" );
@@ -93,4 +95,12 @@ std::vector<RimWellFormationsFile*> RimWellFormationsCollection::importFiles( co
     }
 
     return importedFiles;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimWellFormationsCollection::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
+{
+    menuBuilder << "RicImportWellFormationsFeature";
 }

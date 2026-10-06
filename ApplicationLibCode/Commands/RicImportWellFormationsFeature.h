@@ -18,37 +18,17 @@
 
 #pragma once
 
-#include "cafPdmChildArrayField.h"
-#include "cafPdmObject.h"
-
-namespace caf
-{
-class CmdFeatureMenuBuilder;
-}
-
-class RimWellFormationsFile;
+#include "cafCmdFeature.h"
 
 //==================================================================================================
-/// Project-level collection of well formations files (FMU formations.csv, well picks, ...), owned by
-/// RimOilField. RimEnsembleFileSet and RimWellPath point into this collection, so a given file is
-/// only parsed once even when it is used by several of them.
+/// Imports one or more well formations files (e.g. FMU formations.csv) into the project-level
+/// RimWellFormationsCollection, without linking the resulting entries to any well path or file set.
 //==================================================================================================
-class RimWellFormationsCollection : public caf::PdmObject
+class RicImportWellFormationsFeature : public caf::CmdFeature
 {
-    CAF_PDM_HEADER_INIT;
-
-public:
-    RimWellFormationsCollection();
-
-    const caf::PdmChildArrayField<RimWellFormationsFile*>& wellFormationsFiles() const { return m_wellFormationsFiles; }
-
-    RimWellFormationsFile* findOrCreate( const QString& filePath );
-
-    std::vector<RimWellFormationsFile*> importFiles( const QStringList& filePaths );
+    CAF_CMD_HEADER_INIT;
 
 protected:
-    void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
-
-private:
-    caf::PdmChildArrayField<RimWellFormationsFile*> m_wellFormationsFiles;
+    void onActionTriggered( bool isChecked ) override;
+    void setupActionLook( QAction* actionToSetup ) override;
 };
