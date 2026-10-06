@@ -18,6 +18,7 @@
 
 #pragma once
 
+class RimEnsembleFileSet;
 class RimSummaryEnsemble;
 class RimWellFormationsFile;
 
@@ -29,4 +30,8 @@ namespace RimWellFormationsTools
 // The well formations file linked to the ensemble's file set, if any. Returns nullptr for ensembles
 // without a file set (picked file lists, SUMO ensembles, older projects).
 RimWellFormationsFile* formationsForEnsemble( RimSummaryEnsemble* ensemble );
+
+// Auto-discovers "share/results/tables/formations.csv" in the file set's realization folders and
+// links it, unless the file set already has a well formations entry. Does nothing if not found.
+void discoverWellFormations( RimEnsembleFileSet* fileSet );
 }; // namespace RimWellFormationsTools

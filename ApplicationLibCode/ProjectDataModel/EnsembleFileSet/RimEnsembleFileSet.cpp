@@ -26,6 +26,7 @@
 
 #include "Formations/RimWellFormationsCollection.h"
 #include "Formations/RimWellFormationsFile.h"
+#include "Formations/RimWellFormationsTools.h"
 #include "RimEnsembleFileSetCollection.h"
 #include "RimOilField.h"
 #include "RimProject.h"
@@ -339,6 +340,14 @@ void RimEnsembleFileSet::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilde
 {
     menuBuilder << "RicCreateEnsembleFromFileSetFeature";
     menuBuilder << "RicCreateReservoirGridEnsembleFromFileSetFeature";
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleFileSet::initAfterRead()
+{
+    RimWellFormationsTools::discoverWellFormations( this );
 }
 
 //--------------------------------------------------------------------------------------------------

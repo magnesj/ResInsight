@@ -355,6 +355,42 @@ std::optional<double> RifRmsSeedFileReader::readSeedValue( const QString& filePa
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+QString RifFmuFormationsFileLocator::relativeFilePath()
+{
+    return "share/results/tables/formations.csv";
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RifFmuFormationsFileLocator::locate( const QString& modelPath )
+{
+    int MAX_LEVELS_UP = 5;
+    int dirLevel      = 0;
+
+    QDir qdir( modelPath );
+
+    const QFileInfo dir( modelPath );
+    if ( dir.isFile() )
+        qdir.cdUp();
+    else if ( !dir.isDir() )
+        return "";
+
+    do
+    {
+        QString candidate = qdir.absoluteFilePath( relativeFilePath() );
+        if ( QFileInfo::exists( candidate ) ) return candidate;
+
+        qdir.cdUp();
+
+    } while ( dirLevel++ < MAX_LEVELS_UP );
+
+    return "";
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 int RifCaseRealizationParametersFileLocator::realizationNumber( const QString& modelPath )
 {
     QDir    dir( modelPath );

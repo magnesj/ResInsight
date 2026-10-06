@@ -108,3 +108,14 @@ public:
     static QString               locate( const QString& modelPath );
     static std::optional<double> readSeedValue( const QString& filePath );
 };
+
+//==================================================================================================
+/// Locates the FMU "share/results/tables/formations.csv" file relative to one of the parent
+/// directories of a model file or folder, i.e. "<ensemble>/realization-N/iter-M/share/results/tables/formations.csv"
+//==================================================================================================
+class RifFmuFormationsFileLocator
+{
+public:
+    static QString relativeFilePath();
+    static QString locate( const QString& modelPath );
+};
