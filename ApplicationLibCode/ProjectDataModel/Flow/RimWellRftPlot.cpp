@@ -57,6 +57,9 @@
 #include "RimWellPlotTools.h"
 #include "RimWellRftEnsembleCurveSet.h"
 
+#include "Formations/RimWellFormationsFile.h"
+#include "Formations/RimWellFormationsTools.h"
+
 #include "RiuAbstractLegendFrame.h"
 #include "RiuDraggableOverlayFrame.h"
 #include "RiuQwtCurveSelectorFilter.h"
@@ -268,7 +271,34 @@ void RimWellRftPlot::updateFormationsOnPlot() const
                 }
             }
 
-            if ( wellPath )
+            // Prefer well-pick (formations.csv) zone bands over case-derived formation names when
+            // they are available for the selected well, so the RFT profile shows the same zone
+            // bands used by other well log tracks and the RFT correlation/cross plots.
+            RimWellFormationsFile* wellFormationsFile = nullptr;
+            QString                wellNameInFile     = associatedSimWellName();
+
+            if ( wellPath && wellPath->formationsGeometry() )
+            {
+                wellFormationsFile = wellPath->wellFormationsFile();
+            }
+            else
+            {
+                for ( RimSummaryEnsemble* ensemble : selectedEnsembles() )
+                {
+                    RimWellFormationsFile* file = RimWellFormationsTools::formationsForEnsemble( ensemble );
+                    if ( file && file->formationsForWell( wellNameInFile ).has_value() )
+                    {
+                        wellFormationsFile = file;
+                        break;
+                    }
+                }
+            }
+
+            if ( wellFormationsFile )
+            {
+                track->setAndUpdateWellPickFormationsData( wellPath, wellFormationsFile, wellNameInFile );
+            }
+            else if ( wellPath )
             {
                 track->setAndUpdateWellPathFormationNamesData( formationNamesCase, wellPath );
             }

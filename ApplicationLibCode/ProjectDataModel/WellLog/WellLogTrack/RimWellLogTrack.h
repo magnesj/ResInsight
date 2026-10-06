@@ -46,6 +46,7 @@ class RigWellPath;
 class RimCase;
 class RimWellPathAttributeCollection;
 class RimWellFlowRateCurve;
+class RimWellFormationsFile;
 class RimWellLogCurve;
 class RimWellPath;
 class RimDepthTrackPlot;
@@ -132,6 +133,8 @@ public:
 
     void setAndUpdateSimWellFormationNamesAndBranchData( RimCase* rimCase, const QString& simWellName, int branchIndex, bool useBranchDetection );
     void setAndUpdateSimWellFormationNamesData( RimCase* rimCase, const QString& simWellName );
+
+    void setAndUpdateWellPickFormationsData( RimWellPath* wellPath, RimWellFormationsFile* wellFormationsFile, const QString& wellNameInFile );
 
     [[deprecated( "Use setAutoScalePropertyValuesEnabled() instead." )]] void setAutoScaleXEnabled( bool enabled ) override;
     [[deprecated( "Use setAutoScaleDepthValuesEnabled() instead." )]] void    setAutoScaleYEnabled( bool enabled ) override;

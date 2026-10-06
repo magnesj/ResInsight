@@ -1292,6 +1292,29 @@ void RimWellLogTrack::setAndUpdateSimWellFormationNamesData( RimCase* rimCase, c
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimWellLogTrack::setAndUpdateWellPickFormationsData( RimWellPath*           wellPath,
+                                                          RimWellFormationsFile* wellFormationsFile,
+                                                          const QString&         wellNameInFile )
+{
+    m_formationSettings->setFormationSource( RiaDefines::WellLogTrackFormationSource::WELL_PICK_FILTER );
+    m_formationSettings->setWellPathForSourceWellPath( wellPath );
+
+    // The direct file/well name pair is only used when there is no well path to resolve formations
+    // from (e.g. an RFT plot showing a simulation well with no associated well path).
+    m_formationSettings->setWellFormationsFile( wellPath ? nullptr : wellFormationsFile );
+    m_formationSettings->setWellNameInFormationsFile( wellPath ? QString() : wellNameInFile );
+
+    updateConnectedEditors();
+
+    if ( m_regionAnnotationSettings->annotationType() != RiaDefines::RegionAnnotationType::NO_ANNOTATIONS )
+    {
+        updateRegionAnnotationsOnPlot();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setAutoScaleXEnabled( bool enabled )
 {
     CAF_ASSERT( "A well log track can be both vertical and horizontal, use setAutoScalePropertyValuesEnabled " );
