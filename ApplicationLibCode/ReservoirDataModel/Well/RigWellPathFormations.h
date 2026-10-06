@@ -21,6 +21,9 @@
 #include "RiaDefines.h"
 #include "RiaWellLogTrackDefines.h"
 
+#include "cvfVector2.h"
+
+#include <optional>
 #include <set>
 #include <utility>
 #include <vector>
@@ -29,11 +32,12 @@
 
 struct RigWellPathFormation
 {
-    double  mdTop{ 0.0 };
-    double  mdBase{ 0.0 };
-    double  tvdTop{ 0.0 };
-    double  tvdBase{ 0.0 };
-    QString formationName;
+    double                    mdTop{ 0.0 };
+    double                    mdBase{ 0.0 };
+    double                    tvdTop{ 0.0 };
+    double                    tvdBase{ 0.0 };
+    QString                   formationName;
+    std::optional<cvf::Vec2d> topXY;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -56,7 +60,8 @@ public:
     QString filePath() const;
     QString keyInFile() const;
 
-    size_t formationNamesCount() const;
+    size_t                      formationNamesCount() const;
+    const RigWellPathFormation& formationAt( size_t index ) const;
 
 private:
     QString m_filePath;

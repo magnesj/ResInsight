@@ -306,3 +306,11 @@ size_t RigWellPathFormations::formationNamesCount() const
 {
     return m_formations.size() + m_fluids.size();
 }
+
+//--------------------------------------------------------------------------------------------------
+/// Returns the non-fluid formation at index, in the order the input data was given
+//--------------------------------------------------------------------------------------------------
+const RigWellPathFormation& RigWellPathFormations::formationAt( size_t index ) const
+{
+    return m_formations[index].first;
+}

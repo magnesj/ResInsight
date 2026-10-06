@@ -22,19 +22,53 @@
 #include <QStringList>
 #include <QTextStream>
 
+#include <optional>
 #include <vector>
 
 namespace
 {
 //--------------------------------------------------------------------------------------------------
+/// The FMU formations.csv format is comma-separated, the "well pick" formats are semicolon-separated
+//--------------------------------------------------------------------------------------------------
+QChar detectDelimiter( const QString& line )
+{
+    return line.contains( ',' ) ? ',' : ';';
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QStringList parseHeader( const QString& line )
+QStringList parseHeader( const QString& line, QChar delimiter )
 {
     QString header = line.toLower();
-    header.removeIf( []( QChar c ) { return c.isSpace(); } );
+    header.removeIf( []( QChar c ) { return c.isSpace() || c == '_'; } );
 
-    return header.split( ';' );
+    return header.split( delimiter );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Returns the index of the first of the candidate column names present in the header, or -1
+//--------------------------------------------------------------------------------------------------
+int findColumn( const QStringList& header, std::initializer_list<const char*> candidates )
+{
+    for ( const char* candidate : candidates )
+    {
+        const int index = header.indexOf( QString( candidate ) );
+        if ( index != -1 ) return index;
+    }
+    return -1;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::optional<double> toOptionalDouble( const QStringList& columns, int index )
+{
+    if ( index == -1 || index >= columns.size() ) return std::nullopt;
+
+    bool         ok    = false;
+    const double value = columns[index].toDouble( &ok );
+    return ok ? std::optional( value ) : std::nullopt;
 }
 } // namespace
 
@@ -64,22 +98,31 @@ std::expected<RifWellPathFormationReader::WellFormations, QString> RifWellPathFo
     QTextStream stream( &text );
 
     QStringList header;
+    QChar       delimiter = ';';
     while ( header.size() < 3 )
     {
         if ( stream.atEnd() ) return std::unexpected( parseFailure );
 
-        header = parseHeader( stream.readLine() );
+        const QString rawHeaderLine = stream.readLine();
+        delimiter                   = detectDelimiter( rawHeaderLine );
+        header                      = parseHeader( rawHeaderLine, delimiter );
     }
 
-    const int wellNameIndex = header.indexOf( "wellname" );
-    const int unitNameIndex = header.indexOf( "unitname" );
+    // The "well pick" formats use wellname/unitname, the FMU formations.csv format uses well/zone (and
+    // ignores zone_code). Both support md and/or (negated) tvd, and the FMU format can also include an
+    // x/y position for the zone top.
+    const int wellNameIndex = findColumn( header, { "wellname", "well" } );
+    const int unitNameIndex = findColumn( header, { "unitname", "zone" } );
     const int mdTopIndex    = header.indexOf( "topmd" );
     const int mdBaseIndex   = header.indexOf( "basemd" );
-    const int tvdTopIndex   = header.indexOf( "toptvdss" );
-    const int tvdBaseIndex  = header.indexOf( "basetvdss" );
+    const int tvdTopIndex   = findColumn( header, { "toptvdss", "toptvd" } );
+    const int tvdBaseIndex  = findColumn( header, { "basetvdss", "basetvd" } );
+    const int xIndex        = header.indexOf( "xutme" );
+    const int yIndex        = header.indexOf( "yutmn" );
 
     const bool hasMd  = mdTopIndex != -1 && mdBaseIndex != -1;
     const bool hasTvd = tvdTopIndex != -1 && tvdBaseIndex != -1;
+    const bool hasXY  = xIndex != -1 && yIndex != -1;
 
     if ( wellNameIndex == -1 || unitNameIndex == -1 )
     {
@@ -95,7 +138,7 @@ std::expected<RifWellPathFormationReader::WellFormations, QString> RifWellPathFo
 
     while ( !stream.atEnd() )
     {
-        const QStringList columns = stream.readLine().split( ';' );
+        const QStringList columns = stream.readLine().split( delimiter );
         if ( columns.size() != header.size() ) continue;
 
         const QString wellName = columns[wellNameIndex];
@@ -115,6 +158,13 @@ std::expected<RifWellPathFormationReader::WellFormations, QString> RifWellPathFo
         {
             formation.tvdTop  = -columns[tvdTopIndex].toDouble();
             formation.tvdBase = -columns[tvdBaseIndex].toDouble();
+        }
+
+        if ( hasXY )
+        {
+            auto x = toOptionalDouble( columns, xIndex );
+            auto y = toOptionalDouble( columns, yIndex );
+            if ( x && y ) formation.topXY = cvf::Vec2d( *x, *y );
         }
 
         formationsPerWell[wellName].push_back( formation );
