@@ -23,12 +23,18 @@
 #include "RiaWellLogTrackDefines.h"
 #include "RimCase.h"
 #include "RimEclipseCase.h"
+#include "RimOilField.h"
+#include "RimProject.h"
 #include "RimTools.h"
 #include "RimWellLogTrack.h"
 #include "RimWellPath.h"
 
+#include "Formations/RimWellFormationsCollection.h"
+#include "Formations/RimWellFormationsFile.h"
+
 #include "RigEclipseCaseData.h"
 
+#include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiGroup.h"
 
 CAF_PDM_SOURCE_INIT( RimWellLogFormationSettings, "RimWellLogFormationSettings" );
@@ -49,6 +55,12 @@ RimWellLogFormationSettings::RimWellLogFormationSettings()
 
     CAF_PDM_InitFieldNoDefault( &m_formationWellPathForSourceWellPath, "FormationWellPathForSourceWellPath", "Well Path" );
     m_formationWellPathForSourceWellPath.uiCapability()->setUiTreeChildrenHidden( true );
+
+    CAF_PDM_InitFieldNoDefault( &m_wellFormationsFile, "FormationWellFormationsFile", "Formations File" );
+    m_wellFormationsFile.uiCapability()->setUiTreeChildrenHidden( true );
+
+    CAF_PDM_InitField( &m_wellNameInFormationsFile, "FormationWellNameInFile", QString(), "Well" );
+    m_wellNameInFormationsFile.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
 
     CAF_PDM_InitField( &m_formationSimWellName, "FormationSimulationWellName", QString( "None" ), "Simulation Well" );
     CAF_PDM_InitField( &m_formationBranchIndex, "FormationBranchIndex", 0, " " );
@@ -146,6 +158,58 @@ RimWellPath* RimWellLogFormationSettings::wellPathForSourceWellPath() const
 void RimWellLogFormationSettings::setWellPathForSourceWellPath( RimWellPath* wellPath )
 {
     m_formationWellPathForSourceWellPath = wellPath;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimWellFormationsFile* RimWellLogFormationSettings::wellFormationsFile() const
+{
+    return m_wellFormationsFile();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimWellLogFormationSettings::setWellFormationsFile( RimWellFormationsFile* file )
+{
+    m_wellFormationsFile = file;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimWellLogFormationSettings::wellNameInFormationsFile() const
+{
+    return m_wellNameInFormationsFile();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimWellLogFormationSettings::setWellNameInFormationsFile( const QString& wellName )
+{
+    m_wellNameInFormationsFile = wellName;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::optional<RigWellPathFormations> RimWellLogFormationSettings::resolveWellPickFormations() const
+{
+    if ( m_formationWellPathForSourceWellPath() )
+    {
+        const RigWellPathFormations* formations = m_formationWellPathForSourceWellPath->formationsGeometry();
+        if ( formations ) return *formations;
+        return std::nullopt;
+    }
+
+    if ( m_wellFormationsFile() && !m_wellNameInFormationsFile().isEmpty() )
+    {
+        return m_wellFormationsFile->formationsForWell( m_wellNameInFormationsFile() );
+    }
+
+    return std::nullopt;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -265,7 +329,13 @@ void RimWellLogFormationSettings::uiOrdering( const QString& uiConfigName, caf::
     else if ( m_formationSource() == RiaDefines::WellLogTrackFormationSource::WELL_PICK_FILTER )
     {
         uiOrdering.add( &m_formationWellPathForSourceWellPath );
-        if ( m_formationWellPathForSourceWellPath() )
+        if ( !m_formationWellPathForSourceWellPath() )
+        {
+            uiOrdering.add( &m_wellFormationsFile );
+            if ( m_wellFormationsFile() ) uiOrdering.add( &m_wellNameInFormationsFile );
+        }
+
+        if ( resolveWellPickFormations().has_value() )
         {
             uiOrdering.add( &m_formationLevel );
             uiOrdering.add( &m_showFormationFluids );
@@ -291,6 +361,13 @@ void RimWellLogFormationSettings::fieldChangedByUi( const caf::PdmFieldHandle* c
             }
         }
     }
+    else if ( changedField == &m_wellFormationsFile )
+    {
+        // Reset the selected well name when the file changes, picking the first well as a
+        // convenient default (mirrors RimWellPath's behavior when linking a formations file).
+        QStringList wellNames      = m_wellFormationsFile() ? m_wellFormationsFile->wellNames() : QStringList();
+        m_wellNameInFormationsFile = wellNames.isEmpty() ? QString() : wellNames.first();
+    }
 
     auto track = firstAncestorOrThisOfType<RimWellLogTrack>();
     if ( track )
@@ -314,6 +391,29 @@ QList<caf::PdmOptionItemInfo> RimWellLogFormationSettings::calculateValueOptions
     else if ( fieldNeedingOptions == &m_formationWellPathForSourceWellPath )
     {
         RimTools::wellPathWithFormationsOptionItems( &options );
+    }
+    else if ( fieldNeedingOptions == &m_wellFormationsFile )
+    {
+        options.push_back( caf::PdmOptionItemInfo( "None", static_cast<RimWellFormationsFile*>( nullptr ) ) );
+
+        RimProject* proj = RimProject::current();
+        if ( proj && proj->activeOilField() && proj->activeOilField()->wellFormationsCollection() )
+        {
+            for ( RimWellFormationsFile* file : proj->activeOilField()->wellFormationsCollection()->wellFormationsFiles() )
+            {
+                options.push_back( caf::PdmOptionItemInfo( file->shortName(), file, false, file->uiCapability()->uiIconProvider() ) );
+            }
+        }
+    }
+    else if ( fieldNeedingOptions == &m_wellNameInFormationsFile )
+    {
+        if ( m_wellFormationsFile() )
+        {
+            for ( const QString& wellName : m_wellFormationsFile->wellNames() )
+            {
+                options.push_back( caf::PdmOptionItemInfo( wellName, wellName ) );
+            }
+        }
     }
     else if ( fieldNeedingOptions == &m_formationCase )
     {
@@ -342,23 +442,19 @@ QList<caf::PdmOptionItemInfo> RimWellLogFormationSettings::calculateValueOptions
     }
     else if ( fieldNeedingOptions == &m_formationLevel )
     {
-        if ( m_formationWellPathForSourceWellPath )
+        if ( auto formations = resolveWellPickFormations() )
         {
-            const RigWellPathFormations* formations = m_formationWellPathForSourceWellPath->formationsGeometry();
-            if ( formations )
+            using FormationLevelEnum = caf::AppEnum<RiaDefines::WellLogTrackFormationLevel>;
+
+            options.push_back( caf::PdmOptionItemInfo( FormationLevelEnum::uiText( RiaDefines::WellLogTrackFormationLevel::NONE ),
+                                                       RiaDefines::WellLogTrackFormationLevel::NONE ) );
+
+            options.push_back( caf::PdmOptionItemInfo( FormationLevelEnum::uiText( RiaDefines::WellLogTrackFormationLevel::ALL ),
+                                                       RiaDefines::WellLogTrackFormationLevel::ALL ) );
+
+            for ( const auto& level : formations->formationsLevelsPresent() )
             {
-                using FormationLevelEnum = caf::AppEnum<RiaDefines::WellLogTrackFormationLevel>;
-
-                options.push_back( caf::PdmOptionItemInfo( FormationLevelEnum::uiText( RiaDefines::WellLogTrackFormationLevel::NONE ),
-                                                           RiaDefines::WellLogTrackFormationLevel::NONE ) );
-
-                options.push_back( caf::PdmOptionItemInfo( FormationLevelEnum::uiText( RiaDefines::WellLogTrackFormationLevel::ALL ),
-                                                           RiaDefines::WellLogTrackFormationLevel::ALL ) );
-
-                for ( const auto& level : formations->formationsLevelsPresent() )
-                {
-                    options.push_back( caf::PdmOptionItemInfo( FormationLevelEnum::uiText( level ), level ) );
-                }
+                options.push_back( caf::PdmOptionItemInfo( FormationLevelEnum::uiText( level ), level ) );
             }
         }
     }

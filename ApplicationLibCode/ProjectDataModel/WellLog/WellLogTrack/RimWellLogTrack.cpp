@@ -2569,7 +2569,8 @@ void RimWellLogTrack::updateFormationNamesOnPlot()
 
     if ( m_formationSettings->formationSource() == RiaDefines::WellLogTrackFormationSource::WELL_PICK_FILTER )
     {
-        if ( m_formationSettings->wellPathForSourceWellPath() == nullptr ) return;
+        auto formations = m_formationSettings->resolveWellPickFormations();
+        if ( !formations.has_value() ) return;
 
         if ( plot->depthType() != RiaDefines::DepthType::MEASURED_DEPTH && plot->depthType() != RiaDefines::DepthType::TRUE_VERTICAL_DEPTH &&
              plot->depthType() != RiaDefines::DepthType::TRUE_VERTICAL_DEPTH_RKB )
@@ -2577,14 +2578,11 @@ void RimWellLogTrack::updateFormationNamesOnPlot()
             return;
         }
 
-        const RigWellPathFormations* formations = m_formationSettings->wellPathForSourceWellPath()->formationsGeometry();
-        if ( !formations ) return;
-
         auto formationLevel = static_cast<RigWellPathFormations::FormationLevel>( m_formationSettings->formationLevel() );
         auto [formationNamesToPlot, yValues] =
             formations->depthAndFormationNamesUpToLevel( formationLevel, m_formationSettings->showFormationFluids(), plot->depthType() );
 
-        if ( plot->depthType() == RiaDefines::DepthType::TRUE_VERTICAL_DEPTH_RKB )
+        if ( plot->depthType() == RiaDefines::DepthType::TRUE_VERTICAL_DEPTH_RKB && m_formationSettings->wellPathForSourceWellPath() )
         {
             for ( double& depthValue : yValues )
             {
