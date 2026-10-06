@@ -61,6 +61,7 @@ public:
     QString keyInFile() const;
 
     size_t                      formationNamesCount() const;
+    size_t                      formationCount() const;
     const RigWellPathFormation& formationAt( size_t index ) const;
 
 private:

@@ -36,7 +36,7 @@ class RimSummaryFileSetEnsemble : public RimSummaryEnsemble
 public:
     RimSummaryFileSetEnsemble();
 
-    RimEnsembleFileSet* ensembleFileSet();
+    RimEnsembleFileSet* ensembleFileSet() const override;
     void                setEnsembleFileSet( RimEnsembleFileSet* ensembleFileSet );
     void                updateName( const std::set<QString>& existingEnsembleNames ) override;
 

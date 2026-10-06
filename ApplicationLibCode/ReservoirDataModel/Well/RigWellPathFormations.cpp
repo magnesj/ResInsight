@@ -314,3 +314,11 @@ const RigWellPathFormation& RigWellPathFormations::formationAt( size_t index ) c
 {
     return m_formations[index].first;
 }
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+size_t RigWellPathFormations::formationCount() const
+{
+    return m_formations.size();
+}

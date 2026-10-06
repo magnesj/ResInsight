@@ -26,6 +26,9 @@
 #include "cafPdmObject.h"
 #include "cafPdmPointer.h"
 #include "cafPdmProxyValueField.h"
+#include "cafPdmPtrField.h"
+
+class RimWellFormationsFile;
 
 //==================================================================================================
 ///
@@ -63,11 +66,15 @@ public:
 
     void reload();
 
+    RimWellFormationsFile* wellFormations() const;
+    void                   setWellFormations( RimWellFormationsFile* wellFormations );
+
 private:
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
+    QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
 
     void setRangeString( const QString& rangeString );
 
@@ -84,6 +91,8 @@ private:
     caf::PdmField<bool>    m_autoName;
 
     caf::PdmField<caf::AppEnum<RiaDefines::EnsembleGroupingMode>> m_groupingMode;
+
+    caf::PdmPtrField<RimWellFormationsFile*> m_wellFormations;
 
     bool m_useKey1;
     bool m_useKey2;

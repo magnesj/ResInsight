@@ -24,7 +24,10 @@
 #include "RiaStdStringTools.h"
 #include "RiaTextStringTools.h"
 
+#include "Formations/RimWellFormationsCollection.h"
+#include "Formations/RimWellFormationsFile.h"
 #include "RimEnsembleFileSetCollection.h"
+#include "RimOilField.h"
 #include "RimProject.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
@@ -74,6 +77,8 @@ RimEnsembleFileSet::RimEnsembleFileSet()
     m_ensembleInfo.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
 
     CAF_PDM_InitFieldNoDefault( &m_groupingMode, "GroupingMode", "Grouping Mode" );
+
+    CAF_PDM_InitFieldNoDefault( &m_wellFormations, "WellFormations", "Well Formations" );
 
     CAF_PDM_InitScriptableField( &m_autoName, "CreateAutoName", true, "Auto Name" );
 
@@ -308,6 +313,7 @@ void RimEnsembleFileSet::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
     uiOrdering.add( &m_pathPattern );
     uiOrdering.add( &m_realizationSubSet );
     uiOrdering.add( &m_ensembleInfo );
+    uiOrdering.add( &m_wellFormations );
 
     uiOrdering.skipRemainingFields( true );
 }
@@ -494,4 +500,44 @@ void RimEnsembleFileSet::reload()
 {
     m_realizationNumbersReadFromFiles.clear();
     sendFileSetChangedSignal();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimWellFormationsFile* RimEnsembleFileSet::wellFormations() const
+{
+    return m_wellFormations();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleFileSet::setWellFormations( RimWellFormationsFile* wellFormations )
+{
+    m_wellFormations = wellFormations;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QList<caf::PdmOptionItemInfo> RimEnsembleFileSet::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
+{
+    QList<caf::PdmOptionItemInfo> options;
+
+    if ( fieldNeedingOptions == &m_wellFormations )
+    {
+        options.push_back( caf::PdmOptionItemInfo( "None", nullptr ) );
+
+        auto proj = RimProject::current();
+        if ( proj && proj->activeOilField() && proj->activeOilField()->wellFormationsCollection() )
+        {
+            for ( RimWellFormationsFile* file : proj->activeOilField()->wellFormationsCollection()->wellFormationsFiles() )
+            {
+                options.push_back( caf::PdmOptionItemInfo( file->shortName(), file, false, file->uiCapability()->uiIconProvider() ) );
+            }
+        }
+    }
+
+    return options;
 }
