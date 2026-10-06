@@ -78,15 +78,18 @@ public:
     void setEnsembleParameter( const QString& paramName );
     void setWellFormations( RimWellFormationsFile* wellFormationsFile );
 
-    QString               ensembleParameter() const;
-    QString               wellName() const;
-    QDateTime             selectedTimeStep() const;
-    RimSummaryEnsemble*   ensemble() const;
-    RimEclipseResultCase* eclipseCase() const;
-    bool                  useDepthRange() const;
-    double                depthRangeMin() const;
-    double                depthRangeMax() const;
-    RiaDefines::DepthType depthType() const;
+    QString                               ensembleParameter() const;
+    QString                               wellName() const;
+    QDateTime                             selectedTimeStep() const;
+    RimSummaryEnsemble*                   ensemble() const;
+    RimEclipseResultCase*                 eclipseCase() const;
+    bool                                  useDepthRange() const;
+    double                                depthRangeMin() const;
+    double                                depthRangeMax() const;
+    RiaDefines::DepthType                 depthType() const;
+    RimRftCrossPlotTools::DepthFilterMode filterMode() const;
+    std::vector<QString>                  selectedZones() const;
+    RimWellFormationsFile*                wellFormationsFile() const;
 
     RiuQwtPlotWidget* viewer();
 

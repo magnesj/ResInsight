@@ -258,6 +258,30 @@ RiaDefines::DepthType RimParameterRftCrossPlot::depthType() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+RimRftCrossPlotTools::DepthFilterMode RimParameterRftCrossPlot::filterMode() const
+{
+    return m_filterMode();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<QString> RimParameterRftCrossPlot::selectedZones() const
+{
+    return m_selectedZones();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimWellFormationsFile* RimParameterRftCrossPlot::wellFormationsFile() const
+{
+    return m_wellFormations();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RiuQwtPlotWidget* RimParameterRftCrossPlot::viewer()
 {
     return m_plotWidget;
@@ -601,6 +625,13 @@ void RimParameterRftCrossPlot::fieldChangedByUi( const caf::PdmFieldHandle* chan
             }
         }
         m_selectedTimeStep = timeSteps.empty() ? QDateTime() : *timeSteps.begin();
+    }
+
+    if ( changedField == &m_wellName )
+    {
+        // The selected zones belong to the previous well; clear them so stale zone names from
+        // another well are not silently applied as a filter.
+        m_selectedZones = std::vector<QString>();
     }
 
     RimPlot::fieldChangedByUi( changedField, oldValue, newValue );
