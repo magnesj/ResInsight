@@ -169,6 +169,20 @@ void RimWellFormationsFile::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTree
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Parses the file right after the project is loaded, so the data is available without requiring a
+/// manual reload.
+//--------------------------------------------------------------------------------------------------
+void RimWellFormationsFile::initAfterRead()
+{
+    if ( m_filePath().path().isEmpty() ) return;
+
+    if ( auto result = reload(); !result )
+    {
+        RiaLogging::error( result.error().toStdString() );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 void RimWellFormationsFile::updateUiTreeName()
