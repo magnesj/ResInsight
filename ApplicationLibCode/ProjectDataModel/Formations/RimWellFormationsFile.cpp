@@ -21,6 +21,7 @@
 #include "RiaLogging.h"
 
 #include "cafPdmUiFilePathEditor.h"
+#include "cafPdmUiTextEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 
 #include <QFileInfo>
@@ -36,6 +37,12 @@ RimWellFormationsFile::RimWellFormationsFile()
 
     CAF_PDM_InitFieldNoDefault( &m_filePath, "FilePath", "File Path" );
     m_filePath.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
+
+    CAF_PDM_InitFieldNoDefault( &m_contentTable, "ContentTable", "Content" );
+    m_contentTable.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
+    m_contentTable.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::HIDDEN );
+    m_contentTable.uiCapability()->setUiReadOnly( true );
+    m_contentTable.xmlCapability()->disableIO();
 
     setDeletable( true );
 }
@@ -74,10 +81,12 @@ std::expected<void, QString> RimWellFormationsFile::reload()
     if ( !result )
     {
         m_wellFormations.clear();
+        updateContentTable();
         return std::unexpected( result.error() );
     }
 
     m_wellFormations = std::move( *result );
+    updateContentTable();
     return {};
 }
 
@@ -169,6 +178,32 @@ void RimWellFormationsFile::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTree
 }
 
 //--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimWellFormationsFile::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
+{
+    uiOrdering.add( &m_filePath );
+    uiOrdering.add( &m_contentTable );
+    uiOrdering.skipRemainingFields();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimWellFormationsFile::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
+{
+    if ( field == &m_contentTable )
+    {
+        auto myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
+        if ( myAttr )
+        {
+            myAttr->wrapMode = caf::PdmUiTextEditorAttribute::NoWrap;
+            myAttr->textMode = caf::PdmUiTextEditorAttribute::HTML;
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
 /// Parses the file right after the project is loaded, so the data is available without requiring a
 /// manual reload.
 //--------------------------------------------------------------------------------------------------
@@ -188,4 +223,60 @@ void RimWellFormationsFile::initAfterRead()
 void RimWellFormationsFile::updateUiTreeName()
 {
     uiCapability()->setUiName( shortName() );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimWellFormationsFile::updateContentTable()
+{
+    m_contentTable = generateContentTable();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimWellFormationsFile::generateContentTable() const
+{
+    QString header( "<table border=1 cellspacing=0 cellpadding=3>"
+                    "  <thead>"
+                    "    <tr bgcolor=lightblue>"
+                    "      <th>Well</th>"
+                    "      <th>Zone</th>"
+                    "      <th>Top MD</th>"
+                    "      <th>Base MD</th>"
+                    "      <th>Top TVD</th>"
+                    "      <th>Base TVD</th>"
+                    "    </tr>"
+                    "  </thead>"
+                    "  <tbody>" );
+
+    QString body;
+    for ( const auto& [wellName, formations] : m_wellFormations )
+    {
+        for ( size_t i = 0; i < formations.formationCount(); i++ )
+        {
+            const auto& formation = formations.formationAt( i );
+
+            QString row( "<tr>"
+                         "  <td>%1</td>"
+                         "  <td>%2</td>"
+                         "  <td align=right>%3</td>"
+                         "  <td align=right>%4</td>"
+                         "  <td align=right>%5</td>"
+                         "  <td align=right>%6</td>"
+                         "</tr>" );
+
+            body.append( row.arg( wellName )
+                             .arg( formation.formationName )
+                             .arg( formation.mdTop, 0, 'f', 2 )
+                             .arg( formation.mdBase, 0, 'f', 2 )
+                             .arg( formation.tvdTop, 0, 'f', 2 )
+                             .arg( formation.tvdBase, 0, 'f', 2 ) );
+        }
+    }
+
+    QString footer( "</tbody></table>" );
+
+    return header + body + footer;
 }

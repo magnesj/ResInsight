@@ -52,14 +52,19 @@ public:
 
 protected:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+    void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
+    void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
     void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) override;
     void initAfterRead() override;
 
 private:
-    void updateUiTreeName();
+    void    updateUiTreeName();
+    void    updateContentTable();
+    QString generateContentTable() const;
 
 private:
     caf::PdmField<caf::FilePath> m_filePath;
+    caf::PdmField<QString>       m_contentTable;
 
     RifWellPathFormationReader::WellFormations m_wellFormations;
 };
