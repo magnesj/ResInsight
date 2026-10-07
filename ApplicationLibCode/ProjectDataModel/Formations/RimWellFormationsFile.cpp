@@ -19,6 +19,7 @@
 #include "RimWellFormationsFile.h"
 
 #include "RiaLogging.h"
+#include "RifCsvHtmlTableTools.h"
 
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiTextEditor.h"
@@ -230,53 +231,13 @@ void RimWellFormationsFile::updateUiTreeName()
 //--------------------------------------------------------------------------------------------------
 void RimWellFormationsFile::updateContentTable()
 {
-    m_contentTable = generateContentTable();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QString RimWellFormationsFile::generateContentTable() const
-{
-    QString header( "<table border=1 cellspacing=0 cellpadding=3>"
-                    "  <thead>"
-                    "    <tr bgcolor=lightblue>"
-                    "      <th>Well</th>"
-                    "      <th>Zone</th>"
-                    "      <th>Top MD</th>"
-                    "      <th>Base MD</th>"
-                    "      <th>Top TVD</th>"
-                    "      <th>Base TVD</th>"
-                    "    </tr>"
-                    "  </thead>"
-                    "  <tbody>" );
-
-    QString body;
-    for ( const auto& [wellName, formations] : m_wellFormations )
+    auto result = RifCsvHtmlTableTools::generateHtmlTableFromFile( filePath() );
+    if ( result )
     {
-        for ( size_t i = 0; i < formations.formationCount(); i++ )
-        {
-            const auto& formation = formations.formationAt( i );
-
-            QString row( "<tr>"
-                         "  <td>%1</td>"
-                         "  <td>%2</td>"
-                         "  <td align=right>%3</td>"
-                         "  <td align=right>%4</td>"
-                         "  <td align=right>%5</td>"
-                         "  <td align=right>%6</td>"
-                         "</tr>" );
-
-            body.append( row.arg( wellName )
-                             .arg( formation.formationName )
-                             .arg( formation.mdTop, 0, 'f', 2 )
-                             .arg( formation.mdBase, 0, 'f', 2 )
-                             .arg( formation.tvdTop, 0, 'f', 2 )
-                             .arg( formation.tvdBase, 0, 'f', 2 ) );
-        }
+        m_contentTable = *result;
     }
-
-    QString footer( "</tbody></table>" );
-
-    return header + body + footer;
+    else
+    {
+        m_contentTable = result.error();
+    }
 }

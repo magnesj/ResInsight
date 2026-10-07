@@ -58,9 +58,8 @@ protected:
     void initAfterRead() override;
 
 private:
-    void    updateUiTreeName();
-    void    updateContentTable();
-    QString generateContentTable() const;
+    void updateUiTreeName();
+    void updateContentTable();
 
 private:
     caf::PdmField<caf::FilePath> m_filePath;
