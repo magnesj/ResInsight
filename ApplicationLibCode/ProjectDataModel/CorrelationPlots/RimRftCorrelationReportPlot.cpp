@@ -546,13 +546,16 @@ void RimRftCorrelationReportPlot::syncTornadoInputsFromCrossPlot()
 
 //--------------------------------------------------------------------------------------------------
 /// Resolves the well formations file linked to the selected ensemble (if any) and pushes it down
-/// to the sub plots so their "Filter By: Zones" option becomes available.
+/// to the sub plots so their "Filter By: Zones" option becomes available. If the ensemble has no
+/// linked file (e.g. a classic ensemble without an ensemble file set), the user's manual selection
+/// in the cross plot's "Well Formations File" field (if any) is left untouched.
 //--------------------------------------------------------------------------------------------------
 void RimRftCorrelationReportPlot::applyWellFormationsToSubPlots()
 {
     if ( !m_parameterRftCrossPlot() ) return;
 
     RimWellFormationsFile* wellFormationsFile = RimWellFormationsTools::formationsForEnsemble( m_parameterRftCrossPlot->ensemble() );
+    if ( !wellFormationsFile ) wellFormationsFile = m_parameterRftCrossPlot->wellFormationsFile();
 
     m_parameterRftCrossPlot->setWellFormations( wellFormationsFile );
     if ( m_tornadoPlot() ) m_tornadoPlot->setWellFormations( wellFormationsFile );

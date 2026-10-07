@@ -26,10 +26,12 @@
 #include "RigEnsembleParameter.h"
 #include "RigStatisticsTools.h"
 
+#include "Formations/RimWellFormationsCollection.h"
 #include "Formations/RimWellFormationsFile.h"
 
 #include "RimEclipseCase.h"
 #include "RimEclipseResultCase.h"
+#include "RimOilField.h"
 #include "RimProject.h"
 #include "RimRftCrossPlotTools.h"
 #include "RimSummaryCase.h"
@@ -97,7 +99,6 @@ RimParameterRftCrossPlot::RimParameterRftCrossPlot()
     CAF_PDM_InitField( &m_depthRangeMin, "DepthRangeMin", 0.0, "Min Depth" );
     CAF_PDM_InitField( &m_depthRangeMax, "DepthRangeMax", 5000.0, "Max Depth" );
     CAF_PDM_InitFieldNoDefault( &m_wellFormations, "WellFormations", "Well Formations File" );
-    m_wellFormations.uiCapability()->setUiHidden( true ); // driven by the parent RimRftCorrelationReportPlot
     CAF_PDM_InitFieldNoDefault( &m_selectedZones, "SelectedZones", "Zones" );
     m_selectedZones.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
     CAF_PDM_InitField( &m_depthType, "DepthType", caf::AppEnum<RiaDefines::DepthType>( RiaDefines::DepthType::MEASURED_DEPTH ), "Depth Type" );
@@ -575,6 +576,7 @@ void RimParameterRftCrossPlot::defineUiOrdering( QString uiConfigName, caf::PdmU
     auto* depthGroup =
         uiOrdering.addNewGroup( QString( "Depth Range (%1)" ).arg( RimRftCrossPlotTools::depthTypeAbbreviation( m_depthType() ) ) );
     depthGroup->add( &m_useDepthRange );
+    depthGroup->add( &m_wellFormations );
     depthGroup->add( &m_filterMode );
     depthGroup->add( &m_depthRangeMin );
     depthGroup->add( &m_depthRangeMax );
@@ -627,10 +629,10 @@ void RimParameterRftCrossPlot::fieldChangedByUi( const caf::PdmFieldHandle* chan
         m_selectedTimeStep = timeSteps.empty() ? QDateTime() : *timeSteps.begin();
     }
 
-    if ( changedField == &m_wellName )
+    if ( changedField == &m_wellName || changedField == &m_wellFormations )
     {
-        // The selected zones belong to the previous well; clear them so stale zone names from
-        // another well are not silently applied as a filter.
+        // The selected zones belong to the previous well/formations file; clear them so stale zone
+        // names are not silently applied as a filter.
         m_selectedZones = std::vector<QString>();
     }
 
@@ -694,6 +696,16 @@ QList<caf::PdmOptionItemInfo> RimParameterRftCrossPlot::calculateValueOptions( c
         {
             if ( auto* rc = dynamic_cast<RimEclipseResultCase*>( c ) )
                 options.push_back( caf::PdmOptionItemInfo( rc->caseUserDescription(), rc ) );
+        }
+    }
+    else if ( fieldNeedingOptions == &m_wellFormations )
+    {
+        options.push_back( caf::PdmOptionItemInfo( "None", static_cast<RimWellFormationsFile*>( nullptr ) ) );
+        auto* project = RimProject::current();
+        if ( project && project->activeOilField() && project->activeOilField()->wellFormationsCollection() )
+        {
+            for ( RimWellFormationsFile* file : project->activeOilField()->wellFormationsCollection()->wellFormationsFiles() )
+                options.push_back( caf::PdmOptionItemInfo( file->shortName(), file ) );
         }
     }
     else if ( fieldNeedingOptions == &m_selectedZones )
