@@ -25,6 +25,7 @@
 
 #include <optional>
 #include <set>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -54,6 +55,9 @@ public:
     // Returns formation names and depths as parallel vectors
     std::pair<std::vector<QString>, std::vector<double>>
         depthAndFormationNamesUpToLevel( FormationLevel level, bool includeFluids, RiaDefines::DepthType depthType ) const;
+
+    // Returns formation name and (top, base) depth range per zone, for shaded region plotting.
+    std::vector<std::tuple<QString, double, double>> depthRangesUpToLevel( FormationLevel level, RiaDefines::DepthType depthType ) const;
 
     std::vector<FormationLevel> formationsLevelsPresent() const;
 

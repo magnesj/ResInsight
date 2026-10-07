@@ -2602,20 +2602,86 @@ void RimWellLogTrack::updateFormationNamesOnPlot()
         }
 
         auto formationLevel = static_cast<RigWellPathFormations::FormationLevel>( m_formationSettings->formationLevel() );
-        auto [formationNamesToPlot, yValues] =
-            formations->depthAndFormationNamesUpToLevel( formationLevel, m_formationSettings->showFormationFluids(), plot->depthType() );
 
+        double rkbDiff = 0.0;
         if ( plot->depthType() == RiaDefines::DepthType::TRUE_VERTICAL_DEPTH_RKB && m_formationSettings->wellPathForSourceWellPath() )
         {
-            for ( double& depthValue : yValues )
-            {
-                depthValue += m_formationSettings->wellPathForSourceWellPath()->wellPathGeometry()->rkbDiff();
-            }
+            rkbDiff = m_formationSettings->wellPathForSourceWellPath()->wellPathGeometry()->rkbDiff();
         }
 
-        std::vector<double> convertedYValues = RiaWellLogUnitTools<double>::convertDepths( yValues, fromDepthUnit, toDepthUnit );
+        // Fluid contacts are single-depth picks (no zone thickness); keep these as simple pick lines.
+        // depthAndFormationNamesUpToLevel() only produces fluid picks when the formation level is NONE.
+        auto [fluidNamesToPlot, fluidYValues] = formations->depthAndFormationNamesUpToLevel( RigWellPathFormations::FormationLevel::NONE,
+                                                                                             m_formationSettings->showFormationFluids(),
+                                                                                             plot->depthType() );
+        for ( double& depthValue : fluidYValues )
+            depthValue += rkbDiff;
+        std::vector<double> convertedFluidYValues = RiaWellLogUnitTools<double>::convertDepths( fluidYValues, fromDepthUnit, toDepthUnit );
 
-        m_annotationTool->attachWellPicks( m_plotWidget->qwtPlot(), formationNamesToPlot, convertedYValues );
+        // attachWellPicks() clears all existing plot annotations, so call it first and add the
+        // shaded formation zones (if any) afterwards.
+        m_annotationTool->attachWellPicks( m_plotWidget->qwtPlot(), fluidNamesToPlot, convertedFluidYValues );
+
+        // Formations have a top/base depth range, so they can be drawn as shaded zones (or plain
+        // lines) using the same region-display machinery as the CASE-based formation names below.
+        auto depthRanges = formations->depthRangesUpToLevel( formationLevel, plot->depthType() );
+        if ( !depthRanges.empty() )
+        {
+            std::vector<QString>                   zoneNamesToPlot;
+            std::vector<std::pair<double, double>> zoneYValues;
+            for ( const auto& [name, top, base] : depthRanges )
+            {
+                zoneNamesToPlot.push_back( name );
+                zoneYValues.emplace_back( top + rkbDiff, base + rkbDiff );
+            }
+
+            std::vector<std::pair<double, double>> convertedZoneYValues =
+                RiaWellLogUnitTools<double>::convertDepths( zoneYValues, fromDepthUnit, toDepthUnit );
+
+            // Build color table ordered by formation name to ensure correct color mapping
+            // when using a legend based on a LYR-file. Falls back to palette index for
+            // formations not found in the legend (e.g., when using a generic color palette).
+            RimColorLegend* legend = m_regionAnnotationSettings->colorShadingLegend();
+            if ( !legend ) legend = RimRegularLegendConfig::mapToColorLegend( RimRegularLegendConfig::ColorRangesType::NORMAL );
+
+            if ( legend )
+            {
+                std::map<QString, cvf::Color3ub> nameToColor;
+                for ( auto* item : legend->colorLegendItems() )
+                {
+                    nameToColor[item->categoryName()] = cvf::Color3ub( item->color() );
+                }
+
+                cvf::Color3ubArray paletteColors = legend->colorArray();
+                size_t             colorCount    = std::max( size_t( 2 ), zoneNamesToPlot.size() );
+                cvf::Color3ubArray orderedColors( colorCount );
+                orderedColors.setAll( cvf::Color3ub::GRAY );
+
+                for ( size_t i = 0; i < zoneNamesToPlot.size(); i++ )
+                {
+                    auto it = nameToColor.find( zoneNamesToPlot[i] );
+                    if ( it != nameToColor.end() )
+                    {
+                        orderedColors.set( i, it->second );
+                    }
+                    else if ( paletteColors.size() > 0 )
+                    {
+                        orderedColors.set( i, paletteColors[i % paletteColors.size()] );
+                    }
+                }
+
+                caf::ColorTable colorTable( orderedColors );
+
+                m_annotationTool->attachNamedRegions( m_plotWidget->qwtPlot(),
+                                                      zoneNamesToPlot,
+                                                      orientation,
+                                                      convertedZoneYValues,
+                                                      m_regionAnnotationSettings->annotationDisplay(),
+                                                      colorTable,
+                                                      ( ( 100 - m_regionAnnotationSettings->colorShadingTransparency() ) * 255 ) / 100,
+                                                      m_regionAnnotationSettings->showRegionLabels() );
+            }
+        }
     }
     else
     {
