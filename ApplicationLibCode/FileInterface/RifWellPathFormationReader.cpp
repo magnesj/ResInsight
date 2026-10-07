@@ -109,20 +109,27 @@ std::expected<RifWellPathFormationReader::WellFormations, QString> RifWellPathFo
     }
 
     // The "well pick" formats use wellname/unitname, the FMU formations.csv format uses well/zone (and
-    // ignores zone_code). Both support md and/or (negated) tvd, and the FMU format can also include an
-    // x/y position for the zone top.
-    const int wellNameIndex = findColumn( header, { "wellname", "well" } );
-    const int unitNameIndex = findColumn( header, { "unitname", "zone" } );
-    const int mdTopIndex    = header.indexOf( "topmd" );
-    const int mdBaseIndex   = header.indexOf( "basemd" );
-    const int tvdTopIndex   = findColumn( header, { "toptvdss", "toptvd" } );
-    const int tvdBaseIndex  = findColumn( header, { "basetvdss", "basetvd" } );
-    const int xIndex        = header.indexOf( "xutme" );
-    const int yIndex        = header.indexOf( "yutmn" );
+    // ignores zone_code). Both support md and/or tvd, and the FMU format can also include an x/y
+    // position for the zone top.
+    //
+    // "tvdss" columns hold a positive magnitude in the opposite (RMS, Z-up) sign convention and are
+    // negated to match ResInsight's positive-down TVD. Plain "tvd" columns (as used in the FMU
+    // formations.csv) are already positive-down and are used as-is.
+    const int wellNameIndex  = findColumn( header, { "wellname", "well" } );
+    const int unitNameIndex  = findColumn( header, { "unitname", "zone" } );
+    const int mdTopIndex     = header.indexOf( "topmd" );
+    const int mdBaseIndex    = header.indexOf( "basemd" );
+    const int tvdSSTopIndex  = header.indexOf( "toptvdss" );
+    const int tvdSSBaseIndex = header.indexOf( "basetvdss" );
+    const int tvdTopIndex    = tvdSSTopIndex != -1 ? tvdSSTopIndex : header.indexOf( "toptvd" );
+    const int tvdBaseIndex   = tvdSSBaseIndex != -1 ? tvdSSBaseIndex : header.indexOf( "basetvd" );
+    const int xIndex         = header.indexOf( "xutme" );
+    const int yIndex         = header.indexOf( "yutmn" );
 
-    const bool hasMd  = mdTopIndex != -1 && mdBaseIndex != -1;
-    const bool hasTvd = tvdTopIndex != -1 && tvdBaseIndex != -1;
-    const bool hasXY  = xIndex != -1 && yIndex != -1;
+    const bool hasMd   = mdTopIndex != -1 && mdBaseIndex != -1;
+    const bool hasTvd  = tvdTopIndex != -1 && tvdBaseIndex != -1;
+    const bool isTvdSS = tvdSSTopIndex != -1 && tvdSSBaseIndex != -1;
+    const bool hasXY   = xIndex != -1 && yIndex != -1;
 
     if ( wellNameIndex == -1 || unitNameIndex == -1 )
     {
@@ -156,8 +163,9 @@ std::expected<RifWellPathFormationReader::WellFormations, QString> RifWellPathFo
 
         if ( hasTvd )
         {
-            formation.tvdTop  = -columns[tvdTopIndex].toDouble();
-            formation.tvdBase = -columns[tvdBaseIndex].toDouble();
+            const double sign = isTvdSS ? -1.0 : 1.0;
+            formation.tvdTop  = sign * columns[tvdTopIndex].toDouble();
+            formation.tvdBase = sign * columns[tvdBaseIndex].toDouble();
         }
 
         if ( hasXY )

@@ -140,9 +140,9 @@ TEST( RifWellPathFormationReader, ParseFmuFormationsCsv )
     EXPECT_EQ( ( std::vector<QString>{ "Valysar Top", "Therys Top", "Therys Base" } ), mdNames );
     EXPECT_EQ( ( std::vector<double>{ 1693.0, 1711.0, 1727.0 } ), mdDepths );
 
-    // TOP_TVD/BASE_TVD are stored with negated sign, to match the "unitname" TVDSS convention
+    // TOP_TVD/BASE_TVD (without the "SS" suffix) are already positive-down, and are used as-is
     auto [tvdNames, tvdDepths] = allFormations( well, RiaDefines::DepthType::TRUE_VERTICAL_DEPTH );
-    EXPECT_EQ( ( std::vector<double>{ -1644.0, -1662.0, -1678.0 } ), tvdDepths );
+    EXPECT_EQ( ( std::vector<double>{ 1644.0, 1662.0, 1678.0 } ), tvdDepths );
 }
 
 TEST( RifWellPathFormationReader, ParseFmuFormationsCsvIncludesTopXY )
