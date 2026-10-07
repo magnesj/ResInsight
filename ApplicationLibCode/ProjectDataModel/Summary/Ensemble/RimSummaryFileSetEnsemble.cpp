@@ -53,7 +53,7 @@ RimSummaryFileSetEnsemble::RimSummaryFileSetEnsemble()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimEnsembleFileSet* RimSummaryFileSetEnsemble::ensembleFileSet() const
+RimEnsembleFileSet* RimSummaryFileSetEnsemble::ensembleFileSet()
 {
     return m_ensembleFileSet();
 }

@@ -58,7 +58,6 @@
 #include "RimWellRftEnsembleCurveSet.h"
 
 #include "Formations/RimWellFormationsFile.h"
-#include "Formations/RimWellFormationsTools.h"
 
 #include "RiuAbstractLegendFrame.h"
 #include "RiuDraggableOverlayFrame.h"
@@ -280,18 +279,6 @@ void RimWellRftPlot::updateFormationsOnPlot() const
             if ( wellPath && wellPath->formationsGeometry() )
             {
                 wellFormationsFile = wellPath->wellFormationsFile();
-            }
-            else
-            {
-                for ( RimSummaryEnsemble* ensemble : selectedEnsembles() )
-                {
-                    RimWellFormationsFile* file = RimWellFormationsTools::formationsForEnsemble( ensemble );
-                    if ( file && file->formationsForWell( wellNameInFile ).has_value() )
-                    {
-                        wellFormationsFile = file;
-                        break;
-                    }
-                }
             }
 
             if ( wellFormationsFile )

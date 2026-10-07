@@ -41,7 +41,6 @@ class RimSummaryCase;
 class RimSummaryAddressCollection;
 class RiaSummaryAddressAnalyzer;
 class RimSummaryEnsembleParameterCollection;
-class RimEnsembleFileSet;
 
 //==================================================================================================
 ///
@@ -134,11 +133,6 @@ public:
     virtual void cleanupBeforeDelete();
 
     bool includeInAutoReload() const;
-
-    // The file set an ensemble was created from, if any. Used e.g. to find the well formations file
-    // linked to the file set. Returns nullptr when the ensemble has no file set (picked file lists,
-    // SUMO ensembles, older projects).
-    virtual RimEnsembleFileSet* ensembleFileSet() const { return nullptr; }
 
 protected:
     virtual void onLoadDataAndUpdate();
