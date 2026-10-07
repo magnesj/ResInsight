@@ -34,7 +34,7 @@ CAF_PDM_SOURCE_INIT( RimWellFormationsCollection, "WellFormationsCollection" );
 //--------------------------------------------------------------------------------------------------
 RimWellFormationsCollection::RimWellFormationsCollection()
 {
-    CAF_PDM_InitObject( "Well Formations", ":/FormationCollection16x16.png" );
+    CAF_PDM_InitObject( "Well Picks (Formations)", ":/FormationCollection16x16.png" );
 
     CAF_PDM_InitFieldNoDefault( &m_wellFormationsFiles, "WellFormationsFiles", "Well Formations" );
 
