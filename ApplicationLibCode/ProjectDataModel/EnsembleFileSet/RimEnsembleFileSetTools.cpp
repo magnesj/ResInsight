@@ -24,7 +24,6 @@
 #include "Ensemble/RimSummaryFileSetEnsemble.h"
 #include "EnsembleFileSet/RimEnsembleFileSet.h"
 #include "EnsembleFileSet/RimEnsembleFileSetCollection.h"
-#include "Formations/RimWellFormationsTools.h"
 #include "RiaEnsembleNameTools.h"
 #include "RimEclipseCaseCollection.h"
 #include "RimOilField.h"
@@ -51,7 +50,6 @@ std::vector<RimSummaryEnsemble*> createSummaryEnsemblesFromFileSets( const std::
         sumCaseMainColl->addEnsemble( ensemble );
         sumCaseMainColl->updateEnsembleNames();
         ensemble->loadDataAndUpdate();
-        RimWellFormationsTools::discoverWellFormations( fileSet );
         ensembles.push_back( ensemble );
     }
 
@@ -121,7 +119,6 @@ std::vector<RimReservoirGridEnsemble*> createGridEnsemblesFromFileSets( const st
 
         ensemble->createGridCasesFromEnsembleFileSet();
         ensemble->loadDataAndUpdate();
-        RimWellFormationsTools::discoverWellFormations( fileSet );
         ensembles.push_back( ensemble );
     }
 

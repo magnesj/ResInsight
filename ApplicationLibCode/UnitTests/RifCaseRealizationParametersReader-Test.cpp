@@ -150,27 +150,6 @@ TEST( RifRmsSeedFileReaderTest, ReadSeedValue )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-TEST( RifFmuFormationsFileLocatorTest, LocatorTestSuccess )
-{
-    QString modelDir = CASE_REAL_TEST_DATA_DIRECTORY_01 + "formations_csv/realization-1/iter-0/eclipse/model";
-
-    QString file     = RifFmuFormationsFileLocator::locate( modelDir );
-    QString expected = CASE_REAL_TEST_DATA_DIRECTORY_01 + "formations_csv/realization-1/iter-0/share/results/tables/formations.csv";
-    EXPECT_EQ( expected.toStdString(), file.toStdString() );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-TEST( RifFmuFormationsFileLocatorTest, LocatorTestFailure )
-{
-    QString file = RifFmuFormationsFileLocator::locate( CASE_REAL_TEST_DATA_DIRECTORY_01 + "4/3/2" );
-    EXPECT_TRUE( file.isEmpty() );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 TEST( RifCaseRealizationParametersReaderTest, FindRealizationNumber )
 {
     {
