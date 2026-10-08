@@ -45,6 +45,7 @@ namespace RimRftCrossPlotTools
 // looked up in a well formations file.
 enum class DepthFilterMode
 {
+    NONE,
     DEPTH_RANGE,
     ZONES
 };

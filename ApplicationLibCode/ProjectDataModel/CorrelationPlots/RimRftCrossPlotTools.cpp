@@ -42,9 +42,10 @@ namespace caf
 template <>
 void caf::AppEnum<RimRftCrossPlotTools::DepthFilterMode>::setUp()
 {
+    addItem( RimRftCrossPlotTools::DepthFilterMode::NONE, "NONE", "None" );
     addItem( RimRftCrossPlotTools::DepthFilterMode::DEPTH_RANGE, "DEPTH_RANGE", "Depth Range" );
-    addItem( RimRftCrossPlotTools::DepthFilterMode::ZONES, "ZONES", "Zones" );
-    setDefault( RimRftCrossPlotTools::DepthFilterMode::DEPTH_RANGE );
+    addItem( RimRftCrossPlotTools::DepthFilterMode::ZONES, "ZONES", "Formation" );
+    setDefault( RimRftCrossPlotTools::DepthFilterMode::NONE );
 }
 } // namespace caf
 
@@ -109,7 +110,7 @@ std::vector<RimRftCrossPlotTools::DepthInterval> RimRftCrossPlotTools::buildDept
                                                                                             const std::vector<QString>& selectedZones,
                                                                                             RiaDefines::DepthType       depthType )
 {
-    if ( !useFilter ) return {};
+    if ( !useFilter || mode == DepthFilterMode::NONE ) return {};
 
     if ( mode == DepthFilterMode::DEPTH_RANGE ) return { DepthInterval{ depthRangeMin, depthRangeMax } };
 
@@ -175,7 +176,7 @@ QString RimRftCrossPlotTools::depthFilterDescription( bool                      
                                                       double                      depthRangeMax,
                                                       const std::vector<QString>& selectedZones )
 {
-    if ( !useFilter ) return {};
+    if ( !useFilter || mode == DepthFilterMode::NONE ) return {};
 
     if ( mode == DepthFilterMode::ZONES )
     {
