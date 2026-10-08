@@ -2,6 +2,8 @@
 
 #include "Well/RigWellPathFormations.h"
 
+#include "RiaWellLogTrackDefines.h"
+
 #include <QString>
 
 #include <vector>

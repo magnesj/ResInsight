@@ -19,7 +19,6 @@
 #pragma once
 
 #include "RiaDefines.h"
-#include "RiaWellLogTrackDefines.h"
 
 #include "cvfVector2.h"
 
@@ -30,6 +29,11 @@
 #include <vector>
 
 #include <QString>
+
+namespace RiaDefines
+{
+enum class WellLogTrackFormationLevel;
+}
 
 struct RigWellPathFormation
 {

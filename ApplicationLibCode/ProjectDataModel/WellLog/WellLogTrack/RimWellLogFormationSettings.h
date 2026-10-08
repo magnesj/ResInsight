@@ -18,14 +18,19 @@
 
 #pragma once
 
-#include "RiaWellLogTrackDefines.h"
-
 #include "Well/RigWellPathFormations.h"
 
 #include "cafAppEnum.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 #include "cafPdmPtrField.h"
+
+namespace RiaDefines
+{
+enum class WellLogTrackFormationSource;
+enum class WellLogTrackTrajectoryType;
+enum class WellLogTrackFormationLevel;
+} // namespace RiaDefines
 
 class RimCase;
 class RimWellPath;

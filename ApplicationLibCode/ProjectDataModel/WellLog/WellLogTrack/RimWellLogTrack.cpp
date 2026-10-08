@@ -28,6 +28,7 @@
 #include "RiaResultNames.h"
 #include "RiaSimWellBranchTools.h"
 #include "RiaWellLogCurveMerger.h"
+#include "RiaWellLogTrackDefines.h"
 
 #include "RigEclipseCaseData.h"
 #include "RigEclipseResultAddress.h"
@@ -1292,17 +1293,29 @@ void RimWellLogTrack::setAndUpdateSimWellFormationNamesData( RimCase* rimCase, c
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimWellLogTrack::setAndUpdateWellPickFormationsData( RimWellPath*           wellPath,
-                                                          RimWellFormationsFile* wellFormationsFile,
-                                                          const QString&         wellNameInFile )
+void RimWellLogTrack::setAndUpdateWellPickFormationsData( RimWellPath* wellPath )
 {
     m_formationSettings->setFormationSource( RiaDefines::WellLogTrackFormationSource::WELL_PICK_FILTER );
     m_formationSettings->setWellPathForSourceWellPath( wellPath );
 
-    // The direct file/well name pair is only used when there is no well path to resolve formations
-    // from (e.g. an RFT plot showing a simulation well with no associated well path).
-    m_formationSettings->setWellFormationsFile( wellPath ? nullptr : wellFormationsFile );
-    m_formationSettings->setWellNameInFormationsFile( wellPath ? QString() : wellNameInFile );
+    updateConnectedEditors();
+
+    if ( m_regionAnnotationSettings->annotationType() != RiaDefines::RegionAnnotationType::NO_ANNOTATIONS )
+    {
+        updateRegionAnnotationsOnPlot();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Shows formation zone bands using the explicit top/base depths from a formations file, without
+/// requiring a well path trajectory (e.g. for an RFT well with no modelled well path).
+//--------------------------------------------------------------------------------------------------
+void RimWellLogTrack::setAndUpdateFormationFileData( RimWellFormationsFile* wellFormationsFile, const QString& wellNameInFile )
+{
+    m_formationSettings->setFormationSource( RiaDefines::WellLogTrackFormationSource::WELL_PICKS_NO_TRAJECTORY );
+    m_formationSettings->setWellPathForSourceWellPath( nullptr );
+    m_formationSettings->setWellFormationsFile( wellFormationsFile );
+    m_formationSettings->setWellNameInFormationsFile( wellNameInFile );
 
     updateConnectedEditors();
 
@@ -2590,7 +2603,8 @@ void RimWellLogTrack::updateFormationNamesOnPlot()
 
     auto orientation = plot->depthOrientation();
 
-    if ( m_formationSettings->formationSource() == RiaDefines::WellLogTrackFormationSource::WELL_PICK_FILTER )
+    if ( m_formationSettings->formationSource() == RiaDefines::WellLogTrackFormationSource::WELL_PICK_FILTER ||
+         m_formationSettings->formationSource() == RiaDefines::WellLogTrackFormationSource::WELL_PICKS_NO_TRAJECTORY )
     {
         auto formations = m_formationSettings->resolveWellPickFormations();
         if ( !formations.has_value() ) return;

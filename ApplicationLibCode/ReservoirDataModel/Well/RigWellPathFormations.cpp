@@ -18,6 +18,8 @@
 
 #include "RigWellPathFormations.h"
 
+#include "RiaWellLogTrackDefines.h"
+
 #include <QStringList>
 
 #include <algorithm>

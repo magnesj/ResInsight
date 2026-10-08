@@ -44,6 +44,8 @@ public:
 
     RimWellFormationsFile* findOrCreate( const QString& filePath );
 
+    RimWellFormationsFile* findFileForWell( const QString& wellName ) const;
+
     std::vector<RimWellFormationsFile*> importFiles( const QStringList& filePaths );
 
 protected:

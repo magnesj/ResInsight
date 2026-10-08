@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include "RiaWellLogTrackDefines.h"
 #include "RimWellLogPlot.h"
 
 #include "RiaPlotDefines.h"
@@ -41,6 +40,13 @@
 #include <map>
 #include <memory>
 #include <vector>
+
+namespace RiaDefines
+{
+enum class WellLogTrackFormationSource;
+enum class WellLogTrackTrajectoryType;
+enum class WellLogTrackFormationLevel;
+} // namespace RiaDefines
 
 class RigWellPath;
 class RimCase;
@@ -134,7 +140,9 @@ public:
     void setAndUpdateSimWellFormationNamesAndBranchData( RimCase* rimCase, const QString& simWellName, int branchIndex, bool useBranchDetection );
     void setAndUpdateSimWellFormationNamesData( RimCase* rimCase, const QString& simWellName );
 
-    void setAndUpdateWellPickFormationsData( RimWellPath* wellPath, RimWellFormationsFile* wellFormationsFile, const QString& wellNameInFile );
+    void setAndUpdateWellPickFormationsData( RimWellPath* wellPath );
+
+    void setAndUpdateFormationFileData( RimWellFormationsFile* wellFormationsFile, const QString& wellNameInFile );
 
     [[deprecated( "Use setAutoScalePropertyValuesEnabled() instead." )]] void setAutoScaleXEnabled( bool enabled ) override;
     [[deprecated( "Use setAutoScaleDepthValuesEnabled() instead." )]] void    setAutoScaleYEnabled( bool enabled ) override;

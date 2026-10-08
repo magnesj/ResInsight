@@ -197,14 +197,15 @@ void RimWellLogFormationSettings::setWellNameInFormationsFile( const QString& we
 //--------------------------------------------------------------------------------------------------
 std::optional<RigWellPathFormations> RimWellLogFormationSettings::resolveWellPickFormations() const
 {
-    if ( m_formationWellPathForSourceWellPath() )
+    if ( m_formationSource() == RiaDefines::WellLogTrackFormationSource::WELL_PICK_FILTER && m_formationWellPathForSourceWellPath() )
     {
         const RigWellPathFormations* formations = m_formationWellPathForSourceWellPath->formationsGeometry();
         if ( formations ) return *formations;
         return std::nullopt;
     }
 
-    if ( m_wellFormationsFile() && !m_wellNameInFormationsFile().isEmpty() )
+    if ( m_formationSource() == RiaDefines::WellLogTrackFormationSource::WELL_PICKS_NO_TRAJECTORY && m_wellFormationsFile() &&
+         !m_wellNameInFormationsFile().isEmpty() )
     {
         return m_wellFormationsFile->formationsForWell( m_wellNameInFormationsFile() );
     }
@@ -328,12 +329,22 @@ void RimWellLogFormationSettings::uiOrdering( const QString& uiConfigName, caf::
     }
     else if ( m_formationSource() == RiaDefines::WellLogTrackFormationSource::WELL_PICK_FILTER )
     {
+        // The direct Formations File fallback (no well path selected) has moved to the dedicated
+        // WELL_PICKS_NO_TRAJECTORY source, so this source only ever shows the well path picker.
         uiOrdering.add( &m_formationWellPathForSourceWellPath );
-        if ( !m_formationWellPathForSourceWellPath() )
+
+        if ( resolveWellPickFormations().has_value() )
         {
-            uiOrdering.add( &m_wellFormationsFile );
-            if ( m_wellFormationsFile() ) uiOrdering.add( &m_wellNameInFormationsFile );
+            uiOrdering.add( &m_formationLevel );
+            uiOrdering.add( &m_showFormationFluids );
         }
+    }
+    else if ( m_formationSource() == RiaDefines::WellLogTrackFormationSource::WELL_PICKS_NO_TRAJECTORY )
+    {
+        // Well picks use explicit top/base depths and do not require a well path trajectory, so
+        // this source can be used e.g. for an RFT well with no associated/modelled well path.
+        uiOrdering.add( &m_wellFormationsFile );
+        if ( m_wellFormationsFile() ) uiOrdering.add( &m_wellNameInFormationsFile );
 
         if ( resolveWellPickFormations().has_value() )
         {
@@ -360,6 +371,13 @@ void RimWellLogFormationSettings::fieldChangedByUi( const caf::PdmFieldHandle* c
                 break;
             }
         }
+    }
+    else if ( changedField == &m_formationSource && m_formationSource() == RiaDefines::WellLogTrackFormationSource::WELL_PICKS_NO_TRAJECTORY )
+    {
+        // The WELL_PICKS_NO_TRAJECTORY source always resolves formations directly from
+        // m_wellFormationsFile, so clear any well path left over from a previous WELL_PICK_FILTER
+        // selection.
+        m_formationWellPathForSourceWellPath = nullptr;
     }
     else if ( changedField == &m_wellFormationsFile )
     {

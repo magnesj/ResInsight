@@ -69,6 +69,20 @@ RimWellFormationsFile* RimWellFormationsCollection::findOrCreate( const QString&
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Returns the first file containing zone picks for wellName (matched via RimWellFormationsFile's
+/// normalized well name comparison), or nullptr if no file has a matching well.
+//--------------------------------------------------------------------------------------------------
+RimWellFormationsFile* RimWellFormationsCollection::findFileForWell( const QString& wellName ) const
+{
+    for ( RimWellFormationsFile* file : m_wellFormationsFiles )
+    {
+        if ( file->formationsForWell( wellName ).has_value() ) return file;
+    }
+
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 std::vector<RimWellFormationsFile*> RimWellFormationsCollection::importFiles( const QStringList& filePaths )

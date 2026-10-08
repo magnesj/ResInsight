@@ -2,6 +2,8 @@
 
 #include "RifWellPathFormationReader.h"
 
+#include "RiaWellLogTrackDefines.h"
+
 #include <QString>
 
 #include <vector>

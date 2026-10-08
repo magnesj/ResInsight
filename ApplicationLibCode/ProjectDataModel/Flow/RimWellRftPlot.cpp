@@ -36,6 +36,7 @@
 #include "RimEclipseResultCase.h"
 #include "RimEnsembleCurveSetColorManager.h"
 #include "RimObservedFmuRftData.h"
+#include "RimOilField.h"
 #include "RimPressureDepthData.h"
 #include "RimProject.h"
 #include "RimRegularLegendConfig.h"
@@ -57,6 +58,7 @@
 #include "RimWellPlotTools.h"
 #include "RimWellRftEnsembleCurveSet.h"
 
+#include "Formations/RimWellFormationsCollection.h"
 #include "Formations/RimWellFormationsFile.h"
 
 #include "RiuAbstractLegendFrame.h"
@@ -283,7 +285,7 @@ void RimWellRftPlot::updateFormationsOnPlot() const
 
             if ( wellFormationsFile )
             {
-                track->setAndUpdateWellPickFormationsData( wellPath, wellFormationsFile, wellNameInFile );
+                track->setAndUpdateWellPickFormationsData( wellPath );
             }
             else if ( wellPath )
             {
@@ -291,10 +293,27 @@ void RimWellRftPlot::updateFormationsOnPlot() const
             }
             else
             {
-                track->setAndUpdateSimWellFormationNamesAndBranchData( formationNamesCase,
-                                                                       associatedSimWellName(),
-                                                                       m_branchIndex,
-                                                                       m_branchDetection );
+                // No well path trajectory is available (e.g. a purely simulation-well based RFT
+                // entry). Prefer a formations file with explicit, depth-based zone picks for this
+                // well over the case/K-layer based formation names, since there is no trajectory to
+                // extract K-layers along.
+                RimWellFormationsFile* formationsFileForWell = nullptr;
+                if ( proj->activeOilField() && proj->activeOilField()->wellFormationsCollection() )
+                {
+                    formationsFileForWell = proj->activeOilField()->wellFormationsCollection()->findFileForWell( wellNameInFile );
+                }
+
+                if ( formationsFileForWell )
+                {
+                    track->setAndUpdateFormationFileData( formationsFileForWell, wellNameInFile );
+                }
+                else
+                {
+                    track->setAndUpdateSimWellFormationNamesAndBranchData( formationNamesCase,
+                                                                           associatedSimWellName(),
+                                                                           m_branchIndex,
+                                                                           m_branchDetection );
+                }
             }
         }
     }
