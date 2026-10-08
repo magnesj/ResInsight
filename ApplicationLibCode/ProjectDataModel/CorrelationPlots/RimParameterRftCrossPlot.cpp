@@ -574,16 +574,17 @@ void RimParameterRftCrossPlot::defineUiOrdering( QString uiConfigName, caf::PdmU
 
     auto* depthGroup =
         uiOrdering.addNewGroup( QString( "Depth Range (%1)" ).arg( RimRftCrossPlotTools::depthTypeAbbreviation( m_depthType() ) ) );
-    depthGroup->add( &m_wellFormations );
     depthGroup->add( &m_filterMode );
     depthGroup->add( &m_depthRangeMin );
     depthGroup->add( &m_depthRangeMax );
+    depthGroup->add( &m_wellFormations );
     depthGroup->add( &m_selectedZones );
 
     const bool useRange = m_filterMode() == RimRftCrossPlotTools::DepthFilterMode::DEPTH_RANGE;
     const bool useZones = m_filterMode() == RimRftCrossPlotTools::DepthFilterMode::ZONES;
     m_depthRangeMin.uiCapability()->setUiHidden( !useRange );
     m_depthRangeMax.uiCapability()->setUiHidden( !useRange );
+    m_wellFormations.uiCapability()->setUiHidden( !useZones );
     m_selectedZones.uiCapability()->setUiHidden( !useZones || !m_wellFormations() );
 
     auto* crossPlotGroup = uiOrdering.addNewGroup( "Cross Plot Parameter" );
@@ -631,12 +632,6 @@ void RimParameterRftCrossPlot::fieldChangedByUi( const caf::PdmFieldHandle* chan
         // The selected zones belong to the previous well/formations file; clear them so stale zone
         // names are not silently applied as a filter.
         m_selectedZones = std::vector<QString>();
-    }
-
-    if ( changedField == &m_wellFormations && !m_wellFormations() && m_filterMode() == RimRftCrossPlotTools::DepthFilterMode::ZONES )
-    {
-        // Formation filtering is no longer available without a well formations file.
-        m_filterMode = RimRftCrossPlotTools::DepthFilterModeEnum( RimRftCrossPlotTools::DepthFilterMode::NONE );
     }
 
     RimPlot::fieldChangedByUi( changedField, oldValue, newValue );
@@ -716,8 +711,6 @@ QList<caf::PdmOptionItemInfo> RimParameterRftCrossPlot::calculateValueOptions( c
         using DepthFilterMode = RimRftCrossPlotTools::DepthFilterMode;
         for ( auto mode : { DepthFilterMode::NONE, DepthFilterMode::DEPTH_RANGE, DepthFilterMode::ZONES } )
         {
-            if ( mode == DepthFilterMode::ZONES && !m_wellFormations() ) continue;
-
             options.push_back( caf::PdmOptionItemInfo( RimRftCrossPlotTools::DepthFilterModeEnum::uiText( mode ), mode ) );
         }
     }
