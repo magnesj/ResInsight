@@ -103,6 +103,7 @@ def test_segment_interval_segmentation_lengths(rips_instance, initialize_test):
     with pytest.raises(rips.RipsError, match="greater than zero"):
         interval.set_min_segment_length(length=0.0)
 
+
 def test_segment_collection_single_segment_around_perforations(
     rips_instance, initialize_test
 ):
