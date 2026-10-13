@@ -27,6 +27,7 @@
 
 #include "RimSummaryCase.h"
 #include "RimSummaryEnsemble.h"
+#include "RimSummaryMultiPlot.h"
 #include "RimSummaryPlot.h"
 #include "RimSummaryPlotCollection.h"
 
@@ -148,4 +149,52 @@ RimSummaryPlot* RimcSummaryPlotCollection_newSummaryPlot::createSummaryPlot( con
 QString RimcSummaryPlotCollection_newSummaryPlot::classKeywordReturnedType() const
 {
     return RimSummaryPlot::classKeywordStatic();
+}
+
+CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimSummaryPlotCollection, RimcSummaryPlotCollection_newSummaryMultiPlot, "NewSummaryMultiPlot" );
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimcSummaryPlotCollection_newSummaryMultiPlot::RimcSummaryPlotCollection_newSummaryMultiPlot( caf::PdmObjectHandle* self )
+    : caf::PdmObjectCreationMethod( self )
+{
+    CAF_PDM_InitObject( "Create Summary Multi Plot", "", "", "Create a new multi plot with one subplot for each address" );
+
+    CAF_PDM_InitScriptableFieldNoDefault( &m_summaryCases, "SummaryCases", "", "", "", "Summary Cases" );
+    CAF_PDM_InitScriptableFieldNoDefault( &m_ensembles, "Ensembles", "", "", "", "Ensembles plotted together in each subplot" );
+    CAF_PDM_InitScriptableFieldNoDefault( &m_addressStrings, "Addresses", "", "", "", "One formatted address string for each subplot" );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::expected<caf::PdmObjectHandle*, QString> RimcSummaryPlotCollection_newSummaryMultiPlot::execute()
+{
+    if ( m_addressStrings().empty() ) return std::unexpected( "Specify at least one address." );
+
+    std::vector<RimSummaryPlot*> plots;
+    for ( const QString& address : m_addressStrings() )
+    {
+        RimSummaryPlot* plot = RimcSummaryPlotCollection_newSummaryPlot::createSummaryPlot( m_summaryCases.ptrReferencedObjectsByType(),
+                                                                                            m_ensembles.ptrReferencedObjectsByType(),
+                                                                                            address );
+        if ( plot )
+        {
+            plot->loadDataAndUpdate();
+            plots.push_back( plot );
+        }
+    }
+
+    if ( plots.empty() ) return std::unexpected( "Unable to create subplots. Specify summary cases or ensembles." );
+
+    return RiaSummaryPlotTools::createAndAppendSummaryMultiPlot( plots );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimcSummaryPlotCollection_newSummaryMultiPlot::classKeywordReturnedType() const
+{
+    return RimSummaryMultiPlot::classKeywordStatic();
 }

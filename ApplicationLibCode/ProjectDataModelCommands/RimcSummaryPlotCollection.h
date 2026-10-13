@@ -59,3 +59,22 @@ private:
     caf::PdmPtrField<RimSummaryEnsemble*>      m_ensemble;
     caf::PdmPtrArrayField<RimSummaryEnsemble*> m_ensembles;
 };
+
+//==================================================================================================
+///
+//==================================================================================================
+class RimcSummaryPlotCollection_newSummaryMultiPlot : public caf::PdmObjectCreationMethod
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    RimcSummaryPlotCollection_newSummaryMultiPlot( caf::PdmObjectHandle* self );
+
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
+
+private:
+    caf::PdmField<std::vector<QString>>        m_addressStrings;
+    caf::PdmPtrArrayField<RimSummaryCase*>     m_summaryCases;
+    caf::PdmPtrArrayField<RimSummaryEnsemble*> m_ensembles;
+};

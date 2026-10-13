@@ -137,3 +137,19 @@ def test_append_subplot(rips_instance, initialize_test, tmp_path):
 
     with pytest.raises(Exception):
         multi_plot.append_subplot()
+
+
+def test_new_summary_multi_plot(rips_instance, initialize_test, tmp_path):
+    ensemble = _import_ensemble(rips_instance, tmp_path, "ens_a")
+
+    collection = rips_instance.project.descendants(rips.SummaryPlotCollection)[0]
+    multi_plot = collection.new_summary_multi_plot(
+        ensembles=[ensemble], addresses=["FOPT", "FWPT"]
+    )
+    assert multi_plot is not None
+    assert len(rips_instance.project.descendants(rips.MultiSummaryPlot)) == 1
+    assert len(multi_plot.descendants(rips.SummaryPlot)) == 2
+
+    with pytest.raises(Exception):
+        collection.new_summary_multi_plot(ensembles=[ensemble])
+
