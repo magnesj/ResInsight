@@ -404,21 +404,7 @@ std::set<RifEclipseSummaryAddress> RimSummaryEnsemble::ensembleSummaryAddresses(
             // This is typically the case for newly created cases or cases that have not been read yet
             reader->createAddressesIfRequired();
 
-            auto addresses = reader->allResultAddresses();
-
-            // Include addresses already created for other realizations, e.g. user-defined vectors added to a single realization
-            for ( auto* otherCase : m_cases.childrenByType() )
-            {
-                if ( !otherCase || otherCase == caseWithMostKeywords ) continue;
-
-                if ( auto otherReader = otherCase->summaryReader() )
-                {
-                    const auto& otherAddresses = otherReader->allResultAddresses();
-                    addresses.insert( otherAddresses.begin(), otherAddresses.end() );
-                }
-            }
-
-            return addresses;
+            return reader->allResultAddresses();
         }
     }
 
