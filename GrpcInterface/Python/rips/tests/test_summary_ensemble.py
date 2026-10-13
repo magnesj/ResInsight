@@ -150,7 +150,6 @@ def test_new_summary_multi_plot(rips_instance, initialize_test, tmp_path):
         collection.new_summary_multi_plot(ensembles=[ensemble])
 
 
-
 def test_project_summary_ensembles(rips_instance, initialize_test, tmp_path):
     assert rips_instance.project.summary_ensembles() == []
 

@@ -28,9 +28,7 @@ def summary_ensembles(self: Project) -> List[SummaryEnsemble]:
     Returns:
         List[SummaryEnsemble]: Summary case groups flagged as ensembles
     """
-    return [
-        group for group in self.descendants(SummaryEnsemble) if group.is_ensemble
-    ]
+    return [group for group in self.descendants(SummaryEnsemble) if group.is_ensemble]
 
 
 @add_method(Project)
