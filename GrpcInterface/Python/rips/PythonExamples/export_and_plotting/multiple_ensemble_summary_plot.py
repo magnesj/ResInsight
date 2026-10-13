@@ -11,11 +11,7 @@ import rips
 resinsight = rips.Instance.find()
 project = resinsight.project
 
-ensembles = [
-    collection
-    for collection in project.descendants(rips.SummaryEnsemble)
-    if collection.is_ensemble
-]
+ensembles = project.summary_ensembles()
 
 if len(ensembles) < 2:
     print("At least two summary ensembles are required")

@@ -12,12 +12,25 @@ from typing import Dict, List, Optional, Sequence
 
 from .exception import RipsError
 from .pdmobject import add_method
+from .project import Project
 from .resinsight_classes import SummaryEnsemble
 
 logger = logging.getLogger(__name__)
 
 DATE_COLUMN = "DATE"
 REALIZATION_COLUMN = "REAL"
+
+
+@add_method(Project)
+def summary_ensembles(self: Project) -> List[SummaryEnsemble]:
+    """Get all summary ensembles in the project
+
+    Returns:
+        List[SummaryEnsemble]: Summary case groups flagged as ensembles
+    """
+    return [
+        group for group in self.descendants(SummaryEnsemble) if group.is_ensemble
+    ]
 
 
 def _to_datetime(time_stamp: int) -> datetime.datetime:

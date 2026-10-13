@@ -12,11 +12,7 @@ import rips
 resinsight = rips.Instance.find()
 project = resinsight.project
 
-ensembles = [
-    collection
-    for collection in project.descendants(rips.SummaryEnsemble)
-    if collection.is_ensemble
-]
+ensembles = project.summary_ensembles()
 
 if not ensembles:
     print("No summary ensemble found in the current project")

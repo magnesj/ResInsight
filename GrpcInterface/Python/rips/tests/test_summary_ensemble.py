@@ -92,11 +92,7 @@ def test_set_vector_after_project_reload(rips_instance, initialize_test, tmp_pat
     rips_instance.project.close()
     rips_instance.project.open(project_path)
 
-    ensemble = [
-        c
-        for c in rips_instance.project.descendants(rips.SummaryEnsemble)
-        if c.is_ensemble
-    ][0]
+    ensemble = rips_instance.project.summary_ensembles()[0]
     summary_case = ensemble.summary_cases()[0]
     count = len(summary_case.available_time_steps().values)
 
@@ -153,3 +149,12 @@ def test_new_summary_multi_plot(rips_instance, initialize_test, tmp_path):
     with pytest.raises(Exception):
         collection.new_summary_multi_plot(ensembles=[ensemble])
 
+
+
+def test_project_summary_ensembles(rips_instance, initialize_test, tmp_path):
+    assert rips_instance.project.summary_ensembles() == []
+
+    ensemble = _import_ensemble(rips_instance, tmp_path, "ens_a")
+    ensembles = rips_instance.project.summary_ensembles()
+    assert len(ensembles) == 1
+    assert ensembles[0].summary_collection_name == ensemble.summary_collection_name

@@ -12,13 +12,8 @@ resinsight = rips.Instance.find()
 
 project = resinsight.project
 
-# Summary ensembles and summary groups are both represented by
-# SummaryEnsemble. Use the 'is_ensemble' flag to pick the ensembles.
-ensembles = [
-    collection
-    for collection in project.descendants(rips.SummaryEnsemble)
-    if collection.is_ensemble
-]
+# Get all summary ensembles in the project
+ensembles = project.summary_ensembles()
 
 if not ensembles:
     print("No summary ensemble found in the current project")
