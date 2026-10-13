@@ -37,7 +37,8 @@ public:
     {
         EXPONENTIAL,
         HARMONIC,
-        HYPERBOLIC
+        HYPERBOLIC,
+        AUTO_ARPS // Arps model where the hyperbolic constant is fitted to the data
     };
 
     enum class FitMethod
@@ -59,6 +60,7 @@ public:
         double initialProductionRate; // [rate unit]
         double initialDeclineRate; // [1/second]
         time_t referenceTime; // time at which the initial production rate applies
+        double hyperbolicDeclineConstantB = 0.5; // fitted for AUTO_ARPS, otherwise copied from the model
     };
 
     static constexpr double secondsPerYear = 365.25 * 24.0 * 3600.0;
@@ -75,6 +77,17 @@ public:
                                                                          const std::vector<double>& values,
                                                                          const std::vector<time_t>& timeSteps,
                                                                          const std::vector<time_t>& futureTimeSteps );
+
+    struct ArpsFit
+    {
+        double initialProductionRate;
+        double initialDeclineRate; // [1/second]
+        double hyperbolicDeclineConstantB;
+    };
+
+    // Automatic Arps fit. Ignores the ramp-up before the peak rate, and finds qi, Di and b by minimizing the squared relative error.
+    // Time values are seconds relative to the reference time (<= 0).
+    static std::optional<ArpsFit> fitAutoArps( const std::vector<double>& times, const std::vector<double>& flowRates );
 
     static QString equationText( const DeclineModel& model, const DeclineParameters& parameters );
 
