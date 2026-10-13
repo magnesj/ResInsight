@@ -1516,11 +1516,6 @@ void RiaGuiApplication::onProjectBeingSaved()
     setLastUsedDialogDirectory( "BINARY_GRID", QFileInfo( m_project->fileName() ).absolutePath() );
     storeTreeViewState();
     storeDockState();
-
-    if ( auto sumCaseMainColl = RiaSummaryTools::summaryCaseMainCollection() )
-    {
-        sumCaseMainColl->onProjectBeingSaved();
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

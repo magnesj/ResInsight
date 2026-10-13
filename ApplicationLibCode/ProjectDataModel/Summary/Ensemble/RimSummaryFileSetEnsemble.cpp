@@ -26,8 +26,16 @@
 #include "EnsembleFileSet/RimEnsembleFileSet.h"
 #include "EnsembleFileSet/RimEnsembleFileSetCollection.h"
 #include "EnsembleFileSet/RimEnsembleFileSetTools.h"
+#include "RimFileSummaryCase.h"
+#include "RimProject.h"
 #include "RimSummaryCase.h"
 #include "RimSummaryEnsembleTools.h"
+
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
+
+#include <map>
 
 CAF_PDM_SOURCE_INIT( RimSummaryFileSetEnsemble, "RimSummaryFileSetEnsemble" );
 
@@ -44,6 +52,9 @@ RimSummaryFileSetEnsemble::RimSummaryFileSetEnsemble()
     CAF_PDM_InitObject( "Path Pattern Ensemble", ":/SummaryCase.svg" );
 
     CAF_PDM_InitFieldNoDefault( &m_ensembleFileSet, "EnsembleFileSet", "Ensemble File Set" );
+
+    CAF_PDM_InitFieldNoDefault( &m_additionalSummaryFiles, "AdditionalSummaryFiles", "Additional Summary Files" );
+    m_additionalSummaryFiles.uiCapability()->setUiHidden( true );
 
     m_cases.xmlCapability()->disableIO();
 
@@ -152,6 +163,9 @@ void RimSummaryFileSetEnsemble::onFileSetNameChanged( const caf::SignalEmitter* 
 //--------------------------------------------------------------------------------------------------
 void RimSummaryFileSetEnsemble::createSummaryCasesFromEnsembleFileSet( bool notifyChange )
 {
+    // Keep user-defined summary vectors across a recreation of the cases
+    storeAdditionalSummaryFiles();
+
     m_cases.deleteChildren();
 
     if ( m_ensembleFileSet() )
@@ -172,6 +186,8 @@ void RimSummaryFileSetEnsemble::createSummaryCasesFromEnsembleFileSet( bool noti
             return;
         }
 
+        restoreAdditionalSummaryFiles( newCases );
+
         replaceCases( newCases, notifyChange );
 
         // Update name of cases and ensemble after all cases are added
@@ -181,6 +197,80 @@ void RimSummaryFileSetEnsemble::createSummaryCasesFromEnsembleFileSet( bool noti
             summaryCase->setDisplayNameOption( RimCaseDisplayNameTools::DisplayName::SHORT_CASE_NAME );
             summaryCase->updateAutoShortName();
         }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryFileSetEnsemble::onProjectBeingSaved()
+{
+    storeAdditionalSummaryFiles();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryFileSetEnsemble::storeAdditionalSummaryFiles()
+{
+    if ( m_cases.empty() ) return;
+
+    QStringList entries;
+    for ( auto summaryCase : m_cases.childrenByType() )
+    {
+        if ( auto fileSummaryCase = dynamic_cast<RimFileSummaryCase*>( summaryCase ) )
+        {
+            QString additionalFile = fileSummaryCase->additionalSummaryFilePath();
+            if ( !additionalFile.isEmpty() )
+            {
+                entries.push_back( fileSummaryCase->summaryHeaderFilename() + "|" + additionalFile );
+            }
+        }
+    }
+
+    m_additionalSummaryFiles = entries.join( '\n' );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryFileSetEnsemble::restoreAdditionalSummaryFiles( const std::vector<RimSummaryCase*>& summaryCases )
+{
+    if ( m_additionalSummaryFiles().isEmpty() ) return;
+
+    std::map<QString, QString> additionalFileForHeader;
+    for ( const auto& entry : m_additionalSummaryFiles().split( '\n', Qt::SkipEmptyParts ) )
+    {
+        // The additional file name is generated and does not contain separator characters
+        auto separatorIndex = entry.lastIndexOf( '|' );
+        if ( separatorIndex > 0 )
+        {
+            additionalFileForHeader[entry.left( separatorIndex )] = entry.mid( separatorIndex + 1 );
+        }
+    }
+
+    QString projectFolder;
+    if ( RimProject::current() && !RimProject::current()->fileName().isEmpty() )
+    {
+        projectFolder = QFileInfo( RimProject::current()->fileName() ).absolutePath();
+    }
+
+    for ( auto summaryCase : summaryCases )
+    {
+        auto fileSummaryCase = dynamic_cast<RimFileSummaryCase*>( summaryCase );
+        if ( !fileSummaryCase ) continue;
+
+        auto it = additionalFileForHeader.find( fileSummaryCase->summaryHeaderFilename() );
+        if ( it == additionalFileForHeader.end() ) continue;
+
+        QString filePath = it->second;
+        if ( !QFile::exists( filePath ) && !projectFolder.isEmpty() )
+        {
+            // The project folder can have been moved
+            filePath = QDir( projectFolder ).absoluteFilePath( QFileInfo( filePath ).fileName() );
+        }
+
+        fileSummaryCase->setAdditionalSummaryFilePath( filePath );
     }
 }
 

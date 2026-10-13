@@ -303,6 +303,10 @@ void RimFileSummaryCase::openAndAttachAdditionalReader()
     auto isValid             = opmCommonReader->open( additionalSummaryFilePath, includeRestartFiles, nullptr );
     if ( isValid )
     {
+        // The additional file is small, and the addresses are required to read values also when the addresses of the case are not
+        // created (e.g. realizations in an ensemble)
+        opmCommonReader->createAddressesIfRequired();
+
         m_additionalSummaryReaderId = opmCommonReader->serialNumber();
         m_multiSummaryReader->addReader( std::move( opmCommonReader ) );
     }
@@ -436,6 +440,37 @@ std::expected<void, QString>
     m_multiSummaryReader->createAndSetAddresses();
 
     return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimFileSummaryCase::additionalSummaryFilePath() const
+{
+    return m_additionalSummaryFilePath().path();
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Attach an existing file with user-defined summary vectors. Used when the case is recreated, e.g. when
+/// an ensemble is defined by a file set and the cases are not stored in the project file.
+//--------------------------------------------------------------------------------------------------
+void RimFileSummaryCase::setAdditionalSummaryFilePath( const QString& filePath )
+{
+    if ( filePath.isEmpty() || !QFile::exists( filePath ) ) return;
+
+    m_additionalSummaryFilePath = filePath;
+
+    if ( m_multiSummaryReader )
+    {
+        m_multiSummaryReader->removeReader( m_additionalSummaryReaderId );
+        openAndAttachAdditionalReader();
+
+        // Addresses are created lazily for realizations in an ensemble, only refresh if already created
+        if ( !m_multiSummaryReader->allResultAddresses().empty() )
+        {
+            m_multiSummaryReader->createAndSetAddresses();
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
