@@ -119,6 +119,7 @@ public:
     RiaDefines::EclipseUnitSystem unitSystem() const;
 
     void onCalculationUpdated();
+    void onSummaryVectorsChanged();
 
     void updateReferringCurveSets();
     void updateReferringCurveSetsZoomAll();

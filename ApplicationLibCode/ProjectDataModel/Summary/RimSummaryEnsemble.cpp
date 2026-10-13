@@ -1284,6 +1284,15 @@ void RimSummaryEnsemble::buildMetaData()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimSummaryEnsemble::onSummaryVectorsChanged()
+{
+    m_analyzer.reset();
+    buildMetaData();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimSummaryEnsemble::onCalculationUpdated()
 {
     if ( auto caseWithMostKeywords = RimSummaryEnsembleTools::caseWithMostDataObjects( m_cases.childrenByType() ) )
