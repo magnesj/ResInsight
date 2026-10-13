@@ -85,7 +85,8 @@ public:
         double hyperbolicDeclineConstantB;
     };
 
-    // Automatic Arps fit, q(t) = qi / (1 + b * Di * t)^(1 / b), where b = 0 is exponential and b = 1 is harmonic.
+    // Automatic Arps fit inspired by AutoDCA (https://github.com/equinor/decline-curve-analysis), q(t) = qi / (1 + b * Di * t)^(1 / b),
+    // where b = 0 is exponential and b = 1 is harmonic.
     //
     // Algorithm:
     //  1. Keep positive, finite rates and discard everything before the peak rate (ramp-up/plateau build-up). At least three points
