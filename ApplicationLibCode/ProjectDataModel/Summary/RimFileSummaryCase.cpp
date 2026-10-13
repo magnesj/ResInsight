@@ -361,6 +361,11 @@ std::expected<void, QString>
 
     auto address    = RifEclipseSummaryAddress::fromEclipseTextAddressParseErrorTokens( keyword );
     auto fileReader = m_multiSummaryReader->findReader( m_fileSummaryReaderId );
+    if ( fileReader )
+    {
+        // Addresses are created lazily, and can be missing for realizations in an ensemble
+        fileReader->createAddressesIfRequired();
+    }
     if ( fileReader && fileReader->hasAddress( address ) )
     {
         QString errorMsg = QString( "Cannot set summary values for '%1' because the vector comes from the source summary file. "

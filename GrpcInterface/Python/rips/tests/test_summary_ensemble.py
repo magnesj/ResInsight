@@ -85,6 +85,27 @@ def test_set_vectors_from_dataframe(rips_instance, initialize_test, tmp_path):
         ensemble.set_vectors_from_dataframe(monthly)
 
 
+def test_set_vector_after_project_reload(rips_instance, initialize_test, tmp_path):
+    _import_ensemble(rips_instance, tmp_path, "ens_a")
+    project_path = str(tmp_path / "ensemble.rsp")
+    rips_instance.project.save(project_path)
+    rips_instance.project.close()
+    rips_instance.project.open(project_path)
+
+    ensemble = [
+        c
+        for c in rips_instance.project.descendants(rips.SummaryCaseSubCollection)
+        if c.is_ensemble
+    ][0]
+    summary_case = ensemble.summary_cases()[0]
+    count = len(summary_case.available_time_steps().values)
+
+    # Realization addresses are created lazily after a project is loaded
+    summary_case.set_summary_values("FWCT_N", "", [0.5] * count)
+    with pytest.raises(rips.RipsError):
+        summary_case.set_summary_values("FOPT", "", [0.5] * count)
+
+
 def test_multiple_ensembles_in_one_subplot(rips_instance, initialize_test, tmp_path):
     ensemble_a = _import_ensemble(rips_instance, tmp_path, "ens_a")
     ensemble_b = _import_ensemble(rips_instance, tmp_path, "ens_b")
