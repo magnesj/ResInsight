@@ -66,7 +66,7 @@ RimSummaryEnsemble::RimSummaryEnsemble()
 {
     CAF_PDM_InitScriptableObject( "Summary Case Group", ":/SummaryGroup16x16.png" );
 
-    CAF_PDM_InitFieldNoDefault( &m_cases, "SummaryCases", "" );
+    CAF_PDM_InitScriptableFieldNoDefault( &m_cases, "SummaryCases", "" );
 
     CAF_PDM_InitScriptableField( &m_name, "SummaryCollectionName", QString( "Group" ), "Name" );
     CAF_PDM_InitScriptableField( &m_autoName, "CreateAutoName", true, "Auto Name" );

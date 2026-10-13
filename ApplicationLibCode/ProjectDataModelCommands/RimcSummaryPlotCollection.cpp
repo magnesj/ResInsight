@@ -37,6 +37,8 @@
 
 #include <QStringList>
 
+#include <algorithm>
+
 CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimSummaryPlotCollection, RimcSummaryPlotCollection_newSummaryPlot, "NewSummaryPlot" );
 
 //--------------------------------------------------------------------------------------------------
@@ -49,6 +51,7 @@ RimcSummaryPlotCollection_newSummaryPlot::RimcSummaryPlotCollection_newSummaryPl
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_summaryCases, "SummaryCases", "", "", "", "Summary Cases" );
     CAF_PDM_InitScriptableFieldNoDefault( &m_ensemble, "Ensemble", "", "", "", "Ensemble" );
+    CAF_PDM_InitScriptableFieldNoDefault( &m_ensembles, "Ensembles", "", "", "", "Ensembles plotted together in the same plot" );
     CAF_PDM_InitScriptableFieldNoDefault( &m_addressString, "Address", "", "", "", "Formatted address string specifying the plot options" );
 }
 
@@ -57,31 +60,75 @@ RimcSummaryPlotCollection_newSummaryPlot::RimcSummaryPlotCollection_newSummaryPl
 //--------------------------------------------------------------------------------------------------
 std::expected<caf::PdmObjectHandle*, QString> RimcSummaryPlotCollection_newSummaryPlot::execute()
 {
-    QStringList addressStrings = RiaTextStringTools::splitSkipEmptyParts( m_addressString(), ";" );
+    RimSummaryPlot* newPlot =
+        createSummaryPlot( m_summaryCases.ptrReferencedObjectsByType(), allEnsembles( m_ensemble(), m_ensembles ), m_addressString() );
+
+    if ( newPlot )
+    {
+        newPlot->loadDataAndUpdate();
+        RiaSummaryPlotTools::createAndAppendSingleSummaryMultiPlot( newPlot );
+    }
+
+    return newPlot;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<RimSummaryEnsemble*>
+    RimcSummaryPlotCollection_newSummaryPlot::allEnsembles( RimSummaryEnsemble*                               ensemble,
+                                                            const caf::PdmPtrArrayField<RimSummaryEnsemble*>& ensembleArray )
+{
+    std::vector<RimSummaryEnsemble*> ensembles = ensembleArray.ptrReferencedObjectsByType();
+    if ( ensemble && std::find( ensembles.begin(), ensembles.end(), ensemble ) == ensembles.end() )
+    {
+        ensembles.insert( ensembles.begin(), ensemble );
+    }
+    return ensembles;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimSummaryPlot* RimcSummaryPlotCollection_newSummaryPlot::createSummaryPlot( const std::vector<RimSummaryCase*>&     summaryCases,
+                                                                             const std::vector<RimSummaryEnsemble*>& ensembles,
+                                                                             const QString&                          address )
+{
+    QStringList addressStrings = RiaTextStringTools::splitSkipEmptyParts( address, ";" );
 
     RimSummaryPlot* newPlot = nullptr;
-    if ( m_ensemble )
-    {
-        if ( !addressStrings.empty() )
-        {
-            auto summaryCases = m_ensemble->allSummaryCases();
 
-            // Summary addresses are created on demand, make sure they are available before applying address filters
-            for ( auto summaryCase : summaryCases )
+    if ( !ensembles.empty() )
+    {
+        // Summary addresses are created on demand, make sure they are available before applying address filters
+        for ( auto ensemble : ensembles )
+        {
+            for ( auto summaryCase : ensemble->allSummaryCases() )
             {
                 if ( auto reader = summaryCase ? summaryCase->summaryReader() : nullptr ) reader->createAddressesIfRequired();
             }
+        }
 
-            newPlot = RicSummaryPlotFeatureImpl::createSummaryPlotForEnsemble( summaryCases, m_ensemble, addressStrings );
+        if ( !addressStrings.empty() )
+        {
+            if ( ensembles.size() == 1 )
+            {
+                newPlot = RicSummaryPlotFeatureImpl::createSummaryPlotForEnsemble( ensembles.front()->allSummaryCases(),
+                                                                                   ensembles.front(),
+                                                                                   addressStrings );
+            }
+            else
+            {
+                newPlot = RicSummaryPlotFeatureImpl::createSummaryPlotForEnsembles( ensembles, addressStrings );
+            }
         }
         else
         {
-            newPlot = RicNewSummaryEnsembleCurveSetFeature::createPlotForCurveSetsAndUpdate( { m_ensemble } );
+            newPlot = RicNewSummaryEnsembleCurveSetFeature::createPlotForCurveSetsAndUpdate( ensembles );
         }
     }
-    if ( !m_summaryCases.empty() )
+    if ( !summaryCases.empty() )
     {
-        std::vector<RimSummaryCase*> summaryCases = m_summaryCases.ptrReferencedObjectsByType();
         if ( !addressStrings.empty() )
         {
             newPlot = RicSummaryPlotFeatureImpl::createSummaryPlotForCases( summaryCases, addressStrings );
@@ -90,12 +137,6 @@ std::expected<caf::PdmObjectHandle*, QString> RimcSummaryPlotCollection_newSumma
         {
             newPlot = RicNewDefaultSummaryPlotFeature::createFromSummaryCases( summaryCases );
         }
-    }
-
-    if ( newPlot )
-    {
-        newPlot->loadDataAndUpdate();
-        RiaSummaryPlotTools::createAndAppendSingleSummaryMultiPlot( newPlot );
     }
 
     return newPlot;
