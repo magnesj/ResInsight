@@ -85,7 +85,18 @@ public:
         double hyperbolicDeclineConstantB;
     };
 
-    // Automatic Arps fit. Ignores the ramp-up before the peak rate, and finds qi, Di and b by minimizing the squared relative error.
+    // Automatic Arps fit, q(t) = qi / (1 + b * Di * t)^(1 / b), where b = 0 is exponential and b = 1 is harmonic.
+    //
+    // Algorithm:
+    //  1. Keep positive, finite rates and discard everything before the peak rate (ramp-up/plateau build-up). At least three points
+    //     must remain.
+    //  2. For a grid of b values in [0, 1] (step 0.05), minimize the sum of squared relative errors ((q_model - q) / q)^2 over (ln qi, Di)
+    //     using Nelder-Mead. The start guess is the linearized hyperbolic fit for that b (the exponential fit for b = 0), and the
+    //     minimization is restarted a few times from its own result to avoid a collapsed simplex. Parameter sets where the model is
+    //     undefined in the fitted time range are rejected.
+    //  3. Refine b with a finer grid (step 0.01) around the best coarse value, and return the parameters with the lowest loss. Fits with
+    //     a negative decline rate are rejected.
+    //
     // Time values are seconds relative to the reference time (<= 0).
     static std::optional<ArpsFit> fitAutoArps( const std::vector<double>& times, const std::vector<double>& flowRates );
 
