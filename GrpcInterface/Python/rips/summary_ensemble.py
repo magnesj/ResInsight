@@ -1,6 +1,6 @@
 """Convenience methods for working with summary ensembles from Python.
 
-The methods are added to the ``SummaryCaseSubCollection`` class, which is used
+The methods are added to the ``SummaryEnsemble`` class, which is used
 for both summary ensembles and summary groups. Use the ``is_ensemble`` flag to
 pick the ensembles.
 """
@@ -12,7 +12,7 @@ from typing import Dict, List, Optional, Sequence
 
 from .exception import RipsError
 from .pdmobject import add_method
-from .resinsight_classes import SummaryCaseSubCollection
+from .resinsight_classes import SummaryEnsemble
 
 logger = logging.getLogger(__name__)
 
@@ -26,9 +26,9 @@ def _to_datetime(time_stamp: int) -> datetime.datetime:
     ).replace(tzinfo=None)
 
 
-@add_method(SummaryCaseSubCollection)
+@add_method(SummaryEnsemble)
 def vector_values(
-    self: SummaryCaseSubCollection, address: str, time_resolution: str = "NONE"
+    self: SummaryEnsemble, address: str, time_resolution: str = "NONE"
 ) -> Dict[int, Dict[str, list]]:
     """Read one summary vector for all realizations in the ensemble.
 
@@ -52,9 +52,9 @@ def vector_values(
     return result
 
 
-@add_method(SummaryCaseSubCollection)
+@add_method(SummaryEnsemble)
 def to_dataframe(
-    self: SummaryCaseSubCollection,
+    self: SummaryEnsemble,
     addresses: Sequence[str],
     time_resolution: str = "MONTH",
 ):
@@ -106,9 +106,9 @@ def to_dataframe(
     return pd.concat(frames, ignore_index=True)
 
 
-@add_method(SummaryCaseSubCollection)
+@add_method(SummaryEnsemble)
 def set_vectors_from_dataframe(
-    self: SummaryCaseSubCollection,
+    self: SummaryEnsemble,
     dataframe,
     units: Optional[Dict[str, str]] = None,
 ) -> None:

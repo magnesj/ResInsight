@@ -94,7 +94,7 @@ def test_set_vector_after_project_reload(rips_instance, initialize_test, tmp_pat
 
     ensemble = [
         c
-        for c in rips_instance.project.descendants(rips.SummaryCaseSubCollection)
+        for c in rips_instance.project.descendants(rips.SummaryEnsemble)
         if c.is_ensemble
     ][0]
     summary_case = ensemble.summary_cases()[0]

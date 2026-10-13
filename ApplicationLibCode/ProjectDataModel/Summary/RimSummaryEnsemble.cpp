@@ -64,7 +64,12 @@ RimSummaryEnsemble::RimSummaryEnsemble()
     : caseNameChanged( this )
     , caseRemoved( this )
 {
-    CAF_PDM_InitScriptableObject( "Summary Case Group", ":/SummaryGroup16x16.png" );
+    CAF_PDM_InitScriptableObjectWithNameAndComment( "Summary Case Group",
+                                                    ":/SummaryGroup16x16.png",
+                                                    "",
+                                                    "",
+                                                    "SummaryEnsemble",
+                                                    "A group of summary cases, typically an ensemble" );
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_cases, "SummaryCases", "" );
 

@@ -14,7 +14,7 @@ project = resinsight.project
 
 ensembles = [
     collection
-    for collection in project.descendants(rips.SummaryCaseSubCollection)
+    for collection in project.descendants(rips.SummaryEnsemble)
     if collection.is_ensemble
 ]
 

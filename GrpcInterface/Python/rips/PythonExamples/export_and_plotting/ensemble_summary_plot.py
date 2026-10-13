@@ -13,10 +13,10 @@ resinsight = rips.Instance.find()
 project = resinsight.project
 
 # Summary ensembles and summary groups are both represented by
-# SummaryCaseSubCollection. Use the 'is_ensemble' flag to pick the ensembles.
+# SummaryEnsemble. Use the 'is_ensemble' flag to pick the ensembles.
 ensembles = [
     collection
-    for collection in project.descendants(rips.SummaryCaseSubCollection)
+    for collection in project.descendants(rips.SummaryEnsemble)
     if collection.is_ensemble
 ]
 
