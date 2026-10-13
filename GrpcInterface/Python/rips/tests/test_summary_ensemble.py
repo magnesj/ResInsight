@@ -152,4 +152,3 @@ def test_new_summary_multi_plot(rips_instance, initialize_test, tmp_path):
 
     with pytest.raises(Exception):
         collection.new_summary_multi_plot(ensembles=[ensemble])
-
