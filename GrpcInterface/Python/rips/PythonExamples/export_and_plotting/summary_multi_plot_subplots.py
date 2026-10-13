@@ -16,7 +16,7 @@ if not summary_cases:
     print("At least one summary case is required")
     sys.exit(1)
 
-summary_plot_collection = project.descendants(rips.SummaryPlotCollection)[0]
+summary_plot_collection = project.summary_plot_collection()
 
 # Create a multi plot with one subplot for each address
 multi_plot = summary_plot_collection.new_summary_multi_plot(

@@ -19,7 +19,7 @@ if not ensembles:
     print("No summary ensemble found in the current project")
     sys.exit(1)
 
-summary_plot_collection = project.descendants(rips.SummaryPlotCollection)[0]
+summary_plot_collection = project.summary_plot_collection()
 
 for ensemble in ensembles:
     print("Creating plots for ensemble: " + ensemble.summary_collection_name)

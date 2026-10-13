@@ -13,7 +13,7 @@ from typing import Dict, List, Optional, Sequence
 from .exception import RipsError
 from .pdmobject import add_method
 from .project import Project
-from .resinsight_classes import SummaryEnsemble
+from .resinsight_classes import SummaryEnsemble, SummaryPlotCollection
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +31,19 @@ def summary_ensembles(self: Project) -> List[SummaryEnsemble]:
     return [
         group for group in self.descendants(SummaryEnsemble) if group.is_ensemble
     ]
+
+
+@add_method(Project)
+def summary_plot_collection(self: Project) -> SummaryPlotCollection:
+    """Get the summary plot collection of the project
+
+    Returns:
+        SummaryPlotCollection: The collection used to create summary plots
+    """
+    collections = self.descendants(SummaryPlotCollection)
+    if not collections:
+        raise RipsError("No summary plot collection found in the project")
+    return collections[0]
 
 
 def _to_datetime(time_stamp: int) -> datetime.datetime:

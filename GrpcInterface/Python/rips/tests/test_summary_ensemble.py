@@ -106,7 +106,7 @@ def test_multiple_ensembles_in_one_subplot(rips_instance, initialize_test, tmp_p
     ensemble_a = _import_ensemble(rips_instance, tmp_path, "ens_a")
     ensemble_b = _import_ensemble(rips_instance, tmp_path, "ens_b")
 
-    collection = rips_instance.project.descendants(rips.SummaryPlotCollection)[0]
+    collection = rips_instance.project.summary_plot_collection()
     plot = collection.new_summary_plot(
         ensembles=[ensemble_a, ensemble_b], address="FOPT"
     )
@@ -120,7 +120,7 @@ def test_multiple_ensembles_in_one_subplot(rips_instance, initialize_test, tmp_p
 def test_append_subplot(rips_instance, initialize_test, tmp_path):
     ensemble = _import_ensemble(rips_instance, tmp_path, "ens_a")
 
-    collection = rips_instance.project.descendants(rips.SummaryPlotCollection)[0]
+    collection = rips_instance.project.summary_plot_collection()
     collection.new_summary_plot(ensemble=ensemble, address="FOPT")
 
     multi_plot = rips_instance.project.descendants(rips.MultiSummaryPlot)[0]
@@ -138,7 +138,7 @@ def test_append_subplot(rips_instance, initialize_test, tmp_path):
 def test_new_summary_multi_plot(rips_instance, initialize_test, tmp_path):
     ensemble = _import_ensemble(rips_instance, tmp_path, "ens_a")
 
-    collection = rips_instance.project.descendants(rips.SummaryPlotCollection)[0]
+    collection = rips_instance.project.summary_plot_collection()
     multi_plot = collection.new_summary_multi_plot(
         ensembles=[ensemble], addresses=["FOPT", "FWPT"]
     )
@@ -158,3 +158,8 @@ def test_project_summary_ensembles(rips_instance, initialize_test, tmp_path):
     ensembles = rips_instance.project.summary_ensembles()
     assert len(ensembles) == 1
     assert ensembles[0].summary_collection_name == ensemble.summary_collection_name
+
+
+def test_project_summary_plot_collection(rips_instance, initialize_test):
+    collection = rips_instance.project.summary_plot_collection()
+    assert isinstance(collection, rips.SummaryPlotCollection)

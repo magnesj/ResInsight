@@ -17,7 +17,7 @@ if len(ensembles) < 2:
     print("At least two summary ensembles are required")
     sys.exit(1)
 
-summary_plot_collection = project.descendants(rips.SummaryPlotCollection)[0]
+summary_plot_collection = project.summary_plot_collection()
 
 # One curve set per ensemble is created in the same subplot
 plot = summary_plot_collection.new_summary_plot(ensembles=ensembles, address="FOPT")
