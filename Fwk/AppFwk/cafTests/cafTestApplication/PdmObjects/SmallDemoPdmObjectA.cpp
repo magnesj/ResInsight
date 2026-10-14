@@ -43,6 +43,7 @@ SmallDemoPdmObjectA::SmallDemoPdmObjectA()
                        " Toggle Field whatsthis" );
 
     CAF_PDM_InitField( &m_pushButtonField, "Push", false, "Button Field", "", "", " " );
+    m_pushButtonField.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::CellKeys::PUSH_BUTTON_TEXT, "Edit" );
     CAF_PDM_InitField( &m_doubleField,
                        "BigNumber",
                        0.0,
@@ -248,18 +249,5 @@ void SmallDemoPdmObjectA::defineEditorAttribute( const caf::PdmFieldHandle* fiel
         {
             attr->currentIndexFieldHandle = &m_highlightedEnum;
         }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void SmallDemoPdmObjectA::defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    caf::PdmUiTableViewPushButtonEditorAttribute* attr =
-        dynamic_cast<caf::PdmUiTableViewPushButtonEditorAttribute*>( attribute );
-    if ( attr )
-    {
-        attr->registerPushButtonTextForFieldKeyword( m_pushButtonField.keyword(), "Edit" );
     }
 }

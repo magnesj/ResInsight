@@ -46,8 +46,6 @@ protected:
                                 QString                    uiConfigName,
                                 caf::PdmUiEditorAttribute* attribute ) override;
 
-    void defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
-
 private:
     caf::PdmField<double>                     m_doubleField;
     caf::PdmField<int>                        m_intField;

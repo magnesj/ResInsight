@@ -73,21 +73,6 @@ private:
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-class PdmUiTableViewPushButtonEditorAttribute : public PdmUiEditorAttribute
-{
-public:
-    void registerPushButtonTextForFieldKeyword( const QString& keyword, const QString& text );
-
-    bool    showPushButtonForFieldKeyword( const QString& keyword ) const;
-    QString pushButtonText( const QString& keyword ) const;
-
-private:
-    std::map<QString, QString> m_fieldKeywordAndPushButtonText;
-};
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 class PdmUiTableViewEditorAttribute : public PdmUiEditorAttribute
 {
 public:
@@ -151,6 +136,13 @@ public:
         static inline const QString BASE_COLOR                   = QStringLiteral( "baseColor" );
         static inline const QString ENABLE_DROP_TARGET           = QStringLiteral( "enableDropTarget" );
         static inline const QString EDIT_ON_SINGLE_CLICK         = QStringLiteral( "editOnSingleClick" );
+    };
+
+    // Attribute keys set on the fields of the objects shown as rows in the table
+    struct CellKeys
+    {
+        // QString. Show a push button with this text in the cells of the field
+        static inline const QString PUSH_BUTTON_TEXT = QStringLiteral( "tableViewPushButtonText" );
     };
 
     // Set of all supported attributes for validation
