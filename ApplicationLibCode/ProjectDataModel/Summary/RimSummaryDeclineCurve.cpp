@@ -99,11 +99,11 @@ RimSummaryDeclineCurve::RimSummaryDeclineCurve()
 
     CAF_PDM_InitFieldNoDefault( &m_minDate, "MinDate", "From", "", dateFormat );
     m_minDate.uiCapability()->setUiEditorTypeName( caf::PdmUiDateEditor::uiEditorTypeName() );
-    caf::PdmUiDateEditor::setFormat( m_minDate.uiCapability(), dateFormatCallback );
+    m_minDate.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiDateEditor::Keys::DATE_FORMAT, dateFormatCallback );
 
     CAF_PDM_InitFieldNoDefault( &m_maxDate, "MaxDate", "To", "", dateFormat );
     m_maxDate.uiCapability()->setUiEditorTypeName( caf::PdmUiDateEditor::uiEditorTypeName() );
-    caf::PdmUiDateEditor::setFormat( m_maxDate.uiCapability(), dateFormatCallback );
+    m_maxDate.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiDateEditor::Keys::DATE_FORMAT, dateFormatCallback );
 
     CAF_PDM_InitField( &m_showTimeSelectionInPlot, "ShowTimeSelectionInPlot", true, "Show In Plot" );
 

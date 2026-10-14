@@ -61,18 +61,12 @@ public:
     // Attribute key constants for compile-time safety and discoverability
     struct Keys
     {
-        // Plain string or std::function<QString()>. Use setFormat() or setAttribute()
+        // Plain string or std::function<QString()>, set with setAttribute()
         static inline const QString DATE_FORMAT = QStringLiteral( "dateFormat" );
     };
 
     // Set of all supported attributes for validation
     inline static const std::set<QString> SUPPORTED_ATTRIBUTES = { Keys::DATE_FORMAT };
-
-    // Set a static date format, e.g. "dd MMM yyyy"
-    static void setFormat( PdmUiItem* uiItem, const QString& format );
-
-    // Set a callback producing the date format, for formats that depend on the current state
-    static void setFormat( PdmUiItem* uiItem, std::function<QString()> formatCallback );
 
     // Returns the date format configured by attributes, or an empty string if none is set
     static QString dateFormat( const PdmUiItem* uiItem, const QString& uiConfigName );

@@ -111,8 +111,8 @@ RimSummaryTimeAxisProperties::RimSummaryTimeAxisProperties()
 
     const auto dateFormatCallback = [this]()
     { return RiaQDateTimeTools::dateFormatString( m_dateFormat(), RiaDefines::DateFormatComponents::DATE_FORMAT_YEAR_MONTH_DAY ); };
-    caf::PdmUiDateEditor::setFormat( m_visibleDateRangeMax.uiCapability(), dateFormatCallback );
-    caf::PdmUiDateEditor::setFormat( m_visibleDateRangeMin.uiCapability(), dateFormatCallback );
+    m_visibleDateRangeMax.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiDateEditor::Keys::DATE_FORMAT, dateFormatCallback );
+    m_visibleDateRangeMin.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiDateEditor::Keys::DATE_FORMAT, dateFormatCallback );
 
     CAF_PDM_InitFieldNoDefault( &m_visibleTimeRangeMax, "VisibleTimeRangeMax", "MaxTime" );
     m_visibleTimeRangeMax.uiCapability()->setUiEditorTypeName( caf::PdmUiTimeEditor::uiEditorTypeName() );

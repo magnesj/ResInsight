@@ -196,7 +196,7 @@ RimEnsembleCurveSet::RimEnsembleCurveSet()
                                 "",
                                 RiaQDateTimeTools::dateFormatString( RiaPreferences::current()->dateFormat() ) );
     m_minDateRange.uiCapability()->setUiEditorTypeName( caf::PdmUiDateEditor::uiEditorTypeName() );
-    caf::PdmUiDateEditor::setFormat( m_minDateRange.uiCapability(), dateFormatCallback );
+    m_minDateRange.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiDateEditor::Keys::DATE_FORMAT, dateFormatCallback );
 
     CAF_PDM_InitField( &m_minTimeSliderPosition, "MinTimeSliderPosition", 0, "" );
     m_minTimeSliderPosition.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
@@ -207,7 +207,7 @@ RimEnsembleCurveSet::RimEnsembleCurveSet()
                                 "",
                                 RiaQDateTimeTools::dateFormatString( RiaPreferences::current()->dateFormat() ) );
     m_maxDateRange.uiCapability()->setUiEditorTypeName( caf::PdmUiDateEditor::uiEditorTypeName() );
-    caf::PdmUiDateEditor::setFormat( m_maxDateRange.uiCapability(), dateFormatCallback );
+    m_maxDateRange.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiDateEditor::Keys::DATE_FORMAT, dateFormatCallback );
 
     CAF_PDM_InitField( &m_maxTimeSliderPosition, "MaxTimeSliderPosition", 100, "" );
     m_maxTimeSliderPosition.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );

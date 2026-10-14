@@ -131,8 +131,8 @@ RimSummaryTable::RimSummaryTable()
         }
         return "yyyy-MM-dd";
     };
-    caf::PdmUiDateEditor::setFormat( m_startDate.uiCapability(), dateFormatCallback );
-    caf::PdmUiDateEditor::setFormat( m_endDate.uiCapability(), dateFormatCallback );
+    m_startDate.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiDateEditor::Keys::DATE_FORMAT, dateFormatCallback );
+    m_endDate.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiDateEditor::Keys::DATE_FORMAT, dateFormatCallback );
 
     setLegendsVisible( true );
     dockAsPlotWindow();
