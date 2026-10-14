@@ -87,7 +87,7 @@ void PdmUiDateEditor::configureAndUpdateUi( const QString& uiConfigName )
 //--------------------------------------------------------------------------------------------------
 void PdmUiDateEditor::setFormat( PdmUiItem* uiItem, const QString& format )
 {
-    setFormat( uiItem, [format]() { return format; } );
+    uiItem->setAttribute( Keys::DATE_FORMAT, format );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -103,12 +103,7 @@ void PdmUiDateEditor::setFormat( PdmUiItem* uiItem, std::function<QString()> for
 //--------------------------------------------------------------------------------------------------
 QString PdmUiDateEditor::dateFormat( const PdmUiItem* uiItem, const QString& uiConfigName )
 {
-    if ( auto callback = uiItem->attribute<std::function<QString()>>( Keys::DATE_FORMAT, uiConfigName ) )
-    {
-        return callback.value()();
-    }
-
-    return QString();
+    return uiItem->attributeString( Keys::DATE_FORMAT, uiConfigName ).value_or( QString() );
 }
 
 //--------------------------------------------------------------------------------------------------

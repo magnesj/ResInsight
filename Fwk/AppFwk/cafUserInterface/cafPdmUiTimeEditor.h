@@ -60,7 +60,7 @@ public:
     // Attribute key constants for compile-time safety and discoverability
     struct Keys
     {
-        // std::function<QString()>. Use setFormat() to set either a static string or a callback
+        // Plain string or std::function<QString()>. Use setFormat() or setAttribute()
         static inline const QString TIME_FORMAT = QStringLiteral( "timeFormat" );
     };
 

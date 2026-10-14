@@ -181,6 +181,11 @@ public:
         return std::nullopt;
     }
 
+    // Resolves a string attribute that was set either as a plain string (QString, const char*) or as a
+    // std::function<QString()> callback evaluated on each call. Returns nullopt if the key is not set
+    // or holds another type.
+    std::optional<QString> attributeString( const QString& key, const QString& uiConfigName = "" ) const;
+
     std::list<QString> attributeNames( const QString& uiConfigName = "" ) const;
 
     // Helper function to validate attributes against a supported set

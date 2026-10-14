@@ -112,7 +112,7 @@ RimWellLogCurveCommonDataSource::RimWellLogCurveCommonDataSource()
 
     CAF_PDM_InitField( &m_wbsSmoothingThreshold, "WBSSmoothingThreshold", -1.0, "Smoothing Threshold" );
     m_wbsSmoothingThreshold.uiCapability()
-        ->setAttribute<std::function<QString()>>( caf::PdmUiLineEditor::Keys::DISPLAY_STRING_CALLBACK,
+        ->setAttribute<std::function<QString()>>( caf::PdmUiLineEditor::Keys::DISPLAY_STRING,
                                                   [this]() -> QString
                                                   {
                                                       if ( wbsSmoothingThreshold() != -1.0 ) return {};

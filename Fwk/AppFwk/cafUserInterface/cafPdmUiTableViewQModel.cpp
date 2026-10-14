@@ -263,13 +263,10 @@ QVariant PdmUiTableViewQModel::data( const QModelIndex& index, int role /*= Qt::
                 // virtual void            defineDisplayString(const PdmFieldHandle* field, QString uiConfigName) {}
 
                 {
-                    if ( auto callback =
-                             uiFieldHandle->attribute<std::function<QString()>>( PdmUiLineEditor::Keys::DISPLAY_STRING_CALLBACK,
-                                                                                 m_currentConfigName ) )
-                    {
-                        QString displayString = callback.value()();
-                        if ( !displayString.isEmpty() ) val = displayString;
-                    }
+                    QString displayString =
+                        uiFieldHandle->attributeString( PdmUiLineEditor::Keys::DISPLAY_STRING, m_currentConfigName )
+                            .value_or( QString() );
+                    if ( !displayString.isEmpty() ) val = displayString;
                 }
 
                 if ( val.isNull() )

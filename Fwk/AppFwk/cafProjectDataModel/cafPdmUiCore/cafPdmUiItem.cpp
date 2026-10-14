@@ -640,6 +640,25 @@ QVariant PdmUiItem::attributeVariant( const QString& key, const QString& uiConfi
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::optional<QString> PdmUiItem::attributeString( const QString& key, const QString& uiConfigName ) const
+{
+    const QVariant value = attributeVariant( key, uiConfigName );
+    if ( !value.isValid() ) return std::nullopt;
+
+    if ( value.metaType() == QMetaType::fromType<std::function<QString()>>() )
+    {
+        const auto callback = value.value<std::function<QString()>>();
+        return callback ? std::optional<QString>( callback() ) : std::nullopt;
+    }
+
+    if ( value.metaType() == QMetaType::fromType<QString>() ) return value.toString();
+
+    return std::nullopt;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 std::list<QString> PdmUiItem::attributeNames( const QString& uiConfigName ) const
 {
     std::list<QString> result;

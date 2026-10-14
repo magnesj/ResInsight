@@ -71,11 +71,7 @@ void PdmUiTimeEditor::configureAndUpdateUi( const QString& uiConfigName )
 
     uiField()->validateAttributes( "PdmUiTimeEditor", SUPPORTED_ATTRIBUTES, uiConfigName );
 
-    QString timeFormat;
-    if ( auto callback = uiField()->attribute<std::function<QString()>>( Keys::TIME_FORMAT, uiConfigName ) )
-    {
-        timeFormat = callback.value()();
-    }
+    QString timeFormat = uiField()->attributeString( Keys::TIME_FORMAT, uiConfigName ).value_or( QString() );
 
     if ( !timeFormat.isEmpty() )
     {
@@ -90,7 +86,7 @@ void PdmUiTimeEditor::configureAndUpdateUi( const QString& uiConfigName )
 //--------------------------------------------------------------------------------------------------
 void PdmUiTimeEditor::setFormat( PdmUiItem* uiItem, const QString& format )
 {
-    setFormat( uiItem, [format]() { return format; } );
+    uiItem->setAttribute( Keys::TIME_FORMAT, format );
 }
 
 //--------------------------------------------------------------------------------------------------
