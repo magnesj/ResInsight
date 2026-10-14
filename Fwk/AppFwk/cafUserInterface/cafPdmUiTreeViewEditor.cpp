@@ -626,44 +626,46 @@ void PdmUiTreeViewEditor::updateItemDelegateForSubTree( const QModelIndex& subRo
                 {
                     size_t indexInParentField = reorderability->indexOf( pdmObject );
                     {
-                        auto tag          = PdmUiTreeViewItemAttribute::createTag();
-                        tag->icon         = caf::IconProvider( ":/caf/Up16x16.png" );
-                        tag->selectedOnly = true;
+                        auto tag         = PdmUiTreeViewItemTag::create();
+                        tag.icon         = caf::IconProvider( ":/caf/Up16x16.png" );
+                        tag.selectedOnly = true;
                         if ( reorderability->canItemBeMovedUp( indexInParentField ) )
                         {
-                            tag->clicked.connect( reorderability, &PdmFieldReorderCapability::onMoveItemUp );
+                            tag.clicked = [reorderability]( size_t index ) { reorderability->moveItemUp( index ); };
                         }
                         else
                         {
-                            tag->icon.setActive( false );
+                            tag.icon.setActive( false );
                         }
 
-                        m_delegate->addTag( filterIndex, std::move( tag ) );
+                        m_delegate->addTag( filterIndex, tag );
                     }
                     {
-                        auto tag          = PdmUiTreeViewItemAttribute::createTag();
-                        tag->icon         = IconProvider( ":/caf/Down16x16.png" );
-                        tag->selectedOnly = true;
+                        auto tag         = PdmUiTreeViewItemTag::create();
+                        tag.icon         = IconProvider( ":/caf/Down16x16.png" );
+                        tag.selectedOnly = true;
                         if ( reorderability->canItemBeMovedDown( indexInParentField ) )
                         {
-                            tag->clicked.connect( reorderability, &PdmFieldReorderCapability::onMoveItemDown );
+                            tag.clicked = [reorderability]( size_t index ) { reorderability->moveItemDown( index ); };
                         }
                         else
                         {
-                            tag->icon.setActive( false );
+                            tag.icon.setActive( false );
                         }
-                        m_delegate->addTag( filterIndex, std::move( tag ) );
+                        m_delegate->addTag( filterIndex, tag );
                     }
                 }
             }
 
-            PdmUiTreeViewItemAttribute attribute;
-            uiObjectHandle->objectEditorAttribute( "", &attribute );
-            for ( auto& tag : attribute.tags )
+            if ( auto tagsFunction = uiObjectHandle->attribute<TreeItemTagsFunction>( Keys::TREE_ITEM_TAGS );
+                 tagsFunction && tagsFunction.value() )
             {
-                if ( !tag->text.isEmpty() || tag->icon.valid() )
+                for ( const auto& tag : tagsFunction.value()() )
                 {
-                    m_delegate->addTag( filterIndex, std::move( tag ) );
+                    if ( !tag.text.isEmpty() || tag.icon.valid() )
+                    {
+                        m_delegate->addTag( filterIndex, tag );
+                    }
                 }
             }
         }

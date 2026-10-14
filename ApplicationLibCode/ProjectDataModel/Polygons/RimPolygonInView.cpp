@@ -42,6 +42,7 @@
 #include "cafPdmUiButton.h"
 #include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTreeAttributes.h"
+#include "cafPdmUiTreeViewEditor.h"
 
 #include "cvfModelBasicList.h"
 
@@ -53,6 +54,9 @@ CAF_PDM_SOURCE_INIT( RimPolygonInView, "RimPolygonInView" );
 RimPolygonInView::RimPolygonInView()
     : m_pickTargetsEventHandler( new RicPolylineTargetsPickEventHandler( this ) )
 {
+    uiCapability()->setAttribute<caf::PdmUiTreeViewEditor::TreeItemTagsFunction>( caf::PdmUiTreeViewEditor::Keys::TREE_ITEM_TAGS,
+                                                                                  [this]() { return treeItemTags(); } );
+
     CAF_PDM_InitObject( "Polygon", ":/PolylinesFromFile16x16.png" );
 
     CAF_PDM_InitFieldNoDefault( &m_polygon, "Polygon", "Polygon" );
@@ -380,25 +384,32 @@ void RimPolygonInView::defineObjectEditorAttribute( QString uiConfigName, caf::P
         attrib->pickEventHandler = m_pickTargetsEventHandler;
         attrib->enablePicking    = m_enablePicking;
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<caf::PdmUiTreeViewItemTag> RimPolygonInView::treeItemTags()
+{
+    std::vector<caf::PdmUiTreeViewItemTag> tags;
 
     if ( m_polygon() )
     {
-        if ( auto* treeItemAttribute = dynamic_cast<caf::PdmUiTreeViewItemAttribute*>( attribute ) )
-        {
-            auto tag = caf::PdmUiTreeViewItemAttribute::createTag( RiaColorTools::toQColor( m_polygon->color() ),
-                                                                   RiuGuiTheme::getColorByVariableName( "backgroundColor1" ),
-                                                                   "---" );
+        auto tag = caf::PdmUiTreeViewItemTag::create( RiaColorTools::toQColor( m_polygon->color() ),
+                                                      RiuGuiTheme::getColorByVariableName( "backgroundColor1" ),
+                                                      "---" );
 
-            tag->clicked.connect( m_polygon(), &RimPolygon::onColorTagClicked );
+        tag.clicked = [target = m_polygon()]( size_t index ) { target->onColorTagClicked( nullptr, index ); };
 
-            treeItemAttribute->tags.push_back( std::move( tag ) );
-        }
+        tags.push_back( tag );
 
         if ( m_polygon->isReadOnly() )
         {
-            caf::PdmUiTreeViewItemAttribute::appendTagToTreeViewItemAttribute( attribute, ":/padlock.svg" );
+            tags.push_back( caf::PdmUiTreeViewItemTag::createWithIcon( ":/padlock.svg" ) );
         }
     }
+
+    return tags;
 }
 
 //--------------------------------------------------------------------------------------------------

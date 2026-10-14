@@ -53,6 +53,7 @@
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiSliderEditor.h"
 #include "cafPdmUiTreeAttributes.h"
+#include "cafPdmUiTreeViewEditor.h"
 
 #include "cafAssert.h"
 
@@ -66,6 +67,9 @@ CAF_PDM_SOURCE_INIT( RimEclipsePropertyFilter, "CellPropertyFilter" );
 //--------------------------------------------------------------------------------------------------
 RimEclipsePropertyFilter::RimEclipsePropertyFilter()
 {
+    uiCapability()->setAttribute<caf::PdmUiTreeViewEditor::TreeItemTagsFunction>( caf::PdmUiTreeViewEditor::Keys::TREE_ITEM_TAGS,
+                                                                                  [this]() { return treeItemTags(); } );
+
     CAF_PDM_InitScriptableObject( "Cell Property Filter", ":/CellFilter_Values.png" );
 
     CAF_PDM_InitFieldNoDefault( &m_resultDefinition, "ResultDefinition", "Result Definition" );
@@ -483,26 +487,25 @@ void RimEclipsePropertyFilter::defineEditorAttribute( const caf::PdmFieldHandle*
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEclipsePropertyFilter::defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
+std::vector<caf::PdmUiTreeViewItemTag> RimEclipsePropertyFilter::treeItemTags()
 {
-    if ( !m_isDuplicatedFromLinkedView ) return;
+    std::vector<caf::PdmUiTreeViewItemTag> tags;
+
+    if ( !m_isDuplicatedFromLinkedView ) return tags;
 
     auto rimView = firstAncestorOrThisOfType<Rim3dView>();
-    if ( !rimView ) return;
+    if ( !rimView ) return tags;
 
     RimViewController* vc = rimView->viewController();
     if ( vc && vc->isPropertyFilterDuplicationActive() )
     {
-        auto* treeItemAttribute = dynamic_cast<caf::PdmUiTreeViewItemAttribute*>( attribute );
-        if ( treeItemAttribute )
-        {
-            treeItemAttribute->tags.clear();
-            auto tag  = caf::PdmUiTreeViewItemAttribute::createTag();
-            tag->icon = caf::IconProvider( ":/chain.png" );
+        auto tag = caf::PdmUiTreeViewItemTag::create();
+        tag.icon = caf::IconProvider( ":/chain.png" );
 
-            treeItemAttribute->tags.push_back( std::move( tag ) );
-        }
+        tags.push_back( tag );
     }
+
+    return tags;
 }
 
 //--------------------------------------------------------------------------------------------------

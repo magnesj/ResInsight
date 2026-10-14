@@ -32,6 +32,7 @@
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTimeEditor.h"
 #include "cafPdmUiTreeAttributes.h"
+#include "cafPdmUiTreeViewEditor.h"
 
 #include "cafAssert.h"
 #include "cafCmdFeatureMenuBuilder.h"
@@ -91,6 +92,9 @@ CAF_PDM_SOURCE_INIT( RimSummaryTimeAxisProperties, "SummaryTimeAxisProperties" )
 RimSummaryTimeAxisProperties::RimSummaryTimeAxisProperties()
     : requestLoadDataAndUpdate( this )
 {
+    uiCapability()->setAttribute<caf::PdmUiTreeViewEditor::TreeItemTagsFunction>( caf::PdmUiTreeViewEditor::Keys::TREE_ITEM_TAGS,
+                                                                                  [this]() { return treeItemTags(); } );
+
     CAF_PDM_InitObject( "Time Axis", ":/BottomAxis16x16.png" );
 
     CAF_PDM_InitField( &m_isActive, "Active", true, "Active" );
@@ -241,33 +245,32 @@ void RimSummaryTimeAxisProperties::appendMenuItems( caf::CmdFeatureMenuBuilder& 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryTimeAxisProperties::defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
+std::vector<caf::PdmUiTreeViewItemTag> RimSummaryTimeAxisProperties::treeItemTags()
 {
-    auto* treeItemAttribute = dynamic_cast<caf::PdmUiTreeViewItemAttribute*>( attribute );
-    if ( !treeItemAttribute ) return;
-
-    treeItemAttribute->tags.clear();
+    std::vector<caf::PdmUiTreeViewItemTag> tags;
 
     auto summaryMultiPlot = firstAncestorOfType<RimSummaryMultiPlot>();
     if ( summaryMultiPlot && summaryMultiPlot->isTimeAxisLinked() )
     {
-        auto tag  = caf::PdmUiTreeViewItemAttribute::createTag();
-        tag->icon = caf::IconProvider( ":/SharedAxis.svg" );
+        auto tag = caf::PdmUiTreeViewItemTag::create();
+        tag.icon = caf::IconProvider( ":/SharedAxis.svg" );
 
-        treeItemAttribute->tags.push_back( std::move( tag ) );
+        tags.push_back( tag );
     }
 
     if ( isRangeUserDefined() )
     {
         // Indicate that the axis range is fixed by the user, and will not be updated by auto-zoom.
         // Clicking the tag releases the user-defined range, so the axis follows the data again.
-        auto tag  = caf::PdmUiTreeViewItemAttribute::createTag();
-        tag->icon = caf::IconProvider( ":/PinnedAxisRange.svg" );
+        auto tag = caf::PdmUiTreeViewItemTag::create();
+        tag.icon = caf::IconProvider( ":/PinnedAxisRange.svg" );
 
-        tag->clicked.connect( this, &RimSummaryTimeAxisProperties::onPinnedTagClicked );
+        tag.clicked = [this]( size_t index ) { this->onPinnedTagClicked( nullptr, index ); };
 
-        treeItemAttribute->tags.push_back( std::move( tag ) );
+        tags.push_back( tag );
     }
+
+    return tags;
 }
 
 //--------------------------------------------------------------------------------------------------

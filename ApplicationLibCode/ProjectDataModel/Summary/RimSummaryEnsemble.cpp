@@ -49,6 +49,7 @@
 #include "cafPdmUiTextEditor.h"
 #include "cafPdmUiTreeAttributes.h"
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmUiTreeViewEditor.h"
 
 #include <QFileInfo>
 
@@ -64,6 +65,9 @@ RimSummaryEnsemble::RimSummaryEnsemble()
     : caseNameChanged( this )
     , caseRemoved( this )
 {
+    uiCapability()->setAttribute<caf::PdmUiTreeViewEditor::TreeItemTagsFunction>( caf::PdmUiTreeViewEditor::Keys::TREE_ITEM_TAGS,
+                                                                                  [this]() { return treeItemTags(); } );
+
     CAF_PDM_InitScriptableObject( "Summary Case Group", ":/SummaryGroup16x16.png" );
 
     CAF_PDM_InitFieldNoDefault( &m_cases, "SummaryCases", "" );
@@ -1072,17 +1076,18 @@ void RimSummaryEnsemble::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrd
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryEnsemble::defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
+std::vector<caf::PdmUiTreeViewItemTag> RimSummaryEnsemble::treeItemTags()
 {
-    if ( auto* treeItemAttribute = dynamic_cast<caf::PdmUiTreeViewItemAttribute*>( attribute ) )
+    std::vector<caf::PdmUiTreeViewItemTag> tags;
+
+    if ( m_includeInAutoReload() )
     {
-        if ( m_includeInAutoReload() )
-        {
-            auto tag  = caf::PdmUiTreeViewItemAttribute::createTag();
-            tag->icon = caf::IconProvider( ":/TimedRefresh.png" );
-            treeItemAttribute->tags.push_back( std::move( tag ) );
-        }
+        auto tag = caf::PdmUiTreeViewItemTag::create();
+        tag.icon = caf::IconProvider( ":/TimedRefresh.png" );
+        tags.push_back( tag );
     }
+
+    return tags;
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -102,6 +102,9 @@ Rim3dView::Rim3dView()
     , m_animationIntervalMillisec( 50 )
     , m_animationTimerUsers( 0 )
 {
+    uiCapability()->setAttribute<caf::PdmUiTreeViewEditor::TreeItemTagsFunction>( caf::PdmUiTreeViewEditor::Keys::TREE_ITEM_TAGS,
+                                                                                  [this]() { return treeItemTags(); } );
+
     RiaPreferences* preferences = RiaPreferences::current();
     CAF_ASSERT( preferences );
 
@@ -1991,15 +1994,16 @@ void Rim3dView::dockInPlotWindow()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void Rim3dView::defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
+std::vector<caf::PdmUiTreeViewItemTag> Rim3dView::treeItemTags()
 {
-    RimViewWindow::defineObjectEditorAttribute( uiConfigName, attribute );
+    std::vector<caf::PdmUiTreeViewItemTag> tags = RimViewWindow::treeItemTags();
 
-    caf::PdmUiTreeViewItemAttribute* treeItemAttribute = dynamic_cast<caf::PdmUiTreeViewItemAttribute*>( attribute );
-    if ( treeItemAttribute && isDockedInPlotView() )
+    if ( isDockedInPlotView() )
     {
-        auto iconTag  = caf::PdmUiTreeViewItemAttribute::createTag();
-        iconTag->icon = caf::IconProvider( ":/PlotWindow.svg" );
-        treeItemAttribute->tags.push_back( std::move( iconTag ) );
+        auto iconTag = caf::PdmUiTreeViewItemTag::create();
+        iconTag.icon = caf::IconProvider( ":/PlotWindow.svg" );
+        tags.push_back( iconTag );
     }
+
+    return tags;
 }

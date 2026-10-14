@@ -80,6 +80,7 @@
 #include "cafPdmUiTreeAttributes.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafPdmUiTreeViewEditor.h"
 #include "cafSelectionManager.h"
 
 #include <algorithm>
@@ -107,6 +108,9 @@ RimEnsembleCurveSet::RimEnsembleCurveSet()
     , m_realizationHash( 0 )
 
 {
+    uiCapability()->setAttribute<caf::PdmUiTreeViewEditor::TreeItemTagsFunction>( caf::PdmUiTreeViewEditor::Keys::TREE_ITEM_TAGS,
+                                                                                  [this]() { return treeItemTags(); } );
+
     CAF_PDM_InitObject( "Ensemble Curve Set", ":/EnsembleCurveSet16x16.png" );
 
     CAF_PDM_InitFieldNoDefault( &m_realizationCurves, "EnsembleCurveSet", "Ensemble Curve Set" );
@@ -1146,20 +1150,20 @@ void RimEnsembleCurveSet::fieldChangedByUi( const caf::PdmFieldHandle* changedFi
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleCurveSet::defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
+std::vector<caf::PdmUiTreeViewItemTag> RimEnsembleCurveSet::treeItemTags()
 {
-    if ( auto* treeItemAttribute = dynamic_cast<caf::PdmUiTreeViewItemAttribute*>( attribute ) )
-    {
-        treeItemAttribute->tags.clear();
-        auto tag     = caf::PdmUiTreeViewItemAttribute::createTag();
-        tag->bgColor = RiaColorTools::toQColor( m_colorForRealizations );
-        tag->fgColor = RiaColorTools::toQColor( m_statistics->color() );
-        tag->text    = "---";
+    std::vector<caf::PdmUiTreeViewItemTag> tags;
 
-        tag->clicked.connect( this, &RimEnsembleCurveSet::onColorTagClicked );
+    auto tag    = caf::PdmUiTreeViewItemTag::create();
+    tag.bgColor = RiaColorTools::toQColor( m_colorForRealizations );
+    tag.fgColor = RiaColorTools::toQColor( m_statistics->color() );
+    tag.text    = "---";
 
-        treeItemAttribute->tags.push_back( std::move( tag ) );
-    }
+    tag.clicked = [this]( size_t index ) { this->onColorTagClicked( nullptr, index ); };
+
+    tags.push_back( tag );
+
+    return tags;
 }
 
 //--------------------------------------------------------------------------------------------------

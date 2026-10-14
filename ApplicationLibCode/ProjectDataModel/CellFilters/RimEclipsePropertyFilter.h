@@ -22,6 +22,7 @@
 
 #include "QuickAccess/RimFieldQuickAccessInterface.h"
 #include "RimPropertyFilter.h"
+#include "cafPdmUiTreeAttributes.h"
 
 #include "cafPdmChildField.h"
 
@@ -72,7 +73,7 @@ private:
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName ) override;
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
-    void defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
+    std::vector<caf::PdmUiTreeViewItemTag> treeItemTags();
 
     int  upperBound() const;
     void setUpperBound( const int& upperBound );
