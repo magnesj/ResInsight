@@ -49,7 +49,8 @@ RimReachCircleAnnotation::RimReachCircleAnnotation()
     CAF_PDM_InitField( &m_centerPointXyd, "CenterPointXyd", Vec3d::ZERO, "Center Point" );
     m_centerPointXyd.uiCapability()->setUiEditorTypeName( caf::PdmUiPickableLineEditor::uiEditorTypeName() );
     CAF_PDM_InitField( &m_centerPointPickEnabled, "AnchorPointPick", false, "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_centerPointPickEnabled );
+    m_centerPointPickEnabled.xmlCapability()->disableIO();
+    m_centerPointPickEnabled.uiCapability()->setUiHidden( true );
 
     CAF_PDM_InitField( &m_radius, "Radius", 100.0, "Radius" );
 
@@ -122,7 +123,13 @@ void RimReachCircleAnnotation::defineUiOrdering( QString uiConfigName, caf::PdmU
 {
     uiOrdering.add( nameField() );
     uiOrdering.add( &m_centerPointXyd );
-    uiOrdering.appendToRow( &m_centerPointPickEnabled );
+    uiOrdering.addNewButton( m_centerPointPickEnabled ? "Stop" : "Pick",
+                             [this]()
+                             {
+                                 m_centerPointPickEnabled = !m_centerPointPickEnabled;
+                                 updateConnectedEditors();
+                             },
+                             { .newRow = false, .totalColumnSpan = 1 } );
     uiOrdering.add( &m_radius );
 
     auto appearanceGroup = uiOrdering.addNewGroup( "Appearance" );
@@ -139,10 +146,6 @@ void RimReachCircleAnnotation::fieldChangedByUi( const caf::PdmFieldHandle* chan
     if ( changedField == &m_centerPointXyd )
     {
         m_centerPointPickEnabled = false;
-        updateConnectedEditors();
-    }
-    if ( changedField == &m_centerPointPickEnabled )
-    {
         updateConnectedEditors();
     }
     auto annColl = firstAncestorOrThisOfTypeAsserted<RimAnnotationCollection>();
@@ -165,22 +168,6 @@ void RimReachCircleAnnotation::defineEditorAttribute( const caf::PdmFieldHandle*
             if ( m_centerPointXyd().isZero() )
             {
                 attr->enablePicking = true;
-            }
-        }
-    }
-
-    if ( field == &m_centerPointPickEnabled )
-    {
-        auto* attr = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attr )
-        {
-            if ( m_centerPointPickEnabled )
-            {
-                attr->m_buttonText = "Stop";
-            }
-            else
-            {
-                attr->m_buttonText = "Pick";
             }
         }
     }
