@@ -148,6 +148,9 @@ const QString& RimTextAnnotation::text() const
 void RimTextAnnotation::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_anchorPointXyd );
+    m_anchorPointXyd.uiCapability()->setAttribute( caf::PdmUiPickableLineEditor::Keys::PICK_EVENT_HANDLER, m_anchorPointPickEventHandler );
+    m_anchorPointXyd.uiCapability()->setAttribute( caf::PdmUiPickableLineEditor::Keys::ENABLE_PICKING,
+                                                   (bool)m_anchorPointPickEnabledButtonField );
     uiOrdering.addNewButton( m_anchorPointPickEnabledButtonField ? "Stop" : "Pick",
                              [this]()
                              {
@@ -156,6 +159,8 @@ void RimTextAnnotation::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
                              },
                              { .newRow = false, .totalColumnSpan = 1 } );
     uiOrdering.add( &m_labelPointXyd );
+    m_labelPointXyd.uiCapability()->setAttribute( caf::PdmUiPickableLineEditor::Keys::PICK_EVENT_HANDLER, m_labelPointPickEventHandler );
+    m_labelPointXyd.uiCapability()->setAttribute( caf::PdmUiPickableLineEditor::Keys::ENABLE_PICKING, (bool)m_labelPointPickEnabledButtonField );
     uiOrdering.addNewButton( m_labelPointPickEnabledButtonField ? "Stop" : "Pick",
                              [this]()
                              {
@@ -240,25 +245,6 @@ void RimTextAnnotation::enablePicking( bool enable )
 RimAnnotationTextAppearance* RimTextAnnotation::appearance() const
 {
     return m_textAppearance();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimTextAnnotation::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    caf::PdmUiPickableLineEditorAttribute* attr = dynamic_cast<caf::PdmUiPickableLineEditorAttribute*>( attribute );
-
-    if ( attr && field == &m_anchorPointXyd )
-    {
-        attr->pickEventHandler = m_anchorPointPickEventHandler;
-        attr->enablePicking    = m_anchorPointPickEnabledButtonField;
-    }
-    else if ( attr && field == &m_labelPointXyd )
-    {
-        attr->pickEventHandler = m_labelPointPickEventHandler;
-        attr->enablePicking    = m_labelPointPickEnabledButtonField;
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

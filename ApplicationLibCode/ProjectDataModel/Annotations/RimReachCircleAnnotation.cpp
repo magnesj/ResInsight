@@ -123,6 +123,9 @@ void RimReachCircleAnnotation::defineUiOrdering( QString uiConfigName, caf::PdmU
 {
     uiOrdering.add( nameField() );
     uiOrdering.add( &m_centerPointXyd );
+    m_centerPointXyd.uiCapability()->setAttribute( caf::PdmUiPickableLineEditor::Keys::PICK_EVENT_HANDLER, m_centerPointEventHandler );
+    m_centerPointXyd.uiCapability()->setAttribute( caf::PdmUiPickableLineEditor::Keys::ENABLE_PICKING,
+                                                   m_centerPointPickEnabled() || m_centerPointXyd().isZero() );
     uiOrdering.addNewButton( m_centerPointPickEnabled ? "Stop" : "Pick",
                              [this]()
                              {
@@ -151,24 +154,4 @@ void RimReachCircleAnnotation::fieldChangedByUi( const caf::PdmFieldHandle* chan
     auto annColl = firstAncestorOrThisOfTypeAsserted<RimAnnotationCollection>();
 
     annColl->scheduleRedrawOfRelevantViews();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimReachCircleAnnotation::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_centerPointXyd )
-    {
-        auto* attr = dynamic_cast<caf::PdmUiPickableLineEditorAttribute*>( attribute );
-        if ( attr )
-        {
-            attr->pickEventHandler = m_centerPointEventHandler;
-            attr->enablePicking    = m_centerPointPickEnabled;
-            if ( m_centerPointXyd().isZero() )
-            {
-                attr->enablePicking = true;
-            }
-        }
-    }
 }
