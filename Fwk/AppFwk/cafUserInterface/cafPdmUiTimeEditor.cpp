@@ -69,27 +69,21 @@ void PdmUiTimeEditor::configureAndUpdateUi( const QString& uiConfigName )
 
     m_timeEdit->setEnabled( !uiField()->isUiReadOnly( uiConfigName ) );
 
-    caf::PdmUiObjectHandle* uiObject = uiObj( uiField()->fieldHandle()->ownerObject() );
-    if ( uiObject )
+    uiField()->validateAttributes( "PdmUiTimeEditor", SUPPORTED_ATTRIBUTES, uiConfigName );
+
+    QString timeFormat;
+    if ( auto callback = uiField()->attribute<std::function<QString()>>( Keys::TIME_FORMAT_CALLBACK, uiConfigName ) )
     {
-        uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &m_attributes );
+        timeFormat = callback.value()();
+    }
+    else if ( auto val = uiField()->attribute<QString>( Keys::TIME_FORMAT, uiConfigName ) )
+    {
+        timeFormat = val.value();
     }
 
-    // Override with map-based attributes if present (new system takes precedence)
-    if ( auto uiItem = uiField() )
+    if ( !timeFormat.isEmpty() )
     {
-        if ( auto val = uiItem->attribute<QString>( Keys::TIME_FORMAT, uiConfigName ) )
-        {
-            m_attributes.timeFormat = val.value();
-        }
-
-        // Validate: warn about unsupported attributes
-        uiItem->validateAttributes( "PdmUiTimeEditor", SUPPORTED_ATTRIBUTES, uiConfigName );
-    }
-
-    if ( !m_attributes.timeFormat.isEmpty() )
-    {
-        m_timeEdit->setDisplayFormat( m_attributes.timeFormat );
+        m_timeEdit->setDisplayFormat( timeFormat );
     }
 
     m_timeEdit->setTime( uiField()->uiValue().toTime() );

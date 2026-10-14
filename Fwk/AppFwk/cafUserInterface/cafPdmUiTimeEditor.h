@@ -45,18 +45,6 @@
 
 namespace caf
 {
-//==================================================================================================
-///
-//==================================================================================================
-class PdmUiTimeEditorAttribute : public PdmUiEditorAttribute
-{
-public:
-    QString timeFormat;
-
-public:
-    PdmUiTimeEditorAttribute() {}
-};
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -73,10 +61,13 @@ public:
     struct Keys
     {
         static inline const QString TIME_FORMAT = QStringLiteral( "timeFormat" );
+
+        // std::function<QString()>. Takes precedence over TIME_FORMAT, for formats that depend on the current state
+        static inline const QString TIME_FORMAT_CALLBACK = QStringLiteral( "timeFormatCallback" );
     };
 
     // Set of all supported attributes for validation
-    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = { Keys::TIME_FORMAT };
+    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = { Keys::TIME_FORMAT, Keys::TIME_FORMAT_CALLBACK };
 
 protected:
     QWidget* createEditorWidget( QWidget* parent ) override;
@@ -88,8 +79,6 @@ protected slots:
 
 private:
     QPointer<QTimeEdit> m_timeEdit;
-
-    PdmUiTimeEditorAttribute m_attributes;
 };
 
 } // end namespace caf

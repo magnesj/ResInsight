@@ -120,9 +120,16 @@ RimSummaryTimeAxisProperties::RimSummaryTimeAxisProperties()
     m_visibleTimeRangeMax.uiCapability()->setUiEditorTypeName( caf::PdmUiTimeEditor::uiEditorTypeName() );
     m_visibleTimeRangeMax.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::HIDDEN );
 
+    const auto timeFormatCallback = [this]()
+    { return RiaQDateTimeTools::timeFormatString( m_timeFormat(), RiaDefines::TimeFormatComponents::TIME_FORMAT_HOUR_MINUTE_SECOND ); };
+    m_visibleTimeRangeMax.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiTimeEditor::Keys::TIME_FORMAT_CALLBACK,
+                                                                                  timeFormatCallback );
+
     CAF_PDM_InitFieldNoDefault( &m_visibleTimeRangeMin, "VisibleTimeRangeMin", "Min Time" );
     m_visibleTimeRangeMin.uiCapability()->setUiEditorTypeName( caf::PdmUiTimeEditor::uiEditorTypeName() );
     m_visibleTimeRangeMin.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::HIDDEN );
+    m_visibleTimeRangeMin.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiTimeEditor::Keys::TIME_FORMAT_CALLBACK,
+                                                                                  timeFormatCallback );
 
     CAF_PDM_InitFieldNoDefault( &m_visibleTimeSinceStartRangeMax, "VisibleTimeModeRangeMax", "Max" );
     m_visibleTimeSinceStartRangeMax.uiCapability()->setUiEditorTypeName( caf::PdmUiLineEditor::uiEditorTypeName() );
@@ -1045,22 +1052,4 @@ void RimSummaryTimeAxisProperties::fieldChangedByUi( const caf::PdmFieldHandle* 
     }
 
     settingsChanged.send();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimSummaryTimeAxisProperties::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                          QString                    uiConfigName,
-                                                          caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_visibleTimeRangeMin || field == &m_visibleTimeRangeMax )
-    {
-        auto timeAttrib = dynamic_cast<caf::PdmUiTimeEditorAttribute*>( attribute );
-        if ( timeAttrib )
-        {
-            timeAttrib->timeFormat =
-                RiaQDateTimeTools::timeFormatString( m_timeFormat(), RiaDefines::TimeFormatComponents::TIME_FORMAT_HOUR_MINUTE_SECOND );
-        }
-    }
 }
