@@ -66,6 +66,10 @@ RimPolygonInView::RimPolygonInView()
 
     CAF_PDM_InitFieldNoDefault( &m_targets, "Targets", "Targets" );
     m_targets.uiCapability()->setUiEditorTypeName( caf::PdmUiTableViewEditor::uiEditorTypeName() );
+    m_targets.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::RESIZE_POLICY,
+                                            static_cast<int>( caf::PdmUiTableViewEditor::RESIZE_TO_FIT_CONTENT ) );
+    m_targets.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::ALWAYS_ENFORCE_RESIZE_POLICY, true );
+    m_targets.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::HEIGHT_HINT, 1000 );
     m_targets.uiCapability()->setUiTreeChildrenHidden( true );
     m_targets.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::TOP );
     m_targets.uiCapability()->setCustomContextMenuEnabled( true );
@@ -327,6 +331,8 @@ void RimPolygonInView::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
     {
         uiOrdering.addNewButton( m_enablePicking ? "Stop Picking Points" : "Start Picking Points", [this]() { togglePicking(); } );
         uiOrdering.add( &m_targets );
+        m_targets.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::BASE_COLOR,
+                                                m_enablePicking ? RiuGuiTheme::getColorByVariableName( "externalInputColor" ) : QColor() );
         uiOrdering.add( &m_handleScalingFactor );
     }
 
@@ -402,6 +408,8 @@ void RimPolygonInView::uiOrderingForLocalPolygon( QString uiConfigName, caf::Pdm
 {
     uiOrdering.addNewButton( m_enablePicking ? "Stop Picking Points" : "Start Picking Points", [this]() { togglePicking(); } );
     uiOrdering.add( &m_targets );
+    m_targets.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::BASE_COLOR,
+                                            m_enablePicking ? RiuGuiTheme::getColorByVariableName( "externalInputColor" ) : QColor() );
     uiOrdering.add( &m_handleScalingFactor );
 }
 
@@ -468,27 +476,6 @@ void RimPolygonInView::initAfterRead()
 double RimPolygonInView::scalingFactorForTarget() const
 {
     return m_handleScalingFactor();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimPolygonInView::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_targets )
-    {
-        if ( auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute ) )
-        {
-            tvAttribute->resizePolicy = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT;
-
-            if ( m_enablePicking )
-            {
-                tvAttribute->baseColor = RiuGuiTheme::getColorByVariableName( "externalInputColor" );
-            }
-            tvAttribute->alwaysEnforceResizePolicy = true;
-            tvAttribute->heightHint                = 1000;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

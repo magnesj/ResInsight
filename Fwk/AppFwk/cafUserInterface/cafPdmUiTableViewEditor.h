@@ -70,49 +70,6 @@ private:
     int m_heightHint;
 };
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-class PdmUiTableViewEditorAttribute : public PdmUiEditorAttribute
-{
-public:
-    enum ResizePolicy
-    {
-        NO_AUTOMATIC_RESIZE,
-        RESIZE_TO_FIT_CONTENT,
-        RESIZE_TO_FILL_CONTAINER
-    };
-
-    PdmUiTableViewEditorAttribute()
-        : tableSelectionLevel( 0 )
-        , rowSelectionLevel( 1 )
-        , enableHeaderText( true )
-        , minimumHeight( -1 )
-        , heightHint( -1 )
-        , alwaysEnforceResizePolicy( false )
-        , resizePolicy( NO_AUTOMATIC_RESIZE )
-        , enableDropTarget( false )
-        , editOnSingleClick( false )
-    {
-    }
-
-    int              tableSelectionLevel;
-    int              rowSelectionLevel;
-    bool             enableHeaderText;
-    std::vector<int> columnWidths;
-    int              minimumHeight; ///< Not used if If < 0
-    int              heightHint; ///< Not used if If < 0
-    QColor           baseColor;
-    bool             alwaysEnforceResizePolicy;
-    ResizePolicy     resizePolicy;
-    bool             enableDropTarget;
-    bool             editOnSingleClick; ///< Start editing on a single click and open combo box popups immediately
-};
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-
 class PdmUiTableViewEditor : public PdmUiFieldEditorHandle, public SelectionChangedReceiver
 {
     Q_OBJECT
@@ -121,6 +78,13 @@ class PdmUiTableViewEditor : public PdmUiFieldEditorHandle, public SelectionChan
 public:
     PdmUiTableViewEditor();
     ~PdmUiTableViewEditor() override;
+
+    enum ResizePolicy
+    {
+        NO_AUTOMATIC_RESIZE,
+        RESIZE_TO_FIT_CONTENT,
+        RESIZE_TO_FILL_CONTAINER
+    };
 
     // Attribute key constants for compile-time safety and discoverability
     struct Keys

@@ -106,6 +106,10 @@ RicExportSectorModelUi::RicExportSectorModelUi()
 
     CAF_PDM_InitFieldNoDefault( &m_bcpropKeywords, "BcpropKeywords", "BCPROP Keywords" );
     m_bcpropKeywords.uiCapability()->setUiEditorTypeName( caf::PdmUiTableViewEditor::uiEditorTypeName() );
+    m_bcpropKeywords.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::RESIZE_POLICY,
+                                                   static_cast<int>( caf::PdmUiTableViewEditor::RESIZE_TO_FILL_CONTAINER ) );
+    m_bcpropKeywords.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::ALWAYS_ENFORCE_RESIZE_POLICY, true );
+    m_bcpropKeywords.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::EDIT_ON_SINGLE_CLICK, true );
     m_bcpropKeywords.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::HIDDEN );
 
     CAF_PDM_InitFieldNoDefault( &m_keywordsToRemove, "KeywordsToRemove", "Keywords to Remove from Output" );
@@ -394,17 +398,7 @@ void RicExportSectorModelUi::setEclipseView( RimEclipseView* view )
 //--------------------------------------------------------------------------------------------------
 void RicExportSectorModelUi::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_bcpropKeywords )
-    {
-        auto* tvAttr = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
-        if ( tvAttr )
-        {
-            tvAttr->resizePolicy              = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER;
-            tvAttr->alwaysEnforceResizePolicy = true;
-            tvAttr->editOnSingleClick         = true;
-        }
-    }
-    else if ( ( field == &m_exportFolder ) || ( field == &m_simulationJobFolder ) )
+    if ( ( field == &m_exportFolder ) || ( field == &m_simulationJobFolder ) )
     {
         caf::PdmUiFilePathEditorAttribute* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
         if ( myAttr )

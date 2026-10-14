@@ -70,6 +70,10 @@ RimSeismicData::RimSeismicData()
 
     CAF_PDM_InitFieldNoDefault( &m_metadata, "Metadata", "Metadata" );
     m_metadata.uiCapability()->setUiEditorTypeName( caf::PdmUiTableViewEditor::uiEditorTypeName() );
+    m_metadata.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::RESIZE_POLICY,
+                                             static_cast<int>( caf::PdmUiTableViewEditor::RESIZE_TO_FILL_CONTAINER ) );
+    m_metadata.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::ALWAYS_ENFORCE_RESIZE_POLICY, true );
+    m_metadata.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::MINIMUM_HEIGHT, 400 );
     m_metadata.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::HIDDEN );
     m_metadata.uiCapability()->setUiTreeChildrenHidden( true );
     m_metadata.uiCapability()->setUiReadOnly( true );
@@ -300,23 +304,6 @@ void RimSeismicData::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
 void RimSeismicData::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName /*= "" */ )
 {
     uiTreeOrdering.skipRemainingChildren();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimSeismicData::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_metadata )
-    {
-        auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
-        if ( tvAttribute )
-        {
-            tvAttribute->resizePolicy              = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER;
-            tvAttribute->alwaysEnforceResizePolicy = true;
-            tvAttribute->minimumHeight             = 400;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

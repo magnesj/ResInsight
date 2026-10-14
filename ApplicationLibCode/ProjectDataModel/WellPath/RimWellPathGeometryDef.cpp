@@ -604,6 +604,12 @@ void RimWellPathGeometryDef::defineUiOrdering( QString uiConfigName, caf::PdmUiO
 
     uiOrdering.add( &m_showAbsolutePosForWellTargets );
     uiOrdering.add( &m_wellTargets );
+    m_wellTargets.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::RESIZE_POLICY,
+                                                static_cast<int>( caf::PdmUiTableViewEditor::RESIZE_TO_FIT_CONTENT ) );
+    m_wellTargets.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::ALWAYS_ENFORCE_RESIZE_POLICY, (bool)m_pickPointsEnabled );
+    m_wellTargets.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::BASE_COLOR,
+                                                m_pickPointsEnabled ? QColor( 255, 220, 255 ) : QColor() );
+    m_wellTargets.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::HEIGHT_HINT, 1000 );
     uiOrdering.addNewButton( m_pickPointsEnabled ? "Stop Picking Targets" : "Start Picking Targets",
                              [this]() { enableTargetPointPicking( !m_pickPointsEnabled ); } );
 
@@ -751,28 +757,6 @@ void RimWellPathGeometryDef::defineCustomContextMenu( const caf::PdmFieldHandle*
     menuBuilder << "RicDeleteWellPathTargetFeature";
 
     menuBuilder.appendToMenu( menu );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellPathGeometryDef::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_wellTargets )
-    {
-        auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
-        if ( tvAttribute )
-        {
-            tvAttribute->resizePolicy = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT;
-            tvAttribute->heightHint   = 1000;
-
-            if ( m_pickPointsEnabled )
-            {
-                tvAttribute->baseColor.setRgb( 255, 220, 255 );
-                tvAttribute->alwaysEnforceResizePolicy = true;
-            }
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

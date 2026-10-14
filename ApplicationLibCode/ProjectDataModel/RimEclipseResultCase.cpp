@@ -86,6 +86,10 @@ RimEclipseResultCase::RimEclipseResultCase()
 {
     CAF_PDM_InitScriptableObject( "Eclipse Case", ":/Case48x48.png", "", "The Regular Eclipse Results Case" );
 
+    m_resultAliasList.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::RESIZE_POLICY,
+                                                    static_cast<int>( caf::PdmUiTableViewEditor::RESIZE_TO_FILL_CONTAINER ) );
+    m_resultAliasList.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::ALWAYS_ENFORCE_RESIZE_POLICY, true );
+
     CAF_PDM_InitFieldNoDefault( &m_unitSystem, "UnitSystem", "Unit System" );
     m_unitSystem.registerGetMethod( RimProject::current(), &RimProject::commonUnitSystemForAllCases );
     m_unitSystem.uiCapability()->setUiReadOnly( true );
@@ -830,15 +834,6 @@ void RimEclipseResultCase::defineEditorAttribute( const caf::PdmFieldHandle* fie
         {
             myAttr->m_fileSelectionFilter = "SourSim (*.sourres)";
             myAttr->m_defaultPath         = QFileInfo( gridFileName() ).absolutePath();
-        }
-    }
-    else if ( field == &m_resultAliasList )
-    {
-        auto* tvAttr = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
-        if ( tvAttr )
-        {
-            tvAttr->resizePolicy              = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER;
-            tvAttr->alwaysEnforceResizePolicy = true;
         }
     }
 }

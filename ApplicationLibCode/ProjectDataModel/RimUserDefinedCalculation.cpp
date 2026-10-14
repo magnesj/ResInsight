@@ -67,6 +67,7 @@ RimUserDefinedCalculation::RimUserDefinedCalculation()
     m_unit.uiCapability()->setUiEditorTypeName( caf::PdmUiLineEditor::uiEditorTypeName() );
 
     CAF_PDM_InitFieldNoDefault( &m_variables, "Variables", "Variables" );
+    m_variables.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::ENABLE_DROP_TARGET, true );
 
     CAF_PDM_InitField( &m_id, "Id", -1, "Id" );
     m_id.uiCapability()->setUiHidden( true );
@@ -365,21 +366,6 @@ QString RimUserDefinedCalculation::buildCalculationName() const
     }
 
     return name;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimUserDefinedCalculation::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_variables )
-    {
-        auto* myAttr = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->enableDropTarget = true;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

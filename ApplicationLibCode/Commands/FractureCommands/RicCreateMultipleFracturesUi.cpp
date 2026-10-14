@@ -89,6 +89,8 @@ RiuCreateMultipleFractionsUi::RiuCreateMultipleFractionsUi()
 
     CAF_PDM_InitFieldNoDefault( &m_options, "Options", "Options" );
     m_options.uiCapability()->setUiEditorTypeName( caf::PdmUiTableViewEditor::uiEditorTypeName() );
+    m_options.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::MINIMUM_HEIGHT, 130 );
+    m_options.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::COLUMN_WIDTHS, QVariantList{ 90, 90, 400, 70 } );
     m_options.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::TOP );
     m_options.uiCapability()->setCustomContextMenuEnabled( true );
 
@@ -274,24 +276,6 @@ QString RiuCreateMultipleFractionsUi::summaryText() const
     }
 
     return tableText;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiuCreateMultipleFractionsUi::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                          QString                    uiConfigName,
-                                                          caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_options )
-    {
-        auto attr = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
-        if ( attr )
-        {
-            attr->minimumHeight = 130;
-            attr->columnWidths  = { 90, 90, 400, 70 };
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

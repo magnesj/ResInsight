@@ -200,6 +200,11 @@ void RimSeismicSection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
         {
             auto polyGrp = uiOrdering.addNewGroup( "Polyline Definition" );
             polyGrp->add( &m_targets );
+            m_targets.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::RESIZE_POLICY,
+                                                    static_cast<int>( caf::PdmUiTableViewEditor::RESIZE_TO_FIT_CONTENT ) );
+            m_targets.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::ALWAYS_ENFORCE_RESIZE_POLICY, (bool)m_enablePicking );
+            m_targets.uiCapability()->setAttribute( caf::PdmUiTableViewEditor::Keys::BASE_COLOR,
+                                                    m_enablePicking ? QColor( 255, 220, 255 ) : QColor() );
             polyGrp->addNewButton( m_enablePicking ? "Stop Picking Points" : "Start Picking Points",
                                    [this]() { enablePicking( !m_enablePicking ); } );
         }
@@ -277,27 +282,6 @@ void RimSeismicSection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
 void RimSeismicSection::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName /*= "" */ )
 {
     uiTreeOrdering.skipRemainingChildren();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimSeismicSection::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_targets )
-    {
-        auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
-        if ( tvAttribute )
-        {
-            tvAttribute->resizePolicy = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT;
-
-            if ( m_enablePicking )
-            {
-                tvAttribute->baseColor.setRgb( 255, 220, 255 );
-                tvAttribute->alwaysEnforceResizePolicy = true;
-            }
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
