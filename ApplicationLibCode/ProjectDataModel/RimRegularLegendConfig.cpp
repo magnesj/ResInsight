@@ -103,6 +103,7 @@ void RimRegularLegendConfig::ColorRangeEnum::setUp()
     addItem( RimRegularLegendConfig::ColorRangesType::BLUE_MAGENTA, "BLUE_MAGENTA", "Blue to Magenta" );
     addItem( RimRegularLegendConfig::ColorRangesType::CORRELATION, "CORRELATION", "Correlation colors" );
     addItem( RimRegularLegendConfig::ColorRangesType::HEAT_MAP, "HEAT_MAP", "Heat map colors" );
+    addItem( RimRegularLegendConfig::ColorRangesType::SEISMIC, "SEISMIC", "Seismic colors" );
     addItem( RimRegularLegendConfig::ColorRangesType::UNDEFINED, "UNDEFINED", "Undefined" );
     setDefault( RimRegularLegendConfig::ColorRangesType::UNDEFINED );
 }
@@ -1128,6 +1129,9 @@ cvf::Color3ubArray RimRegularLegendConfig::colorArrayFromColorType( ColorRangesT
             break;
         case RimRegularLegendConfig::ColorRangesType::HEAT_MAP:
             return RiaColorTables::heatMapPaletteColors().color3ubArray();
+            break;
+        case RimRegularLegendConfig::ColorRangesType::SEISMIC:
+            return RiaColorTables::seismicPaletteColors().color3ubArray();
             break;
         default:
             if ( ColorManager::isEnsembleColorRange( colorType ) ) return ColorManager::EnsembleColorRanges().at( colorType );

@@ -552,6 +552,27 @@ const caf::ColorTable& RiaColorTables::heatMapPaletteColors()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+const caf::ColorTable& RiaColorTables::seismicPaletteColors()
+{
+    // Standard geophysics seismic scale: green, blue, cyan, white, yellow, orange, red, pink
+    static std::vector<cvf::Color3ub> colors{ cvf::Color3ub( 0, 170, 0 ), // Green
+                                              cvf::Color3ub( 0, 0, 200 ), // Blue
+                                              cvf::Color3ub( 0, 120, 255 ), // Light blue
+                                              cvf::Color3ub( 0, 255, 255 ), // Cyan
+                                              cvf::Color3ub( 255, 255, 255 ), // White
+                                              cvf::Color3ub( 255, 255, 0 ), // Yellow
+                                              cvf::Color3ub( 255, 140, 0 ), // Orange
+                                              cvf::Color3ub( 200, 0, 0 ), // Red
+                                              cvf::Color3ub( 200, 0, 160 ) }; // Pink
+
+    static caf::ColorTable colorTable = caf::ColorTable( colors );
+
+    return colorTable;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 const caf::ColorTable& RiaColorTables::curveSetPaletteColors()
 {
     static std::vector<cvf::Color3ub> colors{

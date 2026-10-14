@@ -99,6 +99,8 @@ public:
 
         HEAT_MAP,
 
+        SEISMIC,
+
         UNDEFINED
     };
 
