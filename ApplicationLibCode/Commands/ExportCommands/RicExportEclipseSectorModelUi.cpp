@@ -123,7 +123,7 @@ RicExportEclipseSectorModelUi::RicExportEclipseSectorModelUi()
     CAF_PDM_InitField( &m_exportParametersFilename, "ExportParamsFilename", QString(), "File Name" );
 
     CAF_PDM_InitFieldNoDefault( &selectedKeywords, "ExportMainKeywords", "Keywords to Export" );
-
+    selectedKeywords.uiCapability()->setAttribute( caf::PdmUiTreeSelectionEditor::Keys::HEIGHT_HINT, 280 );
     CAF_PDM_InitField( &m_writeEchoInGrdeclFiles,
                        "WriteEchoInGrdeclFiles",
                        RiaPreferences::current()->writeEchoInGrdeclFiles(),
@@ -258,14 +258,6 @@ void RicExportEclipseSectorModelUi::defineEditorAttribute( const caf::PdmFieldHa
             myAttr->m_fileSelectionFilter = "GRDECL files (*.grdecl *.GRDECL);;All files (*.*)";
         }
     }
-    else if ( field == &selectedKeywords )
-    {
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute ) )
-        {
-            myAttr->heightHint = 280;
-        }
-    }
-
     if ( field == &m_exportFolder )
     {
         if ( auto* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute ) )

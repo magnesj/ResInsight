@@ -156,6 +156,9 @@ RimEnsembleFractureStatistics::RimEnsembleFractureStatistics()
     CAF_PDM_InitField( &m_selectedStatisticsType, "SelectedStatisticsType", defaultStatisticsTypes, "Statistics Type" );
     m_selectedStatisticsType.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
     m_selectedStatisticsType.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::TOP );
+    m_selectedStatisticsType.uiCapability()->setAttribute( caf::PdmUiTreeSelectionEditor::Keys::SHOW_TEXT_FILTER, false );
+    m_selectedStatisticsType.uiCapability()->setAttribute( caf::PdmUiTreeSelectionEditor::Keys::SHOW_TOGGLE_ALL_CHECKBOX, false );
+    m_selectedStatisticsType.uiCapability()->setAttribute( caf::PdmUiTreeSelectionEditor::Keys::SINGLE_SELECTION_MODE, false );
 
     CAF_PDM_InitFieldNoDefault( &m_computeStatistics, "ComputeStatistics", "Compute Templates" );
     m_computeStatistics.uiCapability()->setUiEditorTypeName( caf::PdmUiToolButtonEditor::uiEditorTypeName() );
@@ -228,16 +231,6 @@ void RimEnsembleFractureStatistics::defineEditorAttribute( const caf::PdmFieldHa
         {
             myAttr->wrapMode = caf::PdmUiTextEditorAttribute::NoWrap;
             myAttr->textMode = caf::PdmUiTextEditorAttribute::HTML;
-        }
-    }
-    else if ( field == &m_selectedStatisticsType )
-    {
-        caf::PdmUiTreeSelectionEditorAttribute* attrib = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->showTextFilter        = false;
-            attrib->showToggleAllCheckbox = false;
-            attrib->singleSelectionMode   = false;
         }
     }
     else if ( field == &m_statisticsTable )

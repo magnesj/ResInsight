@@ -99,6 +99,9 @@ RiaPreferencesSystem::RiaPreferencesSystem()
 
     CAF_PDM_InitFieldNoDefault( &m_enabledFeatures, "EnabledFeatures", "Experimental Features" );
     m_enabledFeatures.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
+    // Report the highlighted (clicked) feature so its description can be shown below the list.
+    m_enabledFeatures.uiCapability()->setAttribute<caf::PdmFieldHandle*>( caf::PdmUiTreeSelectionEditor::Keys::CURRENT_INDEX_FIELD_HANDLE,
+                                                                          &m_currentFeatureKeyword );
 
     // Transient UI helper fields, not stored in the preferences file.
     CAF_PDM_InitFieldNoDefault( &m_currentFeatureKeyword, "currentFeatureKeyword", "" );
@@ -417,14 +420,6 @@ void RiaPreferencesSystem::defineEditorAttribute( const caf::PdmFieldHandle* fie
         if ( myAttr )
         {
             myAttr->m_selectDirectory = true;
-        }
-    }
-    else if ( field == &m_enabledFeatures )
-    {
-        // Report the highlighted (clicked) feature so its description can be shown below the list.
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute ) )
-        {
-            myAttr->currentIndexFieldHandle = &m_currentFeatureKeyword;
         }
     }
     else if ( field == &m_selectedFeatureDescription )

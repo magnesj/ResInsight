@@ -102,6 +102,7 @@ RicExportSectorModelUi::RicExportSectorModelUi()
 
     CAF_PDM_InitFieldNoDefault( &m_selectedRegions, "SelectedRefinementRegions", "Refinement Regions" );
     m_selectedRegions.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
+    m_selectedRegions.uiCapability()->setAttribute( caf::PdmUiTreeSelectionEditor::Keys::HEIGHT_HINT, 100 );
 
     CAF_PDM_InitFieldNoDefault( &m_bcpropKeywords, "BcpropKeywords", "BCPROP Keywords" );
     m_bcpropKeywords.uiCapability()->setUiEditorTypeName( caf::PdmUiTableViewEditor::uiEditorTypeName() );
@@ -409,14 +410,6 @@ void RicExportSectorModelUi::defineEditorAttribute( const caf::PdmFieldHandle* f
         if ( myAttr )
         {
             myAttr->m_selectDirectory = true;
-        }
-    }
-    else if ( field == &m_selectedRegions )
-    {
-        auto attrib = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->heightHint = 100;
         }
     }
     else if ( field == &m_inputDeckName )
