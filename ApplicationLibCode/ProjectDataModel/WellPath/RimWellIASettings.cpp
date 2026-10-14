@@ -173,6 +173,11 @@ void RimWellIASettings::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
     auto wellPath = firstAncestorOrThisOfType<RimWellPath>();
     if ( wellPath )
     {
+        m_startMD.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MINIMUM, wellPath->uniqueStartMD() );
+        m_startMD.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MAXIMUM, wellPath->uniqueEndMD() );
+        m_endMD.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MINIMUM, wellPath->uniqueStartMD() );
+        m_endMD.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MAXIMUM, wellPath->uniqueEndMD() );
+
         if ( wellPath->unitSystem() == RiaDefines::EclipseUnitSystem::UNITS_METRIC )
         {
             m_startMD.uiCapability()->setUiName( "Start MD [m]" );
@@ -200,26 +205,6 @@ void RimWellIASettings::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
     modelGroup->add( &m_showBox );
 
     uiOrdering.skipRemainingFields( true );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellIASettings::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_startMD || field == &m_endMD )
-    {
-        caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-
-        if ( myAttr )
-        {
-            auto wellPath = firstAncestorOrThisOfType<RimWellPath>();
-            if ( !wellPath ) return;
-
-            myAttr->m_minimum = wellPath->uniqueStartMD();
-            myAttr->m_maximum = wellPath->uniqueEndMD();
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

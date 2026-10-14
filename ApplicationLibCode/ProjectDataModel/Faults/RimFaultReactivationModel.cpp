@@ -463,6 +463,20 @@ void RimFaultReactivationModel::defineUiOrdering( QString uiConfigName, caf::Pdm
     }
 
     auto faultGrp = modelGrp->addNewGroup( "Fault Extension" );
+    {
+        double maxExtension = 1000.0;
+        if ( auto eclCase = eclipseCase() )
+        {
+            auto bb      = eclCase->allCellsBoundingBox();
+            maxExtension = bb.max().z() - bb.min().z();
+        }
+
+        for ( auto* field : { &m_faultExtendUpwards, &m_faultExtendDownwards } )
+        {
+            field->uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MINIMUM, 0.0 );
+            field->uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MAXIMUM, maxExtension );
+        }
+    }
     faultGrp->add( &m_faultExtendUpwards );
     faultGrp->add( &m_faultExtendDownwards );
 
@@ -554,32 +568,6 @@ void RimFaultReactivationModel::fieldChangedByUi( const caf::PdmFieldHandle* cha
         }
 
         updateVisualization();
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimFaultReactivationModel::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( ( field == &m_faultExtendUpwards ) || ( field == &m_faultExtendDownwards ) )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            auto eclCase = eclipseCase();
-            if ( eclCase )
-            {
-                auto   bb       = eclCase->allCellsBoundingBox();
-                double diff     = bb.max().z() - bb.min().z();
-                attr->m_minimum = 0;
-                attr->m_maximum = diff;
-            }
-            else
-            {
-                attr->m_minimum = 0;
-                attr->m_maximum = 1000;
-            }
-        }
     }
 }
 

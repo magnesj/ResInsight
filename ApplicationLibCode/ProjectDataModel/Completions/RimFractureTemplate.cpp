@@ -138,6 +138,8 @@ RimFractureTemplate::RimFractureTemplate()
 
     CAF_PDM_InitField( &m_perforationEfficiency, "PerforationEfficiency", 1.0, "Perforation Efficiency" );
     m_perforationEfficiency.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_perforationEfficiency.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MINIMUM, 0.0 );
+    m_perforationEfficiency.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MAXIMUM, 1.0 );
 
     CAF_PDM_InitField( &m_wellDiameter, "WellDiameter", 0.216, "Well Diameter at Fracture" );
     CAF_PDM_InitScriptableField( &m_conductivityType,
@@ -353,6 +355,12 @@ void RimFractureTemplate::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
     prepareFieldsForUiDisplay();
 
     {
+        auto [minimum, maximum] = wellPathDepthAtFractureRange();
+        m_wellPathDepthAtFracture.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MINIMUM, static_cast<double>( minimum ) );
+        m_wellPathDepthAtFracture.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MAXIMUM, static_cast<double>( maximum ) );
+    }
+
+    {
         auto group = uiOrdering.addNewGroup( "Sensitivity Scale Factors" );
         group->setCollapsedByDefault();
         group->add( &m_heightScaleFactor );
@@ -409,33 +417,6 @@ void RimFractureTemplate::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
 
     uiOrdering.add( &m_fractureTemplateUnit );
     uiOrdering.skipRemainingFields( true );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimFractureTemplate::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_perforationEfficiency )
-    {
-        auto myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_minimum = 0;
-            myAttr->m_maximum = 1.0;
-        }
-    }
-
-    if ( field == &m_wellPathDepthAtFracture )
-    {
-        auto* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            auto [minimum, maximum] = wellPathDepthAtFractureRange();
-            myAttr->m_minimum       = minimum;
-            myAttr->m_maximum       = maximum;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

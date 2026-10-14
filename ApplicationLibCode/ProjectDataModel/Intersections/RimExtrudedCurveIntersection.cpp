@@ -223,9 +223,15 @@ RimExtrudedCurveIntersection::RimExtrudedCurveIntersection()
 
     CAF_PDM_InitField( &m_azimuthAngle, "AzimuthAngle", 0.0, "Azimuth" );
     m_azimuthAngle.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_azimuthAngle.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MINIMUM, 0.0 );
+    m_azimuthAngle.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MAXIMUM, 360.0 );
+    m_azimuthAngle.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::SLIDER_TICK_COUNT, 360 );
 
     CAF_PDM_InitField( &m_dipAngle, "DipAngle", 90.0, "Dip" );
     m_dipAngle.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_dipAngle.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MINIMUM, 0.0 );
+    m_dipAngle.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MAXIMUM, 180.0 );
+    m_dipAngle.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::SLIDER_TICK_COUNT, 180 );
 
     CAF_PDM_InitFieldNoDefault( &m_customExtrusionPoints, "CustomExtrusionPoints", "" );
     CAF_PDM_InitFieldNoDefault( &m_twoAzimuthPoints,
@@ -597,6 +603,30 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
     }
 
     auto filterGroup = uiOrdering.addNewGroup( "Depth Filter" );
+
+    {
+        auto setDepthRange = [this]( const cvf::BoundingBox& bb )
+        {
+            for ( auto* field : { &m_depthUpperThreshold, &m_depthLowerThreshold } )
+            {
+                field->uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MINIMUM, -1.0 * bb.max().z() );
+                field->uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MAXIMUM, -1.0 * bb.min().z() );
+            }
+        };
+
+        RimEclipseView* eclView = eclipseView();
+        if ( eclView && eclView->mainGrid() )
+        {
+            setDepthRange( eclView->mainGrid()->boundingBox() );
+        }
+
+        RimGeoMechView* geomView = firstAncestorOrThisOfType<RimGeoMechView>();
+        if ( geomView )
+        {
+            setDepthRange( geomView->domainBoundingBox() );
+        }
+    }
+
     if ( m_depthThresholdOverridden() )
     {
         filterGroup->add( &m_depthThresholdOverridden );
@@ -1027,53 +1057,6 @@ int RimExtrudedCurveIntersection::branchIndex() const
 void RimExtrudedCurveIntersection::setBaseColor( caf::PdmFieldHandle& field, bool enable )
 {
     field.uiCapability()->setAttribute( caf::PdmUiListEditor::Keys::QSS_STATE, enable ? QString( "ExternalInput" ) : QString() );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimExtrudedCurveIntersection::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                          QString                    uiConfigName,
-                                                          caf::PdmUiEditorAttribute* attribute )
-{
-    auto* doubleSliderAttrib = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-    if ( doubleSliderAttrib )
-    {
-        if ( field == &m_azimuthAngle )
-        {
-            doubleSliderAttrib->m_minimum         = 0;
-            doubleSliderAttrib->m_maximum         = 360;
-            doubleSliderAttrib->m_sliderTickCount = 360;
-        }
-        else if ( field == &m_dipAngle )
-        {
-            doubleSliderAttrib->m_minimum         = 0;
-            doubleSliderAttrib->m_maximum         = 180;
-            doubleSliderAttrib->m_sliderTickCount = 180;
-        }
-        else if ( ( field == &m_depthUpperThreshold ) || ( field == &m_depthLowerThreshold ) )
-        {
-            RimEclipseView* eclView = eclipseView();
-
-            if ( eclView && eclView->mainGrid() )
-            {
-                const cvf::BoundingBox bb = eclView->mainGrid()->boundingBox();
-
-                doubleSliderAttrib->m_minimum = -1.0 * bb.max().z();
-                doubleSliderAttrib->m_maximum = -1.0 * bb.min().z();
-            }
-
-            RimGeoMechView* geomView = firstAncestorOrThisOfType<RimGeoMechView>();
-
-            if ( geomView )
-            {
-                const cvf::BoundingBox bb = geomView->domainBoundingBox();
-
-                doubleSliderAttrib->m_minimum = -1.0 * bb.max().z();
-                doubleSliderAttrib->m_maximum = -1.0 * bb.min().z();
-            }
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

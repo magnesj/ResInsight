@@ -144,6 +144,8 @@ RimStreamlineInViewCollection::RimStreamlineInViewCollection()
 
     CAF_PDM_InitFieldNoDefault( &m_scaleFactor, "ScaleFactor", "Scale Factor" );
     m_scaleFactor.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_scaleFactor.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MINIMUM, 0.1 );
+    m_scaleFactor.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MAXIMUM, 10000.0 );
     m_scaleFactor = 100.0;
 
     CAF_PDM_InitFieldNoDefault( &m_tracerLength, "TracerLength", "Tracer Length" );
@@ -600,24 +602,6 @@ void RimStreamlineInViewCollection::defineUiTreeOrdering( caf::PdmUiTreeOrdering
 {
     uiTreeOrdering.add( &m_legendConfig );
     uiTreeOrdering.skipRemainingChildren();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimStreamlineInViewCollection::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                           QString                    uiConfigName,
-                                                           caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_scaleFactor )
-    {
-        caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_minimum = 0.1;
-            myAttr->m_maximum = 10000.0;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

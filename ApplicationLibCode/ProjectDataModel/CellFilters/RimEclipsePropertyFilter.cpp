@@ -312,6 +312,17 @@ void RimEclipsePropertyFilter::defineUiOrdering( QString uiConfigName, caf::PdmU
         {
             group2.add( &m_lowerBound );
             group2.add( &m_upperBound );
+
+            if ( m_minimumResultValue != cvf::UNDEFINED_DOUBLE && m_maximumResultValue != cvf::UNDEFINED_DOUBLE )
+            {
+                for ( auto* field : { &m_lowerBound, &m_upperBound } )
+                {
+                    field->uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MINIMUM,
+                                                         static_cast<double>( m_minimumResultValue ) );
+                    field->uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MAXIMUM,
+                                                         static_cast<double>( m_maximumResultValue ) );
+                }
+            }
         }
     }
 
@@ -462,26 +473,6 @@ void RimEclipsePropertyFilter::setCategoriesFromTracerNames( const std::vector<Q
 void RimEclipsePropertyFilter::updateActiveState()
 {
     m_isChecked.uiCapability()->setUiReadOnly( isPropertyFilterControlled() );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimEclipsePropertyFilter::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( m_minimumResultValue == cvf::UNDEFINED_DOUBLE || m_maximumResultValue == cvf::UNDEFINED_DOUBLE )
-    {
-        return;
-    }
-
-    if ( field == &m_lowerBound || field == &m_upperBound )
-    {
-        if ( auto doubleAttributes = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            doubleAttributes->m_minimum = m_minimumResultValue;
-            doubleAttributes->m_maximum = m_maximumResultValue;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -436,48 +436,6 @@ void RimBoxIntersection::updateBoxManipulatorGeometry()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimBoxIntersection::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-    if ( myAttr )
-    {
-        cvf::BoundingBox cellsBoundingBox = currentCellBoundingBox();
-        if ( field == &m_minXCoord || field == &m_maxXCoord )
-        {
-            myAttr->m_minimum = cellsBoundingBox.min().x();
-            myAttr->m_maximum = cellsBoundingBox.max().x();
-
-            int range     = cellsBoundingBox.extent().x();
-            int tickCount = range / m_xySliderStepSize;
-
-            myAttr->m_sliderTickCount = cvf::Math::abs( tickCount );
-        }
-        else if ( field == &m_minYCoord || field == &m_maxYCoord )
-        {
-            myAttr->m_minimum = cellsBoundingBox.min().y();
-            myAttr->m_maximum = cellsBoundingBox.max().y();
-
-            int range     = cellsBoundingBox.extent().y();
-            int tickCount = range / m_xySliderStepSize;
-
-            myAttr->m_sliderTickCount = cvf::Math::abs( tickCount );
-        }
-        else if ( field == &m_minDepth || field == &m_maxDepth )
-        {
-            myAttr->m_minimum = -cellsBoundingBox.max().z();
-            myAttr->m_maximum = -cellsBoundingBox.min().z();
-
-            int range     = cellsBoundingBox.extent().z();
-            int tickCount = range / m_depthSliderStepSize;
-
-            myAttr->m_sliderTickCount = cvf::Math::abs( tickCount );
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimBoxIntersection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_name );
@@ -514,6 +472,30 @@ void RimBoxIntersection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
         caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Slider Options" );
         group->add( &m_xySliderStepSize );
         group->add( &m_depthSliderStepSize );
+    }
+
+    auto setSliderAttributes = []( auto& field, double minimum, double maximum, int tickCount )
+    {
+        field.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MINIMUM, minimum );
+        field.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MAXIMUM, maximum );
+        field.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::SLIDER_TICK_COUNT, cvf::Math::abs( tickCount ) );
+    };
+
+    const int xTickCount     = static_cast<int>( static_cast<int>( cellsBoundingBox.extent().x() ) / m_xySliderStepSize );
+    const int yTickCount     = static_cast<int>( static_cast<int>( cellsBoundingBox.extent().y() ) / m_xySliderStepSize );
+    const int depthTickCount = static_cast<int>( static_cast<int>( cellsBoundingBox.extent().z() ) / m_depthSliderStepSize );
+
+    for ( auto* field : { &m_minXCoord, &m_maxXCoord } )
+    {
+        setSliderAttributes( *field, cellsBoundingBox.min().x(), cellsBoundingBox.max().x(), xTickCount );
+    }
+    for ( auto* field : { &m_minYCoord, &m_maxYCoord } )
+    {
+        setSliderAttributes( *field, cellsBoundingBox.min().y(), cellsBoundingBox.max().y(), yTickCount );
+    }
+    for ( auto* field : { &m_minDepth, &m_maxDepth } )
+    {
+        setSliderAttributes( *field, -cellsBoundingBox.max().z(), -cellsBoundingBox.min().z(), depthTickCount );
     }
 
     uiOrdering.addNewButton( m_show3DManipulator ? "Hide 3D manipulator" : "Show 3D manipulator",

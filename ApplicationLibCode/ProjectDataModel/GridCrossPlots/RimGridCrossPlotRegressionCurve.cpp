@@ -349,6 +349,20 @@ void RimGridCrossPlotRegressionCurve::defineUiOrdering( QString uiConfigName, ca
     dataSelectionGroup->add( &m_maxRangeY );
     dataSelectionGroup->add( &m_showDataSelectionInPlot );
 
+    auto setSliderRange = []( auto& field, const std::pair<double, double>& range )
+    {
+        auto [min, max] = range;
+        field.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MINIMUM,
+                                            RiaNumericalTools::roundToNumSignificantDigitsFloor( min, 2 ) );
+        field.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MAXIMUM,
+                                            RiaNumericalTools::roundToNumSignificantDigitsCeil( max, 2 ) );
+        field.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::DECIMALS, 3 );
+    };
+    setSliderRange( m_minRangeX, m_dataRangeX );
+    setSliderRange( m_maxRangeX, m_dataRangeX );
+    setSliderRange( m_minRangeY, m_dataRangeY );
+    setSliderRange( m_maxRangeY, m_dataRangeY );
+
     caf::PdmUiGroup* forecastingGroup = uiOrdering.addNewGroup( "Extrapolation" );
     forecastingGroup->add( &m_minExtrapolationRangeX );
     forecastingGroup->add( &m_maxExtrapolationRangeX );
@@ -366,35 +380,6 @@ void RimGridCrossPlotRegressionCurve::defineObjectEditorAttribute( QString uiCon
 {
     // Implement an empty method to avoid the base class implementation in RimPlotCurve
     // The color tag is not used for Grid Cross Plot Curves
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimGridCrossPlotRegressionCurve::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                             QString                    uiConfigName,
-                                                             caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_minRangeX || field == &m_maxRangeX )
-    {
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            auto [min, max]    = m_dataRangeX;
-            myAttr->m_minimum  = RiaNumericalTools::roundToNumSignificantDigitsFloor( min, 2 );
-            myAttr->m_maximum  = RiaNumericalTools::roundToNumSignificantDigitsCeil( max, 2 );
-            myAttr->m_decimals = 3;
-        }
-    }
-    else if ( field == &m_minRangeY || field == &m_maxRangeY )
-    {
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            auto [min, max]    = m_dataRangeY;
-            myAttr->m_minimum  = RiaNumericalTools::roundToNumSignificantDigitsFloor( min, 2 );
-            myAttr->m_maximum  = RiaNumericalTools::roundToNumSignificantDigitsCeil( max, 2 );
-            myAttr->m_decimals = 3;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

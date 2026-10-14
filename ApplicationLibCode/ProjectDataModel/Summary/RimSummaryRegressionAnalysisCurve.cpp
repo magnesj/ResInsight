@@ -32,6 +32,7 @@
 #include "RimTimeAxisAnnotation.h"
 
 #include "cafPdmUiDateEditor.h"
+#include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiSliderEditor.h"
 #include "cafPdmUiSliderTools.h"
@@ -141,10 +142,14 @@ RimSummaryRegressionAnalysisCurve::RimSummaryRegressionAnalysisCurve()
     CAF_PDM_InitFieldNoDefault( &m_xRangeSelection, "XRangeSelection", "X Value Range" );
     CAF_PDM_InitField( &m_valueRangeX, "ValueRangeX", std::make_pair( 0.0, 0.0 ), "Value Range X" );
     m_valueRangeX.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::HIDDEN );
+    m_valueRangeX.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::DECIMALS, 2 );
+    m_valueRangeX.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::SLIDER_TICK_COUNT, 100 );
 
     CAF_PDM_InitFieldNoDefault( &m_yRangeSelection, "YRangeSelection", "Y Value Range" );
     CAF_PDM_InitField( &m_valueRangeY, "ValueRangeY", std::make_pair( 0.0, 0.0 ), "Value Range Y" );
     m_valueRangeY.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::HIDDEN );
+    m_valueRangeY.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::DECIMALS, 2 );
+    m_valueRangeY.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::SLIDER_TICK_COUNT, 100 );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -489,6 +494,16 @@ void RimSummaryRegressionAnalysisCurve::defineUiOrdering( QString uiConfigName, 
         valueRangeYGroup->add( &m_valueRangeY );
     }
 
+    auto setValueRangeLimits = []( auto& field, const std::vector<double>& values )
+    {
+        if ( values.empty() ) return;
+
+        field.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MINIMUM, *std::min_element( values.begin(), values.end() ) );
+        field.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MAXIMUM, *std::max_element( values.begin(), values.end() ) );
+    };
+    setValueRangeLimits( m_valueRangeX, m_sourceValuesX );
+    setValueRangeLimits( m_valueRangeY, m_sourceValuesY );
+
     if ( axisTypeX() == RiaDefines::HorizontalAxisType::SUMMARY_VECTOR )
     {
         caf::PdmUiGroup* valueRangeXGroup = uiOrdering.addNewGroup( "Value Range X" );
@@ -556,47 +571,6 @@ void RimSummaryRegressionAnalysisCurve::fieldChangedByUi( const caf::PdmFieldHan
 
     auto plot = firstAncestorOrThisOfTypeAsserted<RimSummaryPlot>();
     if ( plot ) plot->zoomAll();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimSummaryRegressionAnalysisCurve::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                               QString                    uiConfigName,
-                                                               caf::PdmUiEditorAttribute* attribute )
-{
-    RimSummaryCurve::defineEditorAttribute( field, uiConfigName, attribute );
-
-    if ( field == &m_valueRangeX )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            attr->m_decimals        = 2;
-            attr->m_sliderTickCount = 100;
-
-            auto values = m_sourceValuesX;
-            if ( !values.empty() )
-            {
-                attr->m_minimum = *std::min_element( values.begin(), values.end() );
-                attr->m_maximum = *std::max_element( values.begin(), values.end() );
-            }
-        }
-    }
-    else if ( field == &m_valueRangeY )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            attr->m_decimals        = 2;
-            attr->m_sliderTickCount = 100;
-
-            auto values = m_sourceValuesY;
-            if ( !values.empty() )
-            {
-                attr->m_minimum = *std::min_element( values.begin(), values.end() );
-                attr->m_maximum = *std::max_element( values.begin(), values.end() );
-            }
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
