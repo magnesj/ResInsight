@@ -24,54 +24,15 @@
 #include "RigPolyLinesData.h"
 
 #include "RiaNumericalTools.h"
-#include "RiaStdStringTools.h"
 
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmFieldScriptingCapabilityCvfColor3.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiDoubleSliderEditor.h"
-#include "cafPdmUiLineEditor.h"
 
 #include "cvfBoundingBox.h"
 
 CAF_PDM_SOURCE_INIT( RimPolygonAppearance, "RimPolygonAppearance" );
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-class ThicknessValidator : public QValidator
-{
-public:
-    State validate( QString& input, int& pos ) const override
-    {
-        if ( input.isEmpty() ) return State::Intermediate;
-
-        int val = RiaStdStringTools::toInt( input.toStdString() );
-        if ( val > 0 && val < 8 )
-            return State::Acceptable;
-        else
-            return State::Invalid;
-    }
-};
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-class RadiusValidator : public QValidator
-{
-public:
-    State validate( QString& input, int& pos ) const override
-    {
-        if ( input.isEmpty() ) return State::Intermediate;
-
-        double val = 0.0;
-        RiaStdStringTools::toDouble( input.toStdString(), val );
-        if ( val > 0.001 && val <= 2.0 )
-            return State::Acceptable;
-        else
-            return State::Invalid;
-    }
-};
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -87,6 +48,7 @@ RimPolygonAppearance::RimPolygonAppearance()
     CAF_PDM_InitScriptableField( &m_showSpheres, "ShowSpheres", false, "Show Spheres" );
 
     CAF_PDM_InitScriptableField( &m_lineThickness, "LineThickness", 3, "Line Thickness" );
+    m_lineThickness.setRange( 1, 7 );
     CAF_PDM_InitScriptableField( &m_sphereRadiusFactor, "SphereRadiusFactor", 0.15, "Sphere Radius Factor" );
 
     CAF_PDM_InitScriptableField( &m_lineColor, "LineColor", cvf::Color3f( cvf::Color3f::ORANGE ), "Line Color" );
@@ -234,21 +196,7 @@ void RimPolygonAppearance::fieldChangedByUi( const caf::PdmFieldHandle* changedF
 //--------------------------------------------------------------------------------------------------
 void RimPolygonAppearance::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_lineThickness )
-    {
-        if ( auto myAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute ) )
-        {
-            myAttr->validator = new ThicknessValidator();
-        }
-    }
-    else if ( field == &m_lineThickness )
-    {
-        if ( auto myAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute ) )
-        {
-            myAttr->validator = new RadiusValidator();
-        }
-    }
-    else if ( field == &m_polygonPlaneDepth )
+    if ( field == &m_polygonPlaneDepth )
     {
         if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
         {

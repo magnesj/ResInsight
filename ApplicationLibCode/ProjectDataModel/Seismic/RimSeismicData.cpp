@@ -43,7 +43,6 @@
 
 #include <QFile>
 #include <QFileInfo>
-#include <QValidator>
 
 #include <algorithm>
 #include <cmath>
@@ -316,14 +315,6 @@ void RimSeismicData::defineEditorAttribute( const caf::PdmFieldHandle* field, QS
             tvAttribute->resizePolicy              = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER;
             tvAttribute->alwaysEnforceResizePolicy = true;
             tvAttribute->minimumHeight             = 400;
-        }
-    }
-    else if ( field == &m_userClipValue )
-    {
-        auto myAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->validator = new QDoubleValidator( 0.00001, std::numeric_limits<double>::infinity(), 6 );
         }
     }
 }
