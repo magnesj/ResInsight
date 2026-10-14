@@ -68,9 +68,6 @@ public:
     // Set of all supported attributes for validation
     inline static const std::set<QString> SUPPORTED_ATTRIBUTES = { Keys::DATE_FORMAT };
 
-    // Returns the date format configured by attributes, or an empty string if none is set
-    static QString dateFormat( const PdmUiItem* uiItem, const QString& uiConfigName );
-
 protected:
     QWidget* createEditorWidget( QWidget* parent ) override;
     void     configureAndUpdateUi( const QString& uiConfigName ) override;

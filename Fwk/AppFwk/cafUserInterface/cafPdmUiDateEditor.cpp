@@ -73,7 +73,8 @@ void PdmUiDateEditor::configureAndUpdateUi( const QString& uiConfigName )
 
     uiField()->validateAttributes( "PdmUiDateEditor", SUPPORTED_ATTRIBUTES, uiConfigName );
 
-    QString dateFormat = PdmUiDateEditor::dateFormat( uiField(), uiConfigName );
+    QString dateFormat =
+        PdmUiAttributeTools::stringAttribute( uiField(), Keys::DATE_FORMAT, uiConfigName ).value_or( QString() );
     if ( !dateFormat.isEmpty() )
     {
         m_dateEdit->setDisplayFormat( dateFormat );
@@ -81,14 +82,6 @@ void PdmUiDateEditor::configureAndUpdateUi( const QString& uiConfigName )
 
     m_dateEdit->setDate( uiField()->uiValue().toDate() );
     m_dateEdit->setTime( uiField()->uiValue().toTime() );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QString PdmUiDateEditor::dateFormat( const PdmUiItem* uiItem, const QString& uiConfigName )
-{
-    return PdmUiAttributeTools::stringAttribute( uiItem, Keys::DATE_FORMAT, uiConfigName ).value_or( QString() );
 }
 
 //--------------------------------------------------------------------------------------------------
