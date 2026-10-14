@@ -182,6 +182,12 @@ RiaPreferences::RiaPreferences()
     auto defaultValue = FontSizeEnum( RiaFontCache::FontSize::FONT_SIZE_10 );
     CAF_PDM_InitField( &defaultPlotFontSize, "defaultPlotFontSizePt", defaultValue, "Plot Font Size" );
 
+    for ( caf::PdmFieldHandle* fontSizeField :
+          std::vector<caf::PdmFieldHandle*>{ &defaultSceneFontSize, &defaultAnnotationFontSize, &defaultWellLabelFontSize, &defaultPlotFontSize } )
+    {
+        fontSizeField->uiCapability()->setAttribute( caf::PdmUiComboBoxEditor::Keys::MINIMUM_CONTENTS_LENGTH, 2 );
+    }
+
     CAF_PDM_InitField( &m_showLegendBackground, "showLegendBackground", true, "Show Box around Legends" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_showLegendBackground );
 
@@ -314,8 +320,6 @@ RiaPreferences* RiaPreferences::current()
 //--------------------------------------------------------------------------------------------------
 void RiaPreferences::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    m_summaryPreferences->defineEditorAttribute( field, uiConfigName, attribute );
-
     {
         caf::PdmUiFilePathEditorAttribute* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
         if ( myAttr )
@@ -332,16 +336,7 @@ void RiaPreferences::defineEditorAttribute( const caf::PdmFieldHandle* field, QS
         }
     }
 
-    if ( field == &defaultSceneFontSize || field == &defaultWellLabelFontSize || field == &defaultAnnotationFontSize ||
-         field == &defaultPlotFontSize )
-    {
-        caf::PdmUiComboBoxEditorAttribute* myAttr = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->minimumContentsLength = 2;
-        }
-    }
-    else if ( field == &m_multiLateralWellPattern )
+    if ( field == &m_multiLateralWellPattern )
     {
         caf::PdmUiLineEditorAttribute* myAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute );
         if ( myAttr )
