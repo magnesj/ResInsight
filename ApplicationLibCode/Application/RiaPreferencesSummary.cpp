@@ -120,6 +120,7 @@ RiaPreferencesSummary::RiaPreferencesSummary()
     CAF_PDM_InitFieldNoDefault( &m_selectedDefaultTemplates, "defaultSummaryTemplates", "Select Summary Plot Templates" );
     m_selectedDefaultTemplates.uiCapability()->setUiReadOnly( true );
     m_selectedDefaultTemplates.uiCapability()->setUiEditorTypeName( caf::PdmUiListEditor::uiEditorTypeName() );
+    m_selectedDefaultTemplates.uiCapability()->setAttribute( caf::PdmUiListEditor::Keys::HEIGHT_HINT, 30 );
     m_selectedDefaultTemplates.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::HIDDEN );
 
     CAF_PDM_InitField( &m_summaryReadoutMode, "summaryReadoutMode", RiaDefines::ReadOutType::SNAP_TO_POINT, "Default Readout Mode" );
@@ -462,14 +463,6 @@ void RiaPreferencesSummary::defineEditorAttribute( const caf::PdmFieldHandle* fi
         if ( myattr )
         {
             myattr->iconSize = QSize( 24, 16 );
-        }
-    }
-    else if ( field == &m_selectedDefaultTemplates )
-    {
-        auto attrib = dynamic_cast<caf::PdmUiListEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->heightHint = 30;
         }
     }
 }

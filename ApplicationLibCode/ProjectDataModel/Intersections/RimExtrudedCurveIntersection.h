@@ -43,11 +43,6 @@ class RimSurfaceIntersectionCurve;
 class RimSurfaceIntersectionBand;
 class RimPolygon;
 
-namespace caf
-{
-class PdmUiListEditorAttribute;
-} // namespace caf
-
 //==================================================================================================
 //
 //
@@ -148,7 +143,7 @@ private:
     void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) override;
 
     void        toggleViewerPointInput( caf::PdmField<bool>* inputField );
-    static void setBaseColor( bool enable, caf::PdmUiListEditorAttribute* attribute );
+    static void setBaseColor( caf::PdmFieldHandle& field, bool enable );
 
     RimSimWellInViewCollection* simulationWellCollection() const;
     void                        updateAzimuthLine();

@@ -541,6 +541,7 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
     }
     else if ( type() == CrossSectionEnum::CS_POLYLINE )
     {
+        setBaseColor( m_userPolylineXydForUi, m_inputPolylineFromViewerEnabled );
         geometryGroup->add( &m_userPolylineXydForUi );
         geometryGroup->addNewButton( m_inputPolylineFromViewerEnabled ? "Stop picking points" : "Start picking points",
                                      [this]() { toggleViewerPointInput( &m_inputPolylineFromViewerEnabled ); } );
@@ -554,6 +555,7 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
     }
     else if ( type() == CrossSectionEnum::CS_AZIMUTHLINE )
     {
+        setBaseColor( m_twoAzimuthPoints, m_inputTwoAzimuthPointsFromViewerEnabled );
         geometryGroup->add( &m_twoAzimuthPoints );
         geometryGroup->addNewButton( m_inputTwoAzimuthPointsFromViewerEnabled ? "Stop picking points" : "Start picking points",
                                      [this]() { toggleViewerPointInput( &m_inputTwoAzimuthPointsFromViewerEnabled ); } );
@@ -577,6 +579,7 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
 
     if ( direction() == CrossSectionDirEnum::CS_TWO_POINTS )
     {
+        setBaseColor( m_customExtrusionPoints, m_inputExtrusionPointsFromViewerEnabled );
         optionsGroup->add( &m_customExtrusionPoints );
         optionsGroup->addNewButton( m_inputExtrusionPointsFromViewerEnabled ? "Stop picking points" : "Start picking points",
                                     [this]() { toggleViewerPointInput( &m_inputExtrusionPointsFromViewerEnabled ); } );
@@ -1021,12 +1024,9 @@ int RimExtrudedCurveIntersection::branchIndex() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimExtrudedCurveIntersection::setBaseColor( bool enable, caf::PdmUiListEditorAttribute* attribute )
+void RimExtrudedCurveIntersection::setBaseColor( caf::PdmFieldHandle& field, bool enable )
 {
-    if ( attribute )
-    {
-        attribute->qssState = enable ? "ExternalInput" : QString();
-    }
+    field.uiCapability()->setAttribute( caf::PdmUiListEditor::Keys::QSS_STATE, enable ? QString( "ExternalInput" ) : QString() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1073,18 +1073,6 @@ void RimExtrudedCurveIntersection::defineEditorAttribute( const caf::PdmFieldHan
                 doubleSliderAttrib->m_maximum = -1.0 * bb.min().z();
             }
         }
-    }
-    else if ( field == &m_userPolylineXydForUi )
-    {
-        setBaseColor( m_inputPolylineFromViewerEnabled, dynamic_cast<caf::PdmUiListEditorAttribute*>( attribute ) );
-    }
-    else if ( field == &m_twoAzimuthPoints )
-    {
-        setBaseColor( m_inputTwoAzimuthPointsFromViewerEnabled, dynamic_cast<caf::PdmUiListEditorAttribute*>( attribute ) );
-    }
-    else if ( field == &m_customExtrusionPoints )
-    {
-        setBaseColor( m_inputExtrusionPointsFromViewerEnabled, dynamic_cast<caf::PdmUiListEditorAttribute*>( attribute ) );
     }
 }
 

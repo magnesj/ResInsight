@@ -109,6 +109,7 @@ RicExportSectorModelUi::RicExportSectorModelUi()
 
     CAF_PDM_InitFieldNoDefault( &m_keywordsToRemove, "KeywordsToRemove", "Keywords to Remove from Output" );
     m_keywordsToRemove.uiCapability()->setUiEditorTypeName( caf::PdmUiListEditor::uiEditorTypeName() );
+    m_keywordsToRemove.uiCapability()->setAttribute( caf::PdmUiListEditor::Keys::HEIGHT_HINT, 200 );
     setDefaultKeywordsToRemove();
 
     // Model padding fields
@@ -408,14 +409,6 @@ void RicExportSectorModelUi::defineEditorAttribute( const caf::PdmFieldHandle* f
         if ( myAttr )
         {
             myAttr->m_selectDirectory = true;
-        }
-    }
-    else if ( field == &m_keywordsToRemove )
-    {
-        auto attrib = dynamic_cast<caf::PdmUiListEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->heightHint = 200;
         }
     }
     else if ( field == &m_selectedRegions )
