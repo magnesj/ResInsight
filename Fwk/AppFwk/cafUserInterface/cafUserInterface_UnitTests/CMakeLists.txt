@@ -20,6 +20,7 @@ set(PROJECT_FILES
     cafPdmUiTreeSelectionQModelTest.cpp
     cafPdmUiTableViewQModelTest.cpp
     cafPdmUiNumberFormatTest.cpp
+    cafPdmUiAttributeToolsTest.cpp
     cafPdmUiCheckBoxAndTextEditorTest.cpp
     cafPdmUiPropertyViewDialogTest.cpp
     cafPdmUiEditorHandleTest.cpp

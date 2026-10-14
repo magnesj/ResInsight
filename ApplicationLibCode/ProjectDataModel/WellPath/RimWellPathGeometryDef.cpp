@@ -70,7 +70,7 @@ RimWellPathGeometryDef::RimWellPathGeometryDef()
                                                   "ReferencePoint",
                                                   cvf::Vec3d( 0, 0, 0 ),
                                                   "UTM Reference Point" );
-    m_referencePointUtmXyd.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiLineEditor::Keys::DISPLAY_STRING_CALLBACK,
+    m_referencePointUtmXyd.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiLineEditor::Keys::DISPLAY_STRING,
                                                                                    [this]()
                                                                                    {
                                                                                        const cvf::Vec3d& v = m_referencePointUtmXyd();

@@ -95,11 +95,15 @@ RimSummaryDeclineCurve::RimSummaryDeclineCurve()
 
     const QString dateFormat = RiaQDateTimeTools::dateFormatString( RiaPreferences::current()->dateFormat() );
 
+    const auto dateFormatCallback = []() { return RiaQDateTimeTools::dateFormatString( RiaPreferences::current()->dateFormat() ); };
+
     CAF_PDM_InitFieldNoDefault( &m_minDate, "MinDate", "From", "", dateFormat );
     m_minDate.uiCapability()->setUiEditorTypeName( caf::PdmUiDateEditor::uiEditorTypeName() );
+    m_minDate.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiDateEditor::Keys::DATE_FORMAT, dateFormatCallback );
 
     CAF_PDM_InitFieldNoDefault( &m_maxDate, "MaxDate", "To", "", dateFormat );
     m_maxDate.uiCapability()->setUiEditorTypeName( caf::PdmUiDateEditor::uiEditorTypeName() );
+    m_maxDate.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiDateEditor::Keys::DATE_FORMAT, dateFormatCallback );
 
     CAF_PDM_InitField( &m_showTimeSelectionInPlot, "ShowTimeSelectionInPlot", true, "Show In Plot" );
 
@@ -447,13 +451,6 @@ void RimSummaryDeclineCurve::defineEditorAttribute( const caf::PdmFieldHandle* f
         if ( auto* myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute ) )
         {
             myAttr->heightHint = -1;
-        }
-    }
-    else if ( field == &m_minDate || field == &m_maxDate )
-    {
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiDateEditorAttribute*>( attribute ) )
-        {
-            myAttr->dateFormat = RiaQDateTimeTools::dateFormatString( RiaPreferences::current()->dateFormat() );
         }
     }
     else if ( field == &m_minTimeSliderPosition || field == &m_maxTimeSliderPosition )

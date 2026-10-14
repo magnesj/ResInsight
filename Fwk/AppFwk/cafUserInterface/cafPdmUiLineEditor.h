@@ -127,8 +127,8 @@ public:
         static inline const QString COMPLETER_FILTER_MODE      = QStringLiteral( "completerFilterMode" );
         static inline const QString NOTIFY_WHEN_TEXT_IS_EDITED = QStringLiteral( "notifyWhenTextIsEdited" );
 
-        // std::function<QString()>. A non-empty result overrides the text shown for the field value
-        static inline const QString DISPLAY_STRING_CALLBACK = QStringLiteral( "displayStringCallback" );
+        // std::function<QString()> or plain string. A non-empty result overrides the text shown for the field value
+        static inline const QString DISPLAY_STRING = QStringLiteral( "displayString" );
     };
 
     // Set of all supported attributes for validation
@@ -139,7 +139,7 @@ public:
                                                                    Keys::COMPLETER_CASE_SENSITIVITY,
                                                                    Keys::COMPLETER_FILTER_MODE,
                                                                    Keys::NOTIFY_WHEN_TEXT_IS_EDITED,
-                                                                   Keys::DISPLAY_STRING_CALLBACK };
+                                                                   Keys::DISPLAY_STRING };
 
     static void updateLineEditFromReadOnlyState( QLineEdit* lineEdit, bool isReadOnly );
 

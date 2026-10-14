@@ -40,6 +40,7 @@
 #include "cafPdmField.h"
 #include "cafPdmLogging.h"
 #include "cafPdmObject.h"
+#include "cafPdmUiAttributeTools.h"
 #include "cafPdmUiDefaultObjectEditor.h"
 #include "cafPdmUiFieldEditorHandle.h"
 #include "cafPdmUniqueIdValidator.h"
@@ -308,12 +309,8 @@ void PdmUiLineEditor::configureAndUpdateUi( const QString& uiConfigName )
             delete m_completer;
             m_optionCache.clear();
 
-            QString displayString;
-            if ( auto callback =
-                     uiField()->attribute<std::function<QString()>>( Keys::DISPLAY_STRING_CALLBACK, uiConfigName ) )
-            {
-                displayString = callback.value()();
-            }
+            QString displayString =
+                PdmUiAttributeTools::stringAttribute( uiField(), Keys::DISPLAY_STRING, uiConfigName ).value_or( QString() );
             if ( displayString.isEmpty() ) displayString = uiField()->uiValue().toString();
 
             if ( displayString != m_lineEdit->text() )

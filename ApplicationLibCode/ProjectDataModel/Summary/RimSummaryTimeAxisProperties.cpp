@@ -109,13 +109,23 @@ RimSummaryTimeAxisProperties::RimSummaryTimeAxisProperties()
     CAF_PDM_InitFieldNoDefault( &m_visibleDateRangeMin, "VisibleDateRangeMin", "Min Date" );
     m_visibleDateRangeMin.uiCapability()->setUiEditorTypeName( caf::PdmUiDateEditor::uiEditorTypeName() );
 
+    const auto dateFormatCallback = [this]()
+    { return RiaQDateTimeTools::dateFormatString( m_dateFormat(), RiaDefines::DateFormatComponents::DATE_FORMAT_YEAR_MONTH_DAY ); };
+    m_visibleDateRangeMax.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiDateEditor::Keys::DATE_FORMAT, dateFormatCallback );
+    m_visibleDateRangeMin.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiDateEditor::Keys::DATE_FORMAT, dateFormatCallback );
+
     CAF_PDM_InitFieldNoDefault( &m_visibleTimeRangeMax, "VisibleTimeRangeMax", "MaxTime" );
     m_visibleTimeRangeMax.uiCapability()->setUiEditorTypeName( caf::PdmUiTimeEditor::uiEditorTypeName() );
     m_visibleTimeRangeMax.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::HIDDEN );
 
+    const auto timeFormatCallback = [this]()
+    { return RiaQDateTimeTools::timeFormatString( m_timeFormat(), RiaDefines::TimeFormatComponents::TIME_FORMAT_HOUR_MINUTE_SECOND ); };
+    m_visibleTimeRangeMax.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiTimeEditor::Keys::TIME_FORMAT, timeFormatCallback );
+
     CAF_PDM_InitFieldNoDefault( &m_visibleTimeRangeMin, "VisibleTimeRangeMin", "Min Time" );
     m_visibleTimeRangeMin.uiCapability()->setUiEditorTypeName( caf::PdmUiTimeEditor::uiEditorTypeName() );
     m_visibleTimeRangeMin.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::HIDDEN );
+    m_visibleTimeRangeMin.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiTimeEditor::Keys::TIME_FORMAT, timeFormatCallback );
 
     CAF_PDM_InitFieldNoDefault( &m_visibleTimeSinceStartRangeMax, "VisibleTimeModeRangeMax", "Max" );
     m_visibleTimeSinceStartRangeMax.uiCapability()->setUiEditorTypeName( caf::PdmUiLineEditor::uiEditorTypeName() );
@@ -1038,31 +1048,4 @@ void RimSummaryTimeAxisProperties::fieldChangedByUi( const caf::PdmFieldHandle* 
     }
 
     settingsChanged.send();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimSummaryTimeAxisProperties::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                          QString                    uiConfigName,
-                                                          caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_visibleDateRangeMin || field == &m_visibleDateRangeMax )
-    {
-        auto dateAttrib = dynamic_cast<caf::PdmUiDateEditorAttribute*>( attribute );
-        if ( dateAttrib )
-        {
-            dateAttrib->dateFormat =
-                RiaQDateTimeTools::dateFormatString( m_dateFormat(), RiaDefines::DateFormatComponents::DATE_FORMAT_YEAR_MONTH_DAY );
-        }
-    }
-    else if ( field == &m_visibleTimeRangeMin || field == &m_visibleTimeRangeMax )
-    {
-        auto timeAttrib = dynamic_cast<caf::PdmUiTimeEditorAttribute*>( attribute );
-        if ( timeAttrib )
-        {
-            timeAttrib->timeFormat =
-                RiaQDateTimeTools::timeFormatString( m_timeFormat(), RiaDefines::TimeFormatComponents::TIME_FORMAT_HOUR_MINUTE_SECOND );
-        }
-    }
 }
