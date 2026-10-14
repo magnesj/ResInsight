@@ -70,31 +70,29 @@ void PdmUiDateEditor::configureAndUpdateUi( const QString& uiConfigName )
 
     m_dateEdit->setEnabled( !uiField()->isUiReadOnly( uiConfigName ) );
 
-    caf::PdmUiObjectHandle* uiObject = uiObj( uiField()->fieldHandle()->ownerObject() );
-    if ( uiObject )
-    {
-        uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &m_attributes );
-    }
+    uiField()->validateAttributes( "PdmUiDateEditor", SUPPORTED_ATTRIBUTES, uiConfigName );
 
-    // Override with map-based attributes if present (new system takes precedence)
-    if ( auto uiItem = uiField() )
+    QString dateFormat = PdmUiDateEditor::dateFormat( uiField(), uiConfigName );
+    if ( !dateFormat.isEmpty() )
     {
-        if ( auto val = uiItem->attribute<QString>( Keys::DATE_FORMAT, uiConfigName ) )
-        {
-            m_attributes.dateFormat = val.value();
-        }
-
-        // Validate: warn about unsupported attributes
-        uiItem->validateAttributes( "PdmUiDateEditor", SUPPORTED_ATTRIBUTES, uiConfigName );
-    }
-
-    if ( !m_attributes.dateFormat.isEmpty() )
-    {
-        m_dateEdit->setDisplayFormat( m_attributes.dateFormat );
+        m_dateEdit->setDisplayFormat( dateFormat );
     }
 
     m_dateEdit->setDate( uiField()->uiValue().toDate() );
     m_dateEdit->setTime( uiField()->uiValue().toTime() );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString PdmUiDateEditor::dateFormat( const PdmUiItem* uiItem, const QString& uiConfigName )
+{
+    if ( auto callback = uiItem->attribute<std::function<QString()>>( Keys::DATE_FORMAT_CALLBACK, uiConfigName ) )
+    {
+        return callback.value()();
+    }
+
+    return uiItem->attribute<QString>( Keys::DATE_FORMAT, uiConfigName ).value_or( QString() );
 }
 
 //--------------------------------------------------------------------------------------------------

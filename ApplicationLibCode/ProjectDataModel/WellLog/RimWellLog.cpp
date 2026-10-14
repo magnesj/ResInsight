@@ -48,6 +48,8 @@ RimWellLog::RimWellLog()
     CAF_PDM_InitScriptableObject( "Well File Info", ":/LasFile16x16.png" );
 
     CAF_PDM_InitFieldNoDefault( &m_date, "Date", "Date" );
+    m_date.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiDateEditor::Keys::DATE_FORMAT_CALLBACK,
+                                                                   []() { return RiaQDateTimeTools::dateFormatString(); } );
 
     CAF_PDM_InitFieldNoDefault( &m_wellLogChannels, "WellLogChannels", "" );
     m_wellLogChannels.registerKeywordAlias( "WellLogFileChannels" );
@@ -97,16 +99,5 @@ void RimWellLog::updateChannelsFromWellLogData( RigWellLogData* wellLogData )
         RimWellLogChannel* wellLog = new RimWellLogChannel();
         wellLog->setName( wellLogNames[logIdx] );
         m_wellLogChannels.push_back( wellLog );
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellLog::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( caf::PdmUiDateEditorAttribute* attrib = dynamic_cast<caf::PdmUiDateEditorAttribute*>( attribute ) )
-    {
-        attrib->dateFormat = RiaQDateTimeTools::dateFormatString();
     }
 }

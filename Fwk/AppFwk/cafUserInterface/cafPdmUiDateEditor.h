@@ -46,18 +46,6 @@
 
 namespace caf
 {
-//==================================================================================================
-///
-//==================================================================================================
-class PdmUiDateEditorAttribute : public PdmUiEditorAttribute
-{
-public:
-    QString dateFormat;
-
-public:
-    PdmUiDateEditorAttribute() {}
-};
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -74,10 +62,16 @@ public:
     struct Keys
     {
         static inline const QString DATE_FORMAT = QStringLiteral( "dateFormat" );
+
+        // std::function<QString()>. Takes precedence over DATE_FORMAT, for formats that depend on the current state
+        static inline const QString DATE_FORMAT_CALLBACK = QStringLiteral( "dateFormatCallback" );
     };
 
     // Set of all supported attributes for validation
-    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = { Keys::DATE_FORMAT };
+    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = { Keys::DATE_FORMAT, Keys::DATE_FORMAT_CALLBACK };
+
+    // Returns the date format configured by attributes, or an empty string if none is set
+    static QString dateFormat( const PdmUiItem* uiItem, const QString& uiConfigName );
 
 protected:
     QWidget* createEditorWidget( QWidget* parent ) override;
@@ -88,8 +82,6 @@ protected slots:
 
 private:
     QPointer<QDateTimeEdit> m_dateEdit;
-
-    PdmUiDateEditorAttribute m_attributes;
 };
 
 } // end namespace caf

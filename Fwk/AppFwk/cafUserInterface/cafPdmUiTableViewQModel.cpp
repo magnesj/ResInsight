@@ -274,10 +274,7 @@ QVariant PdmUiTableViewQModel::data( const QModelIndex& index, int role /*= Qt::
 
                 if ( val.isNull() )
                 {
-                    PdmUiDateEditorAttribute leab;
-                    uiObjForRow->editorAttribute( fieldHandle, m_currentConfigName, &leab );
-
-                    QString dateFormat = leab.dateFormat;
+                    QString dateFormat = PdmUiDateEditor::dateFormat( uiFieldHandle, m_currentConfigName );
                     if ( !dateFormat.isEmpty() )
                     {
                         QDate date = uiFieldHandle->uiValue().toDate();
