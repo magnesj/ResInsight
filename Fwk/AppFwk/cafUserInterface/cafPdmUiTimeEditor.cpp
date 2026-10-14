@@ -86,22 +86,6 @@ void PdmUiTimeEditor::configureAndUpdateUi( const QString& uiConfigName )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void PdmUiTimeEditor::setFormat( PdmUiItem* uiItem, const QString& format )
-{
-    uiItem->setAttribute( Keys::TIME_FORMAT, format );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void PdmUiTimeEditor::setFormat( PdmUiItem* uiItem, std::function<QString()> formatCallback )
-{
-    uiItem->setAttribute<std::function<QString()>>( Keys::TIME_FORMAT, std::move( formatCallback ) );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 QWidget* PdmUiTimeEditor::createEditorWidget( QWidget* parent )
 {
     m_timeEdit = new QTimeEdit( parent );

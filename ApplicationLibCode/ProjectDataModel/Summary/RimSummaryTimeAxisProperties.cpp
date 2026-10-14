@@ -120,12 +120,12 @@ RimSummaryTimeAxisProperties::RimSummaryTimeAxisProperties()
 
     const auto timeFormatCallback = [this]()
     { return RiaQDateTimeTools::timeFormatString( m_timeFormat(), RiaDefines::TimeFormatComponents::TIME_FORMAT_HOUR_MINUTE_SECOND ); };
-    caf::PdmUiTimeEditor::setFormat( m_visibleTimeRangeMax.uiCapability(), timeFormatCallback );
+    m_visibleTimeRangeMax.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiTimeEditor::Keys::TIME_FORMAT, timeFormatCallback );
 
     CAF_PDM_InitFieldNoDefault( &m_visibleTimeRangeMin, "VisibleTimeRangeMin", "Min Time" );
     m_visibleTimeRangeMin.uiCapability()->setUiEditorTypeName( caf::PdmUiTimeEditor::uiEditorTypeName() );
     m_visibleTimeRangeMin.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::HIDDEN );
-    caf::PdmUiTimeEditor::setFormat( m_visibleTimeRangeMin.uiCapability(), timeFormatCallback );
+    m_visibleTimeRangeMin.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiTimeEditor::Keys::TIME_FORMAT, timeFormatCallback );
 
     CAF_PDM_InitFieldNoDefault( &m_visibleTimeSinceStartRangeMax, "VisibleTimeModeRangeMax", "Max" );
     m_visibleTimeSinceStartRangeMax.uiCapability()->setUiEditorTypeName( caf::PdmUiLineEditor::uiEditorTypeName() );
