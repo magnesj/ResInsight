@@ -72,13 +72,9 @@ void PdmUiTimeEditor::configureAndUpdateUi( const QString& uiConfigName )
     uiField()->validateAttributes( "PdmUiTimeEditor", SUPPORTED_ATTRIBUTES, uiConfigName );
 
     QString timeFormat;
-    if ( auto callback = uiField()->attribute<std::function<QString()>>( Keys::TIME_FORMAT_CALLBACK, uiConfigName ) )
+    if ( auto callback = uiField()->attribute<std::function<QString()>>( Keys::TIME_FORMAT, uiConfigName ) )
     {
         timeFormat = callback.value()();
-    }
-    else if ( auto val = uiField()->attribute<QString>( Keys::TIME_FORMAT, uiConfigName ) )
-    {
-        timeFormat = val.value();
     }
 
     if ( !timeFormat.isEmpty() )
@@ -87,6 +83,22 @@ void PdmUiTimeEditor::configureAndUpdateUi( const QString& uiConfigName )
     }
 
     m_timeEdit->setTime( uiField()->uiValue().toTime() );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void PdmUiTimeEditor::setFormat( PdmUiItem* uiItem, const QString& format )
+{
+    setFormat( uiItem, [format]() { return format; } );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void PdmUiTimeEditor::setFormat( PdmUiItem* uiItem, std::function<QString()> formatCallback )
+{
+    uiItem->setAttribute<std::function<QString()>>( Keys::TIME_FORMAT, std::move( formatCallback ) );
 }
 
 //--------------------------------------------------------------------------------------------------

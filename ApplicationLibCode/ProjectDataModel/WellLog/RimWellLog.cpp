@@ -48,8 +48,7 @@ RimWellLog::RimWellLog()
     CAF_PDM_InitScriptableObject( "Well File Info", ":/LasFile16x16.png" );
 
     CAF_PDM_InitFieldNoDefault( &m_date, "Date", "Date" );
-    m_date.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiDateEditor::Keys::DATE_FORMAT_CALLBACK,
-                                                                   []() { return RiaQDateTimeTools::dateFormatString(); } );
+    caf::PdmUiDateEditor::setFormat( m_date.uiCapability(), []() { return RiaQDateTimeTools::dateFormatString(); } );
 
     CAF_PDM_InitFieldNoDefault( &m_wellLogChannels, "WellLogChannels", "" );
     m_wellLogChannels.registerKeywordAlias( "WellLogFileChannels" );

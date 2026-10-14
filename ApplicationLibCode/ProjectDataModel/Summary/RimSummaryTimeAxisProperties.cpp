@@ -111,10 +111,8 @@ RimSummaryTimeAxisProperties::RimSummaryTimeAxisProperties()
 
     const auto dateFormatCallback = [this]()
     { return RiaQDateTimeTools::dateFormatString( m_dateFormat(), RiaDefines::DateFormatComponents::DATE_FORMAT_YEAR_MONTH_DAY ); };
-    m_visibleDateRangeMax.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiDateEditor::Keys::DATE_FORMAT_CALLBACK,
-                                                                                  dateFormatCallback );
-    m_visibleDateRangeMin.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiDateEditor::Keys::DATE_FORMAT_CALLBACK,
-                                                                                  dateFormatCallback );
+    caf::PdmUiDateEditor::setFormat( m_visibleDateRangeMax.uiCapability(), dateFormatCallback );
+    caf::PdmUiDateEditor::setFormat( m_visibleDateRangeMin.uiCapability(), dateFormatCallback );
 
     CAF_PDM_InitFieldNoDefault( &m_visibleTimeRangeMax, "VisibleTimeRangeMax", "MaxTime" );
     m_visibleTimeRangeMax.uiCapability()->setUiEditorTypeName( caf::PdmUiTimeEditor::uiEditorTypeName() );
@@ -122,14 +120,12 @@ RimSummaryTimeAxisProperties::RimSummaryTimeAxisProperties()
 
     const auto timeFormatCallback = [this]()
     { return RiaQDateTimeTools::timeFormatString( m_timeFormat(), RiaDefines::TimeFormatComponents::TIME_FORMAT_HOUR_MINUTE_SECOND ); };
-    m_visibleTimeRangeMax.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiTimeEditor::Keys::TIME_FORMAT_CALLBACK,
-                                                                                  timeFormatCallback );
+    caf::PdmUiTimeEditor::setFormat( m_visibleTimeRangeMax.uiCapability(), timeFormatCallback );
 
     CAF_PDM_InitFieldNoDefault( &m_visibleTimeRangeMin, "VisibleTimeRangeMin", "Min Time" );
     m_visibleTimeRangeMin.uiCapability()->setUiEditorTypeName( caf::PdmUiTimeEditor::uiEditorTypeName() );
     m_visibleTimeRangeMin.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::HIDDEN );
-    m_visibleTimeRangeMin.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiTimeEditor::Keys::TIME_FORMAT_CALLBACK,
-                                                                                  timeFormatCallback );
+    caf::PdmUiTimeEditor::setFormat( m_visibleTimeRangeMin.uiCapability(), timeFormatCallback );
 
     CAF_PDM_InitFieldNoDefault( &m_visibleTimeSinceStartRangeMax, "VisibleTimeModeRangeMax", "Max" );
     m_visibleTimeSinceStartRangeMax.uiCapability()->setUiEditorTypeName( caf::PdmUiLineEditor::uiEditorTypeName() );

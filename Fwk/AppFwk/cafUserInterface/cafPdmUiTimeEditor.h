@@ -60,14 +60,18 @@ public:
     // Attribute key constants for compile-time safety and discoverability
     struct Keys
     {
+        // std::function<QString()>. Use setFormat() to set either a static string or a callback
         static inline const QString TIME_FORMAT = QStringLiteral( "timeFormat" );
-
-        // std::function<QString()>. Takes precedence over TIME_FORMAT, for formats that depend on the current state
-        static inline const QString TIME_FORMAT_CALLBACK = QStringLiteral( "timeFormatCallback" );
     };
 
     // Set of all supported attributes for validation
-    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = { Keys::TIME_FORMAT, Keys::TIME_FORMAT_CALLBACK };
+    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = { Keys::TIME_FORMAT };
+
+    // Set a static time format, e.g. "hh:mm"
+    static void setFormat( PdmUiItem* uiItem, const QString& format );
+
+    // Set a callback producing the time format, for formats that depend on the current state
+    static void setFormat( PdmUiItem* uiItem, std::function<QString()> formatCallback );
 
 protected:
     QWidget* createEditorWidget( QWidget* parent ) override;

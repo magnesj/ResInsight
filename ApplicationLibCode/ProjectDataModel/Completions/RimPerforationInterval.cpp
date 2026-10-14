@@ -60,11 +60,11 @@ RimPerforationInterval::RimPerforationInterval()
 
     CAF_PDM_InitField( &m_useCustomStartDate, "UseCustomStartDate", false, "Custom Start Date" );
     CAF_PDM_InitField( &m_startDate, "StartDate", QDateTime::currentDateTime(), "Start Date" );
-    m_startDate.uiCapability()->setAttribute( caf::PdmUiDateEditor::Keys::DATE_FORMAT, "dd MMM yyyy" );
+    caf::PdmUiDateEditor::setFormat( m_startDate.uiCapability(), "dd MMM yyyy" );
 
     CAF_PDM_InitField( &m_useCustomEndDate, "UseCustomEndDate", false, "Custom End Date" );
     CAF_PDM_InitField( &m_endDate, "EndDate", QDateTime::currentDateTime(), "End Date" );
-    m_endDate.uiCapability()->setAttribute( caf::PdmUiDateEditor::Keys::DATE_FORMAT, "dd MMM yyyy" );
+    caf::PdmUiDateEditor::setFormat( m_endDate.uiCapability(), "dd MMM yyyy" );
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_valves, "Valves", "Valves" );
 
