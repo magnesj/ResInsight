@@ -48,27 +48,6 @@
 
 namespace caf
 {
-//==================================================================================================
-///
-//==================================================================================================
-class PdmUiSliderEditorAttribute : public PdmUiEditorAttribute
-{
-public:
-    PdmUiSliderEditorAttribute()
-    {
-        m_minimum     = 0;
-        m_maximum     = 10;
-        m_showSpinBox = true;
-        m_step        = 1;
-    }
-
-public:
-    int  m_minimum;
-    int  m_maximum;
-    bool m_showSpinBox;
-    int  m_step;
-};
-
 class PdmUiSliderEditor : public PdmUiFieldLabelEditorHandle
 {
     Q_OBJECT
@@ -109,7 +88,10 @@ private:
     QPointer<QSpinBox> m_spinBox;
     QPointer<QSlider>  m_slider;
 
-    PdmUiSliderEditorAttribute m_attributes;
+    int  m_minimum     = 0;
+    int  m_maximum     = 10;
+    bool m_showSpinBox = true;
+    int  m_step        = 1;
 };
 
 } // end namespace caf

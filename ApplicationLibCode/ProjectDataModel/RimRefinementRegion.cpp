@@ -257,6 +257,22 @@ void RimRefinementRegion::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
     rangeGroup->add( &m_startK );
     rangeGroup->add( &m_cellCountK );
 
+    if ( auto grid = mainGrid() )
+    {
+        auto setRange = [&]( caf::PdmFieldHandle& field, size_t maximum )
+        {
+            field.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MINIMUM, 1 );
+            field.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MAXIMUM, static_cast<int>( maximum ) );
+        };
+
+        setRange( m_startI, grid->cellCountI() );
+        setRange( m_cellCountI, grid->cellCountI() );
+        setRange( m_startJ, grid->cellCountJ() );
+        setRange( m_cellCountJ, grid->cellCountJ() );
+        setRange( m_startK, grid->cellCountK() );
+        setRange( m_cellCountK, grid->cellCountK() );
+    }
+
     auto* appearanceGroup = uiOrdering.addNewGroup( "Appearance" );
     appearanceGroup->add( &m_previewColor );
     appearanceGroup->setCollapsedByDefault();
@@ -264,34 +280,6 @@ void RimRefinementRegion::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
     m_refinementSettings->addToUiOrdering( uiOrdering );
 
     uiOrdering.skipRemainingFields( true );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimRefinementRegion::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    auto* sliderAttr = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute );
-    if ( !sliderAttr ) return;
-
-    auto grid = mainGrid();
-    if ( !grid ) return;
-
-    if ( field == &m_startI || field == &m_cellCountI )
-    {
-        sliderAttr->m_minimum = 1;
-        sliderAttr->m_maximum = static_cast<int>( grid->cellCountI() );
-    }
-    else if ( field == &m_startJ || field == &m_cellCountJ )
-    {
-        sliderAttr->m_minimum = 1;
-        sliderAttr->m_maximum = static_cast<int>( grid->cellCountJ() );
-    }
-    else if ( field == &m_startK || field == &m_cellCountK )
-    {
-        sliderAttr->m_minimum = 1;
-        sliderAttr->m_maximum = static_cast<int>( grid->cellCountK() );
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

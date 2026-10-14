@@ -83,15 +83,23 @@ RimSummaryDeclineCurve::RimSummaryDeclineCurve()
     CAF_PDM_InitField( &m_predictionYears, "PredictionYears", 5, "Years" );
     m_predictionYears.setRange( 1, 50 );
     m_predictionYears.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
+    m_predictionYears.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MINIMUM, 1 );
+    m_predictionYears.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MAXIMUM, 50 );
 
     CAF_PDM_InitField( &m_hyperbolicDeclineConstant, "HyperbolicDeclineConstant", 0.5, "Decline Constant" );
     m_hyperbolicDeclineConstant.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
 
     CAF_PDM_InitField( &m_minTimeSliderPosition, "MinTimeSliderPosition", 75, "From" );
     m_minTimeSliderPosition.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
+    m_minTimeSliderPosition.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MINIMUM, 0 );
+    m_minTimeSliderPosition.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MAXIMUM, 100 );
+    m_minTimeSliderPosition.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::SHOW_SPIN_BOX, false );
 
     CAF_PDM_InitField( &m_maxTimeSliderPosition, "MaxTimeSliderPosition", 100, "To" );
     m_maxTimeSliderPosition.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
+    m_maxTimeSliderPosition.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MINIMUM, 0 );
+    m_maxTimeSliderPosition.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MAXIMUM, 100 );
+    m_maxTimeSliderPosition.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::SHOW_SPIN_BOX, false );
 
     const QString dateFormat = RiaQDateTimeTools::dateFormatString( RiaPreferences::current()->dateFormat() );
 
@@ -438,28 +446,11 @@ void RimSummaryDeclineCurve::defineEditorAttribute( const caf::PdmFieldHandle* f
             myAttr->m_decimals = 2;
         }
     }
-    else if ( field == &m_predictionYears )
-    {
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute ) )
-        {
-            myAttr->m_minimum = 1;
-            myAttr->m_maximum = 50;
-        }
-    }
     else if ( field == &m_equationText )
     {
         if ( auto* myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute ) )
         {
             myAttr->heightHint = -1;
-        }
-    }
-    else if ( field == &m_minTimeSliderPosition || field == &m_maxTimeSliderPosition )
-    {
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute ) )
-        {
-            myAttr->m_minimum     = 0;
-            myAttr->m_maximum     = 100;
-            myAttr->m_showSpinBox = false;
         }
     }
 }

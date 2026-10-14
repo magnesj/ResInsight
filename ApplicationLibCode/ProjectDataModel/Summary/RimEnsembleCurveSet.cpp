@@ -200,6 +200,9 @@ RimEnsembleCurveSet::RimEnsembleCurveSet()
 
     CAF_PDM_InitField( &m_minTimeSliderPosition, "MinTimeSliderPosition", 0, "" );
     m_minTimeSliderPosition.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
+    m_minTimeSliderPosition.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MINIMUM, 0 );
+    m_minTimeSliderPosition.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MAXIMUM, 100 );
+    m_minTimeSliderPosition.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::SHOW_SPIN_BOX, false );
 
     CAF_PDM_InitFieldNoDefault( &m_maxDateRange,
                                 "MaxDateRange",
@@ -211,6 +214,9 @@ RimEnsembleCurveSet::RimEnsembleCurveSet()
 
     CAF_PDM_InitField( &m_maxTimeSliderPosition, "MaxTimeSliderPosition", 100, "" );
     m_maxTimeSliderPosition.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
+    m_maxTimeSliderPosition.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MINIMUM, 0 );
+    m_maxTimeSliderPosition.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MAXIMUM, 100 );
+    m_maxTimeSliderPosition.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::SHOW_SPIN_BOX, false );
 
     // Time Step Selection
     CAF_PDM_InitFieldNoDefault( &m_timeStepFilter, "TimeStepFilter", "Available Time Steps" );
@@ -1502,15 +1508,6 @@ caf::PdmFieldHandle* RimEnsembleCurveSet::objectToggleField()
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleCurveSet::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_minTimeSliderPosition || field == &m_maxTimeSliderPosition )
-    {
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute ) )
-        {
-            myAttr->m_minimum     = 0;
-            myAttr->m_maximum     = 100;
-            myAttr->m_showSpinBox = false;
-        }
-    }
     if ( field == &m_colorOpacity )
     {
         if ( auto* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )

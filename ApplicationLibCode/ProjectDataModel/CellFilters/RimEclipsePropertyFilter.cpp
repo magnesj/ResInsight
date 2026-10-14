@@ -294,6 +294,15 @@ void RimEclipsePropertyFilter::defineUiOrdering( QString uiConfigName, caf::PdmU
         {
             group2.add( &m_integerLowerBound );
             group2.add( &m_integerUpperBound );
+
+            if ( m_minimumResultValue != cvf::UNDEFINED_DOUBLE && m_maximumResultValue != cvf::UNDEFINED_DOUBLE )
+            {
+                for ( auto* field : { &m_integerLowerBound, &m_integerUpperBound } )
+                {
+                    field->uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MINIMUM, static_cast<int>( m_minimumResultValue ) );
+                    field->uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MAXIMUM, static_cast<int>( m_maximumResultValue ) );
+                }
+            }
         }
         else
         {
@@ -467,15 +476,6 @@ void RimEclipsePropertyFilter::defineEditorAttribute( const caf::PdmFieldHandle*
         {
             doubleAttributes->m_minimum = m_minimumResultValue;
             doubleAttributes->m_maximum = m_maximumResultValue;
-        }
-    }
-
-    if ( field == &m_integerLowerBound || field == &m_integerUpperBound )
-    {
-        if ( auto integerAttributes = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute ) )
-        {
-            integerAttributes->m_minimum = m_minimumResultValue;
-            integerAttributes->m_maximum = m_maximumResultValue;
         }
     }
 }

@@ -118,9 +118,15 @@ RimSummaryRegressionAnalysisCurve::RimSummaryRegressionAnalysisCurve()
     CAF_PDM_InitFieldNoDefault( &m_timeRangeSelection, "TimeRangeSelection", "Time Range" );
     CAF_PDM_InitFieldNoDefault( &m_minTimeSliderPosition, "MinTimeSliderPosition", "From" );
     m_minTimeSliderPosition.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
+    m_minTimeSliderPosition.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MINIMUM, 0 );
+    m_minTimeSliderPosition.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MAXIMUM, 100 );
+    m_minTimeSliderPosition.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::SHOW_SPIN_BOX, false );
 
     CAF_PDM_InitFieldNoDefault( &m_maxTimeSliderPosition, "MaxTimeSliderPosition", "To" );
     m_maxTimeSliderPosition.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
+    m_maxTimeSliderPosition.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MINIMUM, 0 );
+    m_maxTimeSliderPosition.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MAXIMUM, 100 );
+    m_maxTimeSliderPosition.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::SHOW_SPIN_BOX, false );
 
     CAF_PDM_InitField( &m_showTimeSelectionInPlot, "ShowTimeSelectionInPlot", false, "Show In Plot" );
 
@@ -553,16 +559,7 @@ void RimSummaryRegressionAnalysisCurve::defineEditorAttribute( const caf::PdmFie
 {
     RimSummaryCurve::defineEditorAttribute( field, uiConfigName, attribute );
 
-    if ( field == &m_minTimeSliderPosition || field == &m_maxTimeSliderPosition )
-    {
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute ) )
-        {
-            myAttr->m_minimum     = 0;
-            myAttr->m_maximum     = 100;
-            myAttr->m_showSpinBox = false;
-        }
-    }
-    else if ( field == &m_expressionText )
+    if ( field == &m_expressionText )
     {
         auto myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
         if ( myAttr )

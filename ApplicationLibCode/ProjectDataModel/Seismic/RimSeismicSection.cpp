@@ -156,6 +156,37 @@ void RimSeismicSection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
 {
     initSliceRanges();
 
+    if ( ( m_seismicData != nullptr ) && m_seismicData->boundingBox()->isValid() )
+    {
+        auto setSliderAttributes = [&]( caf::PdmFieldHandle& field, int minVal, int maxVal, int stepVal )
+        {
+            field.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MINIMUM, minVal );
+            field.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MAXIMUM, maxVal );
+            field.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::STEP, stepVal );
+        };
+
+        for ( auto* field : { &m_inlineIndex, &m_xlineIndex, &m_depthIndex } )
+        {
+            field->uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::SHOW_SPIN_BOX, true );
+        }
+
+        setSliderAttributes( m_inlineIndex, m_seismicData->inlineMin(), m_seismicData->inlineMax(), m_seismicData->inlineStep() );
+        setSliderAttributes( m_xlineIndex, m_seismicData->xlineMin(), m_seismicData->xlineMax(), m_seismicData->xlineStep() );
+        setSliderAttributes( m_depthIndex,
+                             static_cast<int>( m_seismicData->zMin() ),
+                             static_cast<int>( m_seismicData->zMax() ),
+                             static_cast<int>( m_seismicData->zStep() ) );
+
+        auto bb = m_seismicData->boundingBox();
+        for ( auto* field : { &m_zUpperThreshold, &m_zLowerThreshold } )
+        {
+            setSliderAttributes( *field,
+                                 static_cast<int>( -1 * bb->max().z() ),
+                                 static_cast<int>( -1 * bb->min().z() ),
+                                 static_cast<int>( m_seismicData->zStep() ) );
+        }
+    }
+
     auto genGrp = uiOrdering.addNewGroup( "General" );
 
     genGrp->add( &m_userDescription );
@@ -264,50 +295,6 @@ void RimSeismicSection::defineEditorAttribute( const caf::PdmFieldHandle* field,
             {
                 tvAttribute->baseColor.setRgb( 255, 220, 255 );
                 tvAttribute->alwaysEnforceResizePolicy = true;
-            }
-        }
-    }
-    else if ( ( field == &m_depthIndex ) || ( field == &m_inlineIndex ) || ( field == &m_xlineIndex ) )
-    {
-        if ( ( m_seismicData != nullptr ) && m_seismicData->boundingBox()->isValid() )
-        {
-            auto* sliderAttrib = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute );
-            if ( sliderAttrib != nullptr )
-            {
-                sliderAttrib->m_showSpinBox = true;
-                int minVal                  = m_seismicData->inlineMin();
-                int maxVal                  = m_seismicData->inlineMax();
-                int stepVal                 = m_seismicData->inlineStep();
-
-                if ( field == &m_xlineIndex )
-                {
-                    minVal  = m_seismicData->xlineMin();
-                    maxVal  = m_seismicData->xlineMax();
-                    stepVal = m_seismicData->xlineStep();
-                }
-                else if ( field == &m_depthIndex )
-                {
-                    minVal  = m_seismicData->zMin();
-                    maxVal  = m_seismicData->zMax();
-                    stepVal = m_seismicData->zStep();
-                }
-                sliderAttrib->m_maximum = maxVal;
-                sliderAttrib->m_minimum = minVal;
-                sliderAttrib->m_step    = stepVal;
-            }
-        }
-    }
-    else if ( ( field == &m_zUpperThreshold ) || ( field == &m_zLowerThreshold ) )
-    {
-        auto* sliderAttrib = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute );
-        if ( ( sliderAttrib ) && ( m_seismicData != nullptr ) )
-        {
-            auto bb = m_seismicData->boundingBox();
-            if ( bb->isValid() )
-            {
-                sliderAttrib->m_minimum = -1 * bb->max().z();
-                sliderAttrib->m_maximum = -1 * bb->min().z();
-                sliderAttrib->m_step    = (int)m_seismicData->zStep();
             }
         }
     }
