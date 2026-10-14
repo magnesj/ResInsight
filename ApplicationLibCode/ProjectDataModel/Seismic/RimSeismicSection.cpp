@@ -84,10 +84,8 @@ RimSeismicSection::RimSeismicSection()
     CAF_PDM_InitFieldNoDefault( &m_wellPath, "WellPath", "Well Path" );
 
     CAF_PDM_InitField( &m_enablePicking, "EnablePicking", false, "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_enablePicking );
-
-    CAF_PDM_InitField( &m_showImage, "ShowImage", false, "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_showImage );
+    m_enablePicking.xmlCapability()->disableIO();
+    m_enablePicking.uiCapability()->setUiHidden( true );
 
     CAF_PDM_InitFieldNoDefault( &m_targets, "Targets", "Targets" );
     m_targets.uiCapability()->setUiEditorTypeName( caf::PdmUiTableViewEditor::uiEditorTypeName() );
@@ -171,7 +169,8 @@ void RimSeismicSection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
         {
             auto polyGrp = uiOrdering.addNewGroup( "Polyline Definition" );
             polyGrp->add( &m_targets );
-            polyGrp->add( &m_enablePicking );
+            polyGrp->addNewButton( m_enablePicking ? "Stop Picking Points" : "Start Picking Points",
+                                   [this]() { enablePicking( !m_enablePicking ); } );
         }
         else if ( m_type() == RiaDefines::SeismicSectionType::SS_INLINE )
         {
@@ -235,7 +234,7 @@ void RimSeismicSection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
 
     if ( ( m_type() != RiaDefines::SeismicSectionType::SS_POLYLINE ) && ( m_type() != RiaDefines::SeismicSectionType::SS_WELLPATH ) )
     {
-        uiOrdering.add( &m_showImage );
+        uiOrdering.addNewButton( "Show Image", [this]() { showImageDialog(); } );
     }
 
     uiOrdering.skipRemainingFields();
@@ -254,30 +253,7 @@ void RimSeismicSection::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrde
 //--------------------------------------------------------------------------------------------------
 void RimSeismicSection::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_enablePicking )
-    {
-        auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( pbAttribute )
-        {
-            if ( !m_enablePicking )
-            {
-                pbAttribute->m_buttonText = "Start Picking Points";
-            }
-            else
-            {
-                pbAttribute->m_buttonText = "Stop Picking Points";
-            }
-        }
-    }
-    else if ( field == &m_showImage )
-    {
-        auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( pbAttribute )
-        {
-            pbAttribute->m_buttonText = "Show Image";
-        }
-    }
-    else if ( field == &m_targets )
+    if ( field == &m_targets )
     {
         auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
         if ( tvAttribute )
@@ -714,29 +690,27 @@ cvf::ref<RigTexturedSection> RimSeismicSection::texturedSection()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimSeismicSection::showImageDialog()
+{
+    if ( m_seismicData == nullptr ) return;
+
+    QDialog     w;
+    QLabel      l;
+    QHBoxLayout layout;
+    layout.addWidget( &l );
+    w.setLayout( &layout );
+    QPixmap i = getImage();
+    l.setPixmap( i );
+
+    w.exec();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimSeismicSection::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    if ( changedField == &m_enablePicking )
-    {
-        updateConnectedEditors();
-    }
-    else if ( changedField == &m_showImage )
-    {
-        if ( m_seismicData == nullptr ) return;
-
-        QDialog     w;
-        QLabel      l;
-        QHBoxLayout layout;
-        layout.addWidget( &l );
-        w.setLayout( &layout );
-        QPixmap i = getImage();
-        l.setPixmap( i );
-
-        w.exec();
-
-        m_showImage = false;
-    }
-    else if ( changedField != &m_userDescription )
+    if ( changedField != &m_userDescription )
     {
         RigTexturedSection::WhatToUpdateEnum updateType = RigTexturedSection::WhatToUpdateEnum::UPDATE_NONE;
 

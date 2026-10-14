@@ -46,7 +46,6 @@ class RimPolygon;
 namespace caf
 {
 class PdmUiListEditorAttribute;
-class PdmUiPushButtonEditorAttribute;
 } // namespace caf
 
 //==================================================================================================
@@ -148,7 +147,7 @@ private:
 
     void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) override;
 
-    static void setPushButtonText( bool buttonEnable, caf::PdmUiPushButtonEditorAttribute* attribute );
+    void        toggleViewerPointInput( caf::PdmField<bool>* inputField );
     static void setBaseColor( bool enable, caf::PdmUiListEditorAttribute* attribute );
 
     RimSimWellInViewCollection* simulationWellCollection() const;
@@ -186,7 +185,6 @@ private:
     caf::PdmPtrField<RimSimWellInView*> m_simulationWell;
 
     caf::PdmPtrField<RimPolygon*> m_projectPolygon;
-    caf::PdmField<bool>           m_editPolygonButton;
 
     caf::PdmField<bool> m_inputPolylineFromViewerEnabled;
     caf::PdmField<bool> m_inputExtrusionPointsFromViewerEnabled;

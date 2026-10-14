@@ -103,6 +103,7 @@ protected slots:
 private:
     friend class RimIntersectionCollection;
     void updateBoxManipulatorGeometry();
+    void updateManipulatorState();
 
     void updateVisibility();
     void clampSinglePlaneValues();

@@ -92,9 +92,9 @@ RimBoxIntersection::RimBoxIntersection()
     CAF_PDM_InitField( &m_xySliderStepSize, "xySliderStepSize", 1.0, "XY Slider Step Size" );
     CAF_PDM_InitField( &m_depthSliderStepSize, "DepthSliderStepSize", 0.5, "Depth Slider Step Size" );
 
-    CAF_PDM_InitFieldNoDefault( &m_show3DManipulator, "show3DManipulator", "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_show3DManipulator );
-    m_show3DManipulator = false;
+    CAF_PDM_InitField( &m_show3DManipulator, "show3DManipulator", false, "" );
+    m_show3DManipulator.xmlCapability()->disableIO();
+    m_show3DManipulator.uiCapability()->setUiHidden( true );
 
     setDeletable( true );
 }
@@ -180,6 +180,42 @@ void RimBoxIntersection::setFromOriginAndSize( const cvf::Vec3d& origin, const c
 bool RimBoxIntersection::show3dManipulator() const
 {
     return m_show3DManipulator;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimBoxIntersection::updateManipulatorState()
+{
+    if ( m_show3DManipulator )
+    {
+        if ( viewer() )
+        {
+            m_boxManipulator = new RicBoxManipulatorEventHandler( viewer() );
+
+            auto rimView = firstAncestorOrThisOfType<Rim3dView>();
+            for ( Rim3dView* mainView : rimView->viewsUsingThisAsComparisonView() )
+            {
+                m_boxManipulator->registerInAdditionalViewer( mainView->viewer() );
+            }
+
+            connect( m_boxManipulator, SIGNAL( notifyRedraw() ), this, SLOT( slotScheduleRedraw() ) );
+            connect( m_boxManipulator,
+                     SIGNAL( notifyUpdate( const cvf::Vec3d&, const cvf::Vec3d& ) ),
+                     this,
+                     SLOT( slotUpdateGeometry( const cvf::Vec3d&, const cvf::Vec3d& ) ) );
+
+            updateBoxManipulatorGeometry();
+        }
+    }
+    else
+    {
+        if ( m_boxManipulator )
+        {
+            m_boxManipulator->deleteLater();
+            m_boxManipulator = nullptr;
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -359,39 +395,6 @@ void RimBoxIntersection::fieldChangedByUi( const caf::PdmFieldHandle* changedFie
     {
         m_maxDepth = std::max( m_maxDepth, m_minDepth );
     }
-    else if ( changedField == &m_show3DManipulator )
-    {
-        if ( m_show3DManipulator )
-        {
-            if ( viewer() )
-            {
-                m_boxManipulator = new RicBoxManipulatorEventHandler( viewer() );
-
-                auto rimView = firstAncestorOrThisOfType<Rim3dView>();
-                for ( Rim3dView* mainView : rimView->viewsUsingThisAsComparisonView() )
-                {
-                    m_boxManipulator->registerInAdditionalViewer( mainView->viewer() );
-                }
-
-                connect( m_boxManipulator, SIGNAL( notifyRedraw() ), this, SLOT( slotScheduleRedraw() ) );
-                connect( m_boxManipulator,
-                         SIGNAL( notifyUpdate( const cvf::Vec3d&, const cvf::Vec3d& ) ),
-                         this,
-                         SLOT( slotUpdateGeometry( const cvf::Vec3d&, const cvf::Vec3d& ) ) );
-
-                updateBoxManipulatorGeometry();
-            }
-        }
-        else
-        {
-            if ( m_boxManipulator )
-            {
-                m_boxManipulator->deleteLater();
-                m_boxManipulator = nullptr;
-            }
-        }
-    }
-
     if ( changedField == &m_minXCoord || changedField == &m_minYCoord || changedField == &m_minDepth || changedField == &m_maxXCoord ||
          changedField == &m_maxYCoord || changedField == &m_maxDepth )
     {
@@ -470,23 +473,6 @@ void RimBoxIntersection::defineEditorAttribute( const caf::PdmFieldHandle* field
             myAttr->m_sliderTickCount = cvf::Math::abs( tickCount );
         }
     }
-
-    if ( field == &m_show3DManipulator )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-
-        if ( attrib )
-        {
-            if ( m_show3DManipulator )
-            {
-                attrib->m_buttonText = "Hide 3D manipulator";
-            }
-            else
-            {
-                attrib->m_buttonText = "Show 3D manipulator";
-            }
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -530,7 +516,13 @@ void RimBoxIntersection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
         group->add( &m_depthSliderStepSize );
     }
 
-    uiOrdering.add( &m_show3DManipulator );
+    uiOrdering.addNewButton( m_show3DManipulator ? "Hide 3D manipulator" : "Show 3D manipulator",
+                             [this]()
+                             {
+                                 m_show3DManipulator = !m_show3DManipulator;
+                                 updateManipulatorState();
+                                 updateConnectedEditors();
+                             } );
 
     defineSeparateDataSourceUi( uiConfigName, uiOrdering );
 }
