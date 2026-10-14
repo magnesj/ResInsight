@@ -87,18 +87,6 @@ public:
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-class PdmUiLineEditorAttributeUiDisplayString : public PdmUiEditorAttribute
-{
-public:
-    PdmUiLineEditorAttributeUiDisplayString() {}
-
-public:
-    QString m_displayString;
-};
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 class PdmUiLineEdit : public QLineEdit
 {
     Q_OBJECT
@@ -138,6 +126,9 @@ public:
         static inline const QString COMPLETER_CASE_SENSITIVITY = QStringLiteral( "completerCaseSensitivity" );
         static inline const QString COMPLETER_FILTER_MODE      = QStringLiteral( "completerFilterMode" );
         static inline const QString NOTIFY_WHEN_TEXT_IS_EDITED = QStringLiteral( "notifyWhenTextIsEdited" );
+
+        // std::function<QString()>. A non-empty result overrides the text shown for the field value
+        static inline const QString DISPLAY_STRING_CALLBACK = QStringLiteral( "displayStringCallback" );
     };
 
     // Set of all supported attributes for validation
@@ -147,7 +138,8 @@ public:
                                                                    Keys::AVOID_SENDING_ENTER_EVENT,
                                                                    Keys::COMPLETER_CASE_SENSITIVITY,
                                                                    Keys::COMPLETER_FILTER_MODE,
-                                                                   Keys::NOTIFY_WHEN_TEXT_IS_EDITED };
+                                                                   Keys::NOTIFY_WHEN_TEXT_IS_EDITED,
+                                                                   Keys::DISPLAY_STRING_CALLBACK };
 
     static void updateLineEditFromReadOnlyState( QLineEdit* lineEdit, bool isReadOnly );
 

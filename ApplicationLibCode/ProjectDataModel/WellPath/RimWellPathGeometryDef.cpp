@@ -70,6 +70,14 @@ RimWellPathGeometryDef::RimWellPathGeometryDef()
                                                   "ReferencePoint",
                                                   cvf::Vec3d( 0, 0, 0 ),
                                                   "UTM Reference Point" );
+    m_referencePointUtmXyd.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiLineEditor::Keys::DISPLAY_STRING_CALLBACK,
+                                                                                   [this]()
+                                                                                   {
+                                                                                       const cvf::Vec3d& v = m_referencePointUtmXyd();
+                                                                                       return QString::number( v[0], 'f', 2 ) + " " +
+                                                                                              QString::number( v[1], 'f', 2 ) + " " +
+                                                                                              QString::number( v[2], 'f', 2 );
+                                                                                   } );
 
     CAF_PDM_InitScriptableField( &m_airGap, "AirGap", 0.0, "Air Gap" );
     m_airGap.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
@@ -781,18 +789,6 @@ void RimWellPathGeometryDef::defineEditorAttribute( const caf::PdmFieldHandle* f
                 tvAttribute->baseColor.setRgb( 255, 220, 255 );
                 tvAttribute->alwaysEnforceResizePolicy = true;
             }
-        }
-    }
-
-    if ( field == &m_referencePointUtmXyd )
-    {
-        auto uiDisplayStringAttr = dynamic_cast<caf::PdmUiLineEditorAttributeUiDisplayString*>( attribute );
-
-        if ( uiDisplayStringAttr )
-        {
-            uiDisplayStringAttr->m_displayString = QString::number( m_referencePointUtmXyd()[0], 'f', 2 ) + " " +
-                                                   QString::number( m_referencePointUtmXyd()[1], 'f', 2 ) + " " +
-                                                   QString::number( m_referencePointUtmXyd()[2], 'f', 2 );
         }
     }
 }

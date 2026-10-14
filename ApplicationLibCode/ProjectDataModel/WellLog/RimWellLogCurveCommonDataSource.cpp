@@ -111,6 +111,22 @@ RimWellLogCurveCommonDataSource::RimWellLogCurveCommonDataSource()
     m_wbsSmoothing.v() = caf::Tristate::State::PartiallyTrue;
 
     CAF_PDM_InitField( &m_wbsSmoothingThreshold, "WBSSmoothingThreshold", -1.0, "Smoothing Threshold" );
+    m_wbsSmoothingThreshold.uiCapability()
+        ->setAttribute<std::function<QString()>>( caf::PdmUiLineEditor::Keys::DISPLAY_STRING_CALLBACK,
+                                                  [this]() -> QString
+                                                  {
+                                                      if ( wbsSmoothingThreshold() != -1.0 ) return {};
+
+                                                      QString displayString = "Mixed";
+                                                      if ( m_uniqueWbsSmoothingThreshold.size() > 1u )
+                                                      {
+                                                          auto minmax_it = std::minmax_element( m_uniqueWbsSmoothingThreshold.begin(),
+                                                                                                m_uniqueWbsSmoothingThreshold.end() );
+                                                          displayString +=
+                                                              QString( " [%1, %2]" ).arg( *( minmax_it.first ) ).arg( *( minmax_it.second ) );
+                                                      }
+                                                      return displayString;
+                                                  } );
 
     CAF_PDM_InitField( &m_maximumCurvePointInterval, "MaximumCurvePointInterval", std::make_pair( true, 10.0 ), "Maximum Curve Point Interval" );
 
@@ -1116,19 +1132,6 @@ void RimWellLogCurveCommonDataSource::defineEditorAttribute( const caf::PdmField
             myAttr->nextButtonText = "Next " + modifierText + "PgDown)";
             myAttr->prevButtonText = "Previous " + modifierText + "PgUp)";
         }
-    }
-    auto* uiDisplayStringAttr = dynamic_cast<caf::PdmUiLineEditorAttributeUiDisplayString*>( attribute );
-    if ( uiDisplayStringAttr && ( wbsSmoothingThreshold() == -1.0 ) && ( field == &m_wbsSmoothingThreshold ) )
-    {
-        QString displayString = "Mixed";
-
-        if ( m_uniqueWbsSmoothingThreshold.size() > 1u )
-        {
-            auto minmax_it = std::minmax_element( m_uniqueWbsSmoothingThreshold.begin(), m_uniqueWbsSmoothingThreshold.end() );
-            displayString += QString( " [%1, %2]" ).arg( *( minmax_it.first ) ).arg( *( minmax_it.second ) );
-        }
-
-        uiDisplayStringAttr->m_displayString = displayString;
     }
 }
 

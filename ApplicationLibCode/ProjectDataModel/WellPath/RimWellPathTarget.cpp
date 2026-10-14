@@ -58,10 +58,19 @@ RimWellPathTarget::RimWellPathTarget()
 
     CAF_PDM_InitField( &m_isEnabled, "IsEnabled", true, "" );
 
+    auto formatVec3d = []( const cvf::Vec3d& v )
+    { return QString::number( v[0], 'f', 2 ) + " " + QString::number( v[1], 'f', 2 ) + " " + QString::number( v[2], 'f', 2 ); };
+
     CAF_PDM_InitScriptableFieldNoDefault( &m_targetPointXYD, "TargetPoint", "Relative Coord" );
+    m_targetPointXYD.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiLineEditor::Keys::DISPLAY_STRING_CALLBACK,
+                                                                             [this, formatVec3d]()
+                                                                             { return formatVec3d( m_targetPointXYD() ); } );
     CAF_PDM_InitFieldNoDefault( &m_targetPointForDisplay, "TargetPointForDisplay", "UTM Coord" );
     m_targetPointForDisplay.registerGetMethod( this, &RimWellPathTarget::targetPointForDisplayXYD );
     m_targetPointForDisplay.registerSetMethod( this, &RimWellPathTarget::setTargetPointFromDisplayCoord );
+    m_targetPointForDisplay.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiLineEditor::Keys::DISPLAY_STRING_CALLBACK,
+                                                                                    [this, formatVec3d]()
+                                                                                    { return formatVec3d( m_targetPointForDisplay() ); } );
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_targetMeasuredDepth, "TargetMeasuredDepth", "MD" );
     m_targetMeasuredDepth.registerGetMethod( this, &RimWellPathTarget::measuredDepth );
@@ -412,35 +421,6 @@ void RimWellPathTarget::initAfterRead()
         {
             m_useFixedAzimuth     = true;
             m_useFixedInclination = true;
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellPathTarget::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_targetPointXYD )
-    {
-        auto uiDisplayStringAttr = dynamic_cast<caf::PdmUiLineEditorAttributeUiDisplayString*>( attribute );
-
-        if ( uiDisplayStringAttr )
-        {
-            uiDisplayStringAttr->m_displayString = QString::number( m_targetPointXYD()[0], 'f', 2 ) + " " +
-                                                   QString::number( m_targetPointXYD()[1], 'f', 2 ) + " " +
-                                                   QString::number( m_targetPointXYD()[2], 'f', 2 );
-        }
-    }
-    else if ( field == &m_targetPointForDisplay )
-    {
-        auto uiDisplayStringAttr = dynamic_cast<caf::PdmUiLineEditorAttributeUiDisplayString*>( attribute );
-
-        if ( uiDisplayStringAttr )
-        {
-            uiDisplayStringAttr->m_displayString = QString::number( m_targetPointForDisplay()[0], 'f', 2 ) + " " +
-                                                   QString::number( m_targetPointForDisplay()[1], 'f', 2 ) + " " +
-                                                   QString::number( m_targetPointForDisplay()[2], 'f', 2 );
         }
     }
 }

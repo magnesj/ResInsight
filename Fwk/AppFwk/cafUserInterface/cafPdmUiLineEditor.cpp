@@ -308,22 +308,13 @@ void PdmUiLineEditor::configureAndUpdateUi( const QString& uiConfigName )
             delete m_completer;
             m_optionCache.clear();
 
-            PdmUiLineEditorAttributeUiDisplayString displayStringAttrib;
-            caf::PdmUiObjectHandle*                 uiObject = uiObj( uiField()->fieldHandle()->ownerObject() );
-            if ( uiObject )
-            {
-                uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &displayStringAttrib );
-            }
-
             QString displayString;
-            if ( displayStringAttrib.m_displayString.isEmpty() )
+            if ( auto callback =
+                     uiField()->attribute<std::function<QString()>>( Keys::DISPLAY_STRING_CALLBACK, uiConfigName ) )
             {
-                displayString = uiField()->uiValue().toString();
+                displayString = callback.value()();
             }
-            else
-            {
-                displayString = displayStringAttrib.m_displayString;
-            }
+            if ( displayString.isEmpty() ) displayString = uiField()->uiValue().toString();
 
             if ( displayString != m_lineEdit->text() )
             {
