@@ -109,6 +109,9 @@ RiaPreferencesSystem::RiaPreferencesSystem()
     m_currentFeatureKeyword.xmlCapability()->disableIO();
 
     CAF_PDM_InitFieldNoDefault( &m_selectedFeatureDescription, "selectedFeatureDescription", "Description" );
+    m_selectedFeatureDescription.uiCapability()->setAttribute( caf::PdmUiTextEditor::Keys::WRAP_MODE,
+                                                               static_cast<int>( caf::PdmUiTextEditor::WordWrap ) );
+    m_selectedFeatureDescription.uiCapability()->setAttribute( caf::PdmUiTextEditor::Keys::HEIGHT_HINT, 60 );
     m_selectedFeatureDescription.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
     m_selectedFeatureDescription.uiCapability()->setUiReadOnly( true );
     m_selectedFeatureDescription.xmlCapability()->disableIO();
@@ -420,14 +423,6 @@ void RiaPreferencesSystem::defineEditorAttribute( const caf::PdmFieldHandle* fie
         if ( myAttr )
         {
             myAttr->m_selectDirectory = true;
-        }
-    }
-    else if ( field == &m_selectedFeatureDescription )
-    {
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute ) )
-        {
-            myAttr->wrapMode   = caf::PdmUiTextEditorAttribute::WordWrap;
-            myAttr->heightHint = 60;
         }
     }
 }

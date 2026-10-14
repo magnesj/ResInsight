@@ -51,6 +51,7 @@ RimUserDefinedCalculation::RimUserDefinedCalculation()
     m_description.uiCapability()->setUiReadOnly( true );
 
     CAF_PDM_InitField( &m_expression, "Expression", QString( "" ), "" );
+    m_expression.uiCapability()->setAttribute( caf::PdmUiTextEditor::Keys::HEIGHT_HINT, -1 );
     m_expression.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
 
     CAF_PDM_InitFieldNoDefault( &m_helpText,
@@ -371,15 +372,7 @@ QString RimUserDefinedCalculation::buildCalculationName() const
 //--------------------------------------------------------------------------------------------------
 void RimUserDefinedCalculation::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_expression )
-    {
-        auto* myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->heightHint = -1;
-        }
-    }
-    else if ( field == &m_variables )
+    if ( field == &m_variables )
     {
         auto* myAttr = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
         if ( myAttr )

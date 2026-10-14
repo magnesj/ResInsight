@@ -195,6 +195,9 @@ RimFractureTemplate::RimFractureTemplate()
     m_dFactorSummaryText.uiCapability()->setUiReadOnly( true );
     m_dFactorSummaryText.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
     m_dFactorSummaryText.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::TOP );
+    m_dFactorSummaryText.uiCapability()->setAttribute( caf::PdmUiTextEditor::Keys::WRAP_MODE, static_cast<int>( caf::PdmUiTextEditor::NoWrap ) );
+    m_dFactorSummaryText.uiCapability()->setAttribute( caf::PdmUiTextEditor::Keys::FONT, QFont( "Monospace", 10 ) );
+    m_dFactorSummaryText.uiCapability()->setAttribute( caf::PdmUiTextEditor::Keys::TEXT_MODE, static_cast<int>( caf::PdmUiTextEditor::HTML ) );
 
     CAF_PDM_InitScriptableField( &m_heightScaleFactor, "HeightScaleFactor", 1.0, "Height" );
     CAF_PDM_InitScriptableField( &m_halfLengthScaleFactor, "WidthScaleFactor", 1.0, "Half Length" );
@@ -420,19 +423,6 @@ void RimFractureTemplate::defineEditorAttribute( const caf::PdmFieldHandle* fiel
         {
             myAttr->m_minimum = 0;
             myAttr->m_maximum = 1.0;
-        }
-    }
-
-    if ( field == &m_dFactorSummaryText )
-    {
-        auto myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->wrapMode = caf::PdmUiTextEditorAttribute::NoWrap;
-
-            QFont font( "Monospace", 10 );
-            myAttr->font     = font;
-            myAttr->textMode = caf::PdmUiTextEditorAttribute::HTML;
         }
     }
 

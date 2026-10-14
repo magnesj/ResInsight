@@ -116,6 +116,7 @@ RimSummaryDeclineCurve::RimSummaryDeclineCurve()
     CAF_PDM_InitField( &m_showTimeSelectionInPlot, "ShowTimeSelectionInPlot", true, "Show In Plot" );
 
     CAF_PDM_InitFieldNoDefault( &m_equationText, "EquationText", "Equation" );
+    m_equationText.uiCapability()->setAttribute( caf::PdmUiTextEditor::Keys::HEIGHT_HINT, -1 );
     m_equationText.registerGetMethod( this, &RimSummaryDeclineCurve::equationTextProxy );
     m_equationText.uiCapability()->setUiReadOnly( true );
     m_equationText.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
@@ -444,13 +445,6 @@ void RimSummaryDeclineCurve::defineEditorAttribute( const caf::PdmFieldHandle* f
             myAttr->m_minimum  = 0.001;
             myAttr->m_maximum  = 1.0;
             myAttr->m_decimals = 2;
-        }
-    }
-    else if ( field == &m_equationText )
-    {
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute ) )
-        {
-            myAttr->heightHint = -1;
         }
     }
 }

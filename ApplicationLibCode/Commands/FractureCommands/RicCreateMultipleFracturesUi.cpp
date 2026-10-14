@@ -93,6 +93,9 @@ RiuCreateMultipleFractionsUi::RiuCreateMultipleFractionsUi()
     m_options.uiCapability()->setCustomContextMenuEnabled( true );
 
     CAF_PDM_InitFieldNoDefault( &m_fractureCreationSummary, "FractureCreationSummary", "Generated Fractures" );
+    m_fractureCreationSummary.uiCapability()->setAttribute( caf::PdmUiTextEditor::Keys::FONT, QFont( "Courier", 8 ) );
+    m_fractureCreationSummary.uiCapability()->setAttribute( caf::PdmUiTextEditor::Keys::WRAP_MODE,
+                                                            static_cast<int>( caf::PdmUiTextEditor::NoWrap ) );
     m_fractureCreationSummary.registerGetMethod( this, &RiuCreateMultipleFractionsUi::summaryText );
     m_fractureCreationSummary.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::TOP );
     m_fractureCreationSummary.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
@@ -280,18 +283,7 @@ void RiuCreateMultipleFractionsUi::defineEditorAttribute( const caf::PdmFieldHan
                                                           QString                    uiConfigName,
                                                           caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_fractureCreationSummary )
-    {
-        auto attr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
-        if ( attr )
-        {
-            QFont font( "Courier", 8 );
-
-            attr->font     = font;
-            attr->wrapMode = caf::PdmUiTextEditorAttribute::NoWrap;
-        }
-    }
-    else if ( field == &m_options )
+    if ( field == &m_options )
     {
         auto attr = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
         if ( attr )

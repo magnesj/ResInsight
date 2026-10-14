@@ -101,6 +101,8 @@ RimGridCrossPlotRegressionCurve::RimGridCrossPlotRegressionCurve()
     m_expressionText.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::HIDDEN );
     m_expressionText.uiCapability()->setUiReadOnly( true );
     m_expressionText.xmlCapability()->disableIO();
+    m_expressionText.uiCapability()->setAttribute( caf::PdmUiTextEditor::Keys::WRAP_MODE, static_cast<int>( caf::PdmUiTextEditor::NoWrap ) );
+    m_expressionText.uiCapability()->setAttribute( caf::PdmUiTextEditor::Keys::TEXT_MODE, static_cast<int>( caf::PdmUiTextEditor::HTML ) );
 
     setLineStyle( RiuQwtPlotCurveDefines::LineStyleEnum::STYLE_SOLID );
     setSymbol( RiuPlotCurveSymbol::SYMBOL_RECT );
@@ -334,6 +336,12 @@ void RimGridCrossPlotRegressionCurve::defineUiOrdering( QString uiConfigName, ca
 
     regressionCurveGroup->add( &m_expressionText );
 
+    {
+        QFont font;
+        font.setPointSize( font.pointSize() + 2 );
+        m_expressionText.uiCapability()->setAttribute( caf::PdmUiTextEditor::Keys::FONT, font );
+    }
+
     caf::PdmUiGroup* dataSelectionGroup = uiOrdering.addNewGroup( "Data Selection" );
     dataSelectionGroup->add( &m_minRangeX );
     dataSelectionGroup->add( &m_maxRangeX );
@@ -385,20 +393,6 @@ void RimGridCrossPlotRegressionCurve::defineEditorAttribute( const caf::PdmField
             myAttr->m_minimum  = RiaNumericalTools::roundToNumSignificantDigitsFloor( min, 2 );
             myAttr->m_maximum  = RiaNumericalTools::roundToNumSignificantDigitsCeil( max, 2 );
             myAttr->m_decimals = 3;
-        }
-    }
-    else if ( field == &m_expressionText )
-    {
-        auto myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->wrapMode = caf::PdmUiTextEditorAttribute::NoWrap;
-            myAttr->textMode = caf::PdmUiTextEditorAttribute::HTML;
-
-            QFont font;
-            auto  pointSize = font.pointSize();
-            font.setPointSize( pointSize + 2 );
-            myAttr->font = font;
         }
     }
 }
