@@ -76,6 +76,9 @@ RimSummaryEnsemble::RimSummaryEnsemble()
     QString defaultText = RiaDefines::key1VariableName() + "-" + RiaDefines::key2VariableName();
     QString tooltipText = QString( "Variables in template is supported, and will be replaced to create name. Example '%1'" ).arg( defaultText );
     CAF_PDM_InitField( &m_nameTemplateString, "NameTemplateString", defaultText, "Name Template", "", tooltipText );
+    m_nameTemplateString.uiCapability()->setAttribute( caf::PdmUiLineEditor::Keys::PLACEHOLDER_TEXT,
+                                                       RiaDefines::key1VariableName() + "-" + RiaDefines::key2VariableName() );
+    m_nameTemplateString.uiCapability()->setAttribute( caf::PdmUiLineEditor::Keys::NOTIFY_WHEN_TEXT_IS_EDITED, true );
 
     CAF_PDM_InitFieldNoDefault( &m_groupingMode, "GroupingMode", "Grouping Mode" );
 
@@ -1063,21 +1066,6 @@ void RimSummaryEnsemble::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrd
         m_ensembleParameters->updateUiTreeOrdering( uiTreeOrdering );
 
         uiTreeOrdering.skipRemainingChildren( true );
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimSummaryEnsemble::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_nameTemplateString )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute ) )
-        {
-            attr->placeholderText        = RiaDefines::key1VariableName() + "-" + RiaDefines::key2VariableName();
-            attr->notifyWhenTextIsEdited = true;
-        }
     }
 }
 

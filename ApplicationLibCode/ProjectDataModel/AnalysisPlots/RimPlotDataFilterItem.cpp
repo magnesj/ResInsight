@@ -369,6 +369,8 @@ void RimPlotDataFilterItem::defineUiOrdering( QString uiConfigName, caf::PdmUiOr
         }
         else if ( m_filterOperation == TOP_N || m_filterOperation == BOTTOM_N )
         {
+            QFontMetrics fm = QFontMetrics( QFont() );
+            m_topBottomN.uiCapability()->setAttribute( caf::PdmUiLineEditor::Keys::MAXIMUM_WIDTH, fm.boundingRect( "XXXX" ).width() );
             uiOrdering.appendToRow( &m_topBottomN );
         }
     }
@@ -392,16 +394,6 @@ void RimPlotDataFilterItem::defineEditorAttribute( const caf::PdmFieldHandle* fi
         myAttr->m_minimum                       = m_lowerLimit;
         myAttr->m_maximum                       = m_upperLimit;
         myAttr->m_delaySliderUpdateUntilRelease = true;
-    }
-    else if ( field == &m_topBottomN )
-    {
-        caf::PdmUiLineEditorAttribute* myAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute );
-
-        if ( !myAttr ) return;
-
-        QFontMetrics fm = QFontMetrics( QFont() );
-
-        myAttr->maximumWidth = fm.boundingRect( "XXXX" ).width();
     }
 }
 

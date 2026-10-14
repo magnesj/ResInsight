@@ -57,36 +57,6 @@ namespace caf
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-class PdmUiLineEditorAttribute : public PdmUiEditorAttribute
-{
-public:
-    PdmUiLineEditorAttribute()
-    {
-        avoidSendingEnterEventToParentWidget = false;
-        completerCaseSensitivity             = Qt::CaseInsensitive;
-        completerFilterMode                  = Qt::MatchContains;
-        maximumWidth                         = -1;
-        selectAllOnFocusEvent                = false;
-        placeholderText                      = "";
-        notifyWhenTextIsEdited               = false;
-    }
-
-public:
-    bool                 avoidSendingEnterEventToParentWidget;
-    QPointer<QValidator> validator;
-
-    // Completer setup
-    Qt::CaseSensitivity completerCaseSensitivity;
-    Qt::MatchFlags      completerFilterMode;
-    int                 maximumWidth;
-    bool                selectAllOnFocusEvent;
-    QString             placeholderText;
-    bool                notifyWhenTextIsEdited;
-};
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 class PdmUiLineEdit : public QLineEdit
 {
     Q_OBJECT
@@ -129,6 +99,9 @@ public:
 
         // std::function<QString()> or plain string. A non-empty result overrides the text shown for the field value
         static inline const QString DISPLAY_STRING = QStringLiteral( "displayString" );
+
+        // QValidator*. Not owned by the editor
+        static inline const QString VALIDATOR = QStringLiteral( "validator" );
     };
 
     // Set of all supported attributes for validation
@@ -139,7 +112,8 @@ public:
                                                                    Keys::COMPLETER_CASE_SENSITIVITY,
                                                                    Keys::COMPLETER_FILTER_MODE,
                                                                    Keys::NOTIFY_WHEN_TEXT_IS_EDITED,
-                                                                   Keys::DISPLAY_STRING };
+                                                                   Keys::DISPLAY_STRING,
+                                                                   Keys::VALIDATOR };
 
     static void updateLineEditFromReadOnlyState( QLineEdit* lineEdit, bool isReadOnly );
 

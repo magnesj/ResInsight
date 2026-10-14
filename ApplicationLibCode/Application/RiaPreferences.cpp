@@ -270,6 +270,8 @@ RiaPreferences::RiaPreferences()
                        "of ? and * as wildcards.",
                        "" );
     m_multiLateralWellPattern.uiCapability()->setUiEditorTypeName( caf::PdmUiLineEditor::uiEditorTypeName() );
+    m_multiLateralWellPattern.uiCapability()->setAttribute<QValidator*>( caf::PdmUiLineEditor::Keys::VALIDATOR,
+                                                                         new RiaValidRegExpValidator( defaultMultiLateralWellNamePattern() ) );
 
     CAF_PDM_InitFieldNoDefault( &m_guiTheme, "guiTheme", "GUI theme" );
 
@@ -333,15 +335,6 @@ void RiaPreferences::defineEditorAttribute( const caf::PdmFieldHandle* field, QS
             {
                 myAttr->m_selectDirectory = true;
             }
-        }
-    }
-
-    if ( field == &m_multiLateralWellPattern )
-    {
-        caf::PdmUiLineEditorAttribute* myAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->validator = new RiaValidRegExpValidator( RiaPreferences::defaultMultiLateralWellNamePattern() );
         }
     }
 }

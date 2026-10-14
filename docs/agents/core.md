@@ -385,10 +385,10 @@ m_comboBoxField.uiCapability()->setAttribute( caf::PdmUiComboBoxEditor::Keys::BU
 **Old pattern (deprecated):**
 ```cpp
 // In defineEditorAttribute() override
-auto* myAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute );
+auto* myAttr = dynamic_cast<caf::PdmUiSomeEditorAttribute*>( attribute );
 if ( myAttr )
 {
-    myAttr->notifyWhenTextIsEdited = true;
+    myAttr->someMember = true;
 }
 ```
 
