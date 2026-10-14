@@ -58,6 +58,7 @@ RimUserDefinedCalculation::RimUserDefinedCalculation()
                                 "Use the right-click menu inside the text area for quick access to operators and "
                                 "functions." );
     m_helpText.uiCapability()->setUiEditorTypeName( caf::PdmUiLabelEditor::uiEditorTypeName() );
+    m_helpText.uiCapability()->setAttribute( caf::PdmUiLabelEditor::Keys::USE_WORD_WRAP, true );
     m_helpText.xmlCapability()->disableIO();
     m_helpText = "Use the right-click menu inside the text area for quick access to operators and functions.";
 
@@ -384,14 +385,6 @@ void RimUserDefinedCalculation::defineEditorAttribute( const caf::PdmFieldHandle
         if ( myAttr )
         {
             myAttr->enableDropTarget = true;
-        }
-    }
-    else if ( field == &m_helpText )
-    {
-        auto* attrib = dynamic_cast<caf::PdmUiLabelEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_useWordWrap = true;
         }
     }
 }
