@@ -33,8 +33,8 @@
 
 #include "RiuPlotMainWindowTools.h"
 
-#include "cafPdmUiPropertyViewDialog.h"
 #include "cafPdmUiButton.h"
+#include "cafPdmUiPropertyViewDialog.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 
