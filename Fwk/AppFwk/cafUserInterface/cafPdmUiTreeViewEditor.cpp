@@ -222,26 +222,22 @@ QWidget* PdmUiTreeViewEditor::createWidget( QWidget* parent )
 //--------------------------------------------------------------------------------------------------
 void PdmUiTreeViewEditor::configureAndUpdateUi( const QString& uiConfigName )
 {
-    PdmUiTreeViewEditorAttribute editorAttributes;
-
-    {
-        PdmUiObjectHandle* uiObjectHandle = dynamic_cast<PdmUiObjectHandle*>( this->pdmItemRoot() );
-        if ( uiObjectHandle )
-        {
-            uiObjectHandle->objectEditorAttribute( uiConfigName, &editorAttributes );
-        }
-    }
-
-    m_treeViewModel->setColumnHeaders( editorAttributes.columnHeaders );
     m_treeViewModel->setUiConfigName( uiConfigName );
     m_treeViewModel->setPdmItemRoot( this->pdmItemRoot() );
 
-    if ( editorAttributes.currentObject )
+    if ( auto uiObjectHandle = dynamic_cast<PdmUiObjectHandle*>( this->pdmItemRoot() ) )
     {
-        PdmUiObjectHandle* uiObjectHandle = editorAttributes.currentObject->uiCapability();
-        if ( uiObjectHandle )
+        if ( auto currentObjectFunction =
+                 uiObjectHandle->attribute<std::function<PdmObjectHandle*()>>( Keys::CURRENT_OBJECT, uiConfigName );
+             currentObjectFunction && currentObjectFunction.value() )
         {
-            selectAsCurrentItem( uiObjectHandle );
+            if ( PdmObjectHandle* currentObject = currentObjectFunction.value()() )
+            {
+                if ( PdmUiObjectHandle* currentUiObject = currentObject->uiCapability() )
+                {
+                    selectAsCurrentItem( currentUiObject );
+                }
+            }
         }
     }
 
@@ -320,12 +316,14 @@ void PdmUiTreeViewEditor::updateMySubTree( PdmUiItem* uiItem, bool notifyEditors
         PdmUiObjectHandle* uiObjectHandle = dynamic_cast<PdmUiObjectHandle*>( uiItem );
         if ( uiObjectHandle )
         {
-            PdmUiTreeViewEditorAttribute editorAttributes;
-            QString                      uiConfigName;
-            uiObjectHandle->objectEditorAttribute( uiConfigName, &editorAttributes );
-            if ( editorAttributes.objectForUpdateOfUiTree )
+            auto updateObjectFunction =
+                uiObjectHandle->attribute<std::function<PdmObjectHandle*()>>( Keys::OBJECT_FOR_UPDATE_OF_UI_TREE );
+            if ( updateObjectFunction && updateObjectFunction.value() )
             {
-                itemToUpdate = editorAttributes.objectForUpdateOfUiTree->uiCapability();
+                if ( PdmObjectHandle* objectForUpdate = updateObjectFunction.value()() )
+                {
+                    itemToUpdate = objectForUpdate->uiCapability();
+                }
             }
         }
 

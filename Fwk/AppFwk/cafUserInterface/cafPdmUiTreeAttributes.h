@@ -85,25 +85,4 @@ public:
     std::vector<std::unique_ptr<Tag>> tags;
 };
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-class PdmUiTreeViewEditorAttribute : public PdmUiEditorAttribute
-{
-public:
-    PdmUiTreeViewEditorAttribute()
-        : currentObject( nullptr )
-        , objectForUpdateOfUiTree( nullptr )
-    {
-    }
-
-public:
-    QStringList columnHeaders;
-
-    /// This object is set as current item in the tree view in configureAndUpdateUi()
-    caf::PdmObjectHandle* currentObject;
-
-    caf::PdmObjectHandle* objectForUpdateOfUiTree;
-};
-
 } // namespace caf

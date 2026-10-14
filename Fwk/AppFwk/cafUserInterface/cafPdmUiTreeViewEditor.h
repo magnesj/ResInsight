@@ -52,6 +52,7 @@
 #include <QTreeView>
 #include <QWidget>
 
+#include <functional>
 #include <memory>
 
 class QGridLayout;
@@ -111,6 +112,15 @@ class PdmUiTreeViewEditor : public PdmUiTreeEditorHandle
 public:
     PdmUiTreeViewEditor();
     ~PdmUiTreeViewEditor() override;
+
+    // Attribute keys set on the root object of the tree, or on an object whose subtree is updated
+    struct Keys
+    {
+        // std::function<PdmObjectHandle*()>. The returned object is set as current item in the tree view
+        static inline const QString CURRENT_OBJECT = QStringLiteral( "currentObject" );
+        // std::function<PdmObjectHandle*()>. The returned object is updated in the tree instead of the object itself
+        static inline const QString OBJECT_FOR_UPDATE_OF_UI_TREE = QStringLiteral( "objectForUpdateOfUiTree" );
+    };
 
     void enableDefaultContextMenu( bool enable );
     void enableSelectionManagerUpdating( bool enable );
