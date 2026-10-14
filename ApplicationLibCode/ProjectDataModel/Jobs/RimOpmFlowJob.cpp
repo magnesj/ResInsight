@@ -106,6 +106,7 @@ RimOpmFlowJob::RimOpmFlowJob()
     m_deckFileName.uiCapability()->setUiReadOnly( true );
 
     CAF_PDM_InitFieldNoDefault( &m_workDir, "WorkDirectory", "Working Folder" );
+    m_workDir.uiCapability()->setAttribute( caf::PdmUiFilePathEditor::Keys::SELECT_DIRECTORY, true );
     CAF_PDM_InitFieldNoDefault( &m_wellPath, "WellPath", "Well Path for New Well" );
     CAF_PDM_InitFieldNoDefault( &m_eclipseCase, "EclipseCase", "Eclipse Case for Well Data", "", "Eclipse Case to use for Well Data" );
     CAF_PDM_InitFieldNoDefault( &m_gridEnsemble, "GridEnsemble", "Grid Ensemble" );
@@ -252,20 +253,6 @@ bool RimOpmFlowJob::matchesKeyValue( const QString& key, const QString& value ) 
         return ( m_deckFileName() == value );
     }
     return false;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimOpmFlowJob::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_workDir )
-    {
-        if ( auto myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute ) )
-        {
-            myAttr->m_selectDirectory = true;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

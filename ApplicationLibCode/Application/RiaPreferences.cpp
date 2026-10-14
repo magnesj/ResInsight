@@ -103,6 +103,8 @@ RiaPreferences::RiaPreferences()
 
     CAF_PDM_InitFieldNoDefault( &scriptDirectories, "scriptDirectory", "Shared Script Folder(s)" );
     scriptDirectories.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
+    scriptDirectories.uiCapability()->setAttribute( caf::PdmUiFilePathEditor::Keys::SELECT_DIRECTORY, true );
+    scriptDirectories.uiCapability()->setAttribute( caf::PdmUiFilePathEditor::Keys::APPEND_UI_SELECTED_FOLDER_TO_TEXT, true );
 
     // TODO: This only currently works for installed ResInsight.
     scriptDirectories = QCoreApplication::applicationDirPath() + "/Python/rips/PythonExamples";
@@ -221,6 +223,8 @@ RiaPreferences::RiaPreferences()
 
     CAF_PDM_InitFieldNoDefault( &m_plotTemplateFolders, "plotTemplateFolders", "Plot Template Folder(s)" );
     m_plotTemplateFolders.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
+    m_plotTemplateFolders.uiCapability()->setAttribute( caf::PdmUiFilePathEditor::Keys::SELECT_DIRECTORY, true );
+    m_plotTemplateFolders.uiCapability()->setAttribute( caf::PdmUiFilePathEditor::Keys::APPEND_UI_SELECTED_FOLDER_TO_TEXT, true );
     CAF_PDM_InitField( &m_maxPlotTemplateFoldersDepth, "MaxPlotTemplateFoldersDepth", 2, "Maximum Plot Template Folder Search Depth" );
 
     CAF_PDM_InitFieldNoDefault( &m_lastUsedPlotTemplate, "defaultPlotTemplate", "Default Plot Template" );
@@ -252,6 +256,8 @@ RiaPreferences::RiaPreferences()
     CAF_PDM_InitFieldNoDefault( &m_summaryCalculationExpressionFolder,
                                 "summaryCalculationExpressionFolder",
                                 "Summary Calculation Expression Folder" );
+    m_gridCalculationExpressionFolder.uiCapability()->setAttribute( caf::PdmUiFilePathEditor::Keys::SELECT_DIRECTORY, true );
+    m_summaryCalculationExpressionFolder.uiCapability()->setAttribute( caf::PdmUiFilePathEditor::Keys::SELECT_DIRECTORY, true );
 
     CAF_PDM_InitField( &m_surfaceImportResamplingDistance,
                        "SurfaceImportResamplingDistance",
@@ -315,28 +321,6 @@ RiaPreferences::~RiaPreferences()
 RiaPreferences* RiaPreferences::current()
 {
     return RiaApplication::instance()->preferences();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiaPreferences::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    {
-        caf::PdmUiFilePathEditorAttribute* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            if ( field == &scriptDirectories || field == &m_plotTemplateFolders )
-            {
-                myAttr->m_selectDirectory              = true;
-                myAttr->m_appendUiSelectedFolderToText = true;
-            }
-            else if ( field == &m_gridCalculationExpressionFolder || field == &m_summaryCalculationExpressionFolder )
-            {
-                myAttr->m_selectDirectory = true;
-            }
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

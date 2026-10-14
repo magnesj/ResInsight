@@ -102,6 +102,7 @@ RimEclipseResultCase::RimEclipseResultCase()
 
     CAF_PDM_InitFieldNoDefault( &m_sourSimFileName, "SourSimFileName", "SourSim File Name" );
     m_sourSimFileName.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
+    m_sourSimFileName.uiCapability()->setAttribute( caf::PdmUiFilePathEditor::Keys::FILE_SELECTION_FILTER, QString( "SourSim (*.sourres)" ) );
 #ifndef USE_HDF5
     m_sourSimFileName.uiCapability()->setUiHidden( true );
 #endif
@@ -774,6 +775,8 @@ bool RimEclipseResultCase::hasSourSimFile()
 //--------------------------------------------------------------------------------------------------
 void RimEclipseResultCase::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
+    m_sourSimFileName.uiCapability()->setAttribute( caf::PdmUiFilePathEditor::Keys::DEFAULT_PATH, QFileInfo( gridFileName() ).absolutePath() );
+
     uiOrdering.add( &m_caseUserDescription );
     uiOrdering.add( &m_displayNameOption );
     uiOrdering.add( &m_caseId );
@@ -820,22 +823,6 @@ void RimEclipseResultCase::fieldChangedByUi( const caf::PdmFieldHandle* changedF
     }
 
     return RimEclipseCase::fieldChangedByUi( changedField, oldValue, newValue );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimEclipseResultCase::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_sourSimFileName )
-    {
-        auto* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_fileSelectionFilter = "SourSim (*.sourres)";
-            myAttr->m_defaultPath         = QFileInfo( gridFileName() ).absolutePath();
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

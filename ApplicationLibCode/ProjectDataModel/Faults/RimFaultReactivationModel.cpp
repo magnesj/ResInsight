@@ -81,6 +81,7 @@ RimFaultReactivationModel::RimFaultReactivationModel()
     CAF_PDM_InitField( &m_userDescription, "UserDescription", QString( "Model" ), "Name" );
     CAF_PDM_InitFieldNoDefault( &m_geomechCase, "GeoMechCase", "Global GeoMech Model" );
     CAF_PDM_InitFieldNoDefault( &m_baseDir, "BaseDirectory", "Working Folder" );
+    m_baseDir.uiCapability()->setAttribute( caf::PdmUiFilePathEditor::Keys::SELECT_DIRECTORY, true );
     CAF_PDM_InitField( &m_modelThickness, "ModelThickness", 100.0, "Model Cell Thickness" );
 
     CAF_PDM_InitField( &m_modelExtentFromAnchor, "ModelExtentFromAnchor", 1000.0, "Horz. Extent from Anchor" );
@@ -561,14 +562,7 @@ void RimFaultReactivationModel::fieldChangedByUi( const caf::PdmFieldHandle* cha
 //--------------------------------------------------------------------------------------------------
 void RimFaultReactivationModel::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_baseDir )
-    {
-        if ( auto myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute ) )
-        {
-            myAttr->m_selectDirectory = true;
-        }
-    }
-    else if ( ( field == &m_faultExtendUpwards ) || ( field == &m_faultExtendDownwards ) )
+    if ( ( field == &m_faultExtendUpwards ) || ( field == &m_faultExtendDownwards ) )
     {
         if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
         {
