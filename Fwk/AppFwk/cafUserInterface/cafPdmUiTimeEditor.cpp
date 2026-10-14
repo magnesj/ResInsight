@@ -40,6 +40,7 @@
 #include "cafPdmField.h"
 #include "cafPdmLogging.h"
 #include "cafPdmObject.h"
+#include "cafPdmUiAttributeTools.h"
 #include "cafPdmUiDefaultObjectEditor.h"
 #include "cafPdmUiFieldEditorHandle.h"
 #include "cafSelectionManager.h"
@@ -71,7 +72,8 @@ void PdmUiTimeEditor::configureAndUpdateUi( const QString& uiConfigName )
 
     uiField()->validateAttributes( "PdmUiTimeEditor", SUPPORTED_ATTRIBUTES, uiConfigName );
 
-    QString timeFormat = uiField()->attributeString( Keys::TIME_FORMAT, uiConfigName ).value_or( QString() );
+    QString timeFormat =
+        PdmUiAttributeTools::stringAttribute( uiField(), Keys::TIME_FORMAT, uiConfigName ).value_or( QString() );
 
     if ( !timeFormat.isEmpty() )
     {

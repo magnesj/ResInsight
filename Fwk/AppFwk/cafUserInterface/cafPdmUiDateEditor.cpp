@@ -40,6 +40,7 @@
 #include "cafPdmField.h"
 #include "cafPdmLogging.h"
 #include "cafPdmObject.h"
+#include "cafPdmUiAttributeTools.h"
 #include "cafPdmUiDefaultObjectEditor.h"
 #include "cafPdmUiFieldEditorHandle.h"
 #include "cafSelectionManager.h"
@@ -103,7 +104,7 @@ void PdmUiDateEditor::setFormat( PdmUiItem* uiItem, std::function<QString()> for
 //--------------------------------------------------------------------------------------------------
 QString PdmUiDateEditor::dateFormat( const PdmUiItem* uiItem, const QString& uiConfigName )
 {
-    return uiItem->attributeString( Keys::DATE_FORMAT, uiConfigName ).value_or( QString() );
+    return PdmUiAttributeTools::stringAttribute( uiItem, Keys::DATE_FORMAT, uiConfigName ).value_or( QString() );
 }
 
 //--------------------------------------------------------------------------------------------------

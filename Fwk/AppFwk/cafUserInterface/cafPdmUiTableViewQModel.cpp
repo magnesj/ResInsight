@@ -37,6 +37,7 @@
 #include "cafPdmUiTableViewQModel.h"
 
 #include "cafPdmChildArrayField.h"
+#include "cafPdmUiAttributeTools.h"
 #include "cafPdmUiCommandSystemProxy.h"
 #include "cafPdmUiDateEditor.h"
 #include "cafPdmUiFieldEditorHelper.h"
@@ -263,9 +264,10 @@ QVariant PdmUiTableViewQModel::data( const QModelIndex& index, int role /*= Qt::
                 // virtual void            defineDisplayString(const PdmFieldHandle* field, QString uiConfigName) {}
 
                 {
-                    QString displayString =
-                        uiFieldHandle->attributeString( PdmUiLineEditor::Keys::DISPLAY_STRING, m_currentConfigName )
-                            .value_or( QString() );
+                    QString displayString = PdmUiAttributeTools::stringAttribute( uiFieldHandle,
+                                                                                  PdmUiLineEditor::Keys::DISPLAY_STRING,
+                                                                                  m_currentConfigName )
+                                                .value_or( QString() );
                     if ( !displayString.isEmpty() ) val = displayString;
                 }
 
