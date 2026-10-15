@@ -64,11 +64,15 @@ class ResInsightMCP:
         self.instance: Instance | None = None
         self.read_only = read_only
         self._pdm_objects: dict[str, Any] = {}
-        self.allowed_pdm_methods = allowed_pdm_methods or self._configured_allowlist(
-            "RESINSIGHT_MCP_ALLOWED_PDM_METHODS"
+        self.allowed_pdm_methods = (
+            allowed_pdm_methods
+            if allowed_pdm_methods is not None
+            else self._configured_allowlist("RESINSIGHT_MCP_ALLOWED_PDM_METHODS")
         )
-        self.allowed_pdm_fields = allowed_pdm_fields or self._configured_allowlist(
-            "RESINSIGHT_MCP_ALLOWED_PDM_FIELDS"
+        self.allowed_pdm_fields = (
+            allowed_pdm_fields
+            if allowed_pdm_fields is not None
+            else self._configured_allowlist("RESINSIGHT_MCP_ALLOWED_PDM_FIELDS")
         )
         export_path = export_directory or os.environ.get(
             "RESINSIGHT_EXPORT_DIR", str(Path.cwd() / "resinsight_exports")
@@ -323,12 +327,23 @@ class ResInsightMCP:
                     f"No grid case with id {case_id} exists in the project."
                 )
         for case in cases:
-            selected_cells = case.selected_cells()
-            if selected_cells:
+            total_count = 0
+            page = []
+            if hasattr(case, "selected_cells_async"):
+                for chunk in case.selected_cells_async():
+                    for cell in chunk.cells:
+                        if start <= total_count < start + limit:
+                            page.append(cell)
+                        total_count += 1
+            else:
+                selected_cells = case.selected_cells()
+                total_count = len(selected_cells)
+                page = selected_cells[start : start + limit]
+            if total_count:
                 return {
                     "case_id": case.id,
                     "case_name": case.name,
-                    "total_count": len(selected_cells),
+                    "total_count": total_count,
                     "start": start,
                     "cells": [
                         {
@@ -337,7 +352,7 @@ class ResInsightMCP:
                             "j": cell.ijk.j + 1,
                             "k": cell.ijk.k + 1,
                         }
-                        for cell in selected_cells[start : start + limit]
+                        for cell in page
                     ],
                 }
         return {
@@ -854,8 +869,8 @@ def main() -> None:
     create_server(
         arguments.read_only,
         arguments.export_directory,
-        set(arguments.allow_pdm_method),
-        set(arguments.allow_pdm_field),
+        set(arguments.allow_pdm_method) or None,
+        set(arguments.allow_pdm_field) or None,
     ).run(transport="stdio")
 
 

@@ -286,6 +286,7 @@ def test_view_and_selected_cell_tools_summarize_gui_state():
         id=7,
         name="Example",
         selected_cells=lambda: selected,
+        selected_cells_async=lambda: iter([SimpleNamespace(cells=selected)]),
     )
     cell_result = SimpleNamespace(result_type="STATIC_NATIVE", result_variable="PORO")
     view = SimpleNamespace(
@@ -315,6 +316,7 @@ def test_view_and_selected_cell_tools_summarize_gui_state():
     assert service.get_selected_cells()["cells"] == [
         {"grid_index": 0, "i": 2, "j": 3, "k": 4}
     ]
+    assert service.get_selected_cells(start=1)["cells"] == []
 
 
 def test_read_only_blocks_mutations():
