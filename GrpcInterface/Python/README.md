@@ -13,12 +13,23 @@ pip install "rips[mcp]"
 rips-mcp
 ```
 
-By default, the server attaches to ResInsight on `localhost:50051`. Set
-`RESINSIGHT_PORT` to use another port, or set `RESINSIGHT_EXECUTABLE` and call
-the server's `connect` tool with `launch=true` to launch ResInsight. The MCP
-server is single-instance. Use `--read-only` to disable case imports and
-exports. Property statistics are streamed and raw grid arrays are never
-returned; summary vectors and well lists are paged.
+By default, the server discovers ResInsight instances on ports `50051`–`50070`
+and requires an explicit port if more than one is running. Set
+`RESINSIGHT_GRPC_PORT` (or `RESINSIGHT_PORT`) to select one, or pass `port` to
+`connect`. Set `RESINSIGHT_EXECUTABLE` and call `connect` with `launch=true` to
+launch ResInsight. Use `--read-only` to disable imports, exports, and PDM
+mutations. Property statistics are streamed and raw grid arrays are never
+returned; summary vectors, wells, and selected cells are paged.
+
+Case and summary imports require `RESINSIGHT_MCP_ALLOWED_DIRS` to contain
+absolute input roots separated by the platform path separator (`:` on Linux
+and macOS, `;` on Windows). Paths are resolved before validation, so symlinks
+cannot escape the configured directories. For generic PDM updates and calls,
+explicitly allow each `Class.field` with `--allow-pdm-field` or
+`RESINSIGHT_MCP_ALLOWED_PDM_FIELDS`, and each `Class.method` with
+`--allow-pdm-method` or `RESINSIGHT_MCP_ALLOWED_PDM_METHODS`. File- and
+directory-like arguments to allowed methods are still checked against the
+input roots.
 
 Property and snapshot exports are restricted to the configured export
 directory. Snapshot exports use a fresh subdirectory. Set
@@ -34,7 +45,7 @@ the MCP stdio configuration format:
       "command": "rips-mcp",
       "args": ["--read-only"],
       "env": {
-        "RESINSIGHT_PORT": "50051"
+        "RESINSIGHT_GRPC_PORT": "50051"
       }
     }
   }
@@ -52,5 +63,7 @@ After connecting, tools include `list_cases`, `case_info`,
 to the allow-listed export directory and return paths. Generic PDM tools use
 session-local object IDs returned by `list_pdm_objects`; use `list_pdm_classes`
 to discover generated object types. Field updates and method calls are omitted
-in read-only mode. Use `resinsight://project` and
+in read-only mode and require explicit class-qualified allow-lists otherwise.
+`list_views` and `get_selected_cells` expose GUI state; `export_view_snapshot`
+writes an inline image when mutation tools are enabled. Use `resinsight://project` and
 `resinsight://case/{case_id}` to inspect project resources.

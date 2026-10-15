@@ -5,10 +5,9 @@ import types
 from pathlib import Path
 from types import SimpleNamespace
 
-import grpc
 import pytest
 
-from rips import RipsError, mcp_server
+from rips import mcp_server
 
 import dataroot
 
@@ -55,14 +54,15 @@ def test_connect_uses_port_environment_variable(monkeypatch):
     calls = []
     monkeypatch.setenv("RESINSIGHT_PORT", "50052")
     monkeypatch.setattr(
-        mcp_server.Instance,
-        "find",
-        staticmethod(lambda **kwargs: calls.append(kwargs) or FakeInstance()),
+        mcp_server.ResInsightMCP,
+        "_find_running_ports",
+        staticmethod(lambda ports: calls.append(ports) or [50052]),
     )
+    monkeypatch.setattr(mcp_server, "Instance", lambda port: FakeInstance())
 
     result = mcp_server.ResInsightMCP().connect()
 
-    assert calls == [{"start_port": 50052, "end_port": 50053}]
+    assert calls == [[50052]]
     assert result == {
         "connected": True,
         "host": "localhost",
@@ -72,13 +72,10 @@ def test_connect_uses_port_environment_variable(monkeypatch):
 
 
 def test_connect_reports_unavailable_resinsight_actionably(monkeypatch):
-    def unavailable(**kwargs):
-        raise RipsError("not available", code=grpc.StatusCode.UNAVAILABLE)
-
     monkeypatch.setattr(
-        mcp_server.Instance,
-        "find",
-        staticmethod(unavailable),
+        mcp_server.ResInsightMCP,
+        "_find_running_ports",
+        staticmethod(lambda ports: []),
     )
 
     with pytest.raises(RuntimeError, match="call connect with launch=true"):
@@ -86,6 +83,17 @@ def test_connect_reports_unavailable_resinsight_actionably(monkeypatch):
 
     with pytest.raises(ValueError, match="localhost"):
         mcp_server.ResInsightMCP().connect(host="remote.example")
+
+
+def test_connect_rejects_ambiguous_instance_discovery(monkeypatch):
+    monkeypatch.setattr(
+        mcp_server.ResInsightMCP,
+        "_find_running_ports",
+        staticmethod(lambda ports: [50051, 50052]),
+    )
+
+    with pytest.raises(RuntimeError, match=r"50051, 50052"):
+        mcp_server.ResInsightMCP().connect()
 
 
 def test_read_only_tools_return_summaries_and_statistics():
@@ -149,6 +157,9 @@ def test_generic_pdm_tools_use_discovered_object_ids(monkeypatch):
     class FakeProject(FakePdmObject):
         class_keyword = "Project"
 
+        def address(self):
+            return 456
+
         def descendants(self, object_class):
             return [pdm_object]
 
@@ -172,7 +183,10 @@ def test_generic_pdm_tools_use_discovered_object_ids(monkeypatch):
 
     pdm_object = FakePdmObject()
     project = FakeProject()
-    service = mcp_server.ResInsightMCP()
+    service = mcp_server.ResInsightMCP(
+        allowed_pdm_methods={"SimulationWell.rename_well"},
+        allowed_pdm_fields={"SimulationWell.well_name"},
+    )
     service.instance = SimpleNamespace(project=project)
     assert service.list_pdm_classes()["class_keywords"] == [
         "Project",
@@ -183,7 +197,7 @@ def test_generic_pdm_tools_use_discovered_object_ids(monkeypatch):
 
     assert object_id == "123"
     root_object = service.list_pdm_objects("Project")["objects"][0]
-    assert root_object["object_id"] == "123"
+    assert root_object["object_id"] == "456"
     assert root_object["class_keyword"] == "Project"
     assert service.pdm_get_fields(object_id)["fields"]["well_name"] == "WELL-A"
     assert service.pdm_set_field(object_id, "well_name", "WELL-B")["updated"]
@@ -191,6 +205,116 @@ def test_generic_pdm_tools_use_discovered_object_ids(monkeypatch):
         service.pdm_call_method(object_id, "rename_well", {"name": "WELL-C"})
         == "WELL-C"
     )
+
+
+def test_generic_pdm_mutations_require_explicit_allowlists(tmp_path, monkeypatch):
+    class FakePdmObject:
+        def __init__(self):
+            self.parameters = {"FilePath": ""}
+
+        def address(self):
+            return 99
+
+        def pb2_object(self):
+            return SimpleNamespace(class_keyword="Example", parameters=self.parameters)
+
+        def set_value(self, field_name, value):
+            self.parameters["FilePath"] = value
+
+        def import_file(self, path):
+            return path
+
+    obj = FakePdmObject()
+    service = mcp_server.ResInsightMCP()
+    service._remember_pdm_object(obj)
+    with pytest.raises(PermissionError, match="not enabled"):
+        service.pdm_set_field("99", "file_path", "/tmp/input.dat")
+    with pytest.raises(PermissionError, match="not enabled"):
+        service.pdm_call_method("99", "import_file", {"path": "/tmp/input.dat"})
+
+    service.allowed_pdm_fields.add("Example.file_path")
+    service.allowed_pdm_methods.add("Example.import_file")
+    monkeypatch.setenv("RESINSIGHT_MCP_ALLOWED_DIRS", str(tmp_path))
+    with pytest.raises(PermissionError, match="RESINSIGHT_MCP_ALLOWED_DIRS"):
+        service.pdm_set_field("99", "file_path", "/tmp/input.dat")
+    with pytest.raises(PermissionError, match="RESINSIGHT_MCP_ALLOWED_DIRS"):
+        service.pdm_call_method("99", "import_file", {"path": "/tmp/input.dat"})
+
+
+def test_snapshot_tool_returns_an_image_under_the_export_directory(tmp_path):
+    def export_snapshot(export_folder, prefix):
+        assert prefix == "view"
+        (Path(export_folder) / "view.png").write_bytes(b"png")
+
+    view = SimpleNamespace(id=4, export_snapshot=export_snapshot)
+    instance = SimpleNamespace(
+        project=SimpleNamespace(views=lambda: [view]),
+        is_gui=lambda: True,
+    )
+    service = mcp_server.ResInsightMCP(export_directory=str(tmp_path))
+    service.instance = instance
+
+    image = service.export_view_snapshot()
+
+    assert Path(image.path).name == "view.png"
+    assert Path(image.path).is_relative_to(tmp_path)
+
+
+def test_file_imports_require_paths_inside_configured_allowlist(tmp_path, monkeypatch):
+    allowed = tmp_path / "allowed"
+    blocked = tmp_path / "blocked"
+    allowed.mkdir()
+    blocked.mkdir()
+    monkeypatch.setenv("RESINSIGHT_MCP_ALLOWED_DIRS", str(allowed))
+    service = mcp_server.ResInsightMCP()
+
+    assert service._validate_input_path(
+        str(allowed / "case.EGRID"), "load_case"
+    ) == str(allowed / "case.EGRID")
+    with pytest.raises(PermissionError, match="outside"):
+        service._validate_input_path(str(blocked / "case.EGRID"), "load_case")
+
+
+def test_view_and_selected_cell_tools_summarize_gui_state():
+    selected = [
+        SimpleNamespace(
+            grid_index=0,
+            ijk=SimpleNamespace(i=1, j=2, k=3),
+        )
+    ]
+    case = SimpleNamespace(
+        id=7,
+        name="Example",
+        selected_cells=lambda: selected,
+    )
+    cell_result = SimpleNamespace(result_type="STATIC_NATIVE", result_variable="PORO")
+    view = SimpleNamespace(
+        id=3,
+        current_time_step=2,
+        grid_z_scale=1.0,
+        case=lambda: case,
+        cell_result=lambda: cell_result,
+    )
+    service = mcp_server.ResInsightMCP()
+    service.instance = SimpleNamespace(
+        project=SimpleNamespace(views=lambda: [view], cases=lambda: [case])
+    )
+
+    assert service.list_views() == [
+        {
+            "id": 3,
+            "type": "SimpleNamespace",
+            "case_id": 7,
+            "case_name": "Example",
+            "current_time_step": 2,
+            "grid_z_scale": 1.0,
+            "result_type": "STATIC_NATIVE",
+            "result_variable": "PORO",
+        }
+    ]
+    assert service.get_selected_cells()["cells"] == [
+        {"grid_index": 0, "i": 2, "j": 3, "k": 4}
+    ]
 
 
 def test_read_only_blocks_mutations():
@@ -254,12 +378,18 @@ def test_create_server_registers_mutations_only_when_enabled():
     assert "export_snapshots" in mutable_names
     assert "pdm_set_field" in mutable_names
     assert "pdm_call_method" in mutable_names
+    assert "list_views" in read_only_names
+    assert "get_selected_cells" in read_only_names
+    assert "export_view_snapshot" not in read_only_names
 
 
-def test_mcp_workflow_with_running_resinsight(rips_instance, initialize_test):
+def test_mcp_workflow_with_running_resinsight(
+    rips_instance, initialize_test, monkeypatch
+):
     service = mcp_server.ResInsightMCP()
     service.instance = rips_instance
     case_path = dataroot.PATH + "/TEST10K_FLT_LGR_NNC/TEST10K_FLT_LGR_NNC.EGRID"
+    monkeypatch.setenv("RESINSIGHT_MCP_ALLOWED_DIRS", dataroot.PATH)
 
     loaded_case = service.load_case(case_path)
     properties = service.list_grid_properties(
