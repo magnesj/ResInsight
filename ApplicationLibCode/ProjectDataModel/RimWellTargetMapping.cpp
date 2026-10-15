@@ -441,10 +441,10 @@ void RimWellTargetMapping::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
 
     auto setSliderRange = []( auto& field, double minimum, double maximum )
     {
-        if ( minimum == cvf::UNDEFINED_DOUBLE || maximum == cvf::UNDEFINED_DOUBLE ) return;
-
-        field.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MINIMUM, minimum );
-        field.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MAXIMUM, maximum );
+        if ( minimum == cvf::UNDEFINED_DOUBLE || maximum == cvf::UNDEFINED_DOUBLE )
+            caf::PdmUiDoubleSliderEditor::clearRange( field.uiCapability() );
+        else
+            caf::PdmUiDoubleSliderEditor::setRange( field.uiCapability(), minimum, maximum );
         field.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::DECIMALS, 3 );
     };
     setSliderRange( m_saturationOil, m_minimumSaturationOil, m_maximumSaturationOil );

@@ -38,6 +38,7 @@
 #include <QStringList>
 
 #include <map>
+#include <memory>
 #include <string>
 
 class RiaPreferencesSummary;
@@ -49,6 +50,8 @@ class RiaPreferencesSumo;
 class RiaPreferencesOpm;
 class RiaPreferencesOpenTelemetry;
 class RiaPreferencesCloudApi;
+
+class QValidator;
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -221,7 +224,8 @@ private:
     caf::PdmField<double> m_surfaceImportResamplingDistance;
 
     // Well Path Import
-    caf::PdmField<QString> m_multiLateralWellPattern;
+    caf::PdmField<QString>      m_multiLateralWellPattern;
+    std::unique_ptr<QValidator> m_multiLateralWellPatternValidator;
 
     // Grid import
     caf::PdmChildField<RiaPreferencesGrid*> m_gridPreferences;

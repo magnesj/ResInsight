@@ -39,6 +39,8 @@ public:
     RimWellPathTarget();
     ~RimWellPathTarget() override;
 
+    static QString formatCoordinate( const cvf::Vec3d& v );
+
     void setEnabled( bool enable );
     bool isEnabled() const;
 

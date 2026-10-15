@@ -87,10 +87,14 @@ void PdmUiLabelEditor::configureAndUpdateUi( const QString& uiConfigName )
         PdmUiFieldEditorHandle::updateLabelFromField( m_label, uiConfigName );
     }
 
+    // Called on every UI update, so drop the previous connection to avoid invoking the callback multiple times
+    disconnect( m_label, &QLabel::linkActivated, this, nullptr );
+
     if ( linkActivatedCallback && linkActivatedCallback.value() )
     {
         connect( m_label,
                  &QLabel::linkActivated,
+                 this,
                  [callback = linkActivatedCallback.value()]( const QString& link ) { callback( link ); } );
     }
 }

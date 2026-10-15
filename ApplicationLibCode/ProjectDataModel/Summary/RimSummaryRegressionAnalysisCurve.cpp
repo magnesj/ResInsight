@@ -496,10 +496,14 @@ void RimSummaryRegressionAnalysisCurve::defineUiOrdering( QString uiConfigName, 
 
     auto setValueRangeLimits = []( auto& field, const std::vector<double>& values )
     {
-        if ( values.empty() ) return;
+        if ( values.empty() )
+        {
+            caf::PdmUiDoubleSliderEditor::clearRange( field.uiCapability() );
+            return;
+        }
 
-        field.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MINIMUM, *std::min_element( values.begin(), values.end() ) );
-        field.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MAXIMUM, *std::max_element( values.begin(), values.end() ) );
+        auto [minIt, maxIt] = std::minmax_element( values.begin(), values.end() );
+        caf::PdmUiDoubleSliderEditor::setRange( field.uiCapability(), *minIt, *maxIt );
     };
     setValueRangeLimits( m_valueRangeX, m_sourceValuesX );
     setValueRangeLimits( m_valueRangeY, m_sourceValuesY );

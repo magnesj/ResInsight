@@ -406,11 +406,8 @@ void RimCellRangeFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
 
     if ( auto counts = filterCellCounts() )
     {
-        auto setRange = [&]( caf::PdmFieldHandle& field, size_t maximum )
-        {
-            field.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MINIMUM, 1 );
-            field.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MAXIMUM, static_cast<int>( maximum ) );
-        };
+        auto setRange = []( caf::PdmFieldHandle& field, size_t maximum )
+        { caf::PdmUiSliderEditor::setRange( field.uiCapability(), 1, static_cast<int>( maximum ) ); };
 
         setRange( startIndexI, counts->x() );
         setRange( cellCountI, counts->x() );
@@ -418,6 +415,13 @@ void RimCellRangeFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
         setRange( cellCountJ, counts->y() );
         setRange( startIndexK, counts->z() );
         setRange( cellCountK, counts->z() );
+    }
+    else
+    {
+        for ( auto* field : { &startIndexI, &cellCountI, &startIndexJ, &cellCountJ, &startIndexK, &cellCountK } )
+        {
+            caf::PdmUiSliderEditor::clearRange( field->uiCapability() );
+        }
     }
 
     uiOrdering.skipRemainingFields( true );

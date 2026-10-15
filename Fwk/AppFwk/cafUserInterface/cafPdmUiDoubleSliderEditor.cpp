@@ -67,6 +67,24 @@ PdmUiDoubleSliderEditor::~PdmUiDoubleSliderEditor()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void PdmUiDoubleSliderEditor::setRange( PdmUiItem* uiItem, double minimum, double maximum )
+{
+    uiItem->setAttribute( Keys::MINIMUM, minimum );
+    uiItem->setAttribute( Keys::MAXIMUM, maximum );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void PdmUiDoubleSliderEditor::clearRange( PdmUiItem* uiItem )
+{
+    uiItem->removeAttribute( Keys::MINIMUM );
+    uiItem->removeAttribute( Keys::MAXIMUM );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void PdmUiDoubleSliderEditor::configureAndUpdateUi( const QString& uiConfigName )
 {
     CAF_ASSERT( !m_lineEdit.isNull() );

@@ -399,7 +399,11 @@ std::vector<caf::PdmUiTreeViewItemTag> RimPolygonInView::treeItemTags()
                                                       RiuGuiTheme::getColorByVariableName( "backgroundColor1" ),
                                                       "---" );
 
-        tag.clicked = [target = m_polygon()]( size_t index ) { target->onColorTagClicked( nullptr, index ); };
+        // The polygon is not owned by this object, so it can be deleted independently
+        tag.clicked = [target = caf::PdmPointer<RimPolygon>( m_polygon() )]( size_t index )
+        {
+            if ( target ) target->onColorTagClicked( nullptr, index );
+        };
 
         tags.push_back( tag );
 

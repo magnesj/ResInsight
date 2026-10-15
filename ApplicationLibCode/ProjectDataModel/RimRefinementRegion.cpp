@@ -259,11 +259,8 @@ void RimRefinementRegion::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
 
     if ( auto grid = mainGrid() )
     {
-        auto setRange = [&]( caf::PdmFieldHandle& field, size_t maximum )
-        {
-            field.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MINIMUM, 1 );
-            field.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MAXIMUM, static_cast<int>( maximum ) );
-        };
+        auto setRange = []( caf::PdmFieldHandle& field, size_t maximum )
+        { caf::PdmUiSliderEditor::setRange( field.uiCapability(), 1, static_cast<int>( maximum ) ); };
 
         setRange( m_startI, grid->cellCountI() );
         setRange( m_cellCountI, grid->cellCountI() );
@@ -271,6 +268,13 @@ void RimRefinementRegion::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
         setRange( m_cellCountJ, grid->cellCountJ() );
         setRange( m_startK, grid->cellCountK() );
         setRange( m_cellCountK, grid->cellCountK() );
+    }
+    else
+    {
+        for ( auto* field : { &m_startI, &m_cellCountI, &m_startJ, &m_cellCountJ, &m_startK, &m_cellCountK } )
+        {
+            caf::PdmUiSliderEditor::clearRange( field->uiCapability() );
+        }
     }
 
     auto* appearanceGroup = uiOrdering.addNewGroup( "Appearance" );

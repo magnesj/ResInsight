@@ -40,6 +40,7 @@
 #include "cafPdmField.h"
 #include "cafPdmFieldReorderCapability.h"
 #include "cafPdmObject.h"
+#include "cafPdmPointer.h"
 #include "cafPdmPtrArrayFieldHandle.h"
 #include "cafPdmUiCommandSystemProxy.h"
 #include "cafPdmUiDragDropInterface.h"
@@ -594,6 +595,21 @@ bool PdmUiTreeViewEditor::updateSelectionManager()
 }
 
 //--------------------------------------------------------------------------------------------------
+/// The delegate keeps tags until the next rebuild, so the owner may be deleted before a click
+//--------------------------------------------------------------------------------------------------
+static PdmUiTreeViewItemTag guardedTag( PdmUiTreeViewItemTag tag, PdmObjectHandle* owner )
+{
+    if ( tag.clicked )
+    {
+        tag.clicked = [owner = PdmPointer<PdmObjectHandle>( owner ), clicked = std::move( tag.clicked )]( size_t index )
+        {
+            if ( owner.notNull() ) clicked( index );
+        };
+    }
+    return tag;
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 void PdmUiTreeViewEditor::updateItemDelegateForSubTree( const QModelIndex& subRootIndex /* = QModelIndex() */ )
@@ -638,7 +654,7 @@ void PdmUiTreeViewEditor::updateItemDelegateForSubTree( const QModelIndex& subRo
                             tag.icon.setActive( false );
                         }
 
-                        m_delegate->addTag( filterIndex, tag );
+                        m_delegate->addTag( filterIndex, guardedTag( tag, pdmObject ) );
                     }
                     {
                         auto tag         = PdmUiTreeViewItemTag::create();
@@ -652,7 +668,7 @@ void PdmUiTreeViewEditor::updateItemDelegateForSubTree( const QModelIndex& subRo
                         {
                             tag.icon.setActive( false );
                         }
-                        m_delegate->addTag( filterIndex, tag );
+                        m_delegate->addTag( filterIndex, guardedTag( tag, pdmObject ) );
                     }
                 }
             }
@@ -664,7 +680,7 @@ void PdmUiTreeViewEditor::updateItemDelegateForSubTree( const QModelIndex& subRo
                 {
                     if ( !tag.text.isEmpty() || tag.icon.valid() )
                     {
-                        m_delegate->addTag( filterIndex, tag );
+                        m_delegate->addTag( filterIndex, guardedTag( tag, uiObjectHandle->objectHandle() ) );
                     }
                 }
             }

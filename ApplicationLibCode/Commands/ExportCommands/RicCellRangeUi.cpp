@@ -277,11 +277,8 @@ void RicCellRangeUi::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
 
     if ( const cvf::StructGridInterface* grid = RigReservoirGridTools::gridByIndex( m_case, m_gridIndex() ) )
     {
-        auto setRange = [&]( caf::PdmFieldHandle& field, size_t maximum )
-        {
-            field.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MINIMUM, 1 );
-            field.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MAXIMUM, static_cast<int>( maximum ) );
-        };
+        auto setRange = []( caf::PdmFieldHandle& field, size_t maximum )
+        { caf::PdmUiSliderEditor::setRange( field.uiCapability(), 1, static_cast<int>( maximum ) ); };
 
         setRange( m_startIndexI, grid->cellCountI() );
         setRange( m_cellCountI, grid->cellCountI() );
@@ -289,6 +286,13 @@ void RicCellRangeUi::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
         setRange( m_cellCountJ, grid->cellCountJ() );
         setRange( m_startIndexK, grid->cellCountK() );
         setRange( m_cellCountK, grid->cellCountK() );
+    }
+    else
+    {
+        for ( auto* field : { &m_startIndexI, &m_cellCountI, &m_startIndexJ, &m_cellCountJ, &m_startIndexK, &m_cellCountK } )
+        {
+            caf::PdmUiSliderEditor::clearRange( field->uiCapability() );
+        }
     }
 
     updateLegendText();

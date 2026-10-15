@@ -39,6 +39,7 @@
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTextEditor.h"
+#include "cafPdmUiTreeViewEditor.h"
 
 CAF_PDM_SOURCE_INIT( RimGridCrossPlotRegressionCurve, "GridCrossPlotRegressionCurve" );
 
@@ -64,6 +65,9 @@ RimGridCrossPlotRegressionCurve::RimGridCrossPlotRegressionCurve()
     , m_groupIndex( 0 )
 {
     CAF_PDM_InitObject( "Cross Plot Regression Curve", ":/WellLogCurve16x16.png" );
+
+    // The color tag from RimPlotCurve is not used for Grid Cross Plot Curves
+    uiCapability()->removeAttribute( caf::PdmUiTreeViewEditor::Keys::TREE_ITEM_TAGS );
 
     CAF_PDM_InitFieldNoDefault( &m_regressionType, "RegressionType", "Type" );
 
@@ -371,15 +375,6 @@ void RimGridCrossPlotRegressionCurve::defineUiOrdering( QString uiConfigName, ca
     RimPlotCurve::appearanceUiOrdering( *appearanceGroup );
 
     uiOrdering.skipRemainingFields( true );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimGridCrossPlotRegressionCurve::defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    // Implement an empty method to avoid the base class implementation in RimPlotCurve
-    // The color tag is not used for Grid Cross Plot Curves
 }
 
 //--------------------------------------------------------------------------------------------------

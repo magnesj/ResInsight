@@ -54,6 +54,24 @@ CAF_PDM_UI_FIELD_EDITOR_SOURCE_INIT( PdmUiSliderEditor );
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void PdmUiSliderEditor::setRange( PdmUiItem* uiItem, int minimum, int maximum )
+{
+    uiItem->setAttribute( Keys::MINIMUM, minimum );
+    uiItem->setAttribute( Keys::MAXIMUM, maximum );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void PdmUiSliderEditor::clearRange( PdmUiItem* uiItem )
+{
+    uiItem->removeAttribute( Keys::MINIMUM );
+    uiItem->removeAttribute( Keys::MAXIMUM );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void PdmUiSliderEditor::configureAndUpdateUi( const QString& uiConfigName )
 {
     CAF_ASSERT( !m_spinBox.isNull() );

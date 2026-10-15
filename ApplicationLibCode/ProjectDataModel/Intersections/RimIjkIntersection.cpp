@@ -434,11 +434,8 @@ void RimIjkIntersection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
 
     if ( grid )
     {
-        auto setRange = [&]( caf::PdmFieldHandle& field, int maximum )
-        {
-            field.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MINIMUM, 1 );
-            field.uiCapability()->setAttribute( caf::PdmUiSliderEditor::Keys::MAXIMUM, std::max( 1, maximum ) );
-        };
+        auto setRange = []( caf::PdmFieldHandle& field, int maximum )
+        { caf::PdmUiSliderEditor::setRange( field.uiCapability(), 1, std::max( 1, maximum ) ); };
 
         setRange( m_fixedIndex, axisCellCount() );
         setRange( m_iMin, ni );
@@ -447,6 +444,13 @@ void RimIjkIntersection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
         setRange( m_jMax, nj );
         setRange( m_kMin, nk );
         setRange( m_kMax, nk );
+    }
+    else
+    {
+        for ( auto* field : { &m_fixedIndex, &m_iMin, &m_iMax, &m_jMin, &m_jMax, &m_kMin, &m_kMax } )
+        {
+            caf::PdmUiSliderEditor::clearRange( field->uiCapability() );
+        }
     }
 
     uiOrdering.skipRemainingFields( true );

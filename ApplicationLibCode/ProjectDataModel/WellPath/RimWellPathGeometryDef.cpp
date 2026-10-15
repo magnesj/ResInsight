@@ -70,14 +70,9 @@ RimWellPathGeometryDef::RimWellPathGeometryDef()
                                                   "ReferencePoint",
                                                   cvf::Vec3d( 0, 0, 0 ),
                                                   "UTM Reference Point" );
-    m_referencePointUtmXyd.uiCapability()->setAttribute<std::function<QString()>>( caf::PdmUiLineEditor::Keys::DISPLAY_STRING,
-                                                                                   [this]()
-                                                                                   {
-                                                                                       const cvf::Vec3d& v = m_referencePointUtmXyd();
-                                                                                       return QString::number( v[0], 'f', 2 ) + " " +
-                                                                                              QString::number( v[1], 'f', 2 ) + " " +
-                                                                                              QString::number( v[2], 'f', 2 );
-                                                                                   } );
+    m_referencePointUtmXyd.uiCapability()
+        ->setAttribute<std::function<QString()>>( caf::PdmUiLineEditor::Keys::DISPLAY_STRING,
+                                                  [this]() { return RimWellPathTarget::formatCoordinate( m_referencePointUtmXyd() ); } );
 
     CAF_PDM_InitScriptableField( &m_airGap, "AirGap", 0.0, "Air Gap" );
     m_airGap.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );

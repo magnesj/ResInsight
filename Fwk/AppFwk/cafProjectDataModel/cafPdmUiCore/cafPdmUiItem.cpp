@@ -640,6 +640,18 @@ QVariant PdmUiItem::attributeVariant( const QString& key, const QString& uiConfi
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void PdmUiItem::removeAttribute( const QString& key, const QString& uiConfigName )
+{
+    auto configIt = m_attributeMaps.find( uiConfigName );
+    if ( configIt != m_attributeMaps.end() )
+    {
+        configIt->second.erase( key );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 std::list<QString> PdmUiItem::attributeNames( const QString& uiConfigName ) const
 {
     std::list<QString> result;

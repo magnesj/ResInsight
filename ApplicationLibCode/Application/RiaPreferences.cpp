@@ -276,8 +276,10 @@ RiaPreferences::RiaPreferences()
                        "of ? and * as wildcards.",
                        "" );
     m_multiLateralWellPattern.uiCapability()->setUiEditorTypeName( caf::PdmUiLineEditor::uiEditorTypeName() );
+    // The line editor does not take ownership of the validator
+    m_multiLateralWellPatternValidator = std::make_unique<RiaValidRegExpValidator>( defaultMultiLateralWellNamePattern() );
     m_multiLateralWellPattern.uiCapability()->setAttribute<QValidator*>( caf::PdmUiLineEditor::Keys::VALIDATOR,
-                                                                         new RiaValidRegExpValidator( defaultMultiLateralWellNamePattern() ) );
+                                                                         m_multiLateralWellPatternValidator.get() );
 
     CAF_PDM_InitFieldNoDefault( &m_guiTheme, "guiTheme", "GUI theme" );
 

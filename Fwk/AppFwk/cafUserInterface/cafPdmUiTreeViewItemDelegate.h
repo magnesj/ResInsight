@@ -83,7 +83,6 @@ protected:
 private:
     PdmUiTreeViewEditor* m_treeView;
 
-    // The tag rects are updated when painting\n    mutable std::map<QModelIndex, std::vector<PdmUiTreeViewItemTag>>
     // The tag rects are updated when painting
     mutable std::map<QModelIndex, std::vector<PdmUiTreeViewItemTag>> m_tags;
 };

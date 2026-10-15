@@ -72,6 +72,10 @@ public:
                                                                    Keys::SHOW_SPIN_BOX,
                                                                    Keys::STEP };
 
+    // Clearing restores the editor defaults, use when the range is unknown to avoid keeping a stale range
+    static void setRange( PdmUiItem* uiItem, int minimum, int maximum );
+    static void clearRange( PdmUiItem* uiItem );
+
 protected:
     void     configureAndUpdateUi( const QString& uiConfigName ) override;
     QWidget* createEditorWidget( QWidget* parent ) override;
