@@ -629,13 +629,19 @@ void RiuMultiPlotPage::onLegendUpdated()
 //--------------------------------------------------------------------------------------------------
 void RiuMultiPlotPage::refreshLegends()
 {
+    // The plot that hosts the common legend can change when plots are shown or hidden, so rebuild the layout
+    if ( m_plotDefinition->useCommonLegend() ) reinsertPlotWidgets();
+
     QList<QPointer<RiuQwtPlotLegend>> legends = legendsForVisiblePlots();
     for ( int i = 0; i < legends.size(); ++i )
     {
         const auto& l = legends[i];
         if ( !l ) continue;
-        if ( !showLegendForVisibleIndex( i ) ) continue;
-
+        if ( !showLegendForVisibleIndex( i ) )
+        {
+            l->hide();
+            continue;
+        }
         l->setVisible( !l->isEmpty() );
         updateLegendFont( l );
     }
