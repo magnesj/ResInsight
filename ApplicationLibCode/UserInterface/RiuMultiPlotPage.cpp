@@ -49,10 +49,12 @@
 #include "qwt_axis.h"
 #include "qwt_legend.h"
 #include "qwt_legend_label.h"
+#include "qwt_plot_item.h"
 #include "qwt_plot_layout.h"
 #include "qwt_plot_renderer.h"
 #include "qwt_scale_draw.h"
 #include "qwt_scale_widget.h"
+#include "qwt_text.h"
 
 #include <QDebug>
 #include <QFocusEvent>
@@ -366,13 +368,11 @@ void RiuMultiPlotPage::setHostsCommonLegend( bool hostsCommonLegend )
 }
 
 //--------------------------------------------------------------------------------------------------
-/// With a common legend, only the first visible plot on the first page has a legend
+/// With a common legend, the legends of the individual sub plots are not displayed
 //--------------------------------------------------------------------------------------------------
-bool RiuMultiPlotPage::showLegendForVisibleIndex( int visibleIndex ) const
+bool RiuMultiPlotPage::showSubPlotLegends() const
 {
-    if ( !m_plotDefinition->useCommonLegend() ) return true;
-
-    return m_hostsCommonLegend && visibleIndex == 0;
+    return !m_plotDefinition->useCommonLegend();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -427,6 +427,12 @@ void RiuMultiPlotPage::renderTo( QPainter* painter, double scalingFactor )
             QPoint renderOffset = m_plotWidgetFrame->mapToParent( legend->frameGeometry().topLeft() ) - marginOffset;
             legend->render( painter, renderOffset );
         }
+    }
+
+    if ( m_commonLegend && !m_commonLegend->isHidden() )
+    {
+        QPoint renderOffset = m_plotWidgetFrame->mapToParent( m_commonLegend->frameGeometry().topLeft() ) - marginOffset;
+        m_commonLegend->render( painter, renderOffset );
     }
 
     for ( auto plotWidget : visiblePlotWidgets() )
@@ -637,7 +643,7 @@ void RiuMultiPlotPage::refreshLegends()
     {
         const auto& l = legends[i];
         if ( !l ) continue;
-        if ( !showLegendForVisibleIndex( i ) )
+        if ( !showSubPlotLegends() )
         {
             l->hide();
             continue;
@@ -684,7 +690,7 @@ void RiuMultiPlotPage::reinsertPlotWidgets()
             auto legendFrame = legendFrames[visibleIndex];
             auto subTitle    = subTitles[visibleIndex];
 
-            if ( !showLegendForVisibleIndex( visibleIndex ) )
+            if ( !showSubPlotLegends() )
             {
                 if ( legend ) legend->hide();
                 if ( legendFrame )
@@ -707,6 +713,72 @@ void RiuMultiPlotPage::reinsertPlotWidgets()
             reinsertPlotWidget( plotWidget, legend, legendFrame, subTitle, row, column, rowSpan, colSpan );
         }
     }
+
+    updateCommonLegend();
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Build one legend from the legend data of all sub plots. Entries with identical titles are merged.
+//--------------------------------------------------------------------------------------------------
+void RiuMultiPlotPage::updateCommonLegend()
+{
+    if ( m_commonLegend ) m_layout->removeWidget( m_commonLegend );
+
+    bool isActive = m_plotDefinition->useCommonLegend() && m_hostsCommonLegend && m_plotDefinition->legendsVisible();
+    if ( !isActive )
+    {
+        if ( m_commonLegend ) m_commonLegend->hide();
+        return;
+    }
+
+    if ( !m_commonLegend )
+    {
+        m_commonLegend = new RiuQwtPlotLegend( this );
+        m_commonLegend->horizontalScrollBar()->setVisible( false );
+        m_commonLegend->verticalScrollBar()->setVisible( false );
+        m_commonLegend->setDefaultItemMode( QwtLegendData::ReadOnly );
+        m_commonLegend->contentsWidget()->layout()->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
+        m_commonLegend->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
+    }
+
+    for ( int i = 0; i < m_commonLegendItemCount; i++ )
+    {
+        m_commonLegend->updateLegend( QVariant( i ), {} );
+    }
+    m_commonLegendItemCount = 0;
+
+    QSet<QString> titles;
+    for ( auto plotWidget : visiblePlotWidgets() )
+    {
+        auto qwtPlotWidget = dynamic_cast<RiuQwtPlotWidget*>( plotWidget.data() );
+        if ( !qwtPlotWidget ) continue;
+
+        for ( QwtPlotItem* item : qwtPlotWidget->qwtPlot()->itemList() )
+        {
+            if ( !item->testItemAttribute( QwtPlotItem::Legend ) ) continue;
+
+            QList<QwtLegendData> legendData = item->legendData();
+            if ( legendData.isEmpty() ) continue;
+
+            QString title = legendData.first().value( QwtLegendData::TitleRole ).value<QwtText>().text();
+            if ( titles.contains( title ) ) continue;
+
+            titles.insert( title );
+            m_commonLegend->updateLegend( QVariant( m_commonLegendItemCount++ ), legendData );
+        }
+    }
+
+    if ( m_commonLegendItemCount == 0 )
+    {
+        m_commonLegend->hide();
+        return;
+    }
+
+    // The common legend is placed below the title, centered above all sub plots
+    m_layout->insertWidget( 1, m_commonLegend, 0, Qt::AlignHCenter );
+    updateLegendColumns( m_commonLegend );
+    updateLegendFont( m_commonLegend );
+    m_commonLegend->show();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -754,17 +826,7 @@ void RiuMultiPlotPage::addLegendWidget( RiuPlotWidget*            plotWidget,
 
     if ( m_plotDefinition->legendPosition() == RimPlotWindow::LegendPosition::ABOVE )
     {
-        if ( m_plotDefinition->useCommonLegend() )
-        {
-            // The common legend is placed above all sub plots, centered on the page
-            legend->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
-            m_layout->insertWidget( 1, legend, 0, Qt::AlignHCenter );
-        }
-        else
-        {
-            legend->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
-            m_gridLayout->addWidget( legend, row, column, 1, colSpan, Qt::AlignHCenter | Qt::AlignBottom );
-        }
+        m_gridLayout->addWidget( legend, row, column, 1, colSpan, Qt::AlignHCenter | Qt::AlignBottom );
     }
     else
     {

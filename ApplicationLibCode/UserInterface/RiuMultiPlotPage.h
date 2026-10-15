@@ -184,7 +184,11 @@ protected:
     bool m_autoAlignAxes;
     bool m_hostsCommonLegend = true;
 
-    bool showLegendForVisibleIndex( int visibleIndex ) const;
+    bool showSubPlotLegends() const;
+    void updateCommonLegend();
+
+    QPointer<RiuQwtPlotLegend> m_commonLegend;
+    int                        m_commonLegendItemCount = 0;
 
     std::map<RiuQwtPlotLegend*, int> m_childCountForAdjustSizeOperation;
 
