@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "cafPdmField.h"
+#include "cafPdmLogging.h"
 #include "cafPdmObject.h"
 #include "cafPdmUiAttributeTools.h"
 #include "cafPdmUiFieldHandle.h"
@@ -78,4 +79,54 @@ TEST( PdmUiAttributeToolsTest, StringAttributeUsesConfigName )
 
     EXPECT_EQ( "default", PdmUiAttributeTools::stringAttribute( uiItem, key ).value().toStdString() );
     EXPECT_EQ( "special", PdmUiAttributeTools::stringAttribute( uiItem, key, "SpecialConfig" ).value().toStdString() );
+}
+
+namespace
+{
+class CapturingLogger : public caf::PdmLogger
+{
+public:
+    int  level() const override { return static_cast<int>( caf::PdmLogLevel::PDM_LL_DEBUG ); }
+    void setLevel( int ) override {}
+    void error( const QString& ) override {}
+    void warning( const QString& message ) override { warnings.push_back( message ); }
+    void info( const QString& ) override {}
+    void debug( const QString& ) override {}
+
+    std::vector<QString> warnings;
+};
+} // namespace
+
+TEST( PdmUiAttributeToolsTest, ValidateAttributes )
+{
+    AttributeToolsTestObj obj;
+    PdmUiItem*            uiItem = obj.m_field.uiCapability();
+
+    auto logger = std::make_shared<CapturingLogger>();
+    caf::PdmLogging::registerLogger( logger );
+
+    const std::set<QString> supported = { "known" };
+
+    uiItem->setAttribute( "known", 1 );
+    uiItem->validateAttributes( "TestEditor", supported );
+    EXPECT_TRUE( logger->warnings.empty() );
+
+    uiItem->setAttribute( "unknown", 1 );
+    uiItem->validateAttributes( "TestEditor", supported );
+    ASSERT_EQ( 1u, logger->warnings.size() );
+    EXPECT_TRUE( logger->warnings.front().contains( "unknown" ) );
+
+    // Attributes only set for another config are not validated
+    logger->warnings.clear();
+    uiItem->removeAttribute( "unknown" );
+    uiItem->setAttribute( "otherUnknown", 1, "OtherConfig" );
+    uiItem->validateAttributes( "TestEditor", supported );
+    EXPECT_TRUE( logger->warnings.empty() );
+
+    // Table view cell attributes are consumed by the table editor and never reported
+    uiItem->setAttribute( "tableViewPushButtonText", "Edit" );
+    uiItem->validateAttributes( "TestEditor", supported );
+    EXPECT_TRUE( logger->warnings.empty() );
+
+    caf::PdmLogging::unregisterLogger( logger );
 }
