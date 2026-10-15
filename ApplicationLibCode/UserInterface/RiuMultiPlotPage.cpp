@@ -360,6 +360,24 @@ void RiuMultiPlotPage::scheduleReplotOfAllPlots()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RiuMultiPlotPage::setHostsCommonLegend( bool hostsCommonLegend )
+{
+    m_hostsCommonLegend = hostsCommonLegend;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// With a common legend, only the first visible plot on the first page has a legend
+//--------------------------------------------------------------------------------------------------
+bool RiuMultiPlotPage::showLegendForVisibleIndex( int visibleIndex ) const
+{
+    if ( !m_plotDefinition->useCommonLegend() ) return true;
+
+    return m_hostsCommonLegend && visibleIndex == 0;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RiuMultiPlotPage::updateSubTitles()
 {
     for ( int i = 0; i < m_plotWidgets.size(); ++i )
@@ -616,7 +634,7 @@ void RiuMultiPlotPage::refreshLegends()
     {
         const auto& l = legends[i];
         if ( !l ) continue;
-        if ( i > 0 && m_plotDefinition->useCommonLegend() ) continue;
+        if ( !showLegendForVisibleIndex( i ) ) continue;
 
         l->setVisible( !l->isEmpty() );
         updateLegendFont( l );
@@ -660,7 +678,7 @@ void RiuMultiPlotPage::reinsertPlotWidgets()
             auto legendFrame = legendFrames[visibleIndex];
             auto subTitle    = subTitles[visibleIndex];
 
-            if ( visibleIndex > 0 && m_plotDefinition->useCommonLegend() )
+            if ( !showLegendForVisibleIndex( visibleIndex ) )
             {
                 if ( legend ) legend->hide();
                 if ( legendFrame )

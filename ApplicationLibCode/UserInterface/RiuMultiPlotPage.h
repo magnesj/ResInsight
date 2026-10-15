@@ -82,6 +82,7 @@ public:
     void setPagePreviewModeEnabled( bool previewMode );
 
     void setAutoAlignAxes( bool autoAlignAxes );
+    void setHostsCommonLegend( bool hostsCommonLegend );
 
     void         scheduleUpdate( RiaDefines::MultiPlotPageUpdateType whatToUpdate = RiaDefines::MultiPlotPageUpdateType::ALL );
     void         scheduleReplotOfAllPlots();
@@ -181,6 +182,9 @@ protected:
     bool m_previewMode;
     bool m_showSubTitles;
     bool m_autoAlignAxes;
+    bool m_hostsCommonLegend = true;
+
+    bool showLegendForVisibleIndex( int visibleIndex ) const;
 
     std::map<RiuQwtPlotLegend*, int> m_childCountForAdjustSizeOperation;
 
