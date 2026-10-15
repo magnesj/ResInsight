@@ -404,7 +404,7 @@ void RiuMultiPlotPage::renderTo( QPainter* painter, double scalingFactor )
 
     for ( auto legend : legendsForVisiblePlots() )
     {
-        if ( legend )
+        if ( legend && !legend->isHidden() )
         {
             QPoint renderOffset = m_plotWidgetFrame->mapToParent( legend->frameGeometry().topLeft() ) - marginOffset;
             legend->render( painter, renderOffset );
@@ -612,8 +612,12 @@ void RiuMultiPlotPage::onLegendUpdated()
 void RiuMultiPlotPage::refreshLegends()
 {
     QList<QPointer<RiuQwtPlotLegend>> legends = legendsForVisiblePlots();
-    for ( const auto& l : legends )
+    for ( int i = 0; i < legends.size(); ++i )
     {
+        const auto& l = legends[i];
+        if ( !l ) continue;
+        if ( i > 0 && m_plotDefinition->useCommonLegend() ) continue;
+
         l->setVisible( !l->isEmpty() );
         updateLegendFont( l );
     }
@@ -655,6 +659,17 @@ void RiuMultiPlotPage::reinsertPlotWidgets()
             auto legend      = legends[visibleIndex];
             auto legendFrame = legendFrames[visibleIndex];
             auto subTitle    = subTitles[visibleIndex];
+
+            if ( visibleIndex > 0 && m_plotDefinition->useCommonLegend() )
+            {
+                if ( legend ) legend->hide();
+                if ( legendFrame )
+                {
+                    legendFrame->hide();
+                    plotWidget->removeOverlayFrame( legendFrame );
+                }
+                legend = nullptr;
+            }
 
             int expectedColSpan = plotWidget->colSpan();
             int colSpan         = std::min( expectedColSpan, columnCount );

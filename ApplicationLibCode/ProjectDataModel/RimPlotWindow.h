@@ -67,6 +67,7 @@ public:
     bool                          legendsVisible() const;
     void                          setLegendsVisible( bool doShow );
     bool                          legendsHorizontal() const;
+    virtual bool                  useCommonLegend() const { return false; }
     void                          setLegendsHorizontal( bool horizontal );
     bool                          legendItemsClickable() const;
     void                          setLegendItemsClickable( bool clickable );

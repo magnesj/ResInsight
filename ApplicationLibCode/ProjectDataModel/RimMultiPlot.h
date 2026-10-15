@@ -100,6 +100,7 @@ public:
 
     void setShowPlotTitles( bool enable );
     bool showPlotTitles() const;
+    bool useCommonLegend() const override;
 
     void zoomAll() override;
     void zoomAllYAxes();
@@ -167,6 +168,7 @@ protected:
     caf::PdmField<ColumnCountEnum> m_columnCount;
     caf::PdmField<RowCountEnum>    m_rowsPerPage;
     caf::PdmField<bool>            m_showIndividualPlotTitles;
+    caf::PdmField<bool>            m_useCommonLegend;
     RimFontSizeField               m_subTitleFontSize;
     RimFontSizeField               m_axisTitleFontSize;
     RimFontSizeField               m_axisValueFontSize;
