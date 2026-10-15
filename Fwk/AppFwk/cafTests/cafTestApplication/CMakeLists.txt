@@ -103,6 +103,15 @@ target_link_libraries(
                           ${EXTERNAL_LINK_LIBRARIES}
 )
 
+# Make the executable runnable from its own folder (platform plugins etc.)
+if(WIN32 AND TARGET Qt6::windeployqt)
+  add_custom_command(
+    TARGET ${PROJECT_NAME}
+    POST_BUILD
+    COMMAND Qt6::windeployqt --no-translations $<TARGET_FILE:${PROJECT_NAME}>
+  )
+endif()
+
 foreach(qtlib ${QT_LIBRARIES})
   add_custom_command(
     TARGET ${PROJECT_NAME}
