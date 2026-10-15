@@ -730,7 +730,15 @@ void RiuMultiPlotPage::addLegendWidget( RiuPlotWidget*            plotWidget,
 
     if ( m_plotDefinition->legendPosition() == RimPlotWindow::LegendPosition::ABOVE )
     {
-        m_gridLayout->addWidget( legend, row, column, 1, colSpan, Qt::AlignHCenter | Qt::AlignBottom );
+        if ( m_plotDefinition->useCommonLegend() )
+        {
+            // The common legend is placed above all sub plots, centered on the page
+            m_layout->insertWidget( 1, legend, 0, Qt::AlignHCenter );
+        }
+        else
+        {
+            m_gridLayout->addWidget( legend, row, column, 1, colSpan, Qt::AlignHCenter | Qt::AlignBottom );
+        }
     }
     else
     {
@@ -949,6 +957,7 @@ void RiuMultiPlotPage::clearGridLayout()
             if ( m_legends[tIdx] )
             {
                 m_gridLayout->removeWidget( m_legends[tIdx] );
+                m_layout->removeWidget( m_legends[tIdx] );
             }
             m_gridLayout->removeWidget( m_plotWidgets[tIdx] );
         }
