@@ -21,6 +21,7 @@ set(PROJECT_FILES
     cafPdmUiTableViewQModelTest.cpp
     cafPdmUiNumberFormatTest.cpp
     cafPdmUiAttributeToolsTest.cpp
+    cafPdmUiEditorAttributesTest.cpp
     cafPdmUiCheckBoxAndTextEditorTest.cpp
     cafPdmUiPropertyViewDialogTest.cpp
     cafPdmUiEditorHandleTest.cpp
