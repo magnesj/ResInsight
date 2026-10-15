@@ -80,6 +80,8 @@ qt_add_executable(
   # when we can use target_link_libraries with OBJECT libraries
 )
 
+set_target_properties(${PROJECT_NAME} PROPERTIES AUTORCC ON)
+
 set(TAP_LINK_LIBRARIES cafUserInterface)
 
 if(USE_COMMAND_FRAMEWORK)

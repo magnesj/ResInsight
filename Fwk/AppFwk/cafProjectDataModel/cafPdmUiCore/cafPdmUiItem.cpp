@@ -697,6 +697,9 @@ void PdmUiItem::validateAttributes( const QString&           contextName,
     auto allAttributeNames = attributeNames( uiConfigName );
     for ( const auto& key : allAttributeNames )
     {
+        // Table view cell attributes are read by the table editor, not by the field editors
+        if ( key.startsWith( "tableView" ) ) continue;
+
         if ( supportedAttributes.find( key ) == supportedAttributes.end() )
         {
             CAF_PDM_LOG_WARNING(
