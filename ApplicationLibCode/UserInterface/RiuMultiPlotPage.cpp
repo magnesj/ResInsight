@@ -733,10 +733,12 @@ void RiuMultiPlotPage::addLegendWidget( RiuPlotWidget*            plotWidget,
         if ( m_plotDefinition->useCommonLegend() )
         {
             // The common legend is placed above all sub plots, centered on the page
+            legend->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
             m_layout->insertWidget( 1, legend, 0, Qt::AlignHCenter );
         }
         else
         {
+            legend->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
             m_gridLayout->addWidget( legend, row, column, 1, colSpan, Qt::AlignHCenter | Qt::AlignBottom );
         }
     }
