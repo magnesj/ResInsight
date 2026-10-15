@@ -247,7 +247,12 @@ class ResInsightMCP:
         object_class = class_from_keyword(class_keyword)
         if object_class is None:
             raise ValueError(f"Unknown PDM class keyword: {class_keyword}")
-        objects = self._require_instance().project.descendants(object_class)
+        project = self._require_instance().project
+        objects = (
+            [project]
+            if object_class is type(project)
+            else project.descendants(object_class)
+        )
         page = objects[start : start + limit]
         return {
             "total_count": len(objects),

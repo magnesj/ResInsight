@@ -125,6 +125,7 @@ def test_summary_values_are_paged_and_validated():
 def test_generic_pdm_tools_use_discovered_object_ids(monkeypatch):
     class FakePdmObject:
         well_name = "WELL-A"
+        class_keyword = "SimulationWell"
 
         def __init__(self):
             self.parameters = {"WellName": "WELL-A"}
@@ -134,7 +135,7 @@ def test_generic_pdm_tools_use_discovered_object_ids(monkeypatch):
 
         def pb2_object(self):
             return SimpleNamespace(
-                class_keyword="SimulationWell", parameters=self.parameters
+                class_keyword=self.class_keyword, parameters=self.parameters
             )
 
         def set_value(self, field_name, value):
@@ -145,14 +146,24 @@ def test_generic_pdm_tools_use_discovered_object_ids(monkeypatch):
             self.well_name = name
             return self.well_name
 
+    class FakeProject(FakePdmObject):
+        class_keyword = "Project"
+
+        def descendants(self, object_class):
+            return [pdm_object]
+
     generated_package = types.ModuleType("rips.generated")
     generated_package.__path__ = []
     generated_classes = types.ModuleType("rips.generated.generated_classes")
-    generated_classes.class_from_keyword = lambda keyword: (
-        FakePdmObject if keyword == "SimulationWell" else None
-    )
+    generated_classes.class_from_keyword = lambda keyword: {
+        "Project": FakeProject,
+        "SimulationWell": FakePdmObject,
+    }.get(keyword)
     resinsight_classes = types.ModuleType("rips.resinsight_classes")
-    resinsight_classes.class_dict = lambda: {"SimulationWell": FakePdmObject}
+    resinsight_classes.class_dict = lambda: {
+        "Project": FakeProject,
+        "SimulationWell": FakePdmObject,
+    }
     monkeypatch.setitem(sys.modules, "rips.generated", generated_package)
     monkeypatch.setitem(
         sys.modules, "rips.generated.generated_classes", generated_classes
@@ -160,15 +171,20 @@ def test_generic_pdm_tools_use_discovered_object_ids(monkeypatch):
     monkeypatch.setitem(sys.modules, "rips.resinsight_classes", resinsight_classes)
 
     pdm_object = FakePdmObject()
+    project = FakeProject()
     service = mcp_server.ResInsightMCP()
-    service.instance = SimpleNamespace(
-        project=SimpleNamespace(descendants=lambda object_class: [pdm_object])
-    )
-    assert service.list_pdm_classes()["class_keywords"] == ["SimulationWell"]
+    service.instance = SimpleNamespace(project=project)
+    assert service.list_pdm_classes()["class_keywords"] == [
+        "Project",
+        "SimulationWell",
+    ]
     discovered = service.list_pdm_objects("SimulationWell")
     object_id = discovered["objects"][0]["object_id"]
 
     assert object_id == "123"
+    root_object = service.list_pdm_objects("Project")["objects"][0]
+    assert root_object["object_id"] == "123"
+    assert root_object["class_keyword"] == "Project"
     assert service.pdm_get_fields(object_id)["fields"]["well_name"] == "WELL-A"
     assert service.pdm_set_field(object_id, "well_name", "WELL-B")["updated"]
     assert (
