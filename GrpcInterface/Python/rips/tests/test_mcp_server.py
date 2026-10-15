@@ -151,16 +151,20 @@ def test_generic_pdm_tools_use_discovered_object_ids(monkeypatch):
     generated_classes.class_from_keyword = lambda keyword: (
         FakePdmObject if keyword == "SimulationWell" else None
     )
+    resinsight_classes = types.ModuleType("rips.resinsight_classes")
+    resinsight_classes.class_dict = lambda: {"SimulationWell": FakePdmObject}
     monkeypatch.setitem(sys.modules, "rips.generated", generated_package)
     monkeypatch.setitem(
         sys.modules, "rips.generated.generated_classes", generated_classes
     )
+    monkeypatch.setitem(sys.modules, "rips.resinsight_classes", resinsight_classes)
 
     pdm_object = FakePdmObject()
     service = mcp_server.ResInsightMCP()
     service.instance = SimpleNamespace(
         project=SimpleNamespace(descendants=lambda object_class: [pdm_object])
     )
+    assert service.list_pdm_classes()["class_keywords"] == ["SimulationWell"]
     discovered = service.list_pdm_objects("SimulationWell")
     object_id = discovered["objects"][0]["object_id"]
 
@@ -223,6 +227,7 @@ def test_create_server_registers_mutations_only_when_enabled():
     mutable_names = {tool.name for tool in mutable_tools}
 
     assert "get_grid_property_statistics" in read_only_names
+    assert "list_pdm_classes" in read_only_names
     assert "load_case" not in read_only_names
     assert "export_grid_property" not in read_only_names
     assert "export_snapshots" not in read_only_names

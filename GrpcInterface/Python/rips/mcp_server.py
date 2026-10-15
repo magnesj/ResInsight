@@ -220,6 +220,21 @@ class ResInsightMCP:
         return list(summary_case.available_addresses().values)
 
     @_translate_errors
+    def list_pdm_classes(self, start: int = 0, limit: int = 100) -> dict[str, Any]:
+        if start < 0 or limit < 1 or limit > _MAX_PAGE_SIZE:
+            raise ValueError(
+                f"start must be >= 0 and limit must be between 1 and {_MAX_PAGE_SIZE}."
+            )
+        from . import resinsight_classes
+
+        classes = sorted(getattr(resinsight_classes, "class_dict")())
+        return {
+            "total_count": len(classes),
+            "start": start,
+            "class_keywords": classes[start : start + limit],
+        }
+
+    @_translate_errors
     def list_pdm_objects(
         self, class_keyword: str, start: int = 0, limit: int = 100
     ) -> dict[str, Any]:
@@ -507,6 +522,7 @@ def create_server(read_only: bool = False, export_directory: str | None = None) 
     server.tool()(service.list_summary_cases)
     server.tool()(service.list_summary_vectors)
     server.tool()(service.get_summary_values)
+    server.tool()(service.list_pdm_classes)
     server.tool()(service.list_pdm_objects)
     server.tool()(service.pdm_get_fields)
     if not read_only:

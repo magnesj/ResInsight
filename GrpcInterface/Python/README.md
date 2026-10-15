@@ -50,6 +50,7 @@ copilot mcp add resinsight -- rips-mcp --read-only
 After connecting, tools include `list_cases`, `case_info`,
 `list_grid_properties`, and `get_grid_property_statistics`. Export tools write
 to the allow-listed export directory and return paths. Generic PDM tools use
-session-local object IDs returned by `list_pdm_objects`; field updates and
-method calls are omitted in read-only mode. Use `resinsight://project` and
+session-local object IDs returned by `list_pdm_objects`; use `list_pdm_classes`
+to discover generated object types. Field updates and method calls are omitted
+in read-only mode. Use `resinsight://project` and
 `resinsight://case/{case_id}` to inspect project resources.
