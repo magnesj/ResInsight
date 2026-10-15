@@ -47,6 +47,7 @@
 #include "cafAssert.h"
 
 #include "qwt_axis.h"
+#include "qwt_graphic.h"
 #include "qwt_legend.h"
 #include "qwt_legend_label.h"
 #include "qwt_plot_item.h"
@@ -61,6 +62,7 @@
 #include <QFontMetrics>
 #include <QGraphicsDropShadowEffect>
 #include <QHBoxLayout>
+#include <QImage>
 #include <QMenu>
 #include <QPainter>
 #include <QScrollBar>
@@ -750,9 +752,19 @@ void RiuMultiPlotPage::updateCommonLegend()
             if ( legendData.isEmpty() ) continue;
 
             QString title = legendData.first().value( QwtLegendData::TitleRole ).value<QwtText>().text();
-            if ( titles.contains( title ) ) continue;
 
-            titles.insert( title );
+            // Include the icon in the key, so entries with the same title but different color or style are all shown
+            QString key  = title;
+            auto    icon = legendData.first().value( QwtLegendData::IconRole ).value<QwtGraphic>();
+            if ( !icon.isNull() )
+            {
+                QImage     image = icon.toImage( QSize( 32, 16 ).expandedTo( icon.defaultSize().toSize() ) );
+                QByteArray bytes( reinterpret_cast<const char*>( image.constBits() ), image.sizeInBytes() );
+                key += QString( "|%1" ).arg( qHash( bytes ) );
+            }
+            if ( titles.contains( key ) ) continue;
+
+            titles.insert( key );
             m_commonLegend->updateLegend( QVariant( m_commonLegendItemCount++ ), legendData );
         }
     }
