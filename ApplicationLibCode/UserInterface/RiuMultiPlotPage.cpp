@@ -637,8 +637,9 @@ void RiuMultiPlotPage::onLegendUpdated()
 //--------------------------------------------------------------------------------------------------
 void RiuMultiPlotPage::refreshLegends()
 {
-    // The plot that hosts the common legend can change when plots are shown or hidden, so rebuild the layout
-    if ( m_plotDefinition->useCommonLegend() ) reinsertPlotWidgets();
+    // The common legend is rebuilt from the sub plot legend data. A full layout rebuild here could trigger new legend
+    // data changes in the plots, and thereby an endless update loop
+    if ( m_plotDefinition->useCommonLegend() ) updateCommonLegend();
 
     QList<QPointer<RiuQwtPlotLegend>> legends = legendsForVisiblePlots();
     for ( int i = 0; i < legends.size(); ++i )
