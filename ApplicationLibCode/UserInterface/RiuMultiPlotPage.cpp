@@ -690,17 +690,6 @@ void RiuMultiPlotPage::reinsertPlotWidgets()
             auto legendFrame = legendFrames[visibleIndex];
             auto subTitle    = subTitles[visibleIndex];
 
-            if ( !showSubPlotLegends() )
-            {
-                if ( legend ) legend->hide();
-                if ( legendFrame )
-                {
-                    legendFrame->hide();
-                    plotWidget->removeOverlayFrame( legendFrame );
-                }
-                legend = nullptr;
-            }
-
             int expectedColSpan = plotWidget->colSpan();
             int colSpan         = std::min( expectedColSpan, columnCount );
             int rowSpan         = plotWidget->rowSpan();
@@ -793,6 +782,17 @@ void RiuMultiPlotPage::reinsertPlotWidget( RiuPlotWidget*            plotWidget,
                                            int                       rowSpan,
                                            int                       colSpan )
 {
+    if ( !showSubPlotLegends() )
+    {
+        if ( legend ) legend->hide();
+        if ( legendFrame )
+        {
+            legendFrame->hide();
+            plotWidget->removeOverlayFrame( legendFrame );
+        }
+        legend = nullptr;
+    }
+
     m_gridLayout->addWidget( subTitle, 3 * row, column, 1, colSpan );
 
     addLegendWidget( plotWidget, legend, legendFrame, 3 * row + 1, column, colSpan );
