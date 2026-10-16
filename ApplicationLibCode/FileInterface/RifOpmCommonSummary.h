@@ -79,13 +79,15 @@ private:
     static void increaseEsmryFileCount();
 
 private:
+    RiaDefines::EclipseUnitSystem detectUnitSystem() const;
+
     std::unique_ptr<Opm::EclIO::ESmry>    m_standardReader;
     std::unique_ptr<Opm::EclIO::ExtESmry> m_enhancedReader;
 
     std::map<RifEclipseSummaryAddress, std::string> m_summaryAddressToKeywordMap;
     std::vector<time_t>                             m_timeSteps;
-
-    static size_t sm_createdEsmryFileCount;
+    RiaDefines::EclipseUnitSystem                   m_unitSystem = RiaDefines::EclipseUnitSystem::UNITS_UNKNOWN;
+    static size_t                                   sm_createdEsmryFileCount;
 
     bool m_useEsmryFiles;
     bool m_createEsmryFiles;

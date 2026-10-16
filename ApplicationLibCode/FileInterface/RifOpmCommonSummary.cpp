@@ -179,6 +179,8 @@ bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRest
     populateTimeSteps();
     if ( isLoggingEnabled ) RiaLogging::logElapsedTime( "Completed populateTimeSteps", timeBeforeTimeSteps );
 
+    m_unitSystem = detectUnitSystem();
+
     return true;
 }
 
@@ -251,7 +253,39 @@ std::string RifOpmCommonEclipseSummary::unitName( const RifEclipseSummaryAddress
 //--------------------------------------------------------------------------------------------------
 RiaDefines::EclipseUnitSystem RifOpmCommonEclipseSummary::unitSystem() const
 {
-    // TODO: Not implemented
+    return m_unitSystem;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// The summary files have no explicit unit system flag, so derive it from the unit of the vectors
+//--------------------------------------------------------------------------------------------------
+RiaDefines::EclipseUnitSystem RifOpmCommonEclipseSummary::detectUnitSystem() const
+{
+    const std::map<std::string, RiaDefines::EclipseUnitSystem> unitToSystem = {
+        { "PSIA", RiaDefines::EclipseUnitSystem::UNITS_FIELD },
+        { "STB", RiaDefines::EclipseUnitSystem::UNITS_FIELD },
+        { "STB/DAY", RiaDefines::EclipseUnitSystem::UNITS_FIELD },
+        { "MSCF/DAY", RiaDefines::EclipseUnitSystem::UNITS_FIELD },
+        { "BARSA", RiaDefines::EclipseUnitSystem::UNITS_METRIC },
+        { "SM3", RiaDefines::EclipseUnitSystem::UNITS_METRIC },
+        { "SM3/DAY", RiaDefines::EclipseUnitSystem::UNITS_METRIC },
+        { "ATMA", RiaDefines::EclipseUnitSystem::UNITS_LAB },
+        { "SCC", RiaDefines::EclipseUnitSystem::UNITS_LAB },
+    };
+
+    for ( const auto& keyword : m_enhancedReader ? m_enhancedReader->keywordList() : m_standardReader->keywordList() )
+    {
+        try
+        {
+            const auto unit = std::string( RiaStdStringTools::trimString( m_enhancedReader ? m_enhancedReader->get_unit( keyword )
+                                                                                           : m_standardReader->get_unit( keyword ) ) );
+            if ( auto it = unitToSystem.find( unit ); it != unitToSystem.end() ) return it->second;
+        }
+        catch ( const std::exception& )
+        {
+        }
+    }
+
     return RiaDefines::EclipseUnitSystem::UNITS_UNKNOWN;
 }
 
