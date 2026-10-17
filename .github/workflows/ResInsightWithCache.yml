@@ -372,6 +372,7 @@ jobs:
         env:
           RESINSIGHT_EXECUTABLE: ${{ runner.workspace }}/ResInsight/cmakebuild/ResInsight${{ runner.os == 'Windows' && '.exe' || '' }}
         run: |
+          ${{ steps.python-path.outputs.PYTHON_EXECUTABLE }} -m pip install "mcp>=1.30.0,<2"
           cd GrpcInterface/Python/rips
           ${{ steps.python-path.outputs.PYTHON_EXECUTABLE }} -m pytest --console
 
