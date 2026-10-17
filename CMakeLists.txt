@@ -189,35 +189,39 @@ find_program(buildcache_program buildcache)
 if(buildcache_program)
   set(CMAKE_CXX_COMPILER_LAUNCHER "${buildcache_program}")
   message(STATUS "Found buildcache from : ${buildcache_program}")
-
-  if(MSVC)
-    # New concept for defining MSVC debug info flags introduced in 3.25.
-    # Evaluate this concept to simplify the setting of CXX-flags
-    # https://cmake.org/cmake/help/v3.25/prop_tgt/MSVC_DEBUG_INFORMATION_FORMAT.html#prop_tgt:MSVC_DEBUG_INFORMATION_FORMAT
-    # https://cmake.org/cmake/help/v3.25/policy/CMP0141.html#policy:CMP0141
-
-    # It is required to use compiler flag /Z7 to be able to use buildcache
-    # https://github.com/mbitsnbites/buildcache/blob/master/doc/usage.md
-    # https://learn.microsoft.com/en-us/cpp/build/reference/z7-zi-zi-debug-information-format?view=msvc-170
-
-    string(REGEX REPLACE "/Zi" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    string(REGEX REPLACE "/Zi" "" CMAKE_CXX_FLAGS_DEBUG
-                         "${CMAKE_CXX_FLAGS_DEBUG}"
-    )
-    string(REGEX REPLACE "/Zi" "" CMAKE_CXX_FLAGS_RELWITHDEBINFO
-                         "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}"
-    )
-
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Z7")
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /Z7")
-
-    # Add this to avoid the warning: overriding '/Zi' with '/Z7'
-    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT
-        "$<$<CONFIG:Debug,RelWithDebInfo>:Embedded>"
-    )
-  endif()
 else()
   message(STATUS "No buildcache found")
+endif()
+
+if(MSVC)
+  # New concept for defining MSVC debug info flags introduced in 3.25. Evaluate
+  # this concept to simplify the setting of CXX-flags
+  # https://cmake.org/cmake/help/v3.25/prop_tgt/MSVC_DEBUG_INFORMATION_FORMAT.html#prop_tgt:MSVC_DEBUG_INFORMATION_FORMAT
+  # https://cmake.org/cmake/help/v3.25/policy/CMP0141.html#policy:CMP0141
+
+  # It is required to use compiler flag /Z7 to be able to use buildcache
+  # https://github.com/mbitsnbites/buildcache/blob/master/doc/usage.md
+  # https://learn.microsoft.com/en-us/cpp/build/reference/z7-zi-zi-debug-information-format?view=msvc-170
+  #
+  # Applied also when buildcache is not found, so that builds with and without
+  # cache use identical flags, and parallel compiles avoid the shared PDB used
+  # by /Zi.
+
+  string(REGEX REPLACE "/Zi" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+  string(REGEX REPLACE "/Zi" "" CMAKE_CXX_FLAGS_DEBUG
+                       "${CMAKE_CXX_FLAGS_DEBUG}"
+  )
+  string(REGEX REPLACE "/Zi" "" CMAKE_CXX_FLAGS_RELWITHDEBINFO
+                       "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}"
+  )
+
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Z7")
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /Z7")
+
+  # Add this to avoid the warning: overriding '/Zi' with '/Z7'
+  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT
+      "$<$<CONFIG:Debug,RelWithDebInfo>:Embedded>"
+  )
 endif()
 
 # ##############################################################################
