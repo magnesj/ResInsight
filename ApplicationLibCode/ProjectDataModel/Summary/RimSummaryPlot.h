@@ -187,6 +187,8 @@ public:
     void   applyDefaultCurveAppearances();
     void   applyDefaultCurveAppearances( std::vector<RimSummaryCurve*> curvesToUpdate );
     void   applyDefaultCurveAppearances( std::vector<RimEnsembleCurveSet*> ensembleCurvesToUpdate );
+    bool   useGlobalCurveAppearance() const;
+    void   updateCurveAppearanceFromGlobalSettings();
 
     void setNormalizationEnabled( bool enable );
     bool isNormalizationEnabled();
@@ -339,6 +341,7 @@ private:
 
 private:
     caf::PdmField<bool>                              m_normalizeCurveYValues;
+    caf::PdmField<bool>                              m_useGlobalCurveAppearance;
     caf::PdmField<caf::AppEnum<EquationBoxPosition>> m_equationBoxPosition;
 
     caf::PdmField<bool>    m_useAutoPlotTitle;

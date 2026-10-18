@@ -47,6 +47,9 @@
 #include "RimSummaryCase.h"
 #include "RimSummaryCurve.h"
 #include "RimSummaryCurveAppearanceCalculator.h"
+#include "RimSummaryCurveAppearanceOverride.h"
+#include "RimSummaryCurveAppearanceOverrideCollection.h"
+#include "RimSummaryCurveAppearanceSettings.h"
 #include "RimSummaryCurveCollection.h"
 #include "RimSummaryCurvesData.h"
 #include "RimSummaryDeclineCurve.h"
@@ -169,6 +172,12 @@ RimSummaryPlot::RimSummaryPlot()
                        caf::AppEnum<EquationBoxPosition>( EquationBoxPosition::UPPER_RIGHT ),
                        "Equation Box Position" );
 
+    CAF_PDM_InitField( &m_useGlobalCurveAppearance,
+                       "UseGlobalCurveAppearance",
+                       false,
+                       "Use Global Curve Appearance",
+                       "",
+                       "Assign curve appearance from the global definition in Preferences" );
     CAF_PDM_InitFieldNoDefault( &m_summaryCurveCollection, "SummaryCurveCollection", "" );
     m_summaryCurveCollection = new RimSummaryCurveCollection;
     m_summaryCurveCollection->curvesChanged.connect( this, &RimSummaryPlot::onCurveCollectionChanged );
@@ -776,12 +785,161 @@ void RimSummaryPlot::applyDefaultCurveAppearances()
     applyDefaultCurveAppearances( ensembleCurveSetCollection()->curveSets() );
 }
 
+namespace
+{
+//--------------------------------------------------------------------------------------------------
+/// Project-stored overrides for specific cases, ensembles and wells. A well override wins over a case override.
+//--------------------------------------------------------------------------------------------------
+std::vector<const RimSummaryCurveAppearanceOverride*> overridesForCurve( RimSummaryCurve* curve )
+{
+    auto project = RimProject::current();
+    if ( !project || !project->curveAppearanceOverrides() ) return {};
+
+    return project->curveAppearanceOverrides()->overridesFor( curve->summaryAddressY(),
+                                                              RimSummaryCurveAppearanceSettings::caseName( curve->summaryCaseY() ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Color override for an ensemble curve set, if any. Later matching overrides win.
+//--------------------------------------------------------------------------------------------------
+std::optional<cvf::Color3f> overriddenEnsembleColor( RimEnsembleCurveSet* curveSet )
+{
+    auto project = RimProject::current();
+    if ( !project || !project->curveAppearanceOverrides() ) return std::nullopt;
+
+    const std::string caseName = curveSet->summaryEnsemble() ? curveSet->summaryEnsemble()->name().toStdString() : std::string();
+
+    std::optional<cvf::Color3f> color;
+    for ( auto o : project->curveAppearanceOverrides()->overridesFor( curveSet->summaryAddressY(), caseName ) )
+    {
+        if ( auto overridden = o->overriddenColor() ) color = overridden;
+    }
+
+    return color;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Maps the values of a dimension to indices used to pick palette colors and symbols. Cases and wells are
+/// indexed among all items in the project to give the same item the same look in every plot, all other
+/// dimensions among the values present in the plot.
+//--------------------------------------------------------------------------------------------------
+class DimensionIndexer
+{
+public:
+    using Settings = RimSummaryCurveAppearanceSettings;
+
+    DimensionIndexer( Settings::Dimension dimension, const std::set<RiaSummaryCurveDefinition>& curveDefs )
+        : m_dimension( dimension )
+    {
+        if ( dimension == Settings::Dimension::NONE ) return;
+
+        std::set<std::string> values;
+        if ( dimension == Settings::Dimension::CASE || dimension == Settings::Dimension::WELL )
+        {
+            for ( const auto& name : RimSummaryCurveAppearanceOverride::availableNames( dimension ) )
+            {
+                m_universe.push_back( name.toStdString() );
+            }
+        }
+        else
+        {
+            for ( const auto& curveDef : curveDefs )
+            {
+                auto value = Settings::dimensionValue( dimension, curveDef.summaryAddressY(), caseName( curveDef ) );
+                if ( !value.empty() ) values.insert( value );
+            }
+            m_universe.assign( values.begin(), values.end() );
+        }
+    }
+
+    static std::string caseName( RimSummaryCase* summaryCase ) { return Settings::caseName( summaryCase ); }
+
+    static std::string caseName( const RiaSummaryCurveDefinition& curveDef )
+    {
+        if ( curveDef.summaryCaseY() ) return caseName( curveDef.summaryCaseY() );
+        return curveDef.ensemble() ? curveDef.ensemble()->name().toStdString() : std::string();
+    }
+
+    // -1 if the dimension has no value for the address
+    int index( const RifEclipseSummaryAddress& address, const std::string& caseName ) const
+    {
+        if ( m_dimension == Settings::Dimension::NONE ) return -1;
+
+        const auto value = Settings::dimensionValue( m_dimension, address, caseName );
+        const auto it    = std::find( m_universe.begin(), m_universe.end(), value );
+        return it == m_universe.end() ? -1 : static_cast<int>( std::distance( m_universe.begin(), it ) );
+    }
+
+    Settings::Dimension dimension() const { return m_dimension; }
+
+private:
+    Settings::Dimension      m_dimension;
+    std::vector<std::string> m_universe;
+};
+
+//--------------------------------------------------------------------------------------------------
+/// Color from the global appearance. Vectors can be colored by phase.
+//--------------------------------------------------------------------------------------------------
+std::optional<cvf::Color3f> globalColor( const DimensionIndexer& indexer, const RifEclipseSummaryAddress& address, const std::string& caseName )
+{
+    if ( indexer.dimension() == RimSummaryCurveAppearanceSettings::Dimension::NONE ) return std::nullopt;
+
+    if ( indexer.dimension() == RimSummaryCurveAppearanceSettings::Dimension::VECTOR && RiaPreferencesSummary::current()->colorCurvesByPhase() )
+    {
+        return RimSummaryCurveAppearanceCalculator::assignColorByPhase( address );
+    }
+
+    const int index = indexer.index( address, caseName );
+    if ( index < 0 ) return std::nullopt;
+
+    return RimSummaryCurveAppearanceCalculator::cycledPaletteColor( index );
+}
+} // namespace
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 void RimSummaryPlot::applyDefaultCurveAppearances( std::vector<RimSummaryCurve*> curvesToUpdate )
 {
     std::set<RiaSummaryCurveDefinition> allCurveDefs = summaryAndEnsembleCurveDefinitions();
+
+    const RimSummaryCurveAppearanceSettings* settings = nullptr;
+    if ( m_useGlobalCurveAppearance() )
+    {
+        settings = RimProject::current()->curveAppearanceOverrides()->settings();
+
+        // Indices depend on all curves in the plot, so all curves must be updated to stay consistent
+        curvesToUpdate = summaryCurves();
+    }
+
+    if ( settings )
+    {
+        const DimensionIndexer colorIndexer( settings->colorDimension(), allCurveDefs );
+        const DimensionIndexer symbolIndexer( settings->symbolDimension(), allCurveDefs );
+
+        for ( auto& curve : curvesToUpdate )
+        {
+            curve->resetAppearance();
+
+            const auto address  = curve->summaryAddressY();
+            const auto caseName = DimensionIndexer::caseName( curve->summaryCaseY() );
+
+            if ( auto color = globalColor( colorIndexer, address, caseName ) ) curve->setColor( *color );
+
+            const int symbolIndex = symbolIndexer.index( address, caseName );
+            if ( symbolIndex >= 0 ) curve->setSymbol( RimSummaryCurveAppearanceCalculator::cycledSymbol( symbolIndex ) );
+
+            curve->setCurveAppearanceFromCaseType();
+
+            for ( auto curveOverride : overridesForCurve( curve ) )
+            {
+                curveOverride->applyToCurve( curve );
+            }
+        }
+
+        return;
+    }
+
     RimSummaryCurveAppearanceCalculator curveLookCalc( allCurveDefs );
 
     for ( auto& curve : curvesToUpdate )
@@ -794,8 +952,33 @@ void RimSummaryPlot::applyDefaultCurveAppearances( std::vector<RimSummaryCurve*>
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool RimSummaryPlot::useGlobalCurveAppearance() const
+{
+    return m_useGlobalCurveAppearance();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryPlot::updateCurveAppearanceFromGlobalSettings()
+{
+    if ( !m_useGlobalCurveAppearance() ) return;
+
+    applyDefaultCurveAppearances( summaryCurves() );
+    applyDefaultCurveAppearances( ensembleCurveSetCollection()->curveSets() );
+
+    updateConnectedEditors();
+    loadDataAndUpdate();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimSummaryPlot::applyDefaultCurveAppearances( std::vector<RimEnsembleCurveSet*> ensembleCurvesToUpdate )
 {
+    // Indices depend on all curve sets in the plot, so all must be updated to stay consistent
+    if ( m_useGlobalCurveAppearance() ) ensembleCurvesToUpdate = ensembleCurveSetCollection()->curveSets();
+
     std::vector<QColor> usedColors;
     for ( auto c : ensembleCurveSetCollection()->curveSets() )
     {
@@ -820,7 +1003,26 @@ void RimSummaryPlot::applyDefaultCurveAppearances( std::vector<RimEnsembleCurveS
         {
             if ( RimEnsembleCurveSetColorManager::hasSameColorForAllRealizationCurves( curveSet->colorMode() ) )
             {
+                if ( useGlobalCurveAppearance() )
+                {
+                    if ( auto overrideColor = overriddenEnsembleColor( curveSet ) )
+                    {
+                        curveSet->setColorAndUpdateCurves( *overrideColor );
+                        continue;
+                    }
+
+                    const auto caseName = curveSet->summaryEnsemble() ? curveSet->summaryEnsemble()->name().toStdString() : std::string();
+                    const DimensionIndexer colorIndexer( RimProject::current()->curveAppearanceOverrides()->settings()->colorDimension(),
+                                                         summaryAndEnsembleCurveDefinitions() );
+                    if ( auto color = globalColor( colorIndexer, adr, caseName ) )
+                    {
+                        curveSet->setColorAndUpdateCurves( *color );
+                        continue;
+                    }
+                }
+
                 std::vector<QColor> candidateColors;
+
                 if ( RiaPreferencesSummary::current()->colorCurvesByPhase() )
                 {
                     // Put the the phase color as first candidate, will then be used if there is only one ensemble in the plot
@@ -1734,6 +1936,11 @@ void RimSummaryPlot::zoomAllForMultiPlot()
 void RimSummaryPlot::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     RimPlot::fieldChangedByUi( changedField, oldValue, newValue );
+
+    if ( changedField == &m_useGlobalCurveAppearance && m_useGlobalCurveAppearance() )
+    {
+        updateCurveAppearanceFromGlobalSettings();
+    }
 
     if ( changedField == &m_equationBoxPosition )
     {
@@ -2814,6 +3021,7 @@ void RimSummaryPlot::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
     }
 
     mainOptions->add( &m_normalizeCurveYValues );
+    mainOptions->add( &m_useGlobalCurveAppearance );
     if ( hasDeclineCurves() ) mainOptions->add( &m_equationBoxPosition );
 
     if ( isMainDockedWindow() )
