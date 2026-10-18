@@ -974,6 +974,52 @@ void RimSummaryPlot::updateCurveAppearanceFromGlobalSettings()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimSummaryPlot::saveCurveAppearances()
+{
+    m_savedCurveAppearances.clear();
+    m_savedEnsembleColors.clear();
+
+    for ( auto curve : summaryCurves() )
+    {
+        auto saved = std::make_unique<RimPlotCurveAppearance>();
+        saved->copyFrom( *curve->curveAppearance() );
+        m_savedCurveAppearances[curve] = std::move( saved );
+    }
+
+    for ( auto curveSet : ensembleCurveSetCollection()->curveSets() )
+    {
+        m_savedEnsembleColors[curveSet] = RiaColorTools::fromQColorTo3f( curveSet->mainEnsembleColor() );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Returns false if nothing was saved, so that the caller can fall back to the default appearance
+//--------------------------------------------------------------------------------------------------
+bool RimSummaryPlot::restoreCurveAppearances()
+{
+    if ( m_savedCurveAppearances.empty() && m_savedEnsembleColors.empty() ) return false;
+
+    for ( auto curve : summaryCurves() )
+    {
+        auto it = m_savedCurveAppearances.find( curve );
+        if ( it != m_savedCurveAppearances.end() ) curve->curveAppearance()->copyFrom( *it->second );
+    }
+
+    for ( auto curveSet : ensembleCurveSetCollection()->curveSets() )
+    {
+        auto it = m_savedEnsembleColors.find( curveSet );
+        if ( it != m_savedEnsembleColors.end() ) curveSet->setColorAndUpdateCurves( it->second );
+    }
+
+    m_savedCurveAppearances.clear();
+    m_savedEnsembleColors.clear();
+
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimSummaryPlot::applyDefaultCurveAppearances( std::vector<RimEnsembleCurveSet*> ensembleCurvesToUpdate )
 {
     // Indices depend on all curve sets in the plot, so all must be updated to stay consistent
@@ -1937,9 +1983,25 @@ void RimSummaryPlot::fieldChangedByUi( const caf::PdmFieldHandle* changedField, 
 {
     RimPlot::fieldChangedByUi( changedField, oldValue, newValue );
 
-    if ( changedField == &m_useGlobalCurveAppearance && m_useGlobalCurveAppearance() )
+    if ( changedField == &m_useGlobalCurveAppearance )
     {
-        updateCurveAppearanceFromGlobalSettings();
+        if ( m_useGlobalCurveAppearance() )
+        {
+            saveCurveAppearances();
+            updateCurveAppearanceFromGlobalSettings();
+        }
+        else
+        {
+            // Restore the appearance from before the global appearance was enabled, or the default if it is unknown
+            if ( !restoreCurveAppearances() )
+            {
+                applyDefaultCurveAppearances( summaryCurves() );
+                applyDefaultCurveAppearances( ensembleCurveSetCollection()->curveSets() );
+            }
+
+            updateConnectedEditors();
+            loadDataAndUpdate();
+        }
     }
 
     if ( changedField == &m_equationBoxPosition )

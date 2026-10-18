@@ -23,6 +23,7 @@
 
 #include "RimPlot.h"
 #include "RimPlotAxisProperties.h"
+#include "RimPlotCurveAppearance.h"
 #include "RimSummaryDataSourceStepping.h"
 #include "RimTabbedTextProducer.h"
 
@@ -36,6 +37,7 @@
 
 #include <QPointer>
 
+#include <map>
 #include <memory>
 #include <set>
 #include <vector>
@@ -66,6 +68,7 @@ class RiaSummaryCurveDefinition;
 class RifEclipseSummaryAddress;
 class RiaSummaryCurveAddress;
 class RimStackablePlotCurve;
+class RimPlotCurve;
 
 class QwtInterval;
 class QwtPlotCurve;
@@ -189,6 +192,8 @@ public:
     void   applyDefaultCurveAppearances( std::vector<RimEnsembleCurveSet*> ensembleCurvesToUpdate );
     bool   useGlobalCurveAppearance() const;
     void   updateCurveAppearanceFromGlobalSettings();
+    void   saveCurveAppearances();
+    bool   restoreCurveAppearances();
 
     void setNormalizationEnabled( bool enable );
     bool isNormalizationEnabled();
@@ -367,6 +372,10 @@ private:
     std::vector<QPointer<RiuDraggableOverlayFrame>> m_equationOverlayFrames;
     bool                                            m_equationOverlayRebuildPending = false;
     std::unique_ptr<QwtPlotTextLabel>               m_plotInfoLabel;
+
+    // Appearance of the curves before the global appearance was enabled, not stored in the project
+    std::map<const RimPlotCurve*, std::unique_ptr<RimPlotCurveAppearance>> m_savedCurveAppearances;
+    std::map<const RimEnsembleCurveSet*, cvf::Color3f>                     m_savedEnsembleColors;
 
     std::unique_ptr<RimSummaryPlotNameHelper>         m_nameHelperAllCurves;
     caf::PdmChildField<RimSummaryPlotSourceStepping*> m_sourceStepping;
