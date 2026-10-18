@@ -257,19 +257,13 @@ endif()
 add_library(ResInsightDummyTarget EXCLUDE_FROM_ALL empty.cpp)
 set_property(TARGET ResInsightDummyTarget PROPERTY FOLDER "FileCopyTargets")
 
-# create a custom target that copies the files to the build folder
-foreach(riFileName ${RI_FILENAMES})
-  list(
-    APPEND
-    copyCommands
-    COMMAND
-    ${CMAKE_COMMAND}
-    -E
-    copy_if_different
-    ${riFileName}
-    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+# create a custom target that copies the files to the build folder. Use a single
+# command, as this target runs on every build.
+if(RI_FILENAMES)
+  set(copyCommands COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                   ${RI_FILENAMES} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
   )
-endforeach()
+endif()
 add_custom_target(PreBuildFileCopy ${copyCommands})
 set_property(TARGET PreBuildFileCopy PROPERTY FOLDER "FileCopyTargets")
 
