@@ -141,33 +141,30 @@ std::string RimSummaryCurveAppearanceSettings::dimensionValue( Dimension        
             return address.networkName();
 
         case Dimension::REGION:
-            return address.category() == Category::SUMMARY_REGION ? std::to_string( address.regionNumber() ) : std::string();
+            return address.category() == Category::SUMMARY_REGION ? address.itemUiText() : std::string();
 
         case Dimension::REGION_2_REGION:
-            return address.category() == Category::SUMMARY_REGION_2_REGION
-                       ? std::to_string( address.regionNumber() ) + "-" + std::to_string( address.regionNumber2() )
-                       : std::string();
+            return address.category() == Category::SUMMARY_REGION_2_REGION ? address.itemUiText() : std::string();
 
         case Dimension::AQUIFER:
-            return address.category() == Category::SUMMARY_AQUIFER ? std::to_string( address.aquiferNumber() ) : std::string();
+            return address.category() == Category::SUMMARY_AQUIFER ? address.itemUiText() : std::string();
 
         case Dimension::LGR:
             return address.lgrName();
 
         case Dimension::BLOCK:
             return address.category() == Category::SUMMARY_BLOCK || address.category() == Category::SUMMARY_BLOCK_LGR
-                       ? address.blockAsString()
+                       ? address.itemUiText()
                        : std::string();
 
         case Dimension::CONNECTION:
             return address.category() == Category::SUMMARY_WELL_COMPLETION || address.category() == Category::SUMMARY_WELL_CONNECTION ||
                            address.category() == Category::SUMMARY_WELL_CONNECTION_LGR
-                       ? address.wellName() + ":" + address.connectionAsString()
+                       ? address.itemUiText()
                        : std::string();
 
         case Dimension::SEGMENT:
-            return address.category() == Category::SUMMARY_WELL_SEGMENT ? address.wellName() + ":" + std::to_string( address.id() )
-                                                                        : std::string();
+            return address.category() == Category::SUMMARY_WELL_SEGMENT ? address.itemUiText() : std::string();
 
         default:
             return std::string();
