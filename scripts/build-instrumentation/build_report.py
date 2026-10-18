@@ -105,8 +105,13 @@ def report(index_file):
     label = os.environ.get("RI_BUILD_LABEL", "")
     stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     reports_dir = build_dir / "instrumentation-reports"
-    out_dir = reports_dir / (f"{stamp}-{label}" if label else stamp)
-    out_dir.mkdir(parents=True, exist_ok=True)
+    base_name = f"{stamp}-{label}" if label else stamp
+    out_dir = reports_dir / base_name
+    suffix = 1
+    while out_dir.exists():
+        suffix += 1
+        out_dir = reports_dir / f"{base_name}-{suffix}"
+    out_dir.mkdir(parents=True)
 
     sec = lambda s: s["duration"] / 1000.0
     if cmake_builds:
