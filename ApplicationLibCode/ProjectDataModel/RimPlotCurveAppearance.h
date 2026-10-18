@@ -79,7 +79,10 @@ public:
     void                              setSymbolLabelPosition( RiuPlotCurveSymbol::LabelPosition labelPosition );
     RiuPlotCurveSymbol::LabelPosition symbolLabelPosition() const;
 
-    void           resetAppearance();
+    void resetAppearance();
+
+    // Copies the visual settings from another appearance without emitting signals
+    void           copyFrom( const RimPlotCurveAppearance& other );
     Qt::BrushStyle fillStyle() const;
     void           setFillStyle( Qt::BrushStyle brushStyle );
 

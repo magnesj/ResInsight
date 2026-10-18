@@ -404,6 +404,26 @@ int RimPlotCurveAppearance::lineThickness() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimPlotCurveAppearance::copyFrom( const RimPlotCurveAppearance& other )
+{
+    m_curveColor              = other.m_curveColor();
+    m_curveColorOpacity       = other.m_curveColorOpacity();
+    m_curveThickness          = other.m_curveThickness();
+    m_symbolSkipPixelDistance = other.m_symbolSkipPixelDistance();
+    m_curveFittingTolerance   = other.m_curveFittingTolerance();
+    m_symbolSize              = other.m_symbolSize();
+    m_pointSymbol             = other.m_pointSymbol();
+    m_lineStyle               = other.m_lineStyle();
+    m_fillStyle               = other.m_fillStyle();
+    m_fillColor               = other.m_fillColor();
+    m_fillColorOpacity        = other.m_fillColorOpacity();
+    m_curveInterpolation      = other.m_curveInterpolation();
+    m_symbolEdgeColor         = other.m_symbolEdgeColor();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimPlotCurveAppearance::resetAppearance()
 {
     setColor( RiaColorTools::textColor3f() );
