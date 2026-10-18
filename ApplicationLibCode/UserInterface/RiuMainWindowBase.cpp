@@ -263,6 +263,17 @@ void RiuMainWindowBase::loadWinGeoAndDockToolBarLayout()
 
     settings.beginGroup( registryFolderName() );
     m_dockManager->loadPerspectives( settings );
+
+    // The curve appearance dock is new: make it visible once, as stored layouts do not contain it
+    const QString shownKey = "curveAppearanceDockShown";
+    if ( !settings.value( shownKey, false ).toBool() )
+    {
+        if ( RiuDockWidgetTools::findDockWidget( m_dockManager, RiuDockWidgetTools::plotMainWindowCurveAppearanceName() ) )
+        {
+            RiuDockWidgetTools::showDockWidget( m_dockManager, RiuDockWidgetTools::plotMainWindowCurveAppearanceName() );
+            settings.setValue( shownKey, true );
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------

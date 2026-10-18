@@ -35,6 +35,7 @@
 #include "RimProject.h"
 #include "RimSummaryCase.h"
 #include "RimSummaryCaseMainCollection.h"
+#include "RimSummaryCurveAppearanceOverrideCollection.h"
 #include "RimSummaryCurveCollection.h"
 #include "RimSummaryEnsembleTools.h"
 #include "RimSummaryMultiPlot.h"
@@ -125,6 +126,7 @@ RiuPlotMainWindow::~RiuPlotMainWindow()
     setBeingDestroyed();
 
     m_summaryPlotManagerView->showProperties( nullptr );
+    m_curveAppearanceOverridesView->showProperties( nullptr );
     setPdmRoot( nullptr );
 }
 
@@ -168,6 +170,8 @@ void RiuPlotMainWindow::initializeGuiNewProjectLoaded()
 {
     setPdmRoot( RimProject::current() );
     restoreTreeViewState();
+
+    m_curveAppearanceOverridesView->showProperties( RimProject::current()->curveAppearanceOverrides() );
 
     RimMainPlotCollection* mainPlotColl = RimMainPlotCollection::current();
     mainPlotColl->ensureDefaultFlowPlotsAreCreated();
@@ -589,6 +593,16 @@ void RiuPlotMainWindow::createDockPanels()
 
         dockWidget->setWidget( m_summaryPlotManagerView.get() );
 
+        rightWidgets.push_back( dockWidget );
+    }
+
+    // the global curve appearance settings (application wide) and per item overrides (stored in the project)
+    {
+        auto dockWidget =
+            RiuDockWidgetTools::createDockWidget( "Curve Appearance", RiuDockWidgetTools::plotMainWindowCurveAppearanceName(), dockManager() );
+
+        m_curveAppearanceOverridesView = std::make_unique<caf::PdmUiPropertyView>( dockWidget );
+        dockWidget->setWidget( m_curveAppearanceOverridesView.get() );
         rightWidgets.push_back( dockWidget );
     }
 
