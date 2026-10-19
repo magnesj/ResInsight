@@ -17,6 +17,10 @@
 /////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "RimCurveStyleRule.h"
+#include "RimPlotCurveAppearance.h"
+#include "RimSavedCurveAppearance.h"
+
 #include "cafPdmChildArrayField.h"
 #include "cafPdmChildField.h"
 #include "cafPdmField.h"
@@ -25,12 +29,9 @@
 
 #include "cvfColor3.h"
 
+#include <map>
 #include <optional>
 #include <string>
-
-#include "RimCurveStyleRule.h"
-#include "RimPlotCurveAppearance.h"
-#include "RimSavedCurveAppearance.h"
 
 class RimColorLegend;
 class RimEnsembleCurveSet;

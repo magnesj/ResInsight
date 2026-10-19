@@ -18,6 +18,8 @@
 
 #include "RimCurveStyleRules.h"
 
+#include "RiaGuiApplication.h"
+
 #include "RimColorLegend.h"
 #include "RimColorLegendCollection.h"
 #include "RimColorLegendItem.h"
@@ -30,12 +32,11 @@
 #include "RimSummaryCurveAppearanceCalculator.h"
 #include "RimSummaryPlot.h"
 
-#include "cafPdmUiLabel.h"
-#include "cafPdmUiListEditor.h"
-
-#include "RiaGuiApplication.h"
 #include "RiuPlotCurveSymbolImageCreator.h"
 #include "RiuPlotMainWindow.h"
+
+#include "cafPdmUiLabel.h"
+#include "cafPdmUiListEditor.h"
 
 #include <algorithm>
 #include <map>
