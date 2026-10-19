@@ -4,6 +4,8 @@ Usage:
   python build_report.py install <build-dir>   Write the instrumentation query for <build-dir>
   python build_report.py <index-file>          Callback invoked by CMake after each 'cmake --build'
 
+Configuring with -DRESINSIGHT_ENABLE_BUILD_INSTRUMENTATION=ON registers the same callback, without 'install'.
+
 Set RI_BUILD_LABEL to tag a run (e.g. the measurement scenario). Reports are written to
 <build-dir>/instrumentation-reports/<timestamp>[-<label>]/ and one summary row per run is appended to
 <build-dir>/instrumentation-reports/history.csv.

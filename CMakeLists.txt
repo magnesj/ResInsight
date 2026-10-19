@@ -225,6 +225,49 @@ if(MSVC)
 endif()
 
 # ##############################################################################
+# Build instrumentation
+# ##############################################################################
+# Toggling the option changes every build command, as CMake then wraps them with
+# 'ctest --instrument', and causes a full rebuild
+option(RESINSIGHT_ENABLE_BUILD_INSTRUMENTATION
+       "Write a build time report after each build, requires CMake 4.5" OFF
+)
+if(RESINSIGHT_ENABLE_BUILD_INSTRUMENTATION)
+  # Data version 1.2 with process metrics was added in CMake 4.5
+  if(CMAKE_VERSION VERSION_LESS 4.5)
+    message(
+      WARNING
+        "RESINSIGHT_ENABLE_BUILD_INSTRUMENTATION requires CMake 4.5, found ${CMAKE_VERSION}"
+    )
+  else()
+    # Prefer the Python used for gRPC. NAMES_PER_DIR avoids picking the python3
+    # stub in WindowsApps before a real Python found earlier in PATH
+    if(RESINSIGHT_GRPC_PYTHON_EXECUTABLE)
+      cmake_path(GET RESINSIGHT_GRPC_PYTHON_EXECUTABLE PARENT_PATH pythonDir)
+    endif()
+    find_program(
+      RESINSIGHT_BUILD_INSTRUMENTATION_PYTHON
+      NAMES python3 python NAMES_PER_DIR
+      HINTS ${pythonDir} REQUIRED
+    )
+    message(
+      STATUS
+        "Build instrumentation enabled, reports in ${CMAKE_BINARY_DIR}/instrumentation-reports"
+    )
+    # cmake-format: off
+    cmake_instrumentation(
+      API_VERSION 1
+      DATA_VERSION 1.2
+      HOOKS postCMakeBuild
+      OPTIONS staticSystemInformation dynamicSystemInformation processMetrics trace
+      CALLBACK ${RESINSIGHT_BUILD_INSTRUMENTATION_PYTHON}
+               ${CMAKE_SOURCE_DIR}/scripts/build-instrumentation/build_report.py
+    )
+    # cmake-format: on
+  endif()
+endif()
+
+# ##############################################################################
 # ABAQUS ODB
 # ##############################################################################
 set(RESINSIGHT_ODB_API_DIR
