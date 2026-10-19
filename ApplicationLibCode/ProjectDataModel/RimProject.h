@@ -195,7 +195,7 @@ public:
     void updatesAfterProjectFileIsRead();
 
     RimQuickAccessCollection*     pinnedFieldCollection() const;
-    RimCurveStyleRules*           curveAppearanceOverrides() const;
+    RimCurveStyleRules*           curveStyleRules() const;
     RimAutomationSettings*        automationSettings() const;
     RimEnsembleFileSetCollection* ensembleFileSetCollection() const;
     RimJobCollection*             jobCollection() const;
@@ -210,7 +210,7 @@ protected:
 private:
     caf::PdmChildField<RimMainPlotCollection*>        m_mainPlotCollection;
     caf::PdmChildField<RimQuickAccessCollection*>     m_pinnedFieldCollection;
-    caf::PdmChildField<RimCurveStyleRules*>           m_curveAppearanceOverrides;
+    caf::PdmChildField<RimCurveStyleRules*>           m_curveStyleRules;
     caf::PdmChildField<RimAutomationSettings*>        m_automationSettings;
     caf::PdmChildField<RimEnsembleFileSetCollection*> m_ensembleFileSetCollection;
     caf::PdmChildField<RimJobCollection*>             m_jobCollection;

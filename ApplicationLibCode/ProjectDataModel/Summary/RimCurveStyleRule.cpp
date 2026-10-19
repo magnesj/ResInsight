@@ -57,7 +57,7 @@ CAF_PDM_SOURCE_INIT( RimCurveStyleRule, "RimCurveStyleRule" );
 //--------------------------------------------------------------------------------------------------
 RimCurveStyleRule::RimCurveStyleRule()
 {
-    CAF_PDM_InitObject( "Curve Appearance Override" );
+    CAF_PDM_InitObject( "Curve Style Rule" );
 
     CAF_PDM_InitFieldNoDefault( &m_dimension, "Dimension", "Type" );
     CAF_PDM_InitFieldNoDefault( &m_itemName, "ItemName", "Name" );
@@ -96,7 +96,7 @@ void RimCurveStyleRule::onAppearanceChanged( const caf::SignalEmitter* emitter )
 
     if ( auto collection = firstAncestorOrThisOfType<RimCurveStyleRules>() )
     {
-        collection->overridesChanged();
+        collection->rulesChanged();
         collection->updateConnectedEditors();
     }
 }
@@ -104,11 +104,19 @@ void RimCurveStyleRule::onAppearanceChanged( const caf::SignalEmitter* emitter )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimCurveStyleRule::applyToCurve( RimPlotCurve* curve ) const
+void RimCurveStyleRule::applyToCurve( RimPlotCurve* curve, bool applyColor, bool applySymbol ) const
 {
     if ( m_mode() != Mode::CUSTOM ) return;
 
-    curve->curveAppearance()->copyFrom( *m_appearance );
+    auto       curveAppearance = curve->curveAppearance();
+    const auto color           = curveAppearance->color();
+    const auto symbol          = curveAppearance->symbol();
+
+    curveAppearance->copyFrom( *m_appearance );
+
+    // Color and symbol are only controlled by the rule when its dimension is the one selected for them
+    if ( !applyColor ) curveAppearance->setColor( color );
+    if ( !applySymbol ) curveAppearance->setSymbol( symbol );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -292,7 +300,7 @@ void RimCurveStyleRule::fieldChangedByUi( const caf::PdmFieldHandle* changedFiel
 
     if ( auto collection = firstAncestorOrThisOfType<RimCurveStyleRules>() )
     {
-        collection->overridesChanged();
+        collection->rulesChanged();
         collection->updateConnectedEditors();
     }
 }

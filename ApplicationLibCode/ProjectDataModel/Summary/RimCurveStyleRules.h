@@ -40,7 +40,7 @@ class RimSummaryPlot;
 class RifEclipseSummaryAddress;
 
 //==================================================================================================
-/// Project-stored list of per-item color overrides for the global curve appearance.
+/// Project-stored list of per-item style rules for the global curve appearance.
 //==================================================================================================
 class RimCurveStyleRules : public caf::PdmObject
 {
@@ -49,15 +49,15 @@ class RimCurveStyleRules : public caf::PdmObject
 public:
     RimCurveStyleRules();
 
-    std::vector<RimCurveStyleRule*> overrides() const;
+    std::vector<RimCurveStyleRule*> rules() const;
 
-    // Overrides matching the address, ordered so that later entries win: case first, then other dimensions
-    std::vector<const RimCurveStyleRule*> overridesFor( const RifEclipseSummaryAddress& address, const std::string& caseName ) const;
+    // Custom rules for the dimensions selected for color or symbol, ordered so that later entries win: by dimension
+    std::vector<const RimCurveStyleRule*> rulesFor( const RifEclipseSummaryAddress& address, const std::string& caseName ) const;
 
     RimCurveStyleSettings* settings() const;
 
     // Re-applies the global appearance to all plots using it
-    void overridesChanged();
+    void rulesChanged();
 
     // Color from the project color legend used for auto colors, if one is selected
     std::optional<cvf::Color3f> autoLegendColor( int index ) const;
@@ -86,7 +86,7 @@ private:
                                            int                                                 index,
                                            std::optional<cvf::Color3f>&                        color,
                                            std::optional<RiuPlotCurveSymbol::PointSymbolEnum>& symbol ) const;
-    RimCurveStyleRule* findOverride( RimCurveStyleRule::Dimension dimension, const QString& name ) const;
+    RimCurveStyleRule* findRule( RimCurveStyleRule::Dimension dimension, const QString& name ) const;
     QString            currentItemName() const;
 
     // The curve appearance before the global appearance was enabled, kept in memory so it can be restored when disabled
@@ -107,7 +107,7 @@ private:
     RimCurveStyleRule::Dimension currentDimension() const;
 
     caf::PdmChildField<RimCurveStyleSettings*>                m_settings;
-    caf::PdmChildArrayField<RimCurveStyleRule*>               m_overrides;
+    caf::PdmChildArrayField<RimCurveStyleRule*>               m_rules;
     caf::PdmField<caf::AppEnum<AppearanceType>>               m_appearanceType;
     caf::PdmField<caf::AppEnum<RimCurveStyleRule::Dimension>> m_currentType;
     caf::PdmPtrField<RimColorLegend*>                         m_autoColorLegend;

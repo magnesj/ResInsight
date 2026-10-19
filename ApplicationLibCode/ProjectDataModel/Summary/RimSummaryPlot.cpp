@@ -782,31 +782,33 @@ void RimSummaryPlot::applyDefaultCurveAppearances()
 namespace
 {
 //--------------------------------------------------------------------------------------------------
-/// Project-stored overrides for specific cases, ensembles and wells. A well override wins over a case override.
+/// Project-stored custom rules for specific items of the dimensions selected for color or symbol. Later rules win.
 //--------------------------------------------------------------------------------------------------
-std::vector<const RimCurveStyleRule*> overridesForCurve( RimSummaryCurve* curve )
+std::vector<const RimCurveStyleRule*> rulesForCurve( RimSummaryCurve* curve )
 {
     auto project = RimProject::current();
-    if ( !project || !project->curveAppearanceOverrides() ) return {};
+    if ( !project || !project->curveStyleRules() ) return {};
 
-    return project->curveAppearanceOverrides()->overridesFor( curve->summaryAddressY(),
-                                                              RimCurveStyleSettings::caseName( curve->summaryCaseY() ) );
+    return project->curveStyleRules()->rulesFor( curve->summaryAddressY(), RimCurveStyleSettings::caseName( curve->summaryCaseY() ) );
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Color override for an ensemble curve set, if any. Later matching overrides win.
+/// Custom color for an ensemble curve set, if any. Later matching rules win.
 //--------------------------------------------------------------------------------------------------
 std::optional<cvf::Color3f> overriddenEnsembleColor( RimEnsembleCurveSet* curveSet )
 {
     auto project = RimProject::current();
-    if ( !project || !project->curveAppearanceOverrides() ) return std::nullopt;
+    if ( !project || !project->curveStyleRules() ) return std::nullopt;
 
     const std::string caseName = curveSet->summaryEnsemble() ? curveSet->summaryEnsemble()->name().toStdString() : std::string();
 
+    const auto colorDimension = project->curveStyleRules()->settings()->colorDimension();
+
     std::optional<cvf::Color3f> color;
-    for ( auto o : project->curveAppearanceOverrides()->overridesFor( curveSet->summaryAddressY(), caseName ) )
+    for ( auto rule : project->curveStyleRules()->rulesFor( curveSet->summaryAddressY(), caseName ) )
     {
-        if ( auto overridden = o->overriddenColor() ) color = overridden;
+        if ( rule->dimension() != colorDimension ) continue;
+        if ( auto overridden = rule->overriddenColor() ) color = overridden;
     }
 
     return color;
@@ -900,7 +902,7 @@ void RimSummaryPlot::applyDefaultCurveAppearances( std::vector<RimSummaryCurve*>
     const RimCurveStyleSettings* settings = nullptr;
     if ( useGlobalCurveAppearance() )
     {
-        settings = RimProject::current()->curveAppearanceOverrides()->settings();
+        settings = RimProject::current()->curveStyleRules()->settings();
 
         // Indices depend on all curves in the plot, so all curves must be updated to stay consistent
         curvesToUpdate = summaryCurves();
@@ -925,9 +927,9 @@ void RimSummaryPlot::applyDefaultCurveAppearances( std::vector<RimSummaryCurve*>
 
             curve->setCurveAppearanceFromCaseType();
 
-            for ( auto curveOverride : overridesForCurve( curve ) )
+            for ( auto rule : rulesForCurve( curve ) )
             {
-                curveOverride->applyToCurve( curve );
+                rule->applyToCurve( curve, rule->dimension() == settings->colorDimension(), rule->dimension() == settings->symbolDimension() );
             }
         }
 
@@ -949,9 +951,9 @@ void RimSummaryPlot::applyDefaultCurveAppearances( std::vector<RimSummaryCurve*>
 bool RimSummaryPlot::useGlobalCurveAppearance() const
 {
     auto project = RimProject::current();
-    if ( !project || !project->curveAppearanceOverrides() ) return false;
+    if ( !project || !project->curveStyleRules() ) return false;
 
-    return project->curveAppearanceOverrides()->useGlobalAppearance();
+    return project->curveStyleRules()->useGlobalAppearance();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1009,7 +1011,7 @@ void RimSummaryPlot::applyDefaultCurveAppearances( std::vector<RimEnsembleCurveS
                     }
 
                     const auto caseName = curveSet->summaryEnsemble() ? curveSet->summaryEnsemble()->name().toStdString() : std::string();
-                    const DimensionIndexer colorIndexer( RimProject::current()->curveAppearanceOverrides()->settings()->colorDimension(),
+                    const DimensionIndexer colorIndexer( RimProject::current()->curveStyleRules()->settings()->colorDimension(),
                                                          summaryAndEnsembleCurveDefinitions() );
                     if ( auto color = globalColor( colorIndexer, adr, caseName ) )
                     {

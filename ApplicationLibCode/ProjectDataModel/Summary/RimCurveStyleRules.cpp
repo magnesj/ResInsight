@@ -39,6 +39,8 @@
 #include "RiuPlotCurveSymbolImageCreator.h"
 #include "RiuPlotMainWindow.h"
 
+#include <algorithm>
+
 CAF_PDM_SOURCE_INIT( RimCurveStyleRules, "RimCurveStyleRules" );
 
 namespace caf
@@ -58,7 +60,7 @@ void caf::AppEnum<RimCurveStyleRules::AppearanceType>::setUp()
 //--------------------------------------------------------------------------------------------------
 RimCurveStyleRules::RimCurveStyleRules()
 {
-    CAF_PDM_InitObject( "Curve Appearance Overrides" );
+    CAF_PDM_InitObject( "Curve Style Rules" );
 
     CAF_PDM_InitField( &m_useGlobalAppearance,
                        "UseGlobalAppearance",
@@ -72,9 +74,9 @@ RimCurveStyleRules::RimCurveStyleRules()
     m_settings.uiCapability()->setUiHidden( true );
     m_settings = new RimCurveStyleSettings;
 
-    CAF_PDM_InitFieldNoDefault( &m_overrides, "Overrides", "Overrides" );
-    m_overrides.uiCapability()->setUiTreeChildrenHidden( true );
-    m_overrides.uiCapability()->setUiHidden( true );
+    CAF_PDM_InitFieldNoDefault( &m_rules, "Rules", "Rules" );
+    m_rules.uiCapability()->setUiTreeChildrenHidden( true );
+    m_rules.uiCapability()->setUiHidden( true );
 
     CAF_PDM_InitFieldNoDefault( &m_appearanceType, "AppearanceType", "Appearance Property" );
     m_appearanceType.xmlCapability()->disableIO();
@@ -112,28 +114,35 @@ RimCurveStyleSettings* RimCurveStyleRules::settings() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RimCurveStyleRule*> RimCurveStyleRules::overrides() const
+std::vector<RimCurveStyleRule*> RimCurveStyleRules::rules() const
 {
-    return m_overrides.childrenByType();
+    return m_rules.childrenByType();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<const RimCurveStyleRule*> RimCurveStyleRules::overridesFor( const RifEclipseSummaryAddress& address, const std::string& caseName ) const
+std::vector<const RimCurveStyleRule*> RimCurveStyleRules::rulesFor( const RifEclipseSummaryAddress& address, const std::string& caseName ) const
 {
-    std::vector<const RimCurveStyleRule*> result;
-    for ( int pass = 0; pass < 2; pass++ )
-    {
-        for ( auto item : m_overrides )
-        {
-            const bool isCase = item->dimension() == RimCurveStyleRule::Dimension::CASE;
-            if ( isCase != ( pass == 0 ) ) continue;
+    const auto colorDimension  = m_settings->colorDimension();
+    const auto symbolDimension = m_settings->symbolDimension();
 
-            const auto value = RimCurveStyleSettings::dimensionValue( item->dimension(), address, caseName );
-            if ( !value.empty() && QString::fromStdString( value ) == item->itemName() ) result.push_back( item );
-        }
+    std::vector<const RimCurveStyleRule*> result;
+    for ( auto rule : m_rules )
+    {
+        if ( !rule->isCustom() ) continue;
+
+        const auto dimension = rule->dimension();
+        if ( dimension != colorDimension && dimension != symbolDimension ) continue;
+
+        const auto value = RimCurveStyleSettings::dimensionValue( dimension, address, caseName );
+        if ( !value.empty() && QString::fromStdString( value ) == rule->itemName() ) result.push_back( rule );
     }
+
+    // Fixed precedence by dimension, so the result does not depend on the order the rules were created in
+    std::stable_sort( result.begin(),
+                      result.end(),
+                      []( const RimCurveStyleRule* a, const RimCurveStyleRule* b ) { return a->dimension() < b->dimension(); } );
 
     return result;
 }
@@ -141,7 +150,7 @@ std::vector<const RimCurveStyleRule*> RimCurveStyleRules::overridesFor( const Ri
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimCurveStyleRules::overridesChanged()
+void RimCurveStyleRules::rulesChanged()
 {
     auto project = RimProject::current();
     if ( !project ) return;
@@ -321,18 +330,18 @@ QList<caf::PdmOptionItemInfo> RimCurveStyleRules::calculateValueOptions( const c
         const bool isSymbolDim = m_appearanceType() == AppearanceType::SYMBOL;
         for ( const auto& name : RimCurveStyleRule::availableNames( m_currentType() ) )
         {
-            const auto                                         customOverride = findOverride( m_currentType(), name );
-            const bool                                         isCustom       = customOverride && customOverride->isCustom();
-            const int                                          index          = static_cast<int>( options.size() );
+            const auto                                         customRule = findRule( m_currentType(), name );
+            const bool                                         isCustom   = customRule && customRule->isCustom();
+            const int                                          index      = static_cast<int>( options.size() );
             std::optional<cvf::Color3f>                        autoColor;
             std::optional<RiuPlotCurveSymbol::PointSymbolEnum> autoSymbol;
             assignedAppearance( name, index, autoColor, autoSymbol );
 
             std::optional<cvf::Color3f> color;
-            if ( isColorDim && autoColor ) color = isCustom ? customOverride->overriddenColor().value_or( *autoColor ) : autoColor;
+            if ( isColorDim && autoColor ) color = isCustom ? customRule->overriddenColor().value_or( *autoColor ) : autoColor;
 
             std::optional<RiuPlotCurveSymbol::PointSymbolEnum> symbol;
-            if ( isSymbolDim && autoSymbol ) symbol = isCustom ? customOverride->overriddenSymbol().value_or( *autoSymbol ) : autoSymbol;
+            if ( isSymbolDim && autoSymbol ) symbol = isCustom ? customRule->overriddenSymbol().value_or( *autoSymbol ) : autoSymbol;
             const auto icon = RimCurveStyleRule::dimensionColorIcon( m_currentType(), color, symbol );
             options.push_back(
                 caf::PdmOptionItemInfo( isCustom ? name + "  [Custom]" : name + "  [Auto]", static_cast<int>( options.size() ), false, icon ) );
@@ -364,9 +373,9 @@ void RimCurveStyleRules::assignedAppearance( const QString&                     
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimCurveStyleRule* RimCurveStyleRules::findOverride( RimCurveStyleRule::Dimension dimension, const QString& name ) const
+RimCurveStyleRule* RimCurveStyleRules::findRule( RimCurveStyleRule::Dimension dimension, const QString& name ) const
 {
-    for ( auto item : m_overrides )
+    for ( auto item : m_rules )
     {
         if ( item->dimension() == dimension && item->itemName() == name ) return item;
     }
@@ -388,7 +397,7 @@ void RimCurveStyleRules::fieldChangedByUi( const caf::PdmFieldHandle* changedFie
     if ( changedField == &m_autoColorLegend )
     {
         updateConnectedEditors();
-        overridesChanged();
+        rulesChanged();
         return;
     }
 
@@ -411,19 +420,19 @@ void RimCurveStyleRules::fieldChangedByUi( const caf::PdmFieldHandle* changedFie
         }
         if ( auto app = RiaApplication::instance() ) app->applyPreferences();
         m_currentItemIndex = 0;
-        overridesChanged();
+        rulesChanged();
     }
 
     const QString itemName = currentItemName();
     if ( ( changedField == &m_currentType || changedField == &m_currentItemIndex ) && !itemName.isEmpty() )
     {
-        // Overrides are created when an item is selected, and are Auto until changed to Custom
-        if ( !findOverride( m_currentType(), itemName ) )
+        // Rules are created when an item is selected, and are Auto until changed to Custom
+        if ( !findRule( m_currentType(), itemName ) )
         {
             auto item = new RimCurveStyleRule;
             item->setDimension( m_currentType() );
             item->setItemName( itemName );
-            m_overrides.push_back( item );
+            m_rules.push_back( item );
         }
     }
 
@@ -463,14 +472,14 @@ void RimCurveStyleRules::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
     uiOrdering.add( &m_appearanceType );
     uiOrdering.add( &m_currentType );
 
-    auto overridesGroup = uiOrdering.addNewGroup( "Assigned Appearance" );
+    auto rulesGroup = uiOrdering.addNewGroup( "Assigned Appearance" );
     if ( m_appearanceType() == AppearanceType::COLOR )
-        overridesGroup->add( &m_autoColorLegend );
+        rulesGroup->add( &m_autoColorLegend );
     else
-        overridesGroup->add( &m_symbolLegend );
-    overridesGroup->add( &m_currentItemIndex );
+        rulesGroup->add( &m_symbolLegend );
+    rulesGroup->add( &m_currentItemIndex );
 
-    if ( auto selected = findOverride( m_currentType(), currentItemName() ) )
+    if ( auto selected = findRule( m_currentType(), currentItemName() ) )
     {
         std::optional<cvf::Color3f>                        autoColor;
         std::optional<RiuPlotCurveSymbol::PointSymbolEnum> autoSymbol;

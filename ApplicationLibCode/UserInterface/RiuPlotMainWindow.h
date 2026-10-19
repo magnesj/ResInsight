@@ -131,7 +131,7 @@ private:
     std::unique_ptr<caf::PdmUiToolBarEditor> m_multiPlotLayoutToolBarEditor;
 
     std::unique_ptr<caf::PdmUiPropertyView> m_summaryPlotManagerView;
-    std::unique_ptr<caf::PdmUiPropertyView> m_curveAppearanceOverridesView;
+    std::unique_ptr<caf::PdmUiPropertyView> m_curveStyleRulesView;
 
     std::unique_ptr<RicSummaryPlotEditorDialog>      m_summaryCurveCreatorDialog;
     std::unique_ptr<RicSummaryCurveCalculatorDialog> m_summaryCurveCalculatorDialog;

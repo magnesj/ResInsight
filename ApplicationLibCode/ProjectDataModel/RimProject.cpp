@@ -149,8 +149,8 @@ RimProject::RimProject()
     CAF_PDM_InitFieldNoDefault( &m_mainPlotCollection, "MainPlotCollection", "Plots" );
     CAF_PDM_InitFieldNoDefault( &m_pinnedFieldCollection, "PinnedFieldCollection", "PinnedFieldCollection" );
 
-    CAF_PDM_InitFieldNoDefault( &m_curveAppearanceOverrides, "CurveAppearanceOverrides", "Curve Appearance Overrides" );
-    m_curveAppearanceOverrides = new RimCurveStyleRules;
+    CAF_PDM_InitFieldNoDefault( &m_curveStyleRules, "CurveStyleRules", "Curve Style Rules" );
+    m_curveStyleRules = new RimCurveStyleRules;
 
     CAF_PDM_InitFieldNoDefault( &viewLinkerCollection, "LinkedViews", "Linked Views", ":/LinkView.svg" );
     viewLinkerCollection = new RimViewLinkerCollection;
@@ -353,9 +353,9 @@ RimQuickAccessCollection* RimProject::pinnedFieldCollection() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimCurveStyleRules* RimProject::curveAppearanceOverrides() const
+RimCurveStyleRules* RimProject::curveStyleRules() const
 {
-    return m_curveAppearanceOverrides();
+    return m_curveStyleRules();
 }
 
 //--------------------------------------------------------------------------------------------------

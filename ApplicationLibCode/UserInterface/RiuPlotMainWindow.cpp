@@ -128,7 +128,7 @@ RiuPlotMainWindow::~RiuPlotMainWindow()
     setBeingDestroyed();
 
     m_summaryPlotManagerView->showProperties( nullptr );
-    m_curveAppearanceOverridesView->showProperties( nullptr );
+    m_curveStyleRulesView->showProperties( nullptr );
     setPdmRoot( nullptr );
 }
 
@@ -173,7 +173,7 @@ void RiuPlotMainWindow::initializeGuiNewProjectLoaded()
     setPdmRoot( RimProject::current() );
     restoreTreeViewState();
 
-    m_curveAppearanceOverridesView->showProperties( RimProject::current()->curveAppearanceOverrides() );
+    m_curveStyleRulesView->showProperties( RimProject::current()->curveStyleRules() );
 
     RimMainPlotCollection* mainPlotColl = RimMainPlotCollection::current();
     mainPlotColl->ensureDefaultFlowPlotsAreCreated();
@@ -603,8 +603,8 @@ void RiuPlotMainWindow::createDockPanels()
         auto dockWidget =
             RiuDockWidgetTools::createDockWidget( "Curve Appearance", RiuDockWidgetTools::plotMainWindowCurveAppearanceName(), dockManager() );
 
-        m_curveAppearanceOverridesView = std::make_unique<caf::PdmUiPropertyView>( dockWidget );
-        dockWidget->setWidget( m_curveAppearanceOverridesView.get() );
+        m_curveStyleRulesView = std::make_unique<caf::PdmUiPropertyView>( dockWidget );
+        dockWidget->setWidget( m_curveStyleRulesView.get() );
         rightWidgets.push_back( dockWidget );
     }
 

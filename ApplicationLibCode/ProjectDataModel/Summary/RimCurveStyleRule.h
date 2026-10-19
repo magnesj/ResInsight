@@ -62,8 +62,8 @@ public:
     void setDimension( Dimension dimension );
     void setItemName( const QString& itemName );
 
-    // Applies the color and symbol to the curve if the override is custom
-    void applyToCurve( RimPlotCurve* curve ) const;
+    // Applies the rule to the curve if it is custom. Color and symbol are only applied when requested
+    void applyToCurve( RimPlotCurve* curve, bool applyColor, bool applySymbol ) const;
 
     static QStringList                 availableNames( Dimension dimension );
     static std::optional<cvf::Color3f> colorFromPlots( Dimension dimension, const QString& name );
@@ -80,7 +80,7 @@ public:
                                                  const std::optional<RiuPlotCurveSymbol::PointSymbolEnum>& symbol = std::nullopt );
     bool                     isCustom() const;
 
-    // The override symbol, if the override is custom
+    // The custom symbol, if the rule is custom
     std::optional<RiuPlotCurveSymbol::PointSymbolEnum> overriddenSymbol() const;
 
     // Adds the mode, color and symbol fields, to be edited for the object selected in the collection
@@ -90,7 +90,7 @@ public:
     void setAutoAssigned( const std::optional<cvf::Color3f>& color, const std::optional<RiuPlotCurveSymbol::PointSymbolEnum>& symbol );
     void updateAppearanceFromCurves();
 
-    // The override color, if the override is custom
+    // The custom color, if the rule is custom
     std::optional<cvf::Color3f> overriddenColor() const;
 
 protected:

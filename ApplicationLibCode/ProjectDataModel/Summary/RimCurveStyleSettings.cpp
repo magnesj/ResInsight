@@ -179,7 +179,7 @@ void RimCurveStyleSettings::fieldChangedByUi( const caf::PdmFieldHandle* changed
     // The collection list shows colors that depend on the global appearance
     if ( auto project = RimProject::current() )
     {
-        if ( auto collection = project->curveAppearanceOverrides() ) collection->updateConnectedEditors();
+        if ( auto collection = project->curveStyleRules() ) collection->updateConnectedEditors();
     }
 }
 
