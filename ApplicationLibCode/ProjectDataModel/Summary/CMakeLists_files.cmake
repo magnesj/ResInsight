@@ -8,6 +8,9 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimSummaryCurve.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimSummaryCurvesData.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimSummaryCurveAppearanceCalculator.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimSummaryCurveAppearanceSettings.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimSummaryCurveAppearanceOverride.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimSummaryCurveAppearanceOverrideCollection.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimSummaryCurveAutoName.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimSummaryPlotAxisFormatter.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimSummaryCurveCollection.cpp
