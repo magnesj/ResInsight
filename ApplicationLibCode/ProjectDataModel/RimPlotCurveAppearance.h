@@ -105,6 +105,9 @@ public:
     void setFillOptionsVisible( bool isVisible );
     void setCurveFittingToleranceVisible( bool isVisible );
 
+    // Shows all fields as read-only, used when the appearance is controlled elsewhere
+    void setUiLocked( bool isLocked );
+
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
 
 protected:
@@ -138,4 +141,5 @@ protected:
     bool m_interpolationVisible;
     bool m_fillOptionsVisible;
     bool m_curveFittingToleranceVisible;
+    bool m_uiLocked = false;
 };

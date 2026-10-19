@@ -172,12 +172,6 @@ RimSummaryPlot::RimSummaryPlot()
                        caf::AppEnum<EquationBoxPosition>( EquationBoxPosition::UPPER_RIGHT ),
                        "Equation Box Position" );
 
-    CAF_PDM_InitField( &m_useGlobalCurveAppearance,
-                       "UseGlobalCurveAppearance",
-                       false,
-                       "Use Global Curve Appearance",
-                       "",
-                       "Assign curve appearance from the global definition in Preferences" );
     CAF_PDM_InitFieldNoDefault( &m_summaryCurveCollection, "SummaryCurveCollection", "" );
     m_summaryCurveCollection = new RimSummaryCurveCollection;
     m_summaryCurveCollection->curvesChanged.connect( this, &RimSummaryPlot::onCurveCollectionChanged );
@@ -904,7 +898,7 @@ void RimSummaryPlot::applyDefaultCurveAppearances( std::vector<RimSummaryCurve*>
     std::set<RiaSummaryCurveDefinition> allCurveDefs = summaryAndEnsembleCurveDefinitions();
 
     const RimSummaryCurveAppearanceSettings* settings = nullptr;
-    if ( m_useGlobalCurveAppearance() )
+    if ( useGlobalCurveAppearance() )
     {
         settings = RimProject::current()->curveAppearanceOverrides()->settings();
 
@@ -954,7 +948,10 @@ void RimSummaryPlot::applyDefaultCurveAppearances( std::vector<RimSummaryCurve*>
 //--------------------------------------------------------------------------------------------------
 bool RimSummaryPlot::useGlobalCurveAppearance() const
 {
-    return m_useGlobalCurveAppearance();
+    auto project = RimProject::current();
+    if ( !project || !project->curveAppearanceOverrides() ) return false;
+
+    return project->curveAppearanceOverrides()->useGlobalAppearance();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -962,7 +959,7 @@ bool RimSummaryPlot::useGlobalCurveAppearance() const
 //--------------------------------------------------------------------------------------------------
 void RimSummaryPlot::updateCurveAppearanceFromGlobalSettings()
 {
-    if ( !m_useGlobalCurveAppearance() ) return;
+    if ( !useGlobalCurveAppearance() ) return;
 
     applyDefaultCurveAppearances( summaryCurves() );
     applyDefaultCurveAppearances( ensembleCurveSetCollection()->curveSets() );
@@ -974,56 +971,10 @@ void RimSummaryPlot::updateCurveAppearanceFromGlobalSettings()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryPlot::saveCurveAppearances()
-{
-    m_savedCurveAppearances.clear();
-    m_savedEnsembleColors.clear();
-
-    for ( auto curve : summaryCurves() )
-    {
-        auto saved = std::make_unique<RimPlotCurveAppearance>();
-        saved->copyFrom( *curve->curveAppearance() );
-        m_savedCurveAppearances[curve] = std::move( saved );
-    }
-
-    for ( auto curveSet : ensembleCurveSetCollection()->curveSets() )
-    {
-        m_savedEnsembleColors[curveSet] = RiaColorTools::fromQColorTo3f( curveSet->mainEnsembleColor() );
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Returns false if nothing was saved, so that the caller can fall back to the default appearance
-//--------------------------------------------------------------------------------------------------
-bool RimSummaryPlot::restoreCurveAppearances()
-{
-    if ( m_savedCurveAppearances.empty() && m_savedEnsembleColors.empty() ) return false;
-
-    for ( auto curve : summaryCurves() )
-    {
-        auto it = m_savedCurveAppearances.find( curve );
-        if ( it != m_savedCurveAppearances.end() ) curve->curveAppearance()->copyFrom( *it->second );
-    }
-
-    for ( auto curveSet : ensembleCurveSetCollection()->curveSets() )
-    {
-        auto it = m_savedEnsembleColors.find( curveSet );
-        if ( it != m_savedEnsembleColors.end() ) curveSet->setColorAndUpdateCurves( it->second );
-    }
-
-    m_savedCurveAppearances.clear();
-    m_savedEnsembleColors.clear();
-
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimSummaryPlot::applyDefaultCurveAppearances( std::vector<RimEnsembleCurveSet*> ensembleCurvesToUpdate )
 {
     // Indices depend on all curve sets in the plot, so all must be updated to stay consistent
-    if ( m_useGlobalCurveAppearance() ) ensembleCurvesToUpdate = ensembleCurveSetCollection()->curveSets();
+    if ( useGlobalCurveAppearance() ) ensembleCurvesToUpdate = ensembleCurveSetCollection()->curveSets();
 
     std::vector<QColor> usedColors;
     for ( auto c : ensembleCurveSetCollection()->curveSets() )
@@ -1982,27 +1933,6 @@ void RimSummaryPlot::zoomAllForMultiPlot()
 void RimSummaryPlot::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     RimPlot::fieldChangedByUi( changedField, oldValue, newValue );
-
-    if ( changedField == &m_useGlobalCurveAppearance )
-    {
-        if ( m_useGlobalCurveAppearance() )
-        {
-            saveCurveAppearances();
-            updateCurveAppearanceFromGlobalSettings();
-        }
-        else
-        {
-            // Restore the appearance from before the global appearance was enabled, or the default if it is unknown
-            if ( !restoreCurveAppearances() )
-            {
-                applyDefaultCurveAppearances( summaryCurves() );
-                applyDefaultCurveAppearances( ensembleCurveSetCollection()->curveSets() );
-            }
-
-            updateConnectedEditors();
-            loadDataAndUpdate();
-        }
-    }
 
     if ( changedField == &m_equationBoxPosition )
     {
@@ -3083,7 +3013,6 @@ void RimSummaryPlot::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
     }
 
     mainOptions->add( &m_normalizeCurveYValues );
-    mainOptions->add( &m_useGlobalCurveAppearance );
     if ( hasDeclineCurves() ) mainOptions->add( &m_equationBoxPosition );
 
     if ( isMainDockedWindow() )

@@ -84,6 +84,7 @@ public:
     RiuMessagePanel* messagePanel();
 
     void showAndSetKeyboardFocusToSummaryPlotManager();
+    void showCurveAppearance();
 
 protected:
     void closeEvent( QCloseEvent* event ) override;

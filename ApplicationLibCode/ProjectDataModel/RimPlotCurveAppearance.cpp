@@ -236,7 +236,33 @@ void RimPlotCurveAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiO
     uiOrdering.add( &m_curveInterpolation );
     m_curveInterpolation.uiCapability()->setUiHidden( !m_interpolationVisible );
 
+    for ( auto field : std::vector<caf::PdmFieldHandle*>{ &m_curveColor,
+                                                          &m_curveColorOpacity,
+                                                          &m_pointSymbol,
+                                                          &m_symbolEdgeColor,
+                                                          &m_symbolSize,
+                                                          &m_symbolSkipPixelDistance,
+                                                          &m_lineStyle,
+                                                          &m_curveThickness,
+                                                          &m_fillStyle,
+                                                          &m_fillColor,
+                                                          &m_fillColorOpacity,
+                                                          &m_curveInterpolation } )
+    {
+        field->uiCapability()->setUiReadOnly( m_uiLocked );
+    }
+
+    if ( m_curveFittingToleranceVisible && m_uiLocked ) m_curveFittingTolerance.uiCapability()->setUiReadOnly( true );
+
     uiOrdering.skipRemainingFields();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPlotCurveAppearance::setUiLocked( bool isLocked )
+{
+    m_uiLocked = isLocked;
 }
 
 //--------------------------------------------------------------------------------------------------

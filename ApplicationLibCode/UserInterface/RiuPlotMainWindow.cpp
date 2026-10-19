@@ -79,9 +79,11 @@
 #include "DockManager.h"
 
 #include <QCloseEvent>
+#include <QFrame>
 #include <QLayout>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QPointer>
 #include <QSettings>
 #include <QTimer>
 #include <QToolBar>
@@ -778,6 +780,28 @@ RicSummaryCurveCalculatorDialog* RiuPlotMainWindow::summaryCurveCalculatorDialog
 RiuMessagePanel* RiuPlotMainWindow::messagePanel()
 {
     return m_messagePanel;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuPlotMainWindow::showCurveAppearance()
+{
+    auto dockWidget = RiuDockWidgetTools::findDockWidget( dockManager(), RiuDockWidgetTools::plotMainWindowCurveAppearanceName() );
+    if ( !dockWidget ) return;
+
+    dockWidget->toggleView( true );
+    dockWidget->raise();
+    dockWidget->setAsCurrentTab();
+
+    // Briefly outline the dock edges so the user sees where the settings are, also when it was already visible
+    auto outline = new QFrame( dockWidget );
+    outline->setAttribute( Qt::WA_TransparentForMouseEvents );
+    outline->setStyleSheet( "QFrame { background: transparent; border: 3px solid rgb(255, 160, 0); }" );
+    outline->setGeometry( dockWidget->rect() );
+    outline->show();
+    outline->raise();
+    QTimer::singleShot( 1000, outline, &QObject::deleteLater );
 }
 
 //--------------------------------------------------------------------------------------------------

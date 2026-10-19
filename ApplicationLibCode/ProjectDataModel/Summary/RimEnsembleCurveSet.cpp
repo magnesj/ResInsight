@@ -51,6 +51,7 @@
 #include "RimSummaryAddressSelector.h"
 #include "RimSummaryCase.h"
 #include "RimSummaryCurve.h"
+#include "RimSummaryCurveAppearanceOverrideCollection.h"
 #include "RimSummaryCurveAutoName.h"
 #include "RimSummaryEnsemble.h"
 #include "RimSummaryMultiPlot.h"
@@ -164,6 +165,11 @@ RimEnsembleCurveSet::RimEnsembleCurveSet()
     m_colorForRealizations_OBSOLETE.xmlCapability()->setIOWritable( false );
 
     CAF_PDM_InitField( &m_mainEnsembleColor, "MainEnsembleColor", RiaColorTools::textColor3f(), "Color" );
+    CAF_PDM_InitFieldNoDefault( &m_globalAppearanceLink, "GlobalAppearanceLink", "" );
+    RimSummaryCurveAppearanceOverrideCollection::configureGlobalAppearanceLink( &m_globalAppearanceLink,
+                                                                                "The color is controlled by the <a href=\"dummy\">global "
+                                                                                "curve "
+                                                                                "appearance</a>." );
     CAF_PDM_InitField( &m_colorOpacity, "ColorTransparency", 0.8, "Opacity [0..1]" );
     m_colorOpacity.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
     m_colorOpacity.uiCapability()->setAttribute( caf::PdmUiDoubleSliderEditor::Keys::MINIMUM, 0.001 );
@@ -1432,7 +1438,11 @@ void RimEnsembleCurveSet::appendColorGroup( caf::PdmUiOrdering& uiOrdering )
 
     if ( m_colorMode() == RimEnsembleCurveSetColorManager::ColorMode::SINGLE_COLOR )
     {
+        auto       plot          = firstAncestorOrThisOfType<RimSummaryPlot>();
+        const bool isColorGlobal = plot && plot->useGlobalCurveAppearance();
+        m_mainEnsembleColor.uiCapability()->setUiReadOnly( isColorGlobal );
         colorsGroup->add( &m_mainEnsembleColor );
+        if ( isColorGlobal ) colorsGroup->add( &m_globalAppearanceLink );
     }
     else if ( m_colorMode == ColorMode::BY_ENSEMBLE_PARAM )
     {

@@ -276,6 +276,7 @@ private:
 
     caf::PdmField<ColorModeEnum>                                             m_colorMode;
     caf::PdmField<cvf::Color3f>                                              m_mainEnsembleColor;
+    caf::PdmField<bool>                                                      m_globalAppearanceLink;
     cvf::Color3f                                                             m_colorForRealizations;
     caf::PdmField<double>                                                    m_colorOpacity;
     caf::PdmField<QString>                                                   m_ensembleParameter;

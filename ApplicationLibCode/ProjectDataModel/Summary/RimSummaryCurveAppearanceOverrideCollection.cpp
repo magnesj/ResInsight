@@ -21,16 +21,23 @@
 #include "RimColorLegend.h"
 #include "RimColorLegendCollection.h"
 #include "RimColorLegendItem.h"
+#include "RimEnsembleCurveSet.h"
+#include "RimEnsembleCurveSetCollection.h"
 #include "RimProject.h"
+#include "RimSummaryCurve.h"
 #include "RimSummaryCurveAppearanceCalculator.h"
 #include "RimSummaryCurveAppearanceOverride.h"
 #include "RimSummaryCurveAppearanceSettings.h"
 #include "RimSummaryPlot.h"
 
+#include "cafPdmUiLabelEditor.h"
 #include "cafPdmUiListEditor.h"
 
 #include "RiaApplication.h"
+#include "RiaColorTools.h"
+#include "RiaGuiApplication.h"
 #include "RiuPlotCurveSymbolImageCreator.h"
+#include "RiuPlotMainWindow.h"
 
 CAF_PDM_SOURCE_INIT( RimSummaryCurveAppearanceOverrideCollection, "RimSummaryCurveAppearanceOverrideCollection" );
 
@@ -52,6 +59,13 @@ void caf::AppEnum<RimSummaryCurveAppearanceOverrideCollection::AppearanceType>::
 RimSummaryCurveAppearanceOverrideCollection::RimSummaryCurveAppearanceOverrideCollection()
 {
     CAF_PDM_InitObject( "Curve Appearance Overrides" );
+
+    CAF_PDM_InitField( &m_useGlobalAppearance,
+                       "UseGlobalAppearance",
+                       false,
+                       "Use Global Curve Appearance",
+                       "",
+                       "Assign curve appearance in all summary plots from the global curve appearance definition" );
 
     CAF_PDM_InitFieldNoDefault( &m_settings, "Settings", "Settings" );
     m_settings.uiCapability()->setUiTreeChildrenHidden( true );
@@ -137,6 +151,123 @@ void RimSummaryCurveAppearanceOverrideCollection::overridesChanged()
     {
         plot->updateCurveAppearanceFromGlobalSettings();
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryCurveAppearanceOverrideCollection::configureGlobalAppearanceLink( caf::PdmFieldHandle* field, const QString& text )
+{
+    field->uiCapability()->setUiEditorTypeName( caf::PdmUiLabelEditor::uiEditorTypeName() );
+    field->uiCapability()->setAttribute( caf::PdmUiLabelEditor::Keys::USE_WORD_WRAP, true );
+    field->uiCapability()->setAttribute( caf::PdmUiLabelEditor::Keys::LINK_TEXT, text );
+    field->uiCapability()->setAttribute<std::function<void( const QString& )>>( caf::PdmUiLabelEditor::Keys::LINK_ACTIVATED_CALLBACK,
+                                                                                []( const QString& )
+                                                                                {
+                                                                                    if ( auto window =
+                                                                                             RiaGuiApplication::instance()->mainPlotWindow() )
+                                                                                        window->showCurveAppearance();
+                                                                                } );
+    field->xmlCapability()->disableIO();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimSummaryCurveAppearanceOverrideCollection::useGlobalAppearance() const
+{
+    return m_useGlobalAppearance();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryCurveAppearanceOverrideCollection::setUseGlobalAppearance( bool enable )
+{
+    if ( m_useGlobalAppearance() == enable ) return;
+
+    m_useGlobalAppearance = enable;
+    applyGlobalAppearanceMode();
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Applies the global appearance to all plots when enabled, and restores the original appearance when disabled
+//--------------------------------------------------------------------------------------------------
+void RimSummaryCurveAppearanceOverrideCollection::applyGlobalAppearanceMode()
+{
+    auto project = RimProject::current();
+    if ( !project ) return;
+
+    for ( auto plot : project->descendantsIncludingThisOfType<RimSummaryPlot>() )
+    {
+        if ( m_useGlobalAppearance() )
+        {
+            saveAppearance( plot );
+            plot->updateCurveAppearanceFromGlobalSettings();
+        }
+        else
+        {
+            // Plots without a saved appearance get the calculated default appearance
+            if ( !restoreAppearance( plot ) )
+            {
+                plot->applyDefaultCurveAppearances();
+            }
+
+            plot->updateConnectedEditors();
+            plot->loadDataAndUpdate();
+        }
+    }
+
+    if ( !m_useGlobalAppearance() ) m_savedAppearances.clear();
+
+    updateConnectedEditors();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryCurveAppearanceOverrideCollection::saveAppearance( RimSummaryPlot* plot )
+{
+    SavedAppearance saved;
+
+    for ( auto curve : plot->summaryCurves() )
+    {
+        auto appearance = std::make_unique<RimPlotCurveAppearance>();
+        appearance->copyFrom( *curve->curveAppearance() );
+        saved.curves[curve] = std::move( appearance );
+    }
+
+    for ( auto curveSet : plot->ensembleCurveSetCollection()->curveSets() )
+    {
+        saved.ensembleColors[curveSet] = RiaColorTools::fromQColorTo3f( curveSet->mainEnsembleColor() );
+    }
+
+    m_savedAppearances[plot] = std::move( saved );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Returns false if nothing was saved for the plot
+//--------------------------------------------------------------------------------------------------
+bool RimSummaryCurveAppearanceOverrideCollection::restoreAppearance( RimSummaryPlot* plot )
+{
+    auto it = m_savedAppearances.find( plot );
+    if ( it == m_savedAppearances.end() ) return false;
+
+    const auto& saved = it->second;
+
+    for ( auto curve : plot->summaryCurves() )
+    {
+        auto curveIt = saved.curves.find( curve );
+        if ( curveIt != saved.curves.end() ) curve->curveAppearance()->copyFrom( *curveIt->second );
+    }
+
+    for ( auto curveSet : plot->ensembleCurveSetCollection()->curveSets() )
+    {
+        auto colorIt = saved.ensembleColors.find( curveSet );
+        if ( colorIt != saved.ensembleColors.end() ) curveSet->setColorAndUpdateCurves( colorIt->second );
+    }
+
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -260,6 +391,12 @@ void RimSummaryCurveAppearanceOverrideCollection::fieldChangedByUi( const caf::P
                                                                     const QVariant&            oldValue,
                                                                     const QVariant&            newValue )
 {
+    if ( changedField == &m_useGlobalAppearance )
+    {
+        applyGlobalAppearanceMode();
+        return;
+    }
+
     if ( changedField == &m_autoColorLegend )
     {
         updateConnectedEditors();
@@ -334,6 +471,7 @@ void RimSummaryCurveAppearanceOverrideCollection::defineUiOrdering( QString uiCo
     // The dimension is stored in the global settings, which can also be changed elsewhere
     m_currentType = currentDimension();
 
+    uiOrdering.add( &m_useGlobalAppearance );
     uiOrdering.add( &m_appearanceType );
     uiOrdering.add( &m_currentType );
 

@@ -25,12 +25,18 @@
 
 #include "cvfColor3.h"
 
+#include <map>
+#include <memory>
 #include <optional>
 #include <string>
 
+#include "RimPlotCurveAppearance.h"
 #include "RimSummaryCurveAppearanceOverride.h"
 
 class RimColorLegend;
+class RimEnsembleCurveSet;
+class RimPlotCurve;
+class RimSummaryPlot;
 class RifEclipseSummaryAddress;
 
 //==================================================================================================
@@ -57,6 +63,13 @@ public:
     // Color from the project color legend used for auto colors, if one is selected
     std::optional<cvf::Color3f> autoLegendColor( int index ) const;
 
+    // Configures a field as a label with a link that shows the global curve appearance
+    static void configureGlobalAppearanceLink( caf::PdmFieldHandle* field, const QString& text );
+
+    // The global appearance applies to all summary plots in the project
+    bool useGlobalAppearance() const;
+    void setUseGlobalAppearance( bool enable );
+
 protected:
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
@@ -76,6 +89,20 @@ private:
                                                            std::optional<RiuPlotCurveSymbol::PointSymbolEnum>& symbol ) const;
     RimSummaryCurveAppearanceOverride* findOverride( RimSummaryCurveAppearanceOverride::Dimension dimension, const QString& name ) const;
     QString                            currentItemName() const;
+
+    // The curve appearance before the global appearance was enabled, kept in memory so it can be restored when disabled
+    struct SavedAppearance
+    {
+        std::map<const RimPlotCurve*, std::unique_ptr<RimPlotCurveAppearance>> curves;
+        std::map<const RimEnsembleCurveSet*, cvf::Color3f>                     ensembleColors;
+    };
+
+    void applyGlobalAppearanceMode();
+    void saveAppearance( RimSummaryPlot* plot );
+    bool restoreAppearance( RimSummaryPlot* plot );
+
+    std::map<const RimSummaryPlot*, SavedAppearance> m_savedAppearances;
+    caf::PdmField<bool>                              m_useGlobalAppearance;
 
     // The dimension controlling the selected appearance type, as stored in the global settings
     RimSummaryCurveAppearanceOverride::Dimension currentDimension() const;
