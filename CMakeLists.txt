@@ -312,6 +312,11 @@ if(RESINSIGHT_ENABLE_GRPC)
   option(RESINSIGHT_GRPC_BUNDLE_PYTHON_MODULE
          "Bundle the gRPC python modules into the install folder" OFF
   )
+  option(
+    RESINSIGHT_GRPC_GENERATE_PYTHON_ON_BUILD
+    "Regenerate the Python classes after every ResInsight link. Takes seconds; when OFF, build RipsGeneratedPythonClasses after changing scriptable classes"
+    ON
+  )
   # NOTE: ENABLE_GRPC is defined per-target (see ApplicationLibCode,
   # ApplicationExeCode, GrpcInterface), to avoid a full project rebuild on
   # toggle.
