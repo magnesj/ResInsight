@@ -153,9 +153,8 @@ std::string RimSummaryCurveAppearanceSettings::dimensionValue( Dimension        
             return address.lgrName();
 
         case Dimension::BLOCK:
-            return address.category() == Category::SUMMARY_BLOCK || address.category() == Category::SUMMARY_BLOCK_LGR
-                       ? address.itemUiText()
-                       : std::string();
+            return address.category() == Category::SUMMARY_BLOCK || address.category() == Category::SUMMARY_BLOCK_LGR ? address.itemUiText()
+                                                                                                                      : std::string();
 
         case Dimension::CONNECTION:
             return address.category() == Category::SUMMARY_WELL_COMPLETION || address.category() == Category::SUMMARY_WELL_CONNECTION ||
