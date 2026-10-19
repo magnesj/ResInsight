@@ -20,11 +20,12 @@
 
 #include "RiaColorTools.h"
 
+#include "cafPdmDefaultObjectFactory.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiCommandSystemProxy.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 
-CAF_PDM_XML_ABSTRACT_SOURCE_INIT( RimPlotCurveAppearance, "PlotCurveAppearance" );
+CAF_PDM_XML_SOURCE_INIT( RimPlotCurveAppearance, "PlotCurveAppearance" );
 
 namespace caf
 {
@@ -236,7 +237,33 @@ void RimPlotCurveAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiO
     uiOrdering.add( &m_curveInterpolation );
     m_curveInterpolation.uiCapability()->setUiHidden( !m_interpolationVisible );
 
+    for ( auto field : std::vector<caf::PdmFieldHandle*>{ &m_curveColor,
+                                                          &m_curveColorOpacity,
+                                                          &m_pointSymbol,
+                                                          &m_symbolEdgeColor,
+                                                          &m_symbolSize,
+                                                          &m_symbolSkipPixelDistance,
+                                                          &m_lineStyle,
+                                                          &m_curveThickness,
+                                                          &m_fillStyle,
+                                                          &m_fillColor,
+                                                          &m_fillColorOpacity,
+                                                          &m_curveInterpolation } )
+    {
+        field->uiCapability()->setUiReadOnly( m_uiLocked );
+    }
+
+    if ( m_curveFittingToleranceVisible && m_uiLocked ) m_curveFittingTolerance.uiCapability()->setUiReadOnly( true );
+
     uiOrdering.skipRemainingFields();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPlotCurveAppearance::setUiLocked( bool isLocked )
+{
+    m_uiLocked = isLocked;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -399,6 +426,14 @@ void RimPlotCurveAppearance::setLineThickness( int thickness )
 int RimPlotCurveAppearance::lineThickness() const
 {
     return m_curveThickness;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPlotCurveAppearance::copyFrom( const RimPlotCurveAppearance& other )
+{
+    xmlCapability()->readObjectFromXmlString( other.xmlCapability()->writeObjectToXmlString(), caf::PdmDefaultObjectFactory::instance() );
 }
 
 //--------------------------------------------------------------------------------------------------
