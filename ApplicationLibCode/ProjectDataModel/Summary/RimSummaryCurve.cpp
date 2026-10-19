@@ -31,6 +31,7 @@
 #include "Summary/RiaSummaryDefines.h"
 #include "Summary/RiaSummaryTools.h"
 
+#include "RimCurveStyleRules.h"
 #include "RimEclipseResultCase.h"
 #include "RimEnsembleCurveSet.h"
 #include "RimEnsembleCurveSetCollection.h"
@@ -67,6 +68,12 @@ CAF_PDM_SOURCE_INIT( RimSummaryCurve, "SummaryCurve" );
 RimSummaryCurve::RimSummaryCurve()
 {
     CAF_PDM_InitObject( "Summary Curve", ":/SummaryCurve16x16.png" );
+
+    CAF_PDM_InitFieldNoDefault( &m_globalAppearanceLink, "GlobalAppearanceLink", "" );
+    RimCurveStyleRules::configureGlobalAppearanceLink( &m_globalAppearanceLink,
+                                                       "The appearance is controlled by the <a "
+                                                       "href=\"dummy\">global "
+                                                       "curve appearance</a>." );
 
     // Y Values
     CAF_PDM_InitFieldNoDefault( &m_yValuesSummaryCase, "SummaryCase", "Case" );
@@ -893,7 +900,12 @@ void RimSummaryCurve::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering
     caf::PdmUiGroup* stackingGroup = uiOrdering.addNewGroup( "Stacking" );
     RimStackablePlotCurve::stackingUiOrdering( *stackingGroup );
 
+    const auto plot               = firstAncestorOrThisOfType<RimSummaryPlot>();
+    const bool isAppearanceGlobal = plot && plot->useGlobalCurveAppearance() && firstAncestorOrThisOfType<RimSummaryCurveCollection>();
+    m_curveAppearance->setUiLocked( isAppearanceGlobal );
+
     caf::PdmUiGroup* appearanceGroup = uiOrdering.addNewGroup( "Appearance" );
+    if ( isAppearanceGlobal ) appearanceGroup->add( &m_globalAppearanceLink );
     RimPlotCurve::appearanceUiOrdering( *appearanceGroup );
 
     caf::PdmUiGroup* nameGroup = uiOrdering.addNewGroup( "Curve Name" );

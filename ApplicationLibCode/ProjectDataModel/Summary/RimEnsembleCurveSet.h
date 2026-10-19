@@ -99,11 +99,13 @@ public:
 
     QString name() const;
 
-    bool   isCurvesVisible() const;
-    void   setColor( cvf::Color3f color );
-    void   setStatisticsColor( const cvf::Color3f& color );
-    void   enableStatisticsLables( bool enable );
-    QColor mainEnsembleColor() const;
+    bool         isCurvesVisible() const;
+    void         setColor( cvf::Color3f color );
+    void         setColorAndUpdateCurves( cvf::Color3f color );
+    cvf::Color3f color() const;
+    void         setStatisticsColor( const cvf::Color3f& color );
+    void         enableStatisticsLables( bool enable );
+    QColor       mainEnsembleColor() const;
 
     void loadDataAndUpdate( bool updateParentPlot );
     void setParentPlotNoReplot( RiuPlotWidget* plot );
@@ -274,6 +276,7 @@ private:
 
     caf::PdmField<ColorModeEnum>                                             m_colorMode;
     caf::PdmField<cvf::Color3f>                                              m_mainEnsembleColor;
+    caf::PdmField<bool>                                                      m_globalAppearanceLink;
     cvf::Color3f                                                             m_colorForRealizations;
     caf::PdmField<double>                                                    m_colorOpacity;
     caf::PdmField<QString>                                                   m_ensembleParameter;

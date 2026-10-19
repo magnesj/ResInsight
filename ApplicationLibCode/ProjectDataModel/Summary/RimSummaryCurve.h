@@ -170,6 +170,7 @@ private:
     caf::PdmChildField<RimSummaryCurveAutoName*>      m_curveNameConfig;
     caf::PdmField<caf::AppEnum<RiaDefines::PlotAxis>> m_plotAxis_OBSOLETE;
     caf::PdmField<bool>                               m_isTopZWithinCategory;
+    caf::PdmField<bool>                               m_globalAppearanceLink;
 
     bool m_showXAxisGroup = true;
 };
