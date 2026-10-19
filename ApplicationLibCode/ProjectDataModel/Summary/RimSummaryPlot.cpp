@@ -976,7 +976,13 @@ void RimSummaryPlot::updateCurveAppearanceFromGlobalSettings()
 void RimSummaryPlot::applyDefaultCurveAppearances( std::vector<RimEnsembleCurveSet*> ensembleCurvesToUpdate )
 {
     // Indices depend on all curve sets in the plot, so all must be updated to stay consistent
-    if ( useGlobalCurveAppearance() ) ensembleCurvesToUpdate = ensembleCurveSetCollection()->curveSets();
+    std::optional<DimensionIndexer> globalColorIndexer;
+    if ( useGlobalCurveAppearance() )
+    {
+        ensembleCurvesToUpdate = ensembleCurveSetCollection()->curveSets();
+        globalColorIndexer.emplace( RimProject::current()->curveStyleRules()->settings()->colorDimension(),
+                                    summaryAndEnsembleCurveDefinitions() );
+    }
 
     std::vector<QColor> usedColors;
     for ( auto c : ensembleCurveSetCollection()->curveSets() )
@@ -1002,7 +1008,7 @@ void RimSummaryPlot::applyDefaultCurveAppearances( std::vector<RimEnsembleCurveS
         {
             if ( RimEnsembleCurveSetColorManager::hasSameColorForAllRealizationCurves( curveSet->colorMode() ) )
             {
-                if ( useGlobalCurveAppearance() )
+                if ( globalColorIndexer )
                 {
                     if ( auto overrideColor = overriddenEnsembleColor( curveSet ) )
                     {
@@ -1011,9 +1017,7 @@ void RimSummaryPlot::applyDefaultCurveAppearances( std::vector<RimEnsembleCurveS
                     }
 
                     const auto caseName = curveSet->summaryEnsemble() ? curveSet->summaryEnsemble()->name().toStdString() : std::string();
-                    const DimensionIndexer colorIndexer( RimProject::current()->curveStyleRules()->settings()->colorDimension(),
-                                                         summaryAndEnsembleCurveDefinitions() );
-                    if ( auto color = globalColor( colorIndexer, adr, caseName ) )
+                    if ( auto color = globalColor( *globalColorIndexer, adr, caseName ) )
                     {
                         curveSet->setColorAndUpdateCurves( *color );
                         continue;

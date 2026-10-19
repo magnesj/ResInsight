@@ -18,12 +18,9 @@
 
 #include "RimCurveStyleSettings.h"
 
-#include "RiaApplication.h"
-
 #include "RifEclipseSummaryAddress.h"
 
 #include "RimCurveStyleRules.h"
-#include "RimProject.h"
 #include "RimSummaryCase.h"
 #include "RimSummaryEnsemble.h"
 
@@ -173,13 +170,11 @@ std::string RimCurveStyleSettings::dimensionValue( Dimension dimension, const Ri
 //--------------------------------------------------------------------------------------------------
 void RimCurveStyleSettings::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    // Edits made in the dock window must take effect immediately and be persisted
-    if ( auto app = RiaApplication::instance() ) app->applyPreferences();
-
     // The collection list shows colors that depend on the global appearance
-    if ( auto project = RimProject::current() )
+    if ( auto collection = firstAncestorOrThisOfType<RimCurveStyleRules>() )
     {
-        if ( auto collection = project->curveStyleRules() ) collection->updateConnectedEditors();
+        collection->rulesChanged();
+        collection->updateConnectedEditors();
     }
 }
 

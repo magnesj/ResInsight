@@ -248,6 +248,7 @@ void RiuPlotMainWindow::cleanupGuiBeforeProjectClose()
     {
         pdmUiPropertyView->showProperties( nullptr );
     }
+    m_curveStyleRulesView->showProperties( nullptr );
 
     cleanUpTemporaryWidgets();
 

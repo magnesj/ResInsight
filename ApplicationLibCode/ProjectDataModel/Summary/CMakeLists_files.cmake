@@ -11,6 +11,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimCurveStyleSettings.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimCurveStyleRule.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimCurveStyleRules.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimSavedCurveAppearance.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimSummaryCurveAutoName.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimSummaryPlotAxisFormatter.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimSummaryCurveCollection.cpp

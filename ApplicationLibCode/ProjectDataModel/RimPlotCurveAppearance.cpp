@@ -25,7 +25,7 @@
 #include "cafPdmUiCommandSystemProxy.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 
-    CAF_PDM_XML_SOURCE_INIT( RimPlotCurveAppearance, "PlotCurveAppearance" );
+CAF_PDM_XML_SOURCE_INIT( RimPlotCurveAppearance, "PlotCurveAppearance" );
 
 namespace caf
 {
@@ -252,6 +252,14 @@ void RimPlotCurveAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiO
     {
         field->uiCapability()->setUiReadOnly( m_uiLocked );
     }
+
+    // Keep the fields that are irrelevant for the current symbol and line style read-only
+    const bool noSymbol = m_pointSymbol() == RiuPlotCurveSymbol::SYMBOL_NONE;
+    const bool noLine   = m_lineStyle() == RiuQwtPlotCurveDefines::LineStyleEnum::STYLE_NONE;
+    m_symbolSize.uiCapability()->setUiReadOnly( m_uiLocked || noSymbol );
+    m_symbolSkipPixelDistance.uiCapability()->setUiReadOnly( m_uiLocked || noSymbol );
+    m_curveThickness.uiCapability()->setUiReadOnly( m_uiLocked || noLine );
+    m_curveInterpolation.uiCapability()->setUiReadOnly( m_uiLocked || noLine );
 
     if ( m_curveFittingToleranceVisible && m_uiLocked ) m_curveFittingTolerance.uiCapability()->setUiReadOnly( true );
 

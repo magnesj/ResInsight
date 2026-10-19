@@ -111,7 +111,6 @@
 #include "RimSummaryCase.h"
 #include "RimSummaryCaseMainCollection.h"
 #include "RimSummaryEnsemble.h"
-#include "RimSummaryPlot.h"
 #include "RimSurfaceCollection.h"
 #include "RimViewLinker.h"
 #include "RimViewLinkerCollection.h"
@@ -1550,11 +1549,6 @@ void RiaApplication::applyPreferences()
 
         project()->scriptCollection()->updateConnectedEditors();
         project()->rootPlotTemplateItem()->updateConnectedEditors();
-
-        for ( auto plot : project()->descendantsIncludingThisOfType<RimSummaryPlot>() )
-        {
-            plot->updateCurveAppearanceFromGlobalSettings();
-        }
     }
 
     caf::ProgressInfoStatic::setEnabled( RiaPreferencesSystem::current()->showProgressBar() );

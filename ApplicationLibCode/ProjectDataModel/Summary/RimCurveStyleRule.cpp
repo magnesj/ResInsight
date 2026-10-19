@@ -111,12 +111,18 @@ void RimCurveStyleRule::applyToCurve( RimPlotCurve* curve, bool applyColor, bool
     auto       curveAppearance = curve->curveAppearance();
     const auto color           = curveAppearance->color();
     const auto symbol          = curveAppearance->symbol();
+    const auto label           = curveAppearance->symbolLabel();
+    const auto labelPosition   = curveAppearance->symbolLabelPosition();
 
     curveAppearance->copyFrom( *m_appearance );
 
     // Color and symbol are only controlled by the rule when its dimension is the one selected for them
     if ( !applyColor ) curveAppearance->setColor( color );
     if ( !applySymbol ) curveAppearance->setSymbol( symbol );
+
+    // Labels are specific to each curve
+    curveAppearance->setSymbolLabel( label );
+    curveAppearance->setSymbolLabelPosition( labelPosition );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -234,8 +240,39 @@ void RimCurveStyleRule::setItemName( const QString& itemName )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+namespace
+{
+std::optional<std::map<RimCurveStyleRule::Dimension, QStringList>> availableNamesCache;
+} // namespace
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimCurveStyleRule::AvailableNamesCache::AvailableNamesCache()
+    : m_isOwner( !availableNamesCache )
+{
+    if ( m_isOwner ) availableNamesCache.emplace();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimCurveStyleRule::AvailableNamesCache::~AvailableNamesCache()
+{
+    if ( m_isOwner ) availableNamesCache.reset();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QStringList RimCurveStyleRule::availableNames( Dimension dimension )
 {
+    if ( availableNamesCache )
+    {
+        auto it = availableNamesCache->find( dimension );
+        if ( it != availableNamesCache->end() ) return it->second;
+    }
+
     std::set<QString> names;
     if ( dimension == Dimension::WELL )
     {
@@ -279,7 +316,46 @@ QStringList RimCurveStyleRule::availableNames( Dimension dimension )
         result.push_back( name );
     }
 
+    if ( availableNamesCache ) ( *availableNamesCache )[dimension] = result;
+
     return result;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::map<QString, RimCurveStyleRule::PlotAppearance> RimCurveStyleRule::appearancesFromPlots( Dimension dimension )
+{
+    std::map<QString, PlotAppearance> appearances;
+
+    auto project = RimProject::current();
+    if ( !project ) return appearances;
+
+    for ( auto plot : project->descendantsIncludingThisOfType<RimSummaryPlot>() )
+    {
+        if ( !plot->useGlobalCurveAppearance() ) continue;
+
+        for ( auto curve : plot->summaryCurves() )
+        {
+            const auto value = RimCurveStyleSettings::dimensionValue( dimension,
+                                                                      curve->summaryAddressY(),
+                                                                      RimCurveStyleSettings::caseName( curve->summaryCaseY() ) );
+
+            auto& appearance = appearances[QString::fromStdString( value )];
+            if ( !appearance.color ) appearance.color = curve->color();
+            if ( !appearance.symbol ) appearance.symbol = curve->symbol();
+        }
+
+        for ( auto curveSet : plot->ensembleCurveSetCollection()->curveSets() )
+        {
+            const auto value = RimCurveStyleSettings::dimensionValue( dimension, curveSet->summaryAddressY(), ensembleCaseName( curveSet ) );
+
+            auto& appearance = appearances[QString::fromStdString( value )];
+            if ( !appearance.color ) appearance.color = curveSet->color();
+        }
+    }
+
+    return appearances;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -327,35 +403,6 @@ void RimCurveStyleRule::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
     uiOrdering.add( &m_dimension );
     uiOrdering.add( &m_itemName );
     uiOrdering.skipRemainingFields();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::optional<cvf::Color3f> RimCurveStyleRule::colorFromPlots( Dimension dimension, const QString& name )
-{
-    auto project = RimProject::current();
-    if ( !project ) return std::nullopt;
-
-    for ( auto plot : project->descendantsIncludingThisOfType<RimSummaryPlot>() )
-    {
-        if ( !plot->useGlobalCurveAppearance() ) continue;
-
-        for ( auto curve : plot->summaryCurves() )
-        {
-            if ( matchesItem( dimension, name, curve->summaryAddressY(), RimCurveStyleSettings::caseName( curve->summaryCaseY() ) ) )
-            {
-                return curve->color();
-            }
-        }
-
-        for ( auto curveSet : plot->ensembleCurveSetCollection()->curveSets() )
-        {
-            if ( matchesItem( dimension, name, curveSet->summaryAddressY(), ensembleCaseName( curveSet ) ) ) return curveSet->color();
-        }
-    }
-
-    return std::nullopt;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -493,30 +540,6 @@ std::optional<RiuPlotCurveSymbol::PointSymbolEnum> RimCurveStyleRule::overridden
 {
     if ( m_mode() != Mode::CUSTOM ) return std::nullopt;
     return m_appearance->symbol();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::optional<RiuPlotCurveSymbol::PointSymbolEnum> RimCurveStyleRule::symbolFromPlots( Dimension dimension, const QString& name )
-{
-    auto project = RimProject::current();
-    if ( !project ) return std::nullopt;
-
-    for ( auto plot : project->descendantsIncludingThisOfType<RimSummaryPlot>() )
-    {
-        if ( !plot->useGlobalCurveAppearance() ) continue;
-
-        for ( auto curve : plot->summaryCurves() )
-        {
-            if ( matchesItem( dimension, name, curve->summaryAddressY(), RimCurveStyleSettings::caseName( curve->summaryCaseY() ) ) )
-            {
-                return curve->symbol();
-            }
-        }
-    }
-
-    return std::nullopt;
 }
 
 //--------------------------------------------------------------------------------------------------

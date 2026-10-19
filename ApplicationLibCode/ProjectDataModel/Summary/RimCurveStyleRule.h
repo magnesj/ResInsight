@@ -33,6 +33,7 @@
 #include <QString>
 #include <QStringList>
 
+#include <map>
 #include <optional>
 
 class RimPlotCurve;
@@ -65,14 +66,34 @@ public:
     // Applies the rule to the curve if it is custom. Color and symbol are only applied when requested
     void applyToCurve( RimPlotCurve* curve, bool applyColor, bool applySymbol ) const;
 
-    static QStringList                 availableNames( Dimension dimension );
-    static std::optional<cvf::Color3f> colorFromPlots( Dimension dimension, const QString& name );
+    static QStringList availableNames( Dimension dimension );
 
-    static caf::IconProvider                                  swatchIcon( const cvf::Color3f& color );
-    static caf::IconProvider                                  paletteIcon();
-    static caf::IconProvider                                  symbolIcon();
-    static caf::IconProvider                                  dimensionIcon( Dimension dimension );
-    static std::optional<RiuPlotCurveSymbol::PointSymbolEnum> symbolFromPlots( Dimension dimension, const QString& name );
+    // Caches availableNames() while in scope, as finding them can require scanning all summary addresses
+    class AvailableNamesCache
+    {
+    public:
+        AvailableNamesCache();
+        ~AvailableNamesCache();
+        AvailableNamesCache( const AvailableNamesCache& )            = delete;
+        AvailableNamesCache& operator=( const AvailableNamesCache& ) = delete;
+
+    private:
+        bool m_isOwner;
+    };
+
+    struct PlotAppearance
+    {
+        std::optional<cvf::Color3f>                        color;
+        std::optional<RiuPlotCurveSymbol::PointSymbolEnum> symbol;
+    };
+
+    // The appearance of the first curve for each item in plots using the global appearance
+    static std::map<QString, PlotAppearance> appearancesFromPlots( Dimension dimension );
+
+    static caf::IconProvider swatchIcon( const cvf::Color3f& color );
+    static caf::IconProvider paletteIcon();
+    static caf::IconProvider symbolIcon();
+    static caf::IconProvider dimensionIcon( Dimension dimension );
 
     // Dimension icon followed by color and/or symbol swatches, when given. The symbol is drawn with the color if present.
     static caf::IconProvider dimensionColorIcon( Dimension                                                 dimension,
