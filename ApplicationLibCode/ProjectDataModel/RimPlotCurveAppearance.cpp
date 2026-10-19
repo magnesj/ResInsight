@@ -25,7 +25,7 @@
 #include "cafPdmUiCommandSystemProxy.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 
-    CAF_PDM_XML_SOURCE_INIT( RimPlotCurveAppearance, "PlotCurveAppearance" );
+CAF_PDM_XML_SOURCE_INIT( RimPlotCurveAppearance, "PlotCurveAppearance" );
 
 namespace caf
 {
