@@ -488,6 +488,13 @@ QLabel* caf::PdmUiFormLayoutObjectEditor::createLabel( QWidget* parent, const Pd
     qLabel->setText( label.uiName( uiConfigName ) );
     qLabel->setWordWrap( true );
 
+    if ( auto callback = label.linkActivatedCallback() )
+    {
+        qLabel->setTextFormat( Qt::RichText );
+        qLabel->setTextInteractionFlags( Qt::LinksAccessibleByMouse );
+        QObject::connect( qLabel, &QLabel::linkActivated, qLabel, [callback]( const QString& link ) { callback( link ); } );
+    }
+
     m_labels.push_back( qLabel );
     return qLabel;
 }
