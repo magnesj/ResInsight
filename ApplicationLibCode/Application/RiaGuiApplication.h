@@ -37,6 +37,7 @@ class Drawable;
 
 class RIProcess;
 
+class RiaHtmlServer;
 class RiaPreferences;
 class RiaProjectModifier;
 class RiaSocketServer;
@@ -171,4 +172,6 @@ private:
     QPointer<RiuPlotMainWindow> m_mainPlotWindow;
 
     std::unique_ptr<RiuRecentFileActionProvider> m_recentFileActionProvider;
+
+    RiaHtmlServer* m_htmlServer;
 };
