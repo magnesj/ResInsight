@@ -39,6 +39,21 @@ public:
     void   setDatumElevationFromOsdu( double datumElevationFromOsdu );
     double datumElevationFromOsdu() const;
 
+    void   setSurfaceEastingFromOsdu( double surfaceEasting );
+    double surfaceEastingFromOsdu() const;
+
+    void   setSurfaceNorthingFromOsdu( double surfaceNorthing );
+    double surfaceNorthingFromOsdu() const;
+
+    void    setCrsFromOsdu( const QString& crs );
+    QString crsFromOsdu() const;
+
+    void   setUnitToMetersFromOsdu( double unitToMeters );
+    double unitToMetersFromOsdu() const;
+
+    void   setTargetUnitToMeters( double targetUnitToMeters );
+    double targetUnitToMeters() const;
+
     void    setExistenceKind( const QString& existenceKind );
     QString existenceKind() const;
 
@@ -51,4 +66,9 @@ private:
     caf::PdmField<QString> m_wellboreTrajectoryId;
     caf::PdmField<QString> m_existenceKind;
     caf::PdmField<double>  m_datumElevationFromOsdu;
+    caf::PdmField<double>  m_surfaceEastingFromOsdu;
+    caf::PdmField<double>  m_surfaceNorthingFromOsdu;
+    caf::PdmField<QString> m_crsFromOsdu;
+    caf::PdmField<double>  m_unitToMetersFromOsdu;
+    caf::PdmField<double>  m_targetUnitToMeters;
 };
