@@ -274,7 +274,8 @@ list(
   make_directory
   ${RESINSIGHT_TESTS_OUTPUT_DIRECTORY}
 )
-foreach(riFileName ${RI_FILENAMES})
+# Use a single copy command, as this target runs on every build
+if(RI_FILENAMES)
   list(
     APPEND
     copyCommands
@@ -282,10 +283,10 @@ foreach(riFileName ${RI_FILENAMES})
     ${CMAKE_COMMAND}
     -E
     copy_if_different
-    ${riFileName}
+    ${RI_FILENAMES}
     ${RESINSIGHT_TESTS_OUTPUT_DIRECTORY}
   )
-endforeach()
+endif()
 add_custom_target(PreBuildFileCopyTest ${copyCommands})
 set_property(TARGET PreBuildFileCopyTest PROPERTY FOLDER "FileCopyTargetsTest")
 
