@@ -568,4 +568,3 @@ def test_geomech_case_results(rips_instance, initialize_test, tmp_path):
         case.result_values(
             "porosity", time_step=0, result_position=positions.ELEMENT, frame_index=1
         )
-
