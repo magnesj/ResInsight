@@ -24,6 +24,7 @@
 #include "RimWbsParameters.h"
 #include "RimWellBoreStabilityPlot.h"
 #include "RimWellPath.h"
+#include "RimcDataContainerString.h"
 
 #include "cafPdmFieldScriptingCapability.h"
 
@@ -96,4 +97,43 @@ std::expected<caf::PdmObjectHandle*, QString> RimGeoMechCase_createWellBoreStabi
 QString RimGeoMechCase_createWellBoreStabilityPlot::classKeywordReturnedType() const
 {
     return RimWellBoreStabilityPlot::classKeywordStatic();
+}
+
+CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimGeoMechCase, RimGeoMechCase_timeStepStrings, "TimeStepStringsInternal" );
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimGeoMechCase_timeStepStrings::RimGeoMechCase_timeStepStrings( caf::PdmObjectHandle* self )
+    : PdmObjectMethod( self, PdmObjectMethod::NullPointerType::NULL_IS_INVALID, PdmObjectMethod::ResultType::PERSISTENT_FALSE )
+{
+    CAF_PDM_InitObject( "Time Step Strings", "", "", "Time step strings for this case." );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::expected<caf::PdmObjectHandle*, QString> RimGeoMechCase_timeStepStrings::execute()
+{
+    auto* geoMechCase = self<RimGeoMechCase>();
+    if ( !geoMechCase ) return std::unexpected( "No GeoMech case is available." );
+
+    auto* container = new RimcDataContainerString();
+
+    std::vector<QString> names;
+    for ( const QString& name : geoMechCase->timeStepStrings() )
+    {
+        names.push_back( name );
+    }
+    container->m_stringValues = names;
+
+    return container;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimGeoMechCase_timeStepStrings::classKeywordReturnedType() const
+{
+    return RimcDataContainerString::classKeywordStatic();
 }

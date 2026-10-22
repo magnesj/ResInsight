@@ -54,3 +54,17 @@ private:
 
     const RimWbsParameters* m_parameters = nullptr;
 };
+
+//==================================================================================================
+/// Get the time step strings of this GeoMech case.
+//==================================================================================================
+class RimGeoMechCase_timeStepStrings : public caf::PdmObjectMethod
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    RimGeoMechCase_timeStepStrings( caf::PdmObjectHandle* self );
+
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
+};
