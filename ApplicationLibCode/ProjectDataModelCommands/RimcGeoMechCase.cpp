@@ -20,6 +20,9 @@
 
 #include "WellLogCommands/RicNewWellBoreStabilityPlotFeature.h"
 
+#include "RigFemPartResultsCollection.h"
+#include "RigGeoMechCaseData.h"
+
 #include "RimGeoMechCase.h"
 #include "RimWbsParameters.h"
 #include "RimWellBoreStabilityPlot.h"
@@ -27,6 +30,16 @@
 #include "RimcDataContainerString.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmScriptEnumNameRegistry.h"
+
+namespace
+{
+struct RegisterScriptEnumNames
+{
+    RegisterScriptEnumNames() { caf::PdmScriptEnumNameRegistry::registerName<RigFemResultPosEnum>( "GeoMechResultPosition" ); }
+};
+const RegisterScriptEnumNames s_registerScriptEnumNames;
+} // namespace
 
 CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimGeoMechCase, RimGeoMechCase_createWellBoreStabilityPlot, "createWellBoreStabilityPlot" );
 
@@ -134,6 +147,70 @@ std::expected<caf::PdmObjectHandle*, QString> RimGeoMechCase_timeStepStrings::ex
 ///
 //--------------------------------------------------------------------------------------------------
 QString RimGeoMechCase_timeStepStrings::classKeywordReturnedType() const
+{
+    return RimcDataContainerString::classKeywordStatic();
+}
+
+CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimGeoMechCase, RimGeoMechCase_resultNames, "ResultNamesInternal" );
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimGeoMechCase_resultNames::RimGeoMechCase_resultNames( caf::PdmObjectHandle* self )
+    : PdmObjectMethod( self, PdmObjectMethod::NullPointerType::NULL_IS_INVALID, PdmObjectMethod::ResultType::PERSISTENT_FALSE )
+{
+    CAF_PDM_InitObject( "Result Names", "", "", "Result names for this case." );
+
+    CAF_PDM_InitScriptableField( &m_resultPosition,
+                                 "ResultPosition",
+                                 caf::AppEnum<RigFemResultPosEnum>( RIG_ELEMENT_NODAL ),
+                                 "Result Position",
+                                 "",
+                                 "",
+                                 "Result position, for example NODAL or ELEMENT_NODAL" );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::expected<caf::PdmObjectHandle*, QString> RimGeoMechCase_resultNames::execute()
+{
+    auto* geoMechCase = self<RimGeoMechCase>();
+    if ( !geoMechCase ) return std::unexpected( "No GeoMech case is available." );
+
+    if ( !geoMechCase->geoMechData() || !geoMechCase->geoMechData()->femPartResults() )
+    {
+        return std::unexpected( "The GeoMech case has no result data. Open the case first." );
+    }
+
+    const auto fieldsWithComponents = geoMechCase->geoMechData()->femPartResults()->scalarFieldAndComponentNames( m_resultPosition() );
+
+    std::vector<QString> names;
+    for ( const auto& [field, components] : fieldsWithComponents )
+    {
+        const QString fieldName = QString::fromStdString( field );
+        if ( components.empty() )
+        {
+            names.push_back( fieldName );
+            continue;
+        }
+
+        for ( const auto& component : components )
+        {
+            names.push_back( fieldName + ":" + QString::fromStdString( component ) );
+        }
+    }
+
+    auto* container           = new RimcDataContainerString();
+    container->m_stringValues = names;
+
+    return container;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimGeoMechCase_resultNames::classKeywordReturnedType() const
 {
     return RimcDataContainerString::classKeywordStatic();
 }

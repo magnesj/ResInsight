@@ -18,6 +18,9 @@
 
 #pragma once
 
+#include "RigFemResultPosEnum.h"
+
+#include "cafAppEnum.h"
 #include "cafPdmField.h"
 #include "cafPdmObjectHandle.h"
 #include "cafPdmObjectMethod.h"
@@ -67,4 +70,23 @@ public:
 
     std::expected<caf::PdmObjectHandle*, QString> execute() override;
     QString                                       classKeywordReturnedType() const override;
+};
+
+//==================================================================================================
+/// Get the result names of this GeoMech case for a result position.
+///
+/// Names are returned as "FIELD:COMPONENT", or "FIELD" for results without components.
+//==================================================================================================
+class RimGeoMechCase_resultNames : public caf::PdmObjectMethod
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    RimGeoMechCase_resultNames( caf::PdmObjectHandle* self );
+
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
+
+private:
+    caf::PdmField<caf::AppEnum<RigFemResultPosEnum>> m_resultPosition;
 };

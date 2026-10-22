@@ -54,6 +54,7 @@ from .resinsight_classes import (
     Case as Case,
     EclipseCase as EclipseCase,
     GeoMechCase as GeoMechCase,
+    GeoMechResultPosition as GeoMechResultPosition,
     PorosityModelType as PorosityModelType,
     PropertyDataType as PropertyDataType,
     PropertyType as PropertyType,
@@ -311,6 +312,24 @@ def time_step_strings(self: GeoMechCase) -> List[str]:
         A list of time step strings, one per time step.
     """
     return self.time_step_strings_internal().values
+
+
+@add_method(GeoMechCase)
+def result_names(
+    self: GeoMechCase,
+    result_position: GeoMechResultPosition = GeoMechResultPosition.ELEMENT_NODAL,
+) -> List[str]:
+    """Get the result names of this geomechanical case
+
+    Arguments:
+        result_position(GeoMechResultPosition): Result position, for example
+            GeoMechResultPosition.NODAL or GeoMechResultPosition.ELEMENT_NODAL.
+
+    Returns:
+        A list of names on the form "FIELD:COMPONENT", or "FIELD" for results
+        without components.
+    """
+    return self.result_names_internal(result_position=result_position).values
 
 
 @add_method(Case)
