@@ -90,3 +90,27 @@ public:
 private:
     caf::PdmField<caf::AppEnum<RigFemResultPosEnum>> m_resultPosition;
 };
+
+//==================================================================================================
+/// Read the values of a GeoMech result into the key-value store.
+///
+/// A negative frame index selects the last frame of the time step. The values of all parts are
+/// stored as a float array under the given key.
+//==================================================================================================
+class RimGeoMechCase_readResultValuesInternal : public caf::PdmVoidObjectMethod
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    RimGeoMechCase_readResultValuesInternal( caf::PdmObjectHandle* self );
+
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+
+private:
+    caf::PdmField<caf::AppEnum<RigFemResultPosEnum>> m_resultPosition;
+    caf::PdmField<QString>                           m_fieldName;
+    caf::PdmField<QString>                           m_componentName;
+    caf::PdmField<int>                               m_timeStep;
+    caf::PdmField<int>                               m_frameIndex;
+    caf::PdmField<QString>                           m_key;
+};
