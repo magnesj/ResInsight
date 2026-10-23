@@ -20,8 +20,12 @@
 
 #include "RiaTestDataDirectory.h"
 
+#include "Well/RigWellPath.h"
+
 #include "RimStimPlanFractureTemplate.h"
+#include "RimWellPath.h"
 #include "RimWellPathFracture.h"
+#include "RimWellPathFractureCollection.h"
 
 #include <memory>
 
@@ -43,6 +47,7 @@ public:
     }
 
     void useBetaFromFile() { m_betaFactorType = BETA_FACTOR_FROM_FRACTURE; }
+    void setPerforationLengthValue( double length ) { m_perforationLength = length; }
     void setOrientation( FracOrientationEnum orientation ) { m_orientationType = orientation; }
 };
 
@@ -105,4 +110,42 @@ TEST( RimStimPlanFractureTemplateTest, FileWithoutWidthUsesConductivityDirectly 
 
     // The conductivity at the well center is 301.7 md-m in the file
     EXPECT_NEAR( 301.7, tmpl.computeKh( &fracture ), 1.0e-9 );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// For fractures along the well path, the values are averaged along the part of the well path
+/// that intersects the fracture
+//--------------------------------------------------------------------------------------------------
+TEST( RimStimPlanFractureTemplateTest, IntersectionDataAlongWellPath )
+{
+    // Horizontal well along the X axis at depth 2015 m, with measured depth equal to the X coordinate + 500
+    std::vector<cvf::Vec3d> wellPathPoints;
+    std::vector<double>     measuredDepths;
+    for ( int i = 0; i <= 20; i++ )
+    {
+        const double x = -500.0 + i * 50.0;
+        wellPathPoints.push_back( cvf::Vec3d( x, 0.0, -2015.0 ) );
+        measuredDepths.push_back( x + 500.0 );
+    }
+
+    RimWellPath wellPath;
+    wellPath.setWellPathGeometry( new RigWellPath( wellPathPoints, measuredDepths ) );
+
+    TestStimPlanFractureTemplate tmpl( STIMPLAN_TEMPLATE_TEST_DATA_DIRECTORY + "uniform_width_beta.xml" );
+    tmpl.useBetaFromFile();
+    tmpl.setOrientation( RimFractureTemplate::ALONG_WELL_PATH );
+    tmpl.setPerforationLengthValue( 80.0 );
+
+    auto fracture = new RimWellPathFracture;
+    wellPath.fractureCollection()->addFracture( fracture );
+    fracture->setFractureUnit( RiaDefines::EclipseUnitSystem::UNITS_METRIC );
+    fracture->setFractureTemplate( &tmpl );
+    fracture->setMeasuredDepth( 500.0 );
+
+    ASSERT_TRUE( fracture->fractureGrid() != nullptr );
+
+    EXPECT_NEAR( 0.01, tmpl.computeFractureWidth( fracture ), 1.0e-9 );
+    EXPECT_NEAR( 30000.0, tmpl.computeEffectivePermeability( fracture ), 1.0e-3 );
+    EXPECT_NEAR( 300.0, tmpl.computeKh( fracture ), 1.0e-6 );
+    EXPECT_NEAR( 2.0, tmpl.getOrComputeBetaFactor( fracture ), 1.0e-9 );
 }
