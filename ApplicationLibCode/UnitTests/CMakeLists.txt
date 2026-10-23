@@ -75,6 +75,7 @@ set(SOURCE_UNITTEST_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimRelocatePath-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigTransmissibilityCondenser-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigPerforationTransmissibilityEquations-Test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimFractureTemplateNonDarcy-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaEclipseUnitTools-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaTextFileCompare-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifCaseRealizationParametersReader-Test.cpp
