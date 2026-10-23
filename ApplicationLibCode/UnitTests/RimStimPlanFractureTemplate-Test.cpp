@@ -27,7 +27,7 @@
 #include "RimWellPathFracture.h"
 #include "RimWellPathFractureCollection.h"
 
-#include <memory>
+#include <cmath>
 
 static const QString STIMPLAN_TEMPLATE_TEST_DATA_DIRECTORY   = QString( "%1/RimStimPlanFractureTemplate/" ).arg( TEST_DATA_DIR );
 static const QString STIMPLAN_XML_READER_TEST_DATA_DIRECTORY = QString( "%1/RifStimPlanXmlReader/" ).arg( TEST_DATA_DIR );
