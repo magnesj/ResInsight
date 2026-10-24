@@ -250,6 +250,15 @@ void PdmUiFieldHandle::setValueOptionsGenerator( const std::function<QList<PdmOp
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void PdmUiFieldHandle::setUiValueConverters( const UiValueConverter& toUi, const UiValueConverter& fromUi )
+{
+    m_toUiConverter   = toUi;
+    m_fromUiConverter = fromUi;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void PdmUiFieldHandle::setValueFromUiEditor( const QVariant& uiValue, bool notifyFieldChanged )
 {
 }

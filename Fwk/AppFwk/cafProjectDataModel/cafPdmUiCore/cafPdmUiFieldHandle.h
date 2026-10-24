@@ -41,8 +41,16 @@ public:
 
     void setValueOptionsGenerator( const std::function<QList<PdmOptionItemInfo>()>& valueOptionsGenerator );
 
+    // Optional conversion between the value stored in the field and the value shown in/entered from the UI,
+    // used for fields where the display representation depends on context (for instance the unit system of the
+    // owner). The converters operate on the QVariant produced by the field type's UI specialization.
+    using UiValueConverter = std::function<QVariant( const QVariant& )>;
+    void setUiValueConverters( const UiValueConverter& toUi, const UiValueConverter& fromUi );
+
 protected:
     std::function<QList<PdmOptionItemInfo>()> m_valueOptionsGenerator;
+    UiValueConverter                          m_toUiConverter;
+    UiValueConverter                          m_fromUiConverter;
 
 private:
     friend class PdmUiCommandSystemProxy;
