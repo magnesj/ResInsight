@@ -31,6 +31,8 @@
 #include <QHBoxLayout>
 #include <QList>
 #include <QPointer>
+#include <QSet>
+#include <QString>
 #include <QWidget>
 
 #include <functional>
@@ -135,6 +137,7 @@ protected:
                              int                       colSpan );
 
     void updateSubTitleVisibility( QLabel* subTitle );
+    bool isSubTitleCoveredByCommonLegend( const QString& subTitleText ) const;
 
     void setDefaultAxisProperties( RiuPlotWidget* plotWidget, int row, int column );
 
@@ -197,6 +200,11 @@ protected:
     // symbol), so the curves can be split into one color legend and one symbol legend.
     QPointer<RiuQwtPlotLegend> m_commonSymbolLegend;
     int                        m_commonSymbolLegendItemCount = 0;
+
+    // Exact entry titles currently shown in the common legend(s). Used to hide a sub plot heading when
+    // all its text is already duplicated by a common legend entry (e.g. a sub plot heading showing only
+    // a case name that is also shown as a symbol legend entry for that case).
+    QSet<QString> m_commonLegendEntryTexts;
 
     std::map<RiuQwtPlotLegend*, int> m_childCountForAdjustSizeOperation;
 

@@ -47,6 +47,7 @@
 
 #include <QCryptographicHash>
 #include <QImage>
+#include <QPainterPath>
 #include <QSet>
 
 #include <map>
@@ -332,11 +333,26 @@ static QwtGraphic createCurveLegendIcon( const QSize&                        siz
     QPainter painter( &graphic );
     painter.setRenderHint( QPainter::Antialiasing );
 
+    // QwtGraphic computes its own bounding rect from the actually painted content (see
+    // QwtGraphic::drawImage()/drawPath()), and the legend later rescales that bounding rect to fill its
+    // fixed icon slot. Without this, a symbol painted smaller than the full icon ends up with a smaller
+    // bounding rect that gets rescaled back up to fill the icon slot, defeating the size reduction below.
+    // Draw an invisible full-size rect first to pin the bounding rect to the full icon size.
+    QPainterPath boundsPath;
+    boundsPath.addRect( 0.0, 0.0, size.width(), size.height() );
+    painter.setPen( Qt::NoPen );
+    painter.setBrush( Qt::NoBrush );
+    painter.drawPath( boundsPath );
+
     if ( drawLine )
     {
+        // A bit thicker than a plain hairline, so colored curve lines are as visually prominent as curve symbols.
+        const double lineWidth = 3.0;
+
         QPen pn;
         pn.setCapStyle( Qt::FlatCap );
         pn.setColor( lineColor );
+        pn.setWidthF( lineWidth );
 
         painter.setPen( pn );
 
@@ -346,9 +362,13 @@ static QwtGraphic createCurveLegendIcon( const QSize&                        siz
 
     if ( symbol != RiuPlotCurveSymbol::SYMBOL_NONE )
     {
-        auto image = RiuPlotCurveSymbolImageCreator::createSymbolImage( symbol, QSize( size.width() / 2, size.height() / 2 ), symbolColor );
+        // Draw the symbol clearly smaller than the full icon, so it does not dominate the icon visually.
+        const double symbolScale = 0.45;
+        QSize        symbolSize( static_cast<int>( size.width() * symbolScale ), static_cast<int>( size.height() * symbolScale ) );
 
-        QPoint p( size.width() / 4, size.height() / 4 );
+        auto image = RiuPlotCurveSymbolImageCreator::createSymbolImage( symbol, symbolSize, symbolColor );
+
+        QPoint p( ( size.width() - symbolSize.width() ) / 2, ( size.height() - symbolSize.height() ) / 2 );
         painter.drawImage( p, image );
     }
 
@@ -553,8 +573,8 @@ bool RiuQwtPlotTools::splitLegendByColorAndSymbol( const std::vector<QwtPlot*>& 
     if ( !foundAttributes ) return false;
 
     // Use the same square icon size as the regular per-curve legend icons (see RimPlotCurve::updateUiIconFromPlotSymbol()),
-    // as symbols are drawn at half this size (see createCurveLegendIcon()) and become an unrecognizable blob if the icon
-    // is too small or not square.
+    // as symbols are drawn smaller than this size (see createCurveLegendIcon()) and become an unrecognizable blob if the
+    // icon is too small or not square.
     const QSize iconSize( 24, 24 );
 
     for ( const auto& [color, label] : colorToLabel )

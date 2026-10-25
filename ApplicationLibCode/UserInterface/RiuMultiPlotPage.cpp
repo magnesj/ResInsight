@@ -392,6 +392,7 @@ void RiuMultiPlotPage::updateSubTitles()
         if ( m_plotWidgets[i] && m_plotWidgets[i]->isChecked() )
         {
             m_subTitles[i]->setText( m_plotWidgets[i]->plotTitle() );
+            updateSubTitleVisibility( m_subTitles[i] );
         }
     }
 }
@@ -645,7 +646,16 @@ void RiuMultiPlotPage::refreshLegends()
 {
     // The common legend is rebuilt from the sub plot legend data. A full layout rebuild here could trigger new legend
     // data changes in the plots, and thereby an endless update loop
-    if ( useCommonLegend( m_plotDefinition ) ) updateCommonLegend();
+    if ( useCommonLegend( m_plotDefinition ) )
+    {
+        updateCommonLegend();
+
+        // The common legend content may have changed, so sub plot headings may need to be shown/hidden again.
+        for ( auto subTitle : subTitlesForVisiblePlots() )
+        {
+            updateSubTitleVisibility( subTitle );
+        }
+    }
 
     QList<QPointer<RiuQwtPlotLegend>> legends = legendsForVisiblePlots();
     for ( const auto& l : legends )
@@ -677,6 +687,10 @@ void RiuMultiPlotPage::updatePlotLayouts()
 void RiuMultiPlotPage::reinsertPlotWidgets()
 {
     clearGridLayout();
+
+    // Build the common legend(s) first, so sub plot headings can be hidden when their text is already
+    // shown as a common legend entry (see updateSubTitleVisibility()).
+    updateCommonLegend();
 
     QList<QPointer<QLabel>>                   subTitles    = subTitlesForVisiblePlots();
     QList<QPointer<RiuQwtPlotLegend>>         legends      = legendsForVisiblePlots();
@@ -710,8 +724,6 @@ void RiuMultiPlotPage::reinsertPlotWidgets()
             reinsertPlotWidget( plotWidget, legend, legendFrame, subTitle, row, column, rowSpan, colSpan );
         }
     }
-
-    updateCommonLegend();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -753,6 +765,8 @@ void RiuMultiPlotPage::clearCommonLegendItems( QPointer<RiuQwtPlotLegend>& legen
 //--------------------------------------------------------------------------------------------------
 void RiuMultiPlotPage::updateCommonLegend()
 {
+    m_commonLegendEntryTexts.clear();
+
     if ( m_commonLegend ) m_layout->removeWidget( m_commonLegend );
     if ( m_commonSymbolLegend ) m_layout->removeWidget( m_commonSymbolLegend );
 
@@ -788,12 +802,14 @@ void RiuMultiPlotPage::updateCommonLegend()
         for ( const auto& legendData : colorLegendData )
         {
             m_commonLegend->updateLegend( QVariant( m_commonLegendItemCount++ ), { legendData } );
+            m_commonLegendEntryTexts.insert( legendData.value( QwtLegendData::TitleRole ).value<QwtText>().text() );
         }
 
         createCommonLegendIfNeeded( m_commonSymbolLegend );
         for ( const auto& legendData : symbolLegendData )
         {
             m_commonSymbolLegend->updateLegend( QVariant( m_commonSymbolLegendItemCount++ ), { legendData } );
+            m_commonLegendEntryTexts.insert( legendData.value( QwtLegendData::TitleRole ).value<QwtText>().text() );
         }
     }
     else
@@ -801,6 +817,10 @@ void RiuMultiPlotPage::updateCommonLegend()
         for ( const auto& legendData : RiuQwtPlotTools::uniqueLegendData( qwtPlots ) )
         {
             m_commonLegend->updateLegend( QVariant( m_commonLegendItemCount++ ), legendData );
+            for ( const auto& entry : legendData )
+            {
+                m_commonLegendEntryTexts.insert( entry.value( QwtLegendData::TitleRole ).value<QwtText>().text() );
+            }
         }
 
         if ( m_commonSymbolLegend ) m_commonSymbolLegend->hide();
@@ -946,11 +966,31 @@ void RiuMultiPlotPage::updateLegendVisibility( RiuPlotWidget* plotWidget, RiuQwt
 //--------------------------------------------------------------------------------------------------
 void RiuMultiPlotPage::updateSubTitleVisibility( QLabel* subTitle )
 {
-    bool isSubTitleVisible = m_showSubTitles && !subTitle->text().isEmpty();
+    bool isSubTitleVisible = m_showSubTitles && !subTitle->text().isEmpty() && !isSubTitleCoveredByCommonLegend( subTitle->text() );
     subTitle->setVisible( isSubTitleVisible );
     QFont subTitleFont = subTitle->font();
     subTitleFont.setPointSize( m_subTitleFontSize );
     subTitle->setFont( subTitleFont );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Returns true if the sub plot heading is redundant, i.e. all of its comma-separated parts are already
+/// shown as common legend entries (see updateCommonLegend()). This avoids duplicating e.g. a case name
+/// both as a sub plot heading and as a common symbol/color legend entry for that case.
+//--------------------------------------------------------------------------------------------------
+bool RiuMultiPlotPage::isSubTitleCoveredByCommonLegend( const QString& subTitleText ) const
+{
+    if ( m_commonLegendEntryTexts.isEmpty() ) return false;
+
+    const QStringList parts = subTitleText.split( ", ", Qt::SkipEmptyParts );
+    if ( parts.isEmpty() ) return false;
+
+    for ( const auto& part : parts )
+    {
+        if ( !m_commonLegendEntryTexts.contains( part ) ) return false;
+    }
+
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------
