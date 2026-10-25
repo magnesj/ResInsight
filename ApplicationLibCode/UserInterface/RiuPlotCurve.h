@@ -20,6 +20,8 @@
 
 #include "RiaCurveDataTools.h"
 
+#include "RifEclipseSummaryAddress.h"
+
 #include "RiuPlotCurveSymbol.h"
 #include "RiuPlotWidget.h"
 #include "RiuQwtPlotCurveDefines.h"
@@ -28,6 +30,8 @@
 #include <QColor>
 #include <QDateTime>
 #include <QString>
+
+#include <optional>
 
 class RimPlotCurve;
 
@@ -112,6 +116,14 @@ public:
     RimPlotCurve*       ownerRimCurve();
     const RimPlotCurve* ownerRimCurve() const;
 
+    // Metadata used to group/label curves in a shared legend (e.g. in a multi plot) without having to
+    // inspect the owner Rim curve object. Set by curve types that are backed by a summary address, such
+    // as RimSummaryCurve.
+    void                     setSummaryAddressMetaData( const QString& caseName, const RifEclipseSummaryAddress& address );
+    bool                     hasSummaryAddressMetaData() const;
+    QString                  summaryCaseNameMetaData() const;
+    RifEclipseSummaryAddress summaryAddressMetaData() const;
+
     virtual std::pair<double, double> xDataRange() const = 0;
     virtual std::pair<double, double> yDataRange() const = 0;
 
@@ -137,6 +149,9 @@ protected:
     std::vector<QString> m_perPointLabels;
 
     std::vector<std::pair<size_t, size_t>> m_polyLineStartStopIndices;
+
+    std::optional<QString>                  m_summaryCaseNameMetaData;
+    std::optional<RifEclipseSummaryAddress> m_summaryAddressMetaData;
 
     caf::PdmPointer<RimPlotCurve> m_ownerRimCurve;
 };

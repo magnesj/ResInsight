@@ -586,6 +586,14 @@ void RimSummaryCurve::onLoadDataAndUpdate( bool updateParentPlot )
 {
     RimPlotCurve::updateCurvePresentation( updateParentPlot );
 
+    // Attach summary address metadata to the Qwt curve regardless of updateParentPlot, as it is cheap and
+    // is relied on by RiuQwtPlotTools::splitLegendByColorAndSymbol() to group curves for the common legend.
+    if ( m_plotCurve )
+    {
+        QString caseName = summaryCaseY() ? summaryCaseY()->displayCaseName() : QString();
+        m_plotCurve->setSummaryAddressMetaData( caseName, summaryAddressY() );
+    }
+
     m_yValuesSummaryAddressUiField = m_yValuesSummaryAddress->address();
     m_xValuesSummaryAddressUiField = m_xValuesSummaryAddress->address();
 
@@ -753,6 +761,12 @@ void RimSummaryCurve::onLoadDataAndUpdate( bool updateParentPlot )
 //--------------------------------------------------------------------------------------------------
 void RimSummaryCurve::updateLegendsInPlot()
 {
+    if ( m_plotCurve )
+    {
+        QString caseName = summaryCaseY() ? summaryCaseY()->displayCaseName() : QString();
+        m_plotCurve->setSummaryAddressMetaData( caseName, summaryAddressY() );
+    }
+
     auto plot = firstAncestorOrThisOfTypeAsserted<RimSummaryPlot>();
     plot->updateLegend();
 }

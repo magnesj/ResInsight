@@ -25,8 +25,11 @@
 
 #include "RimPlotCurve.h"
 
+#include "Summary/RiaSummaryAddressAnalyzer.h"
+
 #include "RiuGuiTheme.h"
 #include "RiuPlotCurveSymbolImageCreator.h"
+#include "RiuQwtPlotCurve.h"
 #include "RiuQwtPlotLegend.h"
 
 #include "qwt_axis.h"
@@ -46,6 +49,9 @@
 #include <QImage>
 #include <QSet>
 
+#include <map>
+#include <optional>
+#include <set>
 #include <vector>
 
 //--------------------------------------------------------------------------------------------------
@@ -311,6 +317,45 @@ QList<QList<QwtLegendData>> RiuQwtPlotTools::uniqueLegendData( const std::vector
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Draw a legend icon consisting of an optional horizontal line and/or an optional symbol.
+//--------------------------------------------------------------------------------------------------
+static QwtGraphic createCurveLegendIcon( const QSize&                        size,
+                                         bool                                drawLine,
+                                         const QColor&                       lineColor,
+                                         RiuPlotCurveSymbol::PointSymbolEnum symbol,
+                                         const QColor&                       symbolColor )
+{
+    QwtGraphic graphic;
+    graphic.setDefaultSize( size );
+    graphic.setRenderHint( QwtGraphic::RenderPensUnscaled, true );
+
+    QPainter painter( &graphic );
+    painter.setRenderHint( QPainter::Antialiasing );
+
+    if ( drawLine )
+    {
+        QPen pn;
+        pn.setCapStyle( Qt::FlatCap );
+        pn.setColor( lineColor );
+
+        painter.setPen( pn );
+
+        const double y = 0.5 * size.height();
+        QwtPainter::drawLine( &painter, 0.0, y, size.width(), y );
+    }
+
+    if ( symbol != RiuPlotCurveSymbol::SYMBOL_NONE )
+    {
+        auto image = RiuPlotCurveSymbolImageCreator::createSymbolImage( symbol, QSize( size.width() / 2, size.height() / 2 ), symbolColor );
+
+        QPoint p( size.width() / 4, size.height() / 4 );
+        painter.drawImage( p, image );
+    }
+
+    return graphic;
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 QList<QwtLegendData> RiuQwtPlotTools::createLegendData( const std::vector<RimPlotCurve*>& curves )
@@ -327,35 +372,8 @@ QList<QwtLegendData> RiuQwtPlotTools::createLegendData( const std::vector<RimPlo
         auto size = icon->availableSizes().first();
         // see QwtPlotCurve::legendIcon
 
-        QwtGraphic graphic;
-        {
-            graphic.setDefaultSize( size );
-            graphic.setRenderHint( QwtGraphic::RenderPensUnscaled, true );
-
-            QPainter painter( &graphic );
-            painter.setRenderHint( QPainter::Antialiasing );
-
-            {
-                QPen pn;
-                pn.setCapStyle( Qt::FlatCap );
-                pn.setColor( RiaColorTools::toQColor( c->color() ) );
-
-                painter.setPen( pn );
-
-                const double y = 0.5 * size.height();
-                QwtPainter::drawLine( &painter, 0.0, y, size.width(), y );
-            }
-
-            if ( c->symbol() != RiuPlotCurveSymbol::SYMBOL_NONE )
-            {
-                auto image = RiuPlotCurveSymbolImageCreator::createSymbolImage( c->symbol(),
-                                                                                QSize( size.width() / 2, size.height() / 2 ),
-                                                                                RiaColorTools::toQColor( c->color() ) );
-
-                QPoint p( size.width() / 4, size.height() / 4 );
-                painter.drawImage( p, image );
-            }
-        }
+        QColor     curveColor = RiaColorTools::toQColor( c->color() );
+        QwtGraphic graphic    = createCurveLegendIcon( size, /*drawLine=*/true, curveColor, c->symbol(), curveColor );
 
         QVariant v = QVariant::fromValue( graphic );
         test.setValue( QwtLegendData::Role::IconRole, v );
@@ -364,6 +382,206 @@ QList<QwtLegendData> RiuQwtPlotTools::createLegendData( const std::vector<RimPlo
     }
 
     return legendDataList;
+}
+
+namespace
+{
+// A curve can be grouped/labeled by any of these attributes. VECTOR is the summary vector name (e.g.
+// WOPR, WBHP), as curves are often colored by vector and symbolized by case, or vice versa.
+enum class SummaryLegendAttribute
+{
+    CASE,
+    WELL,
+    VECTOR
+};
+
+struct SummaryLegendCurveInfo
+{
+    cvf::Color3f                        color;
+    RiuPlotCurveSymbol::PointSymbolEnum symbol;
+    QString                             caseName;
+    RifEclipseSummaryAddress            address;
+};
+
+//--------------------------------------------------------------------------------------------------
+/// Returns the common value of the given attribute across all curves in the group, or an empty optional
+/// if the curves do not all share the same value (i.e. the attribute is not constant within the group).
+//--------------------------------------------------------------------------------------------------
+std::optional<QString> groupLabelForAttribute( SummaryLegendAttribute attribute, const std::vector<SummaryLegendCurveInfo>& group )
+{
+    if ( attribute == SummaryLegendAttribute::CASE )
+    {
+        std::set<QString> names;
+        for ( const auto& curveInfo : group )
+            names.insert( curveInfo.caseName );
+        if ( names.size() != 1 ) return std::nullopt;
+        return *names.begin();
+    }
+
+    std::vector<RifEclipseSummaryAddress> addresses;
+    addresses.reserve( group.size() );
+    for ( const auto& curveInfo : group )
+        addresses.push_back( curveInfo.address );
+
+    RiaSummaryAddressAnalyzer analyzer;
+    analyzer.appendAddresses( addresses );
+
+    if ( attribute == SummaryLegendAttribute::WELL )
+    {
+        auto names = analyzer.wellNames();
+        if ( names.size() != 1 ) return std::nullopt;
+        return QString::fromStdString( *names.begin() );
+    }
+
+    auto quantities = analyzer.quantities();
+    if ( quantities.size() != 1 ) return std::nullopt;
+    return QString::fromStdString( quantities.front() );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Returns a label per group for the given attribute, if that attribute is constant within every group
+/// (see groupLabelForAttribute()) and also discriminates between groups (different groups get different
+/// labels). Without the latter requirement, an attribute that happens to be constant across ALL curves
+/// (e.g. a single well shown in one sub plot) would be accepted and produce a useless legend with the
+/// same label repeated for every color/symbol.
+//--------------------------------------------------------------------------------------------------
+template <typename GroupKey>
+std::optional<std::map<GroupKey, QString>>
+    labelsIfDiscriminating( SummaryLegendAttribute attribute, const std::map<GroupKey, std::vector<SummaryLegendCurveInfo>>& groups )
+{
+    std::map<GroupKey, QString> labels;
+    std::set<QString>           distinctValues;
+    for ( const auto& [group, curveInfos] : groups )
+    {
+        auto label = groupLabelForAttribute( attribute, curveInfos );
+        if ( !label ) return std::nullopt;
+
+        labels[group] = *label;
+        distinctValues.insert( *label );
+    }
+
+    if ( distinctValues.size() != groups.size() ) return std::nullopt;
+    return labels;
+}
+} // namespace
+
+//--------------------------------------------------------------------------------------------------
+/// Try to split the combined (color + symbol) legend into two separate, smaller legends: one showing
+/// the distinct curve colors and one showing the distinct curve symbols.
+///
+/// This is useful when curves vary along two independent dimensions (e.g. one color per source case
+/// and one symbol per well), as a single merged legend would otherwise require one entry per
+/// combination (i.e. case count x well count) instead of (case count + well count).
+///
+/// Returns false, leaving the output lists untouched, if the curves do not have summary address
+/// metadata attached (see RiuPlotCurve::setSummaryAddressMetaData()), or if the colors and symbols
+/// cannot be clearly attributed to two independent dimensions (summary case, well or vector name). The
+/// caller should fall back to a single merged legend in that case.
+//--------------------------------------------------------------------------------------------------
+bool RiuQwtPlotTools::splitLegendByColorAndSymbol( const std::vector<QwtPlot*>& plots,
+                                                   QList<QwtLegendData>&        colorLegendData,
+                                                   QList<QwtLegendData>&        symbolLegendData )
+{
+    std::map<cvf::Color3f, std::vector<SummaryLegendCurveInfo>>                        curvesByColor;
+    std::map<RiuPlotCurveSymbol::PointSymbolEnum, std::vector<SummaryLegendCurveInfo>> curvesBySymbol;
+
+    for ( QwtPlot* plot : plots )
+    {
+        if ( !plot ) continue;
+
+        for ( QwtPlotItem* item : plot->itemList() )
+        {
+            if ( !item->testItemAttribute( QwtPlotItem::Legend ) ) continue;
+
+            auto plotCurve = dynamic_cast<RiuPlotCurve*>( item );
+            if ( !plotCurve || !plotCurve->hasSummaryAddressMetaData() ) return false;
+
+            auto ownerCurve = plotCurve->ownerRimCurve();
+            if ( !ownerCurve ) return false;
+
+            SummaryLegendCurveInfo curveInfo;
+            curveInfo.color    = ownerCurve->color();
+            curveInfo.symbol   = ownerCurve->symbol();
+            curveInfo.caseName = plotCurve->summaryCaseNameMetaData();
+            curveInfo.address  = plotCurve->summaryAddressMetaData();
+
+            curvesByColor[curveInfo.color].push_back( curveInfo );
+            curvesBySymbol[curveInfo.symbol].push_back( curveInfo );
+        }
+    }
+
+    if ( curvesByColor.size() < 2 || curvesBySymbol.size() < 2 ) return false;
+
+    const std::vector<SummaryLegendAttribute> allAttributes = { SummaryLegendAttribute::CASE,
+                                                                SummaryLegendAttribute::WELL,
+                                                                SummaryLegendAttribute::VECTOR };
+
+    std::map<SummaryLegendAttribute, std::optional<std::map<cvf::Color3f, QString>>>                        colorLabelsByAttribute;
+    std::map<SummaryLegendAttribute, std::optional<std::map<RiuPlotCurveSymbol::PointSymbolEnum, QString>>> symbolLabelsByAttribute;
+    for ( auto attribute : allAttributes )
+    {
+        colorLabelsByAttribute[attribute]  = labelsIfDiscriminating( attribute, curvesByColor );
+        symbolLabelsByAttribute[attribute] = labelsIfDiscriminating( attribute, curvesBySymbol );
+    }
+
+    // Try the most common combinations first: one color per case with one symbol per well, falling back
+    // to other combinations (e.g. one color per vector with one symbol per case) if that is what the
+    // curves actually use.
+    const std::vector<std::pair<SummaryLegendAttribute, SummaryLegendAttribute>> preferredAttributePairs = {
+        { SummaryLegendAttribute::CASE, SummaryLegendAttribute::WELL },
+        { SummaryLegendAttribute::WELL, SummaryLegendAttribute::CASE },
+        { SummaryLegendAttribute::VECTOR, SummaryLegendAttribute::CASE },
+        { SummaryLegendAttribute::CASE, SummaryLegendAttribute::VECTOR },
+        { SummaryLegendAttribute::VECTOR, SummaryLegendAttribute::WELL },
+        { SummaryLegendAttribute::WELL, SummaryLegendAttribute::VECTOR },
+    };
+
+    std::map<cvf::Color3f, QString>                        colorToLabel;
+    std::map<RiuPlotCurveSymbol::PointSymbolEnum, QString> symbolToLabel;
+    bool                                                   foundAttributes = false;
+    for ( const auto& [colorAttribute, symbolAttribute] : preferredAttributePairs )
+    {
+        if ( colorLabelsByAttribute[colorAttribute] && symbolLabelsByAttribute[symbolAttribute] )
+        {
+            colorToLabel    = *colorLabelsByAttribute[colorAttribute];
+            symbolToLabel   = *symbolLabelsByAttribute[symbolAttribute];
+            foundAttributes = true;
+            break;
+        }
+    }
+
+    if ( !foundAttributes ) return false;
+
+    // Use the same square icon size as the regular per-curve legend icons (see RimPlotCurve::updateUiIconFromPlotSymbol()),
+    // as symbols are drawn at half this size (see createCurveLegendIcon()) and become an unrecognizable blob if the icon
+    // is too small or not square.
+    const QSize iconSize( 24, 24 );
+
+    for ( const auto& [color, label] : colorToLabel )
+    {
+        QColor        curveColor = RiaColorTools::toQColor( color );
+        QwtLegendData entry;
+        entry.setValue( QwtLegendData::Role::TitleRole, label );
+        entry.setValue( QwtLegendData::Role::IconRole,
+                        QVariant::fromValue(
+                            createCurveLegendIcon( iconSize, /*drawLine=*/true, curveColor, RiuPlotCurveSymbol::SYMBOL_NONE, curveColor ) ) );
+        colorLegendData.push_back( entry );
+    }
+
+    // Use a neutral color for the symbol-only legend, as color is already covered by the color legend.
+    const QColor neutralSymbolColor( 60, 60, 60 );
+
+    for ( const auto& [symbol, label] : symbolToLabel )
+    {
+        QwtLegendData entry;
+        entry.setValue( QwtLegendData::Role::TitleRole, label );
+        entry.setValue( QwtLegendData::Role::IconRole,
+                        QVariant::fromValue(
+                            createCurveLegendIcon( iconSize, /*drawLine=*/false, neutralSymbolColor, symbol, neutralSymbolColor ) ) );
+        symbolLegendData.push_back( entry );
+    }
+
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------

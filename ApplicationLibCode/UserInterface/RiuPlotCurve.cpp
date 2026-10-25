@@ -200,3 +200,36 @@ const RimPlotCurve* RiuPlotCurve::ownerRimCurve() const
 {
     return m_ownerRimCurve;
 }
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuPlotCurve::setSummaryAddressMetaData( const QString& caseName, const RifEclipseSummaryAddress& address )
+{
+    m_summaryCaseNameMetaData = caseName;
+    m_summaryAddressMetaData  = address;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RiuPlotCurve::hasSummaryAddressMetaData() const
+{
+    return m_summaryCaseNameMetaData.has_value() && m_summaryAddressMetaData.has_value();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RiuPlotCurve::summaryCaseNameMetaData() const
+{
+    return m_summaryCaseNameMetaData.value_or( QString() );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RifEclipseSummaryAddress RiuPlotCurve::summaryAddressMetaData() const
+{
+    return m_summaryAddressMetaData.value_or( RifEclipseSummaryAddress() );
+}

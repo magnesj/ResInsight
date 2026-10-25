@@ -715,34 +715,58 @@ void RiuMultiPlotPage::reinsertPlotWidgets()
 }
 
 //--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuMultiPlotPage::createCommonLegendIfNeeded( QPointer<RiuQwtPlotLegend>& legend )
+{
+    if ( legend ) return;
+
+    legend = new RiuQwtPlotLegend( this );
+    legend->horizontalScrollBar()->setVisible( false );
+    legend->verticalScrollBar()->setVisible( false );
+    legend->setDefaultItemMode( QwtLegendData::ReadOnly );
+    legend->contentsWidget()->layout()->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
+    legend->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuMultiPlotPage::clearCommonLegendItems( QPointer<RiuQwtPlotLegend>& legend, int& itemCount )
+{
+    if ( !legend ) return;
+
+    for ( int i = 0; i < itemCount; i++ )
+    {
+        legend->updateLegend( QVariant( i ), {} );
+    }
+    itemCount = 0;
+}
+
+//--------------------------------------------------------------------------------------------------
 /// Build one legend from the legend data of all sub plots. Entries with identical title and icon are merged.
+///
+/// If the curves vary along two independent dimensions (e.g. one color per source case and one symbol
+/// per well), the merged legend is instead split into one color legend and one symbol legend. This
+/// avoids showing one combined entry per combination (case count x well count) when many wells from
+/// multiple source cases are plotted together.
 //--------------------------------------------------------------------------------------------------
 void RiuMultiPlotPage::updateCommonLegend()
 {
     if ( m_commonLegend ) m_layout->removeWidget( m_commonLegend );
+    if ( m_commonSymbolLegend ) m_layout->removeWidget( m_commonSymbolLegend );
 
     bool isActive = useCommonLegend( m_plotDefinition ) && m_hostsCommonLegend && m_plotDefinition->legendsVisible();
     if ( !isActive )
     {
         if ( m_commonLegend ) m_commonLegend->hide();
+        if ( m_commonSymbolLegend ) m_commonSymbolLegend->hide();
         return;
     }
 
-    if ( !m_commonLegend )
-    {
-        m_commonLegend = new RiuQwtPlotLegend( this );
-        m_commonLegend->horizontalScrollBar()->setVisible( false );
-        m_commonLegend->verticalScrollBar()->setVisible( false );
-        m_commonLegend->setDefaultItemMode( QwtLegendData::ReadOnly );
-        m_commonLegend->contentsWidget()->layout()->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
-        m_commonLegend->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
-    }
-
-    for ( int i = 0; i < m_commonLegendItemCount; i++ )
-    {
-        m_commonLegend->updateLegend( QVariant( i ), {} );
-    }
-    m_commonLegendItemCount = 0;
+    createCommonLegendIfNeeded( m_commonLegend );
+    clearCommonLegendItems( m_commonLegend, m_commonLegendItemCount );
+    clearCommonLegendItems( m_commonSymbolLegend, m_commonSymbolLegendItemCount );
 
     std::vector<QwtPlot*> qwtPlots;
     for ( auto plotWidget : visiblePlotWidgets() )
@@ -755,22 +779,57 @@ void RiuMultiPlotPage::updateCommonLegend()
         }
     }
 
-    for ( const auto& legendData : RiuQwtPlotTools::uniqueLegendData( qwtPlots ) )
+    QList<QwtLegendData> colorLegendData;
+    QList<QwtLegendData> symbolLegendData;
+    bool                 useSplitLegend = RiuQwtPlotTools::splitLegendByColorAndSymbol( qwtPlots, colorLegendData, symbolLegendData );
+
+    if ( useSplitLegend )
     {
-        m_commonLegend->updateLegend( QVariant( m_commonLegendItemCount++ ), legendData );
+        for ( const auto& legendData : colorLegendData )
+        {
+            m_commonLegend->updateLegend( QVariant( m_commonLegendItemCount++ ), { legendData } );
+        }
+
+        createCommonLegendIfNeeded( m_commonSymbolLegend );
+        for ( const auto& legendData : symbolLegendData )
+        {
+            m_commonSymbolLegend->updateLegend( QVariant( m_commonSymbolLegendItemCount++ ), { legendData } );
+        }
+    }
+    else
+    {
+        for ( const auto& legendData : RiuQwtPlotTools::uniqueLegendData( qwtPlots ) )
+        {
+            m_commonLegend->updateLegend( QVariant( m_commonLegendItemCount++ ), legendData );
+        }
+
+        if ( m_commonSymbolLegend ) m_commonSymbolLegend->hide();
     }
 
     if ( m_commonLegendItemCount == 0 )
     {
         m_commonLegend->hide();
+        if ( m_commonSymbolLegend ) m_commonSymbolLegend->hide();
         return;
     }
 
-    // The common legend is placed below the title, centered above all sub plots
+    // The common legend(s) are placed below the title, centered above all sub plots
     m_layout->insertWidget( 1, m_commonLegend, 0, Qt::AlignHCenter );
     updateLegendColumns( m_commonLegend );
     updateLegendFont( m_commonLegend );
     m_commonLegend->show();
+
+    if ( useSplitLegend && m_commonSymbolLegendItemCount > 0 )
+    {
+        m_layout->insertWidget( 2, m_commonSymbolLegend, 0, Qt::AlignHCenter );
+        updateLegendColumns( m_commonSymbolLegend );
+        updateLegendFont( m_commonSymbolLegend );
+        m_commonSymbolLegend->show();
+    }
+    else if ( m_commonSymbolLegend )
+    {
+        m_commonSymbolLegend->hide();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
