@@ -20,6 +20,7 @@
 #include "PdmObjects/SmallDemoPdmObjectA.h"
 #include "PdmObjects/SmallGridDemoPdmObject.h"
 #include "PdmObjects/TamComboBox.h"
+#include "PdmObjects/UnitQuantityDemo.h"
 #include "PdmObjects/ValidationTest.h"
 #include "WidgetLayoutTest.h"
 
@@ -198,6 +199,7 @@ void MainWindow::buildTestModel()
     m_testRoot->objects.push_back( new LineEditAndPushButtons );
     m_testRoot->objects.push_back( new LabelsAndHyperlinks );
     m_testRoot->objects.push_back( new OptionalFields );
+    m_testRoot->objects.push_back( new UnitQuantityDemo );
     m_testRoot->objects.push_back( new ReentrantEditorRebuild );
     m_testRoot->objects.push_back( new GroupVisibilityByEnum );
 
