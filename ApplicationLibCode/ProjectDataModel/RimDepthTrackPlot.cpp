@@ -699,9 +699,17 @@ QString RimDepthTrackPlot::createAutoName() const
 
         auto variableValues = createNameKeyValueMap();
 
+        // Air gap is only of interest when the well path has a non-zero value
+        const QString zeroAirGapText = QString( "Air Gap = %1 m" ).arg( 0.0 );
+
         QStringList variablesWithValue;
         for ( const auto& name : candidateNames )
         {
+            if ( name == RiaDefines::namingVariableAirGap() && variableValues.count( name ) && variableValues.at( name ) == zeroAirGapText )
+            {
+                continue;
+            }
+
             if ( variableValues.count( name ) )
             {
                 variablesWithValue.push_back( name );
