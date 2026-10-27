@@ -22,6 +22,7 @@
 
 #include "RimWellLogLasFile.h"
 
+#include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObjectScriptingCapability.h"
 
@@ -32,7 +33,7 @@ CAF_PDM_SOURCE_INIT( RimEnsembleWellLogs, "EnsembleWellLogs" );
 //--------------------------------------------------------------------------------------------------
 RimEnsembleWellLogs::RimEnsembleWellLogs()
 {
-    CAF_PDM_InitScriptableObject( "Ensemble Well Logs" );
+    CAF_PDM_InitScriptableObject( "Ensemble Well Logs", ":/LasFile16x16.png" );
 
     CAF_PDM_InitFieldNoDefault( &m_wellLogFiles, "WellLogFiles", "" );
 }
@@ -74,4 +75,12 @@ void RimEnsembleWellLogs::loadDataAndUpdate()
             RiaLogging::warning( errorMessage.toStdString() );
         }
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleWellLogs::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
+{
+    menuBuilder << "RicNewEnsembleWellLogPlotFeature";
 }

@@ -40,6 +40,9 @@ public:
 
     void loadDataAndUpdate();
 
+protected:
+    void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
+
 private:
     caf::PdmChildArrayField<RimWellLogLasFile*> m_wellLogFiles;
 };
