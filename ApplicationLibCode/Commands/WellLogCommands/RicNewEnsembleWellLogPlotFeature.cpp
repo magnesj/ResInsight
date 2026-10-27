@@ -43,6 +43,24 @@ CAF_CMD_SOURCE_INIT( RicNewEnsembleWellLogPlotFeature, "RicNewEnsembleWellLogPlo
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+RimEnsembleWellLogCurveSet* RicNewEnsembleWellLogPlotFeature::addEnsembleCurveSetToTrack( RimWellLogTrack*     track,
+                                                                                          RimEnsembleWellLogs* ensembleWellLogs,
+                                                                                          const QString&       channelName,
+                                                                                          int                  colorIndex )
+{
+    auto* curveSet = new RimEnsembleWellLogCurveSet();
+    curveSet->setEnsembleWellLogs( ensembleWellLogs );
+    curveSet->setColor( RiaColorTables::normalPaletteColors().cycledColor3f( colorIndex ) );
+    if ( !channelName.isEmpty() ) curveSet->setWellLogChannelName( channelName );
+    track->setEnsembleWellLogCurveSet( curveSet );
+    if ( !channelName.isEmpty() ) curveSet->loadDataAndUpdate( true );
+
+    return curveSet;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 bool RicNewEnsembleWellLogPlotFeature::isCommandEnabled() const
 {
     return caf::SelectionManager::instance()->selectedItemOfType<RimEnsembleWellLogs>() != nullptr;
@@ -85,13 +103,7 @@ void RicNewEnsembleWellLogPlotFeature::onActionTriggered( bool isChecked )
             plot->setNamingMethod( RiaDefines::ObjectNamingMethod::CUSTOM );
         }
 
-        auto* curveSet = new RimEnsembleWellLogCurveSet();
-        curveSet->setEnsembleWellLogs( ensembleWellLogs );
-        curveSet->setColor( RiaColorTables::normalPaletteColors().cycledColor3f( trackIndex ) );
-        curveSet->setWellLogChannelName( channelName );
-        plotTrack->setEnsembleWellLogCurveSet( curveSet );
-        curveSet->loadDataAndUpdate( true );
-
+        auto* curveSet = addEnsembleCurveSetToTrack( plotTrack, ensembleWellLogs, channelName, trackIndex );
         if ( !firstCurveSet ) firstCurveSet = curveSet;
         trackIndex++;
     }
@@ -102,10 +114,7 @@ void RicNewEnsembleWellLogPlotFeature::onActionTriggered( bool isChecked )
         RimWellLogTrack* plotTrack = RicNewWellLogPlotFeatureImpl::createWellLogPlotTrack();
         plot                       = plotTrack->firstAncestorOrThisOfType<RimDepthTrackPlot>();
 
-        firstCurveSet = new RimEnsembleWellLogCurveSet();
-        firstCurveSet->setEnsembleWellLogs( ensembleWellLogs );
-        firstCurveSet->setColor( RiaColorTables::normalPaletteColors().cycledColor3f( 0 ) );
-        plotTrack->setEnsembleWellLogCurveSet( firstCurveSet );
+        firstCurveSet = addEnsembleCurveSetToTrack( plotTrack, ensembleWellLogs, QString(), 0 );
     }
 
     plot->updateConnectedEditors();

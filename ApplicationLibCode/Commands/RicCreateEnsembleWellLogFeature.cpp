@@ -30,6 +30,7 @@
 #include "RicCreateEnsembleWellLogUi.h"
 #include "RicImportEnsembleWellLogsFeature.h"
 #include "RicImportGeneralDataFeature.h"
+#include "RicNewEnsembleWellLogPlotFeature.h"
 #include "RicRecursiveFileSearchDialog.h"
 #include "RifReaderSettings.h"
 #include "WellPathCommands/RicImportWellPaths.h"
@@ -239,16 +240,10 @@ void RicCreateEnsembleWellLogFeature::executeCommand( const RicCreateEnsembleWel
                 for ( const auto& property : properties )
                 {
                     // Create well log track
-                    cvf::Color3f     color = RiaColorTables::normalPaletteColors().cycledColor3f( trackNum );
                     QString          title = QString( "Track %1" ).arg( trackNum );
                     RimWellLogTrack* wellLogTrack =
                         RimcWellLogPlot_newWellLogTrack::createWellLogTrack( wellLogPlot, eclipseCase, wellPath, title );
-                    auto* ensembleWellLogCurveSet = new RimEnsembleWellLogCurveSet();
-                    ensembleWellLogCurveSet->setEnsembleWellLogs( ensembleWellLog );
-                    ensembleWellLogCurveSet->setColor( color );
-                    ensembleWellLogCurveSet->setWellLogChannelName( property.first );
-                    wellLogTrack->setEnsembleWellLogCurveSet( ensembleWellLogCurveSet );
-                    ensembleWellLogCurveSet->loadDataAndUpdate( true );
+                    RicNewEnsembleWellLogPlotFeature::addEnsembleCurveSetToTrack( wellLogTrack, ensembleWellLog, property.first, trackNum );
                     trackNum++;
                 }
 

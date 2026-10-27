@@ -20,12 +20,24 @@
 
 #include "cafCmdFeature.h"
 
+#include <QString>
+
+class RimEnsembleWellLogCurveSet;
+class RimEnsembleWellLogs;
+class RimWellLogTrack;
+
 //==================================================================================================
 ///
 //==================================================================================================
 class RicNewEnsembleWellLogPlotFeature : public caf::CmdFeature
 {
     CAF_CMD_HEADER_INIT;
+
+public:
+    // Add a curve set for the given channel to the track. The color is picked from the default palette by colorIndex.
+    // The curve set is left unconfigured and not loaded if channelName is empty.
+    static RimEnsembleWellLogCurveSet*
+        addEnsembleCurveSetToTrack( RimWellLogTrack* track, RimEnsembleWellLogs* ensembleWellLogs, const QString& channelName, int colorIndex );
 
 protected:
     bool isCommandEnabled() const override;
