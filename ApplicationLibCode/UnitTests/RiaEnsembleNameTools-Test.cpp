@@ -200,7 +200,8 @@ TEST( RiaEnsembleNameToolsTests, stripTrailingRealizationNumberOnlyStripsMatchin
 {
     EXPECT_EQ( "WELL", RiaEnsembleNameTools::stripTrailingRealizationNumber( "WELL_001", "/r/realization-1/WELL_001.LAS" ).toStdString() );
     EXPECT_EQ( "WELL-3", RiaEnsembleNameTools::stripTrailingRealizationNumber( "WELL-3", "/r/realization-2/WELL-3.LAS" ).toStdString() );
-    EXPECT_EQ( "WELL_A1", RiaEnsembleNameTools::stripTrailingRealizationNumber( "WELL_A1", "/r/WELL_A1.LAS" ).toStdString() );
+    EXPECT_EQ( "WELL_A", RiaEnsembleNameTools::stripTrailingRealizationNumber( "WELL_A1", "/r/WELL_A1.LAS" ).toStdString() );
+    EXPECT_EQ( "WELL", RiaEnsembleNameTools::stripTrailingRealizationNumber( "WELL-3", "/r/myrealization-12/WELL-3.LAS" ).toStdString() );
     EXPECT_EQ( "1", RiaEnsembleNameTools::stripTrailingRealizationNumber( "1", "/r/realization-1/1.LAS" ).toStdString() );
 }
 

@@ -1126,7 +1126,11 @@ void RicRecursiveFileSearchDialog::slotFilterTreeViewClicked()
     if ( m_fileType == RicRecursiveFileSearchDialog::FileType::LAS || m_fileType == RicRecursiveFileSearchDialog::FileType::EGRID )
     {
         // Re-apply, as the checks above select all items below checked ensembles
-        uncheckFilenameOutliers();
+        const QStringList warnings = uncheckFilenameOutliers();
+        if ( !warnings.isEmpty() )
+        {
+            QMessageBox::warning( this, "Multiple Filenames Found", warnings.join( "\n\n" ) );
+        }
     }
 }
 

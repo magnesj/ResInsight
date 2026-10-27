@@ -311,12 +311,14 @@ std::shared_ptr<RigWellLogIndexDepthOffset>
             std::vector<double> tvdDepths    = fileData->tvdMslValues();
             std::vector<double> kIndexValues = fileData->values( RiaResultNames::indexKResultName() );
 
+            const size_t numSamples = std::min( { depths.size(), tvdDepths.size(), kIndexValues.size() } );
+
             std::set<int> seenTopIndexes;
             std::set<int> seenBottomIndexes;
-            if ( !depths.empty() && !tvdDepths.empty() && !kIndexValues.empty() )
+            if ( numSamples > 0 )
             {
                 // Find top indexes
-                for ( size_t i = 0; i < kIndexValues.size(); i++ )
+                for ( size_t i = 0; i < numSamples; i++ )
                 {
                     if ( !std::isfinite( kIndexValues[i] ) || kIndexValues[i] < 0.0 || kIndexValues[i] > 1.0e6 ) continue;
                     int kLayer = static_cast<int>( kIndexValues[i] );
@@ -335,7 +337,7 @@ std::shared_ptr<RigWellLogIndexDepthOffset>
                 }
 
                 // Find bottom indexes
-                for ( int i = static_cast<int>( kIndexValues.size() ) - 1; i >= 0; i-- )
+                for ( int i = static_cast<int>( numSamples ) - 1; i >= 0; i-- )
                 {
                     if ( !std::isfinite( kIndexValues[i] ) || kIndexValues[i] < 0.0 || kIndexValues[i] > 1.0e6 ) continue;
                     int kLayer = static_cast<int>( kIndexValues[i] );

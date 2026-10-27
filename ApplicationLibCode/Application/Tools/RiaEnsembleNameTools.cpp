@@ -681,19 +681,20 @@ QString RiaEnsembleNameTools::uniqueShortNameFromComponents( const QString&     
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Strip a trailing number and separator from a filename stem only if it equals the realization number
-/// found in the path ("realization-N"), e.g. "WELL_001" in ".../realization-1/..." -> "WELL"
+/// Strip a trailing number and separator from a filename stem. If the path contains a "realization-N" folder, only a
+/// trailing number equal to N is stripped, e.g. "WELL_001" in ".../realization-1/..." -> "WELL", while "OP_2" is kept.
+/// Without a realization folder any trailing number is stripped.
 //--------------------------------------------------------------------------------------------------
 QString RiaEnsembleNameTools::stripTrailingRealizationNumber( const QString& name, const QString& path )
 {
-    static const QRegularExpression realizationRe( "realization-(\\d+)" );
+    static const QRegularExpression realizationRe( "(^|[/\\\\])realization-(\\d+)([/\\\\]|$)" );
     static const QRegularExpression trailingRe( "[_\\-]?(\\d+)$" );
 
-    auto realizationMatch = realizationRe.match( path );
-    auto trailingMatch    = trailingRe.match( name );
-    if ( !realizationMatch.hasMatch() || !trailingMatch.hasMatch() ) return name;
+    auto trailingMatch = trailingRe.match( name );
+    if ( !trailingMatch.hasMatch() ) return name;
 
-    if ( realizationMatch.captured( 1 ).toInt() != trailingMatch.captured( 1 ).toInt() ) return name;
+    auto realizationMatch = realizationRe.match( path );
+    if ( realizationMatch.hasMatch() && realizationMatch.captured( 2 ).toInt() != trailingMatch.captured( 1 ).toInt() ) return name;
 
     QString stripped = name.left( trailingMatch.capturedStart() );
     return stripped.isEmpty() ? name : stripped;
