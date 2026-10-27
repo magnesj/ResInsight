@@ -60,6 +60,7 @@
 #include <QAction>
 #include <QDir>
 #include <QFileInfo>
+#include <QIcon>
 
 #include <memory>
 
@@ -302,4 +303,5 @@ void RicCreateEnsembleWellLogFeature::onActionTriggered( bool isChecked )
 void RicCreateEnsembleWellLogFeature::setupActionLook( QAction* actionToSetup )
 {
     actionToSetup->setText( "Create Ensemble Well Log..." );
+    actionToSetup->setIcon( QIcon( ":/WellLogFile.svg" ) );
 }
