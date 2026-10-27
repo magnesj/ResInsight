@@ -585,14 +585,22 @@ void RicRecursiveFileSearchDialog::updateFileListWidget()
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Strip trailing realization number and separator from a filename stem, e.g. "WELL_001" -> "WELL"
+/// Strip a trailing number and separator from a filename stem only if it equals the realization number
+/// found in the path ("realization-N"), e.g. "WELL_001" in ".../realization-1/..." -> "WELL"
 //--------------------------------------------------------------------------------------------------
-static QString stripTrailingRealizationNumber( const QString& name )
+static QString stripTrailingRealizationNumber( const QString& name, const QString& path )
 {
-    static const QRegularExpression re( "[_\\-]?\\d+$" );
-    QString                         stripped = name;
-    stripped.remove( re );
-    return stripped;
+    static const QRegularExpression realizationRe( "realization-(\\d+)" );
+    static const QRegularExpression trailingRe( "[_\\-]?(\\d+)$" );
+
+    auto realizationMatch = realizationRe.match( path );
+    auto trailingMatch    = trailingRe.match( name );
+    if ( !realizationMatch.hasMatch() || !trailingMatch.hasMatch() ) return name;
+
+    if ( realizationMatch.captured( 1 ).toInt() != trailingMatch.captured( 1 ).toInt() ) return name;
+
+    QString stripped = name.left( trailingMatch.capturedStart() );
+    return stripped.isEmpty() ? name : stripped;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -611,13 +619,15 @@ QStringList RicRecursiveFileSearchDialog::uncheckFilenameOutliers()
         auto canonicalName = []( QStandardItem* item )
         {
             QString path = QDir::fromNativeSeparators( item->text() );
-            return stripTrailingRealizationNumber( QFileInfo( path ).completeBaseName() );
+            return stripTrailingRealizationNumber( QFileInfo( path ).completeBaseName(), path );
         };
 
+        // Only checked files take part, so files excluded by the realization filter do not influence the majority
         QMap<QString, int> canonicalCounts;
         for ( int j = 0; j < ensembleItem->rowCount(); ++j )
         {
-            if ( auto* childItem = ensembleItem->child( j ) ) canonicalCounts[canonicalName( childItem )]++;
+            auto* childItem = ensembleItem->child( j );
+            if ( childItem && childItem->checkState() == Qt::Checked ) canonicalCounts[canonicalName( childItem )]++;
         }
 
         if ( canonicalCounts.size() <= 1 ) continue;
@@ -647,7 +657,7 @@ QStringList RicRecursiveFileSearchDialog::uncheckFilenameOutliers()
         for ( int j = 0; j < ensembleItem->rowCount(); ++j )
         {
             auto* childItem = ensembleItem->child( j );
-            if ( !childItem ) continue;
+            if ( !childItem || childItem->checkState() != Qt::Checked ) continue;
 
             QString canonical = canonicalName( childItem );
             if ( canonical != mostCommon )
