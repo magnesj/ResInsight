@@ -88,11 +88,25 @@ void RimWellLog::fieldChangedByUi( const caf::PdmFieldHandle* changedField, cons
 //--------------------------------------------------------------------------------------------------
 void RimWellLog::updateChannelsFromWellLogData( RigWellLogData* wellLogData )
 {
-    m_wellLogChannels.deleteChildren();
-
-    if ( !wellLogData ) return;
+    if ( !wellLogData )
+    {
+        m_wellLogChannels.deleteChildren();
+        return;
+    }
 
     QStringList wellLogNames = wellLogData->wellLogChannelNames();
+
+    // Keep existing channel objects when the names are unchanged, to avoid stale entries in the project tree
+    // when a file is read several times
+    QStringList existingNames;
+    for ( const auto* channel : wellLogChannels() )
+    {
+        existingNames.append( channel->name() );
+    }
+    if ( existingNames == wellLogNames ) return;
+
+    m_wellLogChannels.deleteChildren();
+
     for ( int logIdx = 0; logIdx < wellLogNames.size(); logIdx++ )
     {
         RimWellLogChannel* wellLog = new RimWellLogChannel();

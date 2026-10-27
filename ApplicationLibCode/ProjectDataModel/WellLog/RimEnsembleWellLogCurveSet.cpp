@@ -978,7 +978,7 @@ void RimEnsembleWellLogCurveSet::setFilterByEnsembleCurveSet( RimEnsembleCurveSe
 void RimEnsembleWellLogCurveSet::updateAllTextInPlot()
 {
     auto plotTrack = firstAncestorOrThisOfTypeAsserted<RimWellLogTrack>();
-    plotTrack->viewer()->setPlotTitle( name() );
+    plotTrack->viewer()->setPlotTitle( plotTrack->description() );
 
     updateEnsembleLegendItem();
 
