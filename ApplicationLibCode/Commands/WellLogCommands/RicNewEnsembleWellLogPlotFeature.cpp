@@ -56,7 +56,7 @@ void RicNewEnsembleWellLogPlotFeature::onActionTriggered( bool isChecked )
     if ( !ensembleWellLogs ) return;
 
     // Collect available channels (alphabetically, as in the channel list), excluding depth channels
-    const QStringList depthChannels = { "DEPT", "DEPTH", "MD", "MDEPTH", "TVDMSL", "TVDRKB" };
+    const QStringList depthChannels = { "DEPT", "DEPTH", "MD", "MDEPTH", "TVDMSL", "TVDRKB", "INDEX_K" };
     std::set<QString> channelNames;
     for ( auto* wellLogFile : ensembleWellLogs->wellLogFiles() )
     {

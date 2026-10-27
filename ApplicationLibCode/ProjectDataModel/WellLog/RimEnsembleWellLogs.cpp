@@ -39,6 +39,7 @@ CAF_PDM_SOURCE_INIT( RimEnsembleWellLogs, "EnsembleWellLogs" );
 RimEnsembleWellLogs::RimEnsembleWellLogs()
 {
     CAF_PDM_InitScriptableObject( "Ensemble Well Logs", ":/LasFile16x16.png" );
+    setDeletable( true );
 
     CAF_PDM_InitFieldNoDefault( &m_wellLogFiles, "WellLogFiles", "" );
 
@@ -149,4 +150,6 @@ void RimEnsembleWellLogs::loadDataAndUpdate()
 void RimEnsembleWellLogs::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
 {
     menuBuilder << "RicNewEnsembleWellLogPlotFeature";
+    menuBuilder << "Separator";
+    menuBuilder << "RicDeleteItemFeature";
 }
