@@ -72,7 +72,6 @@ public:
 private:
     void setupBeforeSave() override;
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
-    void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName ) override;
 
     caf::PdmFieldHandle* userDescriptionField() override;
 
