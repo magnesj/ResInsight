@@ -182,6 +182,7 @@ private:
 
     bool m_isCancelPressed;
     bool m_blockUpdateOfOtherItems;
+    bool m_outlierWarningShown;
 };
 
 //==================================================================================================

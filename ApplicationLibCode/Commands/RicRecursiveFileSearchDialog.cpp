@@ -240,6 +240,7 @@ RicRecursiveFileSearchDialog::RicRecursiveFileSearchDialog( QWidget* parent, con
     : QDialog( parent, RiuTools::defaultDialogFlags() )
     , m_incomingFileTypes( fileTypes )
     , m_blockUpdateOfOtherItems( false )
+    , m_outlierWarningShown( false )
 {
     // Create widgets
     m_browseButton = new QPushButton();
@@ -574,11 +575,13 @@ void RicRecursiveFileSearchDialog::updateFileListWidget()
     QModelIndex index = m_filePathModel.index( 0, 0 );
     m_fileTreeView->expand( index );
 
+    m_outlierWarningShown = false;
     if ( m_fileType == RicRecursiveFileSearchDialog::FileType::LAS || m_fileType == RicRecursiveFileSearchDialog::FileType::EGRID )
     {
         const QStringList warnings = uncheckFilenameOutliers();
         if ( !warnings.isEmpty() )
         {
+            m_outlierWarningShown = true;
             QMessageBox::warning( this, "Multiple Filenames Found", warnings.join( "\n\n" ) );
         }
     }
@@ -1125,10 +1128,11 @@ void RicRecursiveFileSearchDialog::slotFilterTreeViewClicked()
 
     if ( m_fileType == RicRecursiveFileSearchDialog::FileType::LAS || m_fileType == RicRecursiveFileSearchDialog::FileType::EGRID )
     {
-        // Re-apply, as the checks above select all items below checked ensembles
+        // Re-apply, as the checks above select all items below checked ensembles. Warn only once per search.
         const QStringList warnings = uncheckFilenameOutliers();
-        if ( !warnings.isEmpty() )
+        if ( !warnings.isEmpty() && !m_outlierWarningShown )
         {
+            m_outlierWarningShown = true;
             QMessageBox::warning( this, "Multiple Filenames Found", warnings.join( "\n\n" ) );
         }
     }
