@@ -84,8 +84,8 @@ void RicCreateEnsembleWellLogFeature::openDialogAndExecuteCommand()
                                                                 defaultDir,
                                                                 pathFilter,
                                                                 fileNameFilter,
-                                                                { RicRecursiveFileSearchDialog::FileType::GRDECL,
-                                                                  RicRecursiveFileSearchDialog::FileType::EGRID } );
+                                                                { RicRecursiveFileSearchDialog::FileType::EGRID,
+                                                                  RicRecursiveFileSearchDialog::FileType::GRDECL } );
     if ( !result.ok || result.files.isEmpty() )
     {
         return;
