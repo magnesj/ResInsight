@@ -38,6 +38,7 @@
 
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObjectScriptingCapability.h"
+#include "cafPdmUiTreeOrdering.h"
 
 #include <QFileInfo>
 #include <QString>
@@ -244,6 +245,15 @@ void RimWellLogLasFile::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
     }
 
     uiOrdering.skipRemainingFields( true );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimWellLogLasFile::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName )
+{
+    // The well log channels are hidden objects and should not be listed as children in the tree
+    uiTreeOrdering.skipRemainingChildren( true );
 }
 
 //--------------------------------------------------------------------------------------------------
