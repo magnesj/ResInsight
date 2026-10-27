@@ -34,6 +34,8 @@
 
 #include "cafAppEnum.h"
 
+#include <cmath>
+
 namespace caf
 {
 template <>
@@ -316,6 +318,7 @@ std::shared_ptr<RigWellLogIndexDepthOffset>
                 // Find top indexes
                 for ( size_t i = 0; i < kIndexValues.size(); i++ )
                 {
+                    if ( !std::isfinite( kIndexValues[i] ) || kIndexValues[i] < 0.0 || kIndexValues[i] > 1.0e6 ) continue;
                     int kLayer = static_cast<int>( kIndexValues[i] );
                     if ( seenTopIndexes.count( kLayer ) == 0 )
                     {
@@ -334,6 +337,7 @@ std::shared_ptr<RigWellLogIndexDepthOffset>
                 // Find bottom indexes
                 for ( int i = static_cast<int>( kIndexValues.size() ) - 1; i >= 0; i-- )
                 {
+                    if ( !std::isfinite( kIndexValues[i] ) || kIndexValues[i] < 0.0 || kIndexValues[i] > 1.0e6 ) continue;
                     int kLayer = static_cast<int>( kIndexValues[i] );
                     if ( seenBottomIndexes.count( kLayer ) == 0 )
                     {
@@ -361,13 +365,15 @@ std::shared_ptr<RigWellLogIndexDepthOffset>
     }
 
     std::shared_ptr<RigWellLogIndexDepthOffset> offset = std::make_shared<RigWellLogIndexDepthOffset>();
-    for ( int kLayer = minLayerK; kLayer <= maxLayerK; kLayer++ )
+    // Iterate only over layers actually found, not the full min-max range
+    for ( const auto& [kLayer, topCount] : numTopMds )
     {
-        if ( numTopMds[kLayer] > 0 && numBottomMds[kLayer] > 0 )
+        auto bottomIt = numBottomMds.find( kLayer );
+        if ( topCount > 0 && bottomIt != numBottomMds.end() && bottomIt->second > 0 )
         {
             double topMd     = sumTopMds[kLayer] / numTopMds[kLayer];
             double bottomMd  = sumBottomMds[kLayer] / numBottomMds[kLayer];
-            double topTvd    = sumTopTvds[kLayer] / numBottomMds[kLayer];
+            double topTvd    = sumTopTvds[kLayer] / numTopMds[kLayer];
             double bottomTvd = sumBottomTvds[kLayer] / numBottomMds[kLayer];
             RiaLogging::debug( QString( "K: %1 mean depth range: %2 - %3 Samples: %4 - %5" )
                                    .arg( kLayer )
