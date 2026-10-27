@@ -20,6 +20,7 @@
 
 #include "RimEnsembleWellLogs.h"
 
+#include "cafCmdFeatureMenuBuilder.h"
 #include "cafProgressInfo.h"
 
 CAF_PDM_SOURCE_INIT( RimEnsembleWellLogsCollection, "EnsembleWellLogsCollection" );
@@ -59,4 +60,12 @@ void RimEnsembleWellLogsCollection::loadDataAndUpdate()
     {
         e->loadDataAndUpdate();
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleWellLogsCollection::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
+{
+    menuBuilder << "RicImportEnsembleWellLogsFeature";
 }
