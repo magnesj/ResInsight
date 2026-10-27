@@ -585,97 +585,14 @@ void RicRecursiveFileSearchDialog::updateFileListWidget()
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Strip a trailing number and separator from a filename stem only if it equals the realization number
-/// found in the path ("realization-N"), e.g. "WELL_001" in ".../realization-1/..." -> "WELL"
-//--------------------------------------------------------------------------------------------------
-static QString stripTrailingRealizationNumber( const QString& name, const QString& path )
-{
-    static const QRegularExpression realizationRe( "realization-(\\d+)" );
-    static const QRegularExpression trailingRe( "[_\\-]?(\\d+)$" );
-
-    auto realizationMatch = realizationRe.match( path );
-    auto trailingMatch    = trailingRe.match( name );
-    if ( !realizationMatch.hasMatch() || !trailingMatch.hasMatch() ) return name;
-
-    if ( realizationMatch.captured( 1 ).toInt() != trailingMatch.captured( 1 ).toInt() ) return name;
-
-    QString stripped = name.left( trailingMatch.capturedStart() );
-    return stripped.isEmpty() ? name : stripped;
-}
-
-//--------------------------------------------------------------------------------------------------
 /// Within each ensemble, keep only files with the most common filename (ignoring trailing realization number)
 //--------------------------------------------------------------------------------------------------
 QStringList RicRecursiveFileSearchDialog::uncheckFilenameOutliers()
 {
-    QStringList warnings;
+    QScopedValueRollback<bool> blockGuard( m_blockUpdateOfOtherItems, true );
 
-    auto* rootItem = m_filePathModel.invisibleRootItem();
-    for ( int i = 0; i < rootItem->rowCount(); ++i )
-    {
-        auto* ensembleItem = rootItem->child( i );
-        if ( !ensembleItem ) continue;
-
-        auto canonicalName = []( QStandardItem* item )
-        {
-            QString path = QDir::fromNativeSeparators( item->text() );
-            return stripTrailingRealizationNumber( QFileInfo( path ).completeBaseName(), path );
-        };
-
-        // Only checked files take part, so files excluded by the realization filter do not influence the majority
-        QMap<QString, int> canonicalCounts;
-        for ( int j = 0; j < ensembleItem->rowCount(); ++j )
-        {
-            auto* childItem = ensembleItem->child( j );
-            if ( childItem && childItem->checkState() == Qt::Checked ) canonicalCounts[canonicalName( childItem )]++;
-        }
-
-        if ( canonicalCounts.size() <= 1 ) continue;
-
-        QString mostCommon;
-        int     maxCount = 0;
-        bool    isTie    = false;
-        for ( auto it = canonicalCounts.constBegin(); it != canonicalCounts.constEnd(); ++it )
-        {
-            if ( it.value() > maxCount )
-            {
-                maxCount   = it.value();
-                mostCommon = it.key();
-                isTie      = false;
-            }
-            else if ( it.value() == maxCount )
-            {
-                isTie = true;
-            }
-        }
-
-        // No clear majority: keep the selection unchanged
-        if ( isTie ) continue;
-
-        QStringList                outlierNames;
-        QScopedValueRollback<bool> blockGuard( m_blockUpdateOfOtherItems, true );
-        for ( int j = 0; j < ensembleItem->rowCount(); ++j )
-        {
-            auto* childItem = ensembleItem->child( j );
-            if ( !childItem || childItem->checkState() != Qt::Checked ) continue;
-
-            QString canonical = canonicalName( childItem );
-            if ( canonical != mostCommon )
-            {
-                childItem->setCheckState( Qt::Unchecked );
-                if ( !outlierNames.contains( canonical ) ) outlierNames.append( canonical );
-            }
-        }
-        warnings.append( QString( "Ensemble '%1' contains multiple filenames:\n'%2'\n\n"
-                                  "Only '%3' (%4 files) is selected. Deselected: '%5'." )
-                             .arg( ensembleItem->text() )
-                             .arg( canonicalCounts.keys().join( "', '" ) )
-                             .arg( mostCommon )
-                             .arg( maxCount )
-                             .arg( outlierNames.join( ", " ) ) );
-    }
-
-    return warnings;
+    return RiaEnsembleNameTools::
+        uncheckFilenameOutliers( m_filePathModel, []( QStandardItem* item ) { return QDir::fromNativeSeparators( item->text() ); }, "files", true );
 }
 
 //--------------------------------------------------------------------------------------------------
