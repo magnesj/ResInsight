@@ -32,6 +32,8 @@
 #include "Histogram/RimHistogramPlot.h"
 #include "RimCurveStyleRules.h"
 #include "RimEnsembleCurveSetCollection.h"
+#include "RimGroupNetwork.h"
+#include "RimGroupNetworkNode.h"
 #include "RimMainPlotCollection.h"
 #include "RimMultiPlot.h"
 #include "RimProject.h"
@@ -57,6 +59,7 @@
 #include "RiuContextMenuLauncher.h"
 #include "RiuDockWidgetTools.h"
 #include "RiuDragDrop.h"
+#include "RiuGroupNetworkWidget.h"
 #include "RiuMenuBarBuildTools.h"
 #include "RiuMessagePanel.h"
 #include "RiuMultiPlotBook.h"
@@ -249,6 +252,8 @@ void RiuPlotMainWindow::cleanupGuiBeforeProjectClose()
         pdmUiPropertyView->showProperties( nullptr );
     }
     if ( m_curveStyleRulesView ) m_curveStyleRulesView->showProperties( nullptr );
+    if ( m_groupNetworkWidget ) m_groupNetworkWidget->clear();
+    if ( m_groupNetworkDock ) m_groupNetworkDock->toggleView( false );
 
     cleanUpTemporaryWidgets();
 
@@ -911,6 +916,49 @@ void RiuPlotMainWindow::slotBuildWindowActions()
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Shows the network graph in a central tab, as the workflow graph in the main window
+//--------------------------------------------------------------------------------------------------
+void RiuPlotMainWindow::showGroupNetwork( RimGroupNetwork* network, caf::PdmUiPropertyView* propertyView )
+{
+    if ( !m_groupNetworkDock )
+    {
+        m_groupNetworkDock   = RiuDockWidgetTools::createDockWidget( "Production Network", "GroupNetworkGraph", dockManager() );
+        m_groupNetworkWidget = new RiuGroupNetworkWidget( m_groupNetworkDock );
+        m_groupNetworkDock->setWidget( m_groupNetworkWidget );
+        dockManager()->addDockWidget( ads::DockWidgetArea::CenterDockWidgetArea,
+                                      m_groupNetworkDock,
+                                      dockManager()->centralWidget()->dockAreaWidget() );
+        connect( m_groupNetworkWidget, &RiuGroupNetworkWidget::nodeSelected, this, &RiuPlotMainWindow::showGroupNetworkNodeProperties );
+    }
+
+    m_groupNetworkPropertyView = propertyView;
+    m_groupNetworkWidget->setNetwork( network );
+    m_groupNetworkDock->setWindowTitle( "Network: " + network->name() );
+    m_groupNetworkDock->toggleView( true );
+    m_groupNetworkDock->setAsCurrentTab();
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Show the selected graph node in the property editor, or the network when the selection is cleared
+//--------------------------------------------------------------------------------------------------
+void RiuPlotMainWindow::showGroupNetworkNodeProperties( const QString& nodeName )
+{
+    if ( !m_groupNetworkWidget || !m_groupNetworkPropertyView ) return;
+
+    RimGroupNetwork* network = m_groupNetworkWidget->network();
+    if ( !network ) return;
+
+    if ( RimGroupNetworkNode* node = nodeName.isEmpty() ? nullptr : network->selectNode( nodeName ) )
+    {
+        m_groupNetworkPropertyView->showProperties( node );
+    }
+    else if ( dynamic_cast<RimGroupNetworkNode*>( m_groupNetworkPropertyView->currentObject() ) )
+    {
+        m_groupNetworkPropertyView->showProperties( network );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 void RiuPlotMainWindow::selectedObjectsChanged( caf::PdmUiTreeView* projectTree, caf::PdmUiPropertyView* propertyView )
@@ -936,6 +984,12 @@ void RiuPlotMainWindow::selectedObjectsChanged( caf::PdmUiTreeView* projectTree,
     }
 
     RimSummaryEnsembleTools::highlightCurvesForSummaryCases( summaryCases );
+
+    if ( m_groupNetworkWidget && !m_groupNetworkWidget->network() ) m_groupNetworkWidget->clear();
+    if ( uiItems.size() == 1 )
+    {
+        if ( auto* network = dynamic_cast<RimGroupNetwork*>( firstSelectedObject ) ) showGroupNetwork( network, propertyView );
+    }
 
     if ( uiItems.size() == 1 && m_allowActiveViewChangeFromSelection )
     {

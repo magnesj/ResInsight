@@ -49,6 +49,10 @@ const std::vector<RiaExperimentalFeatures::Feature>& RiaExperimentalFeatures::av
           "lifecycle events; note that debug level also logs one message per rendering pass and per part, every "
           "frame, so the log can grow quickly." },
         { "workflows", "Workflows", "Discover and run taskmaestro workflows from the project tree." },
+        { "group-network",
+          "Production Network",
+          "Show production networks (GRUPTREE and BRANPROP) read from the deck as a graph with summary values in the plot "
+          "window." },
         { curveAppearanceKeyword,
           "Curve Appearance",
           "Show the Curve Appearance panel, toolbar button and global appearance settings for summary plots. Restart "

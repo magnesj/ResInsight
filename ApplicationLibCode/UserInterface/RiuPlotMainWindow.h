@@ -32,6 +32,8 @@ class RimViewWindow;
 class RicSummaryPlotEditorDialog;
 class RicSummaryCurveCalculatorDialog;
 class RiuMessagePanel;
+class RiuGroupNetworkWidget;
+class RimGroupNetwork;
 
 namespace caf
 {
@@ -122,9 +124,16 @@ private slots:
     void selectedObjectsChanged( caf::PdmUiTreeView* projectTree, caf::PdmUiPropertyView* propertyView );
     void customMenuRequested( const QPoint& pos );
 
+    void showGroupNetwork( RimGroupNetwork* network, caf::PdmUiPropertyView* propertyView );
+    void showGroupNetworkNodeProperties( const QString& nodeName );
+
 private:
     caf::PdmPointer<RimViewWindow> m_activePlotViewWindow;
     QPointer<RiuMessagePanel>      m_messagePanel;
+
+    QPointer<ads::CDockWidget>       m_groupNetworkDock;
+    QPointer<RiuGroupNetworkWidget>  m_groupNetworkWidget;
+    QPointer<caf::PdmUiPropertyView> m_groupNetworkPropertyView;
 
     std::unique_ptr<caf::PdmUiToolBarEditor> m_wellLogPlotToolBarEditor;
     std::unique_ptr<caf::PdmUiToolBarEditor> m_multiPlotToolBarEditor;
