@@ -113,7 +113,7 @@ RimGeoMechCase::RimGeoMechCase()
     CAF_PDM_InitFieldNoDefault( &m_elementPropertyFileNames, "ElementPropertyFileNames", "Element Property Files" );
     m_elementPropertyFileNames.uiCapability()->setUiHidden( true );
 
-        CAF_PDM_InitFieldNoDefault( &m_elementPropertyFileNameIndexUiSelection, "ElementPropertyFileNameIndexUiSelection", "" );
+    CAF_PDM_InitFieldNoDefault( &m_elementPropertyFileNameIndexUiSelection, "ElementPropertyFileNameIndexUiSelection", "" );
     m_elementPropertyFileNameIndexUiSelection.xmlCapability()->disableIO();
 
     caf::AppEnum<BiotCoefficientType> defaultBiotCoefficientType = RimGeoMechCase::BiotCoefficientType::BIOT_NONE;
