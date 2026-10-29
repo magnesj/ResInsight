@@ -554,8 +554,8 @@ void RifReaderOpmCommon::transferGeometry( Opm::EclIO::EGrid&  opmMainGrid,
     // use same mapping as resdata
     const size_t cellMappingECLRi[8] = { 0, 1, 3, 2, 4, 5, 7, 6 };
 
-    // The loop is serial, as the corner nodes are added to the shared node table while reading
-    for ( int opmCellIndex = 0; opmCellIndex < static_cast<int>( localGrid->cellCount() ); opmCellIndex++ )
+    const int opmCellCount = static_cast<int>( localGrid->cellCount() );
+    auto      readCell     = [&]( int opmCellIndex, std::array<cvf::Vec3d, 8>& corners )
     {
         auto opmIJK = opmGrid.ijk_from_global_index( opmCellIndex );
 
@@ -611,10 +611,13 @@ void RifReaderOpmCommon::transferGeometry( Opm::EclIO::EGrid&  opmMainGrid,
                                                           yCenterCoordOpm );
             }
 
-            // Nodes with identical coordinates are shared between cells
-            cell.cornerIndices()[riCornerIndex] = mainGrid->appendUniqueNode( riNode );
+            corners[riCornerIndex] = riNode;
         }
-    }
+
+        return &cell.cornerIndices();
+    };
+    // Nodes with identical coordinates are shared between cells
+    mainGrid->appendUniqueCellNodes( opmCellCount, readCell );
 
     // The cell geometry is evaluated from the node table of the main grid, so this must be done after the nodes have
     // been added

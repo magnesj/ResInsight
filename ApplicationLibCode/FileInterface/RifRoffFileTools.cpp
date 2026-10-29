@@ -219,9 +219,8 @@ bool RifRoffFileTools::openGridFile( std::istream& stream, RigEclipseCaseData* e
         // Precompute the active cell matrix index
         size_t numActiveCells = computeActiveCellMatrixIndex( activeCells );
 
-        // Loop over cells and fill them with data. The loop is serial, as the corner nodes are added to the shared
-        // node table while reading.
-        for ( int gridLocalCellIndex = 0; gridLocalCellIndex < cellCount; ++gridLocalCellIndex )
+        // Loop over cells and fill them with data. Nodes with identical coordinates are shared between cells.
+        auto readCell = [&]( int gridLocalCellIndex, std::array<cvf::Vec3d, 8>& corners )
         {
             RigCell& cell = mainGrid->cell( cellStartIndex + gridLocalCellIndex );
 
@@ -237,15 +236,15 @@ bool RifRoffFileTools::openGridFile( std::istream& stream, RigEclipseCaseData* e
 
             cell.setParentCellIndex( cvf::UNDEFINED_SIZE_T );
 
-            // Corner coordinates. Nodes with identical coordinates are shared between cells.
+            // Corner coordinates
             for ( int cIdx = 0; cIdx < 8; ++cIdx )
             {
-                auto corner = getCorner( *mainGrid, cornerLines, zCorners, gridLocalCellIndex, cIdx, offset, scale );
-
-                cell.cornerIndices()[cellMappingECLRi[cIdx]] = mainGrid->appendUniqueNode( corner );
+                corners[cellMappingECLRi[cIdx]] = getCorner( *mainGrid, cornerLines, zCorners, gridLocalCellIndex, cIdx, offset, scale );
             }
-        }
 
+            return &cell.cornerIndices();
+        };
+        mainGrid->appendUniqueCellNodes( cellCount, readCell );
         mainGrid->releaseNodeLookup();
 
         // Mark inactive long pyramid looking cells as invalid. The cell geometry is evaluated from the node table of the

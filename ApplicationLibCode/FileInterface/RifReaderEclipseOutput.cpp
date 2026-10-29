@@ -170,9 +170,8 @@ bool RifReaderEclipseOutput::transferGridCellData( RigMainGrid*         mainGrid
     defaultCell.setHostGrid( localGrid );
     mainGrid->reservoirCells().resize( cellStartIndex + cellCount, defaultCell );
 
-    // Loop over cells and fill them with data. The loop is serial, as the corner nodes are added to the shared node
-    // table while reading.
-    for ( int gridLocalCellIndex = 0; gridLocalCellIndex < cellCount; ++gridLocalCellIndex )
+    // Loop over cells and fill them with data. Nodes with identical coordinates are shared between cells.
+    auto readCell = [&]( int gridLocalCellIndex, std::array<cvf::Vec3d, 8>& corners )
     {
         RigCell& cell = mainGrid->cell( cellStartIndex + gridLocalCellIndex );
 
@@ -204,14 +203,12 @@ bool RifReaderEclipseOutput::transferGridCellData( RigMainGrid*         mainGrid
             cell.setParentCellIndex( parentCellIndex );
         }
 
-        // Corner coordinates. Nodes with identical coordinates are shared between cells.
+        // Corner coordinates
         for ( int cIdx = 0; cIdx < 8; ++cIdx )
         {
-            cvf::Vec3d point;
+            double* point = corners[cellMappingECLRi[cIdx]].ptr();
             ecl_grid_get_cell_corner_xyz1( localEclGrid, gridLocalCellIndex, cIdx, &( point[0] ), &( point[1] ), &( point[2] ) );
             point[2] = -point[2]; // Flipping Z making depth become negative z values
-
-            cell.cornerIndices()[cellMappingECLRi[cIdx]] = mainGrid->appendUniqueNode( point );
         }
 
         // Sub grid in cell
@@ -222,7 +219,10 @@ bool RifReaderEclipseOutput::transferGridCellData( RigMainGrid*         mainGrid
             CAF_ASSERT( subGridId > 0 );
             cell.setSubGrid( static_cast<RigLocalGrid*>( mainGrid->gridById( subGridId ) ) );
         }
-    }
+
+        return &cell.cornerIndices();
+    };
+    mainGrid->appendUniqueCellNodes( cellCount, readCell );
 
     // Mark inactive long pyramid looking cells as invalid. The cell geometry is evaluated from the node table of the
     // main grid, so this must be done after the nodes have been added.

@@ -39,6 +39,10 @@
 #include <cstring>
 #include <limits>
 
+#if defined( _MSC_VER ) && ( defined( _M_X64 ) || defined( _M_IX86 ) )
+#include <xmmintrin.h>
+#endif
+
 RigMainGrid::RigMainGrid()
     : RigGridBase( this )
 {
@@ -114,15 +118,46 @@ void RigMainGrid::transformNodes( const cvf::Mat4d& transform )
 
 namespace
 {
-using NodeLookupIndex                           = uint32_t;
-constexpr NodeLookupIndex emptyNodeLookupSlot   = std::numeric_limits<NodeLookupIndex>::max();
-constexpr size_t          minimumNodeLookupSize = 1024;
+// A lookup entry holds the upper 32 bits of the node hash and a 32-bit node index. Comparing the hash bits first avoids
+// reading the node table for most non-matching entries.
+using NodeLookupEntry                              = uint64_t;
+constexpr NodeLookupEntry emptyNodeLookupEntry     = std::numeric_limits<NodeLookupEntry>::max();
+constexpr NodeLookupEntry nodeLookupHashMask       = 0xFFFFFFFF00000000ULL;
+constexpr size_t          maxNodeLookupNodeCount   = std::numeric_limits<uint32_t>::max();
+constexpr size_t          minimumNodeLookupSizeLog = 10;
+
+uint32_t nodeIndexOf( NodeLookupEntry entry )
+{
+    return static_cast<uint32_t>( entry );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// The slot is taken from the upper bits of the hash. For lookups up to 2^32 slots, the slot can then be computed from the
+/// hash bits stored in the entry when the lookup grows.
+//--------------------------------------------------------------------------------------------------
+size_t nodeLookupSlot( uint64_t hash, size_t lookupSizeLog )
+{
+    return static_cast<size_t>( hash >> ( 64 - lookupSizeLog ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void prefetchForRead( const void* address )
+{
+#if defined( _MSC_VER ) && ( defined( _M_X64 ) || defined( _M_IX86 ) )
+    _mm_prefetch( static_cast<const char*>( address ), _MM_HINT_T0 );
+#elif defined( __GNUC__ )
+    __builtin_prefetch( address );
+#endif
+}
+} // namespace
 
 //--------------------------------------------------------------------------------------------------
 /// Hash of the exact bit pattern of a coordinate. -0.0 is normalized to 0.0 so it hashes like 0.0,
 /// matching operator==.
 //--------------------------------------------------------------------------------------------------
-uint64_t nodeHash( const cvf::Vec3d& p )
+uint64_t RigMainGrid::nodeHash( const cvf::Vec3d& p )
 {
     auto mix = []( uint64_t h, double value )
     {
@@ -139,7 +174,6 @@ uint64_t nodeHash( const cvf::Vec3d& p )
 
     return mix( mix( mix( 0x9e3779b97f4a7c15ULL, p.x() ), p.y() ), p.z() );
 }
-} // namespace
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -157,11 +191,11 @@ void RigMainGrid::releaseNodeLookup()
 //--------------------------------------------------------------------------------------------------
 void RigMainGrid::syncNodeLookup()
 {
-    if ( m_nodes.size() >= emptyNodeLookupSlot ) return;
+    if ( m_nodes.size() >= maxNodeLookupNodeCount ) return;
 
     for ( size_t nodeIndex = m_nodeLookupNodeCount; nodeIndex < m_nodes.size(); nodeIndex++ )
     {
-        findOrAddToNodeLookup( m_nodes[nodeIndex], nodeIndex );
+        findOrAddToNodeLookup( m_nodes[nodeIndex], nodeHash( m_nodes[nodeIndex] ), nodeIndex );
     }
     m_nodeLookupNodeCount = m_nodes.size();
 }
@@ -171,12 +205,20 @@ void RigMainGrid::syncNodeLookup()
 //--------------------------------------------------------------------------------------------------
 size_t RigMainGrid::appendUniqueNode( const cvf::Vec3d& node )
 {
+    return appendUniqueNode( node, nodeHash( node ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+size_t RigMainGrid::appendUniqueNode( const cvf::Vec3d& node, uint64_t hash )
+{
     m_isFaceNormalsOutwardsComputed = false;
 
     const size_t newNodeIndex = m_nodes.size();
 
     // The lookup uses 32-bit node indices. Nodes beyond this are not shared.
-    if ( newNodeIndex >= emptyNodeLookupSlot )
+    if ( newNodeIndex >= maxNodeLookupNodeCount )
     {
         m_nodes.push_back( node );
         return newNodeIndex;
@@ -184,7 +226,7 @@ size_t RigMainGrid::appendUniqueNode( const cvf::Vec3d& node )
 
     if ( m_nodeLookupNodeCount != newNodeIndex ) syncNodeLookup();
 
-    const size_t nodeIndex = findOrAddToNodeLookup( node, newNodeIndex );
+    const size_t nodeIndex = findOrAddToNodeLookup( node, hash, newNodeIndex );
     if ( nodeIndex == newNodeIndex )
     {
         m_nodes.push_back( node );
@@ -195,55 +237,118 @@ size_t RigMainGrid::appendUniqueNode( const cvf::Vec3d& node )
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Returns the index of the node in the lookup equal to the given node. If there is none, nodeIndex is
-/// added to the lookup and returned. m_nodes[nodeIndex] must be equal to node once the lookup is used again.
+/// Neighbor cells along I usually share a face. Corners 0, 3, 4 and 7 of a cell are then equal to corners 1, 2, 5 and
+/// 6 of the previous cell, and the node of the previous cell is used without searching the lookup. Nodes with equal
+/// coordinates are the same node, so this gives the same result as the lookup for any cell order.
 //--------------------------------------------------------------------------------------------------
-size_t RigMainGrid::findOrAddToNodeLookup( const cvf::Vec3d& node, size_t nodeIndex )
+void RigMainGrid::appendUniqueCellNodes( const CellNodeChunk& chunk )
 {
-    // Keep the load factor at most 2/3
-    if ( ( m_nodeLookupEntryCount + 1 ) * 3 > m_nodeLookup.size() * 2 ) growNodeLookup();
+    constexpr std::array<int, 8> previousCellCorner = { 1, -1, -1, 2, 5, -1, -1, 6 };
 
-    const size_t mask = m_nodeLookup.size() - 1;
-    size_t       slot = nodeHash( node ) & mask;
-    while ( true )
+    // The lookup slots of the cell this far ahead are loaded into the cache in advance
+    constexpr size_t prefetchCellDistance = 4;
+
+    const std::array<cvf::Vec3d, 8>* previousCorners       = nullptr;
+    const std::array<size_t, 8>*     previousCornerIndices = nullptr;
+
+    const size_t cellCount = chunk.cornerIndices.size();
+    for ( size_t i = 0; i < cellCount; i++ )
     {
-        const NodeLookupIndex existingIndex = m_nodeLookup[slot];
-        if ( existingIndex == emptyNodeLookupSlot )
+        if ( i + prefetchCellDistance < cellCount && chunk.cornerIndices[i + prefetchCellDistance] )
         {
-            m_nodeLookup[slot] = static_cast<NodeLookupIndex>( nodeIndex );
-            m_nodeLookupEntryCount++;
-            return nodeIndex;
+            for ( uint64_t hash : chunk.hashes[i + prefetchCellDistance] )
+            {
+                prefetchNodeLookup( hash );
+            }
         }
 
-        if ( m_nodes[existingIndex] == node ) return existingIndex;
+        std::array<size_t, 8>* cornerIndices = chunk.cornerIndices[i];
+        if ( !cornerIndices ) continue;
 
-        slot = ( slot + 1 ) & mask;
+        const std::array<cvf::Vec3d, 8>& corners = chunk.corners[i];
+        for ( size_t corner = 0; corner < 8; corner++ )
+        {
+            const int previousCorner = previousCellCorner[corner];
+            if ( previousCorners && previousCorner >= 0 && corners[corner] == ( *previousCorners )[previousCorner] )
+            {
+                ( *cornerIndices )[corner] = ( *previousCornerIndices )[previousCorner];
+            }
+            else
+            {
+                ( *cornerIndices )[corner] = appendUniqueNode( corners[corner], chunk.hashes[i][corner] );
+            }
+        }
+
+        previousCorners       = &corners;
+        previousCornerIndices = cornerIndices;
     }
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RigMainGrid::prefetchNodeLookup( uint64_t hash ) const
+{
+    if ( m_nodeLookup.empty() ) return;
+
+    prefetchForRead( &m_nodeLookup[nodeLookupSlot( hash, m_nodeLookupSizeLog )] );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Returns the index of the node in the lookup equal to the given node. If there is none, nodeIndex is
+/// added to the lookup and returned. m_nodes[nodeIndex] must be equal to node once the lookup is used again.
+//--------------------------------------------------------------------------------------------------
+size_t RigMainGrid::findOrAddToNodeLookup( const cvf::Vec3d& node, uint64_t hash, size_t nodeIndex )
+{
+    // Keep the load factor at most 2/3
+    if ( ( m_nodeLookupEntryCount + 1 ) * 3 > m_nodeLookup.size() * 2 ) growNodeLookup();
+
+    const NodeLookupEntry hashBits = hash & nodeLookupHashMask;
+
+    const size_t mask = m_nodeLookup.size() - 1;
+    size_t       slot = nodeLookupSlot( hash, m_nodeLookupSizeLog );
+    while ( true )
+    {
+        const NodeLookupEntry entry = m_nodeLookup[slot];
+        if ( entry == emptyNodeLookupEntry )
+        {
+            m_nodeLookup[slot] = hashBits | nodeIndex;
+            m_nodeLookupEntryCount++;
+            return nodeIndex;
+        }
+
+        if ( ( entry & nodeLookupHashMask ) == hashBits && m_nodes[nodeIndexOf( entry )] == node ) return nodeIndexOf( entry );
+
+        slot = ( slot + 1 ) & mask;
+    }
+}
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RigMainGrid::growNodeLookup()
 {
-    const size_t newSize = std::max( minimumNodeLookupSize, m_nodeLookup.size() * 2 );
+    const size_t newSizeLog = m_nodeLookup.empty() ? minimumNodeLookupSizeLog : m_nodeLookupSizeLog + 1;
+    const size_t newSize    = size_t( 1 ) << newSizeLog;
 
-    std::vector<NodeLookupIndex> newLookup( newSize, emptyNodeLookupSlot );
+    std::vector<NodeLookupEntry> newLookup( newSize, emptyNodeLookupEntry );
 
     const size_t mask = newSize - 1;
-    for ( NodeLookupIndex nodeIndex : m_nodeLookup )
+    for ( NodeLookupEntry entry : m_nodeLookup )
     {
-        if ( nodeIndex == emptyNodeLookupSlot ) continue;
+        if ( entry == emptyNodeLookupEntry ) continue;
 
-        size_t slot = nodeHash( m_nodes[nodeIndex] ) & mask;
-        while ( newLookup[slot] != emptyNodeLookupSlot )
+        const uint64_t hash = newSizeLog <= 32 ? ( entry & nodeLookupHashMask ) : nodeHash( m_nodes[nodeIndexOf( entry )] );
+
+        size_t slot = nodeLookupSlot( hash, newSizeLog );
+        while ( newLookup[slot] != emptyNodeLookupEntry )
         {
             slot = ( slot + 1 ) & mask;
         }
-        newLookup[slot] = nodeIndex;
+        newLookup[slot] = entry;
     }
 
     m_nodeLookup.swap( newLookup );
+    m_nodeLookupSizeLog = newSizeLog;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -251,7 +356,8 @@ void RigMainGrid::growNodeLookup()
 //--------------------------------------------------------------------------------------------------
 void RigMainGrid::clearNodeLookup()
 {
-    std::vector<NodeLookupIndex>().swap( m_nodeLookup );
+    std::vector<NodeLookupEntry>().swap( m_nodeLookup );
+    m_nodeLookupSizeLog    = 0;
     m_nodeLookupEntryCount = 0;
     m_nodeLookupNodeCount  = 0;
 }

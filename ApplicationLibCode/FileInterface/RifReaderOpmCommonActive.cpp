@@ -266,10 +266,22 @@ void RifReaderOpmCommonActive::transferActiveGeometry( Opm::EclIO::EGrid&  opmMa
     // use same mapping as resdata
     const size_t cellMappingECLRi[8] = { 0, 1, 3, 2, 4, 5, 7, 6 };
 
-    // The loop is serial, as cells are inserted and the corner nodes are added to the shared node table while reading
-    for ( int opmCellIndex = 0; opmCellIndex < static_cast<int>( opmGrid.totalNumberOfCells() ); opmCellIndex++ )
+    const int opmCellCount = static_cast<int>( opmGrid.totalNumberOfCells() );
+
+    // Insert the active cells in a serial loop, so they can be filled in parallel
+    std::vector<RigCell*> opmCells( opmCellCount, nullptr );
+    for ( int opmCellIndex = 0; opmCellIndex < opmCellCount; opmCellIndex++ )
     {
         if ( ( activeMatIndexes[opmCellIndex] < 0 ) && ( activeFracIndexes[opmCellIndex] < 0 ) ) continue;
+
+        auto opmIJK            = opmGrid.ijk_from_global_index( opmCellIndex );
+        auto localIndex        = localGrid->cellIndexFromIJK( opmIJK[0], opmIJK[1], opmIJK[2] );
+        opmCells[opmCellIndex] = &( riCells[cellStartIndex + localIndex] = defaultCell );
+    }
+
+    auto readCell = [&]( int opmCellIndex, std::array<cvf::Vec3d, 8>& corners ) -> std::array<size_t, 8>*
+    {
+        if ( !opmCells[opmCellIndex] ) return nullptr;
 
         auto opmIJK = opmGrid.ijk_from_global_index( opmCellIndex );
 
@@ -284,8 +296,7 @@ void RifReaderOpmCommonActive::transferActiveGeometry( Opm::EclIO::EGrid&  opmMa
         }
 
         auto     localIndex = localGrid->cellIndexFromIJK( opmIJK[0], opmIJK[1], opmIJK[2] );
-        RigCell& cell       = riCells[cellStartIndex + localIndex];
-        cell                = defaultCell;
+        RigCell& cell       = *opmCells[opmCellIndex];
         cell.setGridLocalCellIndex( localIndex );
 
         // parent cell index
@@ -326,10 +337,13 @@ void RifReaderOpmCommonActive::transferActiveGeometry( Opm::EclIO::EGrid&  opmMa
                                                           yCenterCoordOpm );
             }
 
-            // Nodes with identical coordinates are shared between cells
-            cell.cornerIndices()[riCornerIndex] = activeGrid->appendUniqueNode( riNode );
+            corners[riCornerIndex] = riNode;
         }
-    }
+
+        return &cell.cornerIndices();
+    };
+    // Nodes with identical coordinates are shared between cells
+    activeGrid->appendUniqueCellNodes( opmCellCount, readCell );
 
     // The cell geometry is evaluated from the node table of the main grid, so this must be done after the nodes have
     // been added
