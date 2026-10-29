@@ -641,7 +641,7 @@ void RigMainGrid::calculateFaults( const RigActiveCellInfo* activeCellInfo )
     int unNamedFaultWithInactiveIdx = static_cast<int>( m_faults.size() );
     m_faults.push_back( unNamedFaultWithInactive );
 
-    const std::vector<cvf::Vec3d>& vxs = m_mainGrid->nodes();
+    const std::vector<cvf::Vec3d>& vxs = m_nodes;
 
     // Each cell only writes the fault index of its own positive faces and the opposite faces of its neighbors, so the
     // cells can be processed in parallel. Static scheduling assigns increasing cell ranges to increasing thread

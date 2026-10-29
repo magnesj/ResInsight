@@ -125,7 +125,7 @@ void RigReservoirBuilder::createGridsAndCells( RigEclipseCaseData* eclipseCase )
             std::array<size_t, 8>& indices = cell.cornerIndices();
             for ( int nodeIdx = 0; nodeIdx < 8; nodeIdx++ )
             {
-                bb.add( eclipseCase->mainGrid()->nodes()[indices[nodeIdx]] );
+                bb.add( eclipseCase->mainGrid()->node( indices[nodeIdx] ) );
             }
             // Deactivate cell in main grid
             cell.setSubGrid( localGrid );
