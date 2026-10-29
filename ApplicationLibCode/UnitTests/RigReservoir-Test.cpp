@@ -118,6 +118,38 @@ TEST( RigMainGridTest, GridByIndexOutOfRangeReturnsNull )
     EXPECT_EQ( nullptr, mainGrid->gridByIndex( cvf::UNDEFINED_SIZE_T ) );
 }
 
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+TEST( RigMainGridTest, NodeTableAccess )
+{
+    cvf::ref<RigMainGrid> mainGrid = new RigMainGrid;
+    EXPECT_EQ( 0u, mainGrid->nodeCount() );
+
+    mainGrid->setNodes( { cvf::Vec3d( 1, 2, 3 ), cvf::Vec3d( 4, 5, 6 ) } );
+    ASSERT_EQ( 2u, mainGrid->nodeCount() );
+    EXPECT_EQ( cvf::Vec3d( 4, 5, 6 ), mainGrid->node( 1 ) );
+
+    mainGrid->appendNodes( { cvf::Vec3d( 7, 8, 9 ) } );
+    ASSERT_EQ( 3u, mainGrid->nodeCount() );
+    EXPECT_EQ( cvf::Vec3d( 1, 2, 3 ), mainGrid->node( 0 ) );
+    EXPECT_EQ( cvf::Vec3d( 7, 8, 9 ), mainGrid->node( 2 ) );
+
+    mainGrid->setNode( 0, cvf::Vec3d( -1, -2, -3 ) );
+    EXPECT_EQ( cvf::Vec3d( -1, -2, -3 ), mainGrid->node( 0 ) );
+
+    mainGrid->transformNodes( cvf::Mat4d::fromTranslation( cvf::Vec3d( 10, 0, 0 ) ) );
+    EXPECT_EQ( cvf::Vec3d( 9, -2, -3 ), mainGrid->node( 0 ) );
+    EXPECT_EQ( cvf::Vec3d( 17, 8, 9 ), mainGrid->node( 2 ) );
+
+    RigMainGridNodes view( *mainGrid );
+    EXPECT_EQ( 3u, view.size() );
+    EXPECT_EQ( cvf::Vec3d( 14, 5, 6 ), view[1] );
+
+    mainGrid->setNodes( {} );
+    EXPECT_EQ( 0u, mainGrid->nodeCount() );
+}
+
 /*
 
 //--------------------------------------------------------------------------------------------------
