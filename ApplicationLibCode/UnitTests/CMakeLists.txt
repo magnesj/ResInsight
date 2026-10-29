@@ -22,6 +22,8 @@ set(SOURCE_UNITTEST_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RifEclipseInputFileTools-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifEclipseOutputFileTools-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifOpmFlowDeckFile-Test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RifGroupNetworkReader-Test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RifGroupNetworkSummaryData-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifReaderEclipseOutput-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifReaderOpmCommon-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifOpmCommonFlowDiagGridSource-Test.cpp
@@ -112,6 +114,8 @@ set(SOURCE_UNITTEST_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimWorkflowDefinition-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimWorkflowJobSync-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiuWorkflowGraphLayout-Test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RiuGroupNetworkLayout-Test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimGroupNetworkGraph-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimDataFilterCollection-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimEclipseContourMapProjection-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimIntersectionCollection-Test.cpp

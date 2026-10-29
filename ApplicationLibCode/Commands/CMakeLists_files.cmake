@@ -59,6 +59,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RicUnstackSelectedCurvesFeature.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicThemeColorEditorFeature.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicImportVfpDataFeature.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RicNewGroupNetworkFeature.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicNewCustomObjectiveFunctionFeature.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicNewCustomObjectiveFunctionWeightFeature.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicNewPressureTableItemFeature.cpp
