@@ -61,9 +61,6 @@ public:
     void setNode( size_t nodeIndex, const cvf::Vec3d& coordinate );
     void transformNodes( const cvf::Mat4d& transform );
 
-    std::vector<cvf::Vec3d>&       nodes();
-    const std::vector<cvf::Vec3d>& nodes() const;
-
     virtual RigGridBase*       gridAndGridLocalIdxFromGlobalCellIdx( size_t globalCellIdx, size_t* gridLocalCellIdx );
     virtual const RigGridBase* gridAndGridLocalIdxFromGlobalCellIdx( size_t globalCellIdx, size_t* gridLocalCellIdx ) const;
 

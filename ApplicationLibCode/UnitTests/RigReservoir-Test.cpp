@@ -53,9 +53,7 @@ TEST( RigGridManager, BasicTest )
 TEST( RigGridManager, EqualTests )
 {
     cvf::ref<RigMainGrid> mainGridA = new RigMainGrid;
-    mainGridA->nodes().push_back( cvf::Vec3d( 0, 0, 0 ) );
-    mainGridA->nodes().push_back( cvf::Vec3d( 0, 0, 1 ) );
-    mainGridA->nodes().push_back( cvf::Vec3d( 0, 0, 2 ) );
+    mainGridA->setNodes( { cvf::Vec3d( 0, 0, 0 ), cvf::Vec3d( 0, 0, 1 ), cvf::Vec3d( 0, 0, 2 ) } );
 
     cvf::ref<RigEclipseCaseData> eclipseCase = new RigEclipseCaseData( nullptr );
     eclipseCase->setMainGrid( mainGridA.p() );
@@ -67,20 +65,19 @@ TEST( RigGridManager, EqualTests )
     cvf::ref<RigMainGrid> existingGrid = gridCollection.findEqualGrid( mainGridB.p() );
     EXPECT_TRUE( existingGrid.isNull() );
 
-    mainGridB->nodes().push_back( cvf::Vec3d( 0, 0, 0 ) );
+    mainGridB->appendNodes( { cvf::Vec3d( 0, 0, 0 ) } );
     existingGrid = gridCollection.findEqualGrid( mainGridB.p() );
     EXPECT_TRUE( existingGrid.isNull() );
 
     // Insert nodes in opposite direction
-    mainGridB->nodes().push_back( cvf::Vec3d( 0, 0, 2 ) );
-    mainGridB->nodes().push_back( cvf::Vec3d( 0, 0, 1 ) );
+    mainGridB->appendNodes( { cvf::Vec3d( 0, 0, 2 ), cvf::Vec3d( 0, 0, 1 ) } );
     existingGrid = gridCollection.findEqualGrid( mainGridB.p() );
     EXPECT_TRUE( existingGrid.isNull() );
 
     // Overwrite to match the node structure of mainGridA
-    mainGridB->nodes()[1] = cvf::Vec3d( 0, 0, 1 );
-    mainGridB->nodes()[2] = cvf::Vec3d( 0, 0, 2 );
-    existingGrid          = gridCollection.findEqualGrid( mainGridB.p() );
+    mainGridB->setNode( 1, cvf::Vec3d( 0, 0, 1 ) );
+    mainGridB->setNode( 2, cvf::Vec3d( 0, 0, 2 ) );
+    existingGrid = gridCollection.findEqualGrid( mainGridB.p() );
     EXPECT_TRUE( existingGrid.notNull() );
 }
 
