@@ -58,13 +58,19 @@ public:
 
     void setNodes( std::vector<cvf::Vec3d> nodes );
     void appendNodes( const std::vector<cvf::Vec3d>& nodes );
-    void reserveNodes( size_t nodeCount );
     void setNode( size_t nodeIndex, const cvf::Vec3d& coordinate );
     void transformNodes( const cvf::Mat4d& transform );
 
-    // Merge nodes with identical coordinates and remap the corner indices of all cells. After this, nodes are
-    // shared between cells, so setNode() will move the corner of every cell using the node.
-    size_t removeDuplicateNodes();
+    // Shared node table construction, used when reading grids. A node with exactly the same coordinates as an
+    // existing node is not added again, the existing node is used instead. Nodes appended this way are shared
+    // between cells, so setNode() moves the corner of every cell using the node.
+    // Returns the node table index of each of the given nodes.
+    std::vector<size_t> appendUniqueNodes( const std::vector<cvf::Vec3d>& nodes );
+    // Sets the corner indices of the cells starting at firstReservoirCellIndex, using 8 nodes per cell ordered as
+    // RigCell::cornerIndices()
+    void appendUniqueCellNodes( size_t firstReservoirCellIndex, const std::vector<cvf::Vec3d>& cellCornerNodes );
+    // Frees the lookup table used to find existing nodes. Call when the grid geometry is complete.
+    void releaseNodeLookup();
 
     virtual RigGridBase*       gridAndGridLocalIdxFromGlobalCellIdx( size_t globalCellIdx, size_t* gridLocalCellIdx );
     virtual const RigGridBase* gridAndGridLocalIdxFromGlobalCellIdx( size_t globalCellIdx, size_t* gridLocalCellIdx ) const;
@@ -171,10 +177,13 @@ protected: // only for use by file readers and internal services. TODO: replace 
     std::vector<RigCell>&       reservoirCells();
     const std::vector<RigCell>& reservoirCells() const;
 
-    // Replace each cell corner index i (i < oldToNew.size()) with oldToNew[i]
-    virtual void remapCellCornerIndices( const std::vector<uint32_t>& oldToNew );
-
 private:
+    void   syncNodeLookup();
+    size_t appendUniqueNode( const cvf::Vec3d& node );
+    size_t findOrAddToNodeLookup( const cvf::Vec3d& node, size_t nodeIndex );
+    void   growNodeLookup();
+    void   clearNodeLookup();
+
     void initAllSubCellsMainGridCellIndex();
     bool hasFaultWithName( const QString& name ) const;
     void computeBoundingBox();
@@ -187,7 +196,9 @@ private:
 
 private:
     std::vector<cvf::Vec3d>       m_nodes; ///< Global vertex table
-    bool                          m_duplicateNodesRemoved = false;
+    std::vector<uint32_t>         m_nodeLookup; ///< Open addressing hash table of node indices, used to share nodes
+    size_t                        m_nodeLookupEntryCount = 0;
+    size_t                        m_nodeLookupNodeCount  = 0; ///< Nodes [0, m_nodeLookupNodeCount) are in the lookup
     std::vector<RigCell>          m_cells; ///< Global array of all cells in the reservoir (including the ones in LGR's)
     cvf::Collection<RigLocalGrid> m_localGrids; ///< List of all the LGR's in this reservoir
     std::vector<size_t>           m_gridIdToIndexMapping; ///< Mapping from LGR Id to index.

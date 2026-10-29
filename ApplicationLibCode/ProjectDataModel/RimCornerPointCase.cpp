@@ -253,16 +253,14 @@ void RimCornerPointCase::buildGrid( RigEclipseCaseData&       eclipseCaseData,
     activeCellInfo->setReservoirCellCount( totalCellCount );
     fractureActiveCellInfo->setReservoirCellCount( totalCellCount );
 
-    // Reserve room for the cells and nodes and fill them with data
+    // Reserve room for the cells and fill them with data
     mainGrid->reservoirCells().reserve( totalCellCount );
-    mainGrid->reserveNodes( 8 * totalCellCount );
 
     int               progTicks = 100;
     caf::ProgressInfo progInfo( progTicks, "" );
 
     int    cellCount      = static_cast<int>( totalCellCount );
     size_t cellStartIndex = mainGrid->reservoirCells().size();
-    size_t nodeStartIndex = mainGrid->nodeCount();
 
     RigCell defaultCell;
     defaultCell.setHostGrid( mainGrid );
@@ -314,12 +312,12 @@ void RimCornerPointCase::buildGrid( RigEclipseCaseData&       eclipseCaseData,
             point[0] = corners[cIdx].x();
             point[1] = corners[cIdx].y();
             point[2] = -corners[cIdx].z();
-
-            cell.cornerIndices()[cIdx] = nodeStartIndex + (size_t)gridLocalCellIndex * 8 + cIdx;
         }
     }
 
-    mainGrid->appendNodes( gridNodes );
+    // gridNodes holds 8 nodes per cell in corner order. Nodes with identical coordinates are shared between cells.
+    mainGrid->appendUniqueCellNodes( cellStartIndex, gridNodes );
+    mainGrid->releaseNodeLookup();
 
     // Mark inactive long pyramid looking cells as invalid. The cell geometry is evaluated from the node table of the
     // main grid, so this must be done after the nodes have been added.

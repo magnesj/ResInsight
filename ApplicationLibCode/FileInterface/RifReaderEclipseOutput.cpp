@@ -165,7 +165,6 @@ bool RifReaderEclipseOutput::transferGridCellData( RigMainGrid*         mainGrid
 
     int    cellCount      = ecl_grid_get_global_size( localEclGrid );
     size_t cellStartIndex = mainGrid->reservoirCells().size();
-    size_t nodeStartIndex = mainGrid->nodeCount();
 
     RigCell defaultCell;
     defaultCell.setHostGrid( localGrid );
@@ -214,8 +213,7 @@ bool RifReaderEclipseOutput::transferGridCellData( RigMainGrid*         mainGrid
         {
             double* point = gridNodes[(size_t)gridLocalCellIndex * 8 + cellMappingECLRi[cIdx]].ptr();
             ecl_grid_get_cell_corner_xyz1( localEclGrid, gridLocalCellIndex, cIdx, &( point[0] ), &( point[1] ), &( point[2] ) );
-            point[2]                   = -point[2]; // Flipping Z making depth become negative z values
-            cell.cornerIndices()[cIdx] = nodeStartIndex + (size_t)gridLocalCellIndex * 8 + cIdx;
+            point[2] = -point[2]; // Flipping Z making depth become negative z values
         }
 
         // Sub grid in cell
@@ -228,7 +226,8 @@ bool RifReaderEclipseOutput::transferGridCellData( RigMainGrid*         mainGrid
         }
     }
 
-    mainGrid->appendNodes( gridNodes );
+    // gridNodes holds 8 nodes per cell in corner order. Nodes with identical coordinates are shared between cells.
+    mainGrid->appendUniqueCellNodes( cellStartIndex, gridNodes );
 
     // Mark inactive long pyramid looking cells as invalid. The cell geometry is evaluated from the node table of the
     // main grid, so this must be done after the nodes have been added.
@@ -302,10 +301,9 @@ bool RifReaderEclipseOutput::transferGeometry( const ecl_grid_type* mainEclGrid,
     activeCellInfo->setReservoirCellCount( totalCellCount );
     fractureActiveCellInfo->setReservoirCellCount( totalCellCount );
 
-    // Reserve room for the cells and nodes and fill them with data
+    // Reserve room for the cells and fill them with data
 
     mainGrid->reservoirCells().reserve( totalCellCount );
-    mainGrid->reserveNodes( 8 * totalCellCount );
 
     caf::ProgressInfo progInfo( 3 + numLGRs, "" );
 
@@ -353,6 +351,7 @@ bool RifReaderEclipseOutput::transferGeometry( const ecl_grid_type* mainEclGrid,
         transferCoarseningInfo( localEclGrid, localGrid );
     }
 
+    mainGrid->releaseNodeLookup();
     mainGrid->initAllSubGridsParentGridPointer();
     activeCellInfo->computeDerivedData();
     fractureActiveCellInfo->computeDerivedData();

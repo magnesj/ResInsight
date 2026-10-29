@@ -32,6 +32,7 @@
 #include "cafAssert.h"
 #include "cvfBoundingBoxTree.h"
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstdint>
@@ -70,7 +71,7 @@ void RigMainGrid::setNodes( std::vector<cvf::Vec3d> nodes )
     m_nodes = std::move( nodes );
 
     m_isFaceNormalsOutwardsComputed = false;
-    m_duplicateNodesRemoved         = false;
+    clearNodeLookup();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -82,15 +83,6 @@ void RigMainGrid::appendNodes( const std::vector<cvf::Vec3d>& nodes )
     m_nodes.insert( m_nodes.end(), nodes.begin(), nodes.end() );
 
     m_isFaceNormalsOutwardsComputed = false;
-    m_duplicateNodesRemoved         = false;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RigMainGrid::reserveNodes( size_t nodeCount )
-{
-    m_nodes.reserve( nodeCount );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -102,7 +94,7 @@ void RigMainGrid::setNode( size_t nodeIndex, const cvf::Vec3d& coordinate )
     m_nodes[nodeIndex] = coordinate;
 
     m_isFaceNormalsOutwardsComputed = false;
-    m_duplicateNodesRemoved         = false;
+    clearNodeLookup();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -117,11 +109,15 @@ void RigMainGrid::transformNodes( const cvf::Mat4d& transform )
     }
 
     m_isFaceNormalsOutwardsComputed = false;
-    m_duplicateNodesRemoved         = false;
+    clearNodeLookup();
 }
 
 namespace
 {
+using NodeLookupIndex                           = uint32_t;
+constexpr NodeLookupIndex emptyNodeLookupSlot   = std::numeric_limits<NodeLookupIndex>::max();
+constexpr size_t          minimumNodeLookupSize = 1024;
+
 //--------------------------------------------------------------------------------------------------
 /// Hash of the exact bit pattern of a coordinate. -0.0 is normalized to 0.0 so it hashes like 0.0,
 /// matching operator==.
@@ -146,84 +142,156 @@ uint64_t nodeHash( const cvf::Vec3d& p )
 } // namespace
 
 //--------------------------------------------------------------------------------------------------
-/// Nodes with exactly equal coordinates are merged. The first occurrence of a coordinate is kept, and the
-/// relative order of the kept nodes is preserved, so identical input grids give identical node tables.
-/// Returns the number of removed nodes.
+///
 //--------------------------------------------------------------------------------------------------
-size_t RigMainGrid::removeDuplicateNodes()
+std::vector<size_t> RigMainGrid::appendUniqueNodes( const std::vector<cvf::Vec3d>& nodes )
 {
-    if ( m_duplicateNodesRemoved ) return 0;
+    syncNodeLookup();
 
-    const size_t oldNodeCount = m_nodes.size();
-
-    // 32-bit indices keep the temporary memory low. Larger node tables are left as they are.
-    using IndexType               = uint32_t;
-    constexpr IndexType emptySlot = std::numeric_limits<IndexType>::max();
-    if ( oldNodeCount == 0 || oldNodeCount >= emptySlot ) return 0;
-
-    // Open addressing table of new node indices, with a load factor of at most 2/3
-    size_t capacity = 1;
-    while ( capacity < oldNodeCount + oldNodeCount / 2 )
+    std::vector<size_t> nodeIndices( nodes.size() );
+    for ( size_t i = 0; i < nodes.size(); i++ )
     {
-        capacity *= 2;
-    }
-    const size_t mask = capacity - 1;
-
-    std::vector<IndexType> table( capacity, emptySlot );
-    std::vector<IndexType> oldToNew( oldNodeCount );
-
-    // Compact in place: newIndex <= oldIndex, so a node is read before its position can be overwritten
-    IndexType newNodeCount = 0;
-    for ( size_t oldIndex = 0; oldIndex < oldNodeCount; oldIndex++ )
-    {
-        const cvf::Vec3d node = m_nodes[oldIndex];
-
-        size_t slot = nodeHash( node ) & mask;
-        while ( table[slot] != emptySlot && !( m_nodes[table[slot]] == node ) )
-        {
-            slot = ( slot + 1 ) & mask;
-        }
-
-        if ( table[slot] == emptySlot )
-        {
-            table[slot]             = newNodeCount;
-            m_nodes[newNodeCount++] = node;
-        }
-
-        oldToNew[oldIndex] = table[slot];
+        nodeIndices[i] = appendUniqueNode( nodes[i] );
     }
 
-    table.clear();
-    table.shrink_to_fit();
+    m_isFaceNormalsOutwardsComputed = false;
 
-    const size_t removedNodeCount = oldNodeCount - newNodeCount;
-    if ( removedNodeCount > 0 )
-    {
-        m_nodes.resize( newNodeCount );
-        m_nodes.shrink_to_fit();
-
-        remapCellCornerIndices( oldToNew );
-    }
-
-    m_duplicateNodesRemoved = true;
-
-    return removedNodeCount;
+    return nodeIndices;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigMainGrid::remapCellCornerIndices( const std::vector<uint32_t>& oldToNew )
+void RigMainGrid::appendUniqueCellNodes( size_t firstReservoirCellIndex, const std::vector<cvf::Vec3d>& cellCornerNodes )
 {
-#pragma omp parallel for
-    for ( long cellIndex = 0; cellIndex < static_cast<long>( m_cells.size() ); cellIndex++ )
+    CAF_ASSERT( cellCornerNodes.size() % 8 == 0 );
+
+    syncNodeLookup();
+
+    const size_t cellCount = cellCornerNodes.size() / 8;
+    for ( size_t i = 0; i < cellCount; i++ )
     {
-        for ( size_t& cornerIndex : m_cells[cellIndex].cornerIndices() )
+        auto& cornerIndices = cell( firstReservoirCellIndex + i ).cornerIndices();
+        for ( size_t corner = 0; corner < 8; corner++ )
         {
-            if ( cornerIndex < oldToNew.size() ) cornerIndex = oldToNew[cornerIndex];
+            cornerIndices[corner] = appendUniqueNode( cellCornerNodes[i * 8 + corner] );
         }
     }
+
+    m_isFaceNormalsOutwardsComputed = false;
 }
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigMainGrid::releaseNodeLookup()
+{
+    if ( m_nodeLookup.empty() ) return;
+
+    clearNodeLookup();
+    m_nodes.shrink_to_fit();
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Add nodes appended or set without the lookup, so they can be shared as well
+//--------------------------------------------------------------------------------------------------
+void RigMainGrid::syncNodeLookup()
+{
+    if ( m_nodes.size() >= emptyNodeLookupSlot ) return;
+
+    for ( size_t nodeIndex = m_nodeLookupNodeCount; nodeIndex < m_nodes.size(); nodeIndex++ )
+    {
+        findOrAddToNodeLookup( m_nodes[nodeIndex], nodeIndex );
+    }
+    m_nodeLookupNodeCount = m_nodes.size();
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Returns the index of an existing node with the same coordinates, or appends the node
+//--------------------------------------------------------------------------------------------------
+size_t RigMainGrid::appendUniqueNode( const cvf::Vec3d& node )
+{
+    const size_t newNodeIndex = m_nodes.size();
+
+    // The lookup uses 32-bit node indices. Nodes beyond this are not shared.
+    if ( newNodeIndex >= emptyNodeLookupSlot || m_nodeLookupNodeCount != newNodeIndex )
+    {
+        m_nodes.push_back( node );
+        return newNodeIndex;
+    }
+
+    const size_t nodeIndex = findOrAddToNodeLookup( node, newNodeIndex );
+    if ( nodeIndex == newNodeIndex )
+    {
+        m_nodes.push_back( node );
+        m_nodeLookupNodeCount = m_nodes.size();
+    }
+
+    return nodeIndex;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Returns the index of the node in the lookup equal to the given node. If there is none, nodeIndex is
+/// added to the lookup and returned. m_nodes[nodeIndex] must be equal to node once the lookup is used again.
+//--------------------------------------------------------------------------------------------------
+size_t RigMainGrid::findOrAddToNodeLookup( const cvf::Vec3d& node, size_t nodeIndex )
+{
+    // Keep the load factor at most 2/3
+    if ( ( m_nodeLookupEntryCount + 1 ) * 3 > m_nodeLookup.size() * 2 ) growNodeLookup();
+
+    const size_t mask = m_nodeLookup.size() - 1;
+    size_t       slot = nodeHash( node ) & mask;
+    while ( true )
+    {
+        const NodeLookupIndex existingIndex = m_nodeLookup[slot];
+        if ( existingIndex == emptyNodeLookupSlot )
+        {
+            m_nodeLookup[slot] = static_cast<NodeLookupIndex>( nodeIndex );
+            m_nodeLookupEntryCount++;
+            return nodeIndex;
+        }
+
+        if ( m_nodes[existingIndex] == node ) return existingIndex;
+
+        slot = ( slot + 1 ) & mask;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigMainGrid::growNodeLookup()
+{
+    const size_t newSize = std::max( minimumNodeLookupSize, m_nodeLookup.size() * 2 );
+
+    std::vector<NodeLookupIndex> newLookup( newSize, emptyNodeLookupSlot );
+
+    const size_t mask = newSize - 1;
+    for ( NodeLookupIndex nodeIndex : m_nodeLookup )
+    {
+        if ( nodeIndex == emptyNodeLookupSlot ) continue;
+
+        size_t slot = nodeHash( m_nodes[nodeIndex] ) & mask;
+        while ( newLookup[slot] != emptyNodeLookupSlot )
+        {
+            slot = ( slot + 1 ) & mask;
+        }
+        newLookup[slot] = nodeIndex;
+    }
+
+    m_nodeLookup.swap( newLookup );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigMainGrid::clearNodeLookup()
+{
+    std::vector<NodeLookupIndex>().swap( m_nodeLookup );
+    m_nodeLookupEntryCount = 0;
+    m_nodeLookupNodeCount  = 0;
+}
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -423,6 +491,8 @@ void RigMainGrid::setDisplayModelOffset( cvf::Vec3d offset )
 //--------------------------------------------------------------------------------------------------
 void RigMainGrid::computeCachedData( std::string* aabbTreeInfo )
 {
+    releaseNodeLookup();
+
     initAllSubGridsParentGridPointer();
     initAllSubCellsMainGridCellIndex();
 

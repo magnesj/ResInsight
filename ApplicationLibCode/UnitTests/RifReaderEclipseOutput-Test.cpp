@@ -782,22 +782,42 @@ TEST( DISABLED_RigReservoirTest, WellTest )
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Removing duplicate nodes must not change computed faults or NNC geometry
+/// Sharing nodes between cells must not change computed faults or NNC geometry
 //--------------------------------------------------------------------------------------------------
-TEST( RigReservoirTest, RemoveDuplicateNodesPreservesFaultsAndNncs )
+TEST( RigReservoirTest, SharedNodesPreserveFaultsAndNncs )
 {
     QDir baseFolder( TEST_MODEL_DIR );
     baseFolder.cd( "TEST10K_FLT_LGR_NNC" );
     QString filePath = baseFolder.absoluteFilePath( "TEST10K_FLT_LGR_NNC.EGRID" );
 
-    auto loadCase = [&]( bool removeDuplicates, RimEclipseResultCase* rimCase )
+    auto loadCase = [&]( bool sharedNodes, RimEclipseResultCase* rimCase )
     {
         cvf::ref<RigEclipseCaseData> caseData = new RigEclipseCaseData( rimCase );
         cvf::ref<RifReaderOpmCommon> reader   = new RifReaderOpmCommon;
         EXPECT_TRUE( reader->open( filePath, caseData.p() ) );
 
-        auto mainGrid = caseData->mainGrid();
-        if ( removeDuplicates ) EXPECT_GT( mainGrid->removeDuplicateNodes(), 0u );
+        auto         mainGrid  = caseData->mainGrid();
+        const size_t cellCount = mainGrid->totalCellCount();
+        if ( sharedNodes )
+        {
+            EXPECT_LT( mainGrid->nodeCount(), 8 * cellCount / 5 );
+        }
+        else
+        {
+            // Give each cell its own 8 nodes, as done before nodes were shared
+            std::vector<cvf::Vec3d> nodes;
+            nodes.reserve( 8 * cellCount );
+            for ( size_t cellIndex = 0; cellIndex < cellCount; cellIndex++ )
+            {
+                auto& cornerIndices = mainGrid->cell( cellIndex ).cornerIndices();
+                for ( size_t& cornerIndex : cornerIndices )
+                {
+                    nodes.push_back( mainGrid->node( cornerIndex ) );
+                    cornerIndex = nodes.size() - 1;
+                }
+            }
+            mainGrid->setNodes( std::move( nodes ) );
+        }
         mainGrid->computeCachedData();
         mainGrid->calculateFaults( caseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL ) );
         mainGrid->nncData()->ensureAllConnectionDataIsProcessed();
@@ -806,11 +826,11 @@ TEST( RigReservoirTest, RemoveDuplicateNodesPreservesFaultsAndNncs )
 
     RimEclipseResultCase rimCaseA;
     RimEclipseResultCase rimCaseB;
-    auto                 original     = loadCase( false, &rimCaseA );
-    auto                 deduplicated = loadCase( true, &rimCaseB );
+    auto                 original = loadCase( false, &rimCaseA );
+    auto                 shared   = loadCase( true, &rimCaseB );
 
     const auto& faultsA = original->mainGrid()->faults();
-    const auto& faultsB = deduplicated->mainGrid()->faults();
+    const auto& faultsB = shared->mainGrid()->faults();
     ASSERT_EQ( faultsA.size(), faultsB.size() );
     for ( size_t i = 0; i < faultsA.size(); i++ )
     {
@@ -818,7 +838,7 @@ TEST( RigReservoirTest, RemoveDuplicateNodesPreservesFaultsAndNncs )
     }
 
     const auto& nncsA = original->mainGrid()->nncData()->allConnections();
-    const auto& nncsB = deduplicated->mainGrid()->nncData()->allConnections();
+    const auto& nncsB = shared->mainGrid()->nncData()->allConnections();
     ASSERT_EQ( nncsA.size(), nncsB.size() );
 
     // Consecutive coinciding vertices can be collapsed when nodes are shared, so compare without them

@@ -154,7 +154,49 @@ TEST( RigMainGridTest, NodeTableAccess )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-TEST( RigMainGridTest, RemoveDuplicateNodes )
+TEST( RigMainGridTest, AppendUniqueNodes )
+{
+    const cvf::Vec3d a( 1, 2, 3 );
+    const cvf::Vec3d b( 4, 5, 6 );
+    const cvf::Vec3d c( 7, 8, 9 );
+
+    cvf::ref<RigMainGrid> mainGrid = new RigMainGrid;
+
+    EXPECT_EQ( ( std::vector<size_t>{ 0, 1, 0, 2, 1 } ), mainGrid->appendUniqueNodes( { a, b, a, c, b } ) );
+    EXPECT_EQ( 3u, mainGrid->nodeCount() );
+
+    // Nodes from earlier calls are reused, and -0.0 equals 0.0
+    EXPECT_EQ( ( std::vector<size_t>{ 2, 3, 3 } ), mainGrid->appendUniqueNodes( { c, cvf::Vec3d( 0, 0, 0 ), cvf::Vec3d( -0.0, 0, 0 ) } ) );
+    EXPECT_EQ( 4u, mainGrid->nodeCount() );
+
+    // Nodes appended without the lookup can be shared later
+    mainGrid->appendNodes( { cvf::Vec3d( 10, 10, 10 ) } );
+    EXPECT_EQ( ( std::vector<size_t>{ 4 } ), mainGrid->appendUniqueNodes( { cvf::Vec3d( 10, 10, 10 ) } ) );
+
+    // A modified node is found by its new coordinates
+    mainGrid->setNode( 0, cvf::Vec3d( -1, -1, -1 ) );
+    EXPECT_EQ( ( std::vector<size_t>{ 0, 5 } ), mainGrid->appendUniqueNodes( { cvf::Vec3d( -1, -1, -1 ), a } ) );
+    EXPECT_EQ( 6u, mainGrid->nodeCount() );
+
+    // Grow the lookup table beyond its initial size
+    std::vector<cvf::Vec3d> manyNodes;
+    for ( int i = 0; i < 5000; i++ )
+    {
+        manyNodes.emplace_back( i, 0.5 * i, -i );
+    }
+    const auto firstIndices  = mainGrid->appendUniqueNodes( manyNodes );
+    const auto secondIndices = mainGrid->appendUniqueNodes( manyNodes );
+    EXPECT_EQ( firstIndices, secondIndices );
+    EXPECT_EQ( 6u + 5000u - 1u, mainGrid->nodeCount() ); // ( 0, 0, 0 ) was already present
+
+    mainGrid->releaseNodeLookup();
+    EXPECT_EQ( ( std::vector<size_t>{ 1 } ), mainGrid->appendUniqueNodes( { b } ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+TEST( RigMainGridTest, AppendUniqueCellNodes )
 {
     RigReservoirBuilder builder;
     builder.setIJKCount( cvf::Vec3st( 3, 2, 2 ) );
@@ -168,59 +210,39 @@ TEST( RigMainGridTest, RemoveDuplicateNodes )
     ASSERT_EQ( 12u, cellCount );
     ASSERT_EQ( 8u * cellCount, mainGrid->nodeCount() );
 
-    std::vector<std::array<cvf::Vec3d, 8>> cornersBefore;
-    for ( size_t cellIndex = 0; cellIndex < cellCount; cellIndex++ )
+    auto cellCornerNodes = [&]()
     {
-        cornersBefore.push_back( mainGrid->cellCornerVertices( cellIndex ) );
-    }
+        std::vector<cvf::Vec3d> nodes;
+        for ( size_t cellIndex = 0; cellIndex < cellCount; cellIndex++ )
+        {
+            for ( const auto& corner : mainGrid->cellCornerVertices( cellIndex ) )
+            {
+                nodes.push_back( corner );
+            }
+        }
+        return nodes;
+    };
+
+    const auto cornersBefore = cellCornerNodes();
 
     // A 3 x 2 x 2 grid without faults has 4 x 3 x 3 unique corner nodes
-    EXPECT_EQ( 96u - 36u, mainGrid->removeDuplicateNodes() );
+    mainGrid->setNodes( {} );
+    mainGrid->appendUniqueCellNodes( 0, cornersBefore );
     EXPECT_EQ( 36u, mainGrid->nodeCount() );
-    EXPECT_EQ( 0u, mainGrid->removeDuplicateNodes() );
+    EXPECT_EQ( cornersBefore, cellCornerNodes() );
 
-    for ( size_t cellIndex = 0; cellIndex < cellCount; cellIndex++ )
+    // Shifting the cells of the first layer by half a cell gives no shared nodes between the layers
+    std::vector<cvf::Vec3d> faultedCorners = cornersBefore;
+    for ( size_t i = 0; i < 6 * 8; i++ )
     {
-        EXPECT_EQ( cornersBefore[cellIndex], mainGrid->cellCornerVertices( cellIndex ) );
-        for ( size_t nodeIndex : mainGrid->cell( cellIndex ).cornerIndices() )
-        {
-            EXPECT_LT( nodeIndex, mainGrid->nodeCount() );
-        }
+        faultedCorners[i] -= cvf::Vec3d( 0.0, 0.0, 0.5 );
     }
+
+    mainGrid->setNodes( {} );
+    mainGrid->appendUniqueCellNodes( 0, faultedCorners );
+    EXPECT_EQ( 24u + 24u, mainGrid->nodeCount() );
+    EXPECT_EQ( faultedCorners, cellCornerNodes() );
 }
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-TEST( RigMainGridTest, RemoveDuplicateNodesKeepsFaultedNodesSeparate )
-{
-    RigReservoirBuilder builder;
-    builder.setIJKCount( cvf::Vec3st( 2, 1, 1 ) );
-    builder.setWorldCoordinates( cvf::Vec3d( 0.0, 0.0, 0.0 ), cvf::Vec3d( 2.0, 1.0, -1.0 ) );
-
-    cvf::ref<RigEclipseCaseData> eclipseCase = new RigEclipseCaseData( nullptr );
-    builder.createGridsAndCells( eclipseCase.p() );
-    RigMainGrid* mainGrid = eclipseCase->mainGrid();
-
-    // Shift the second cell down by half a cell, so no corners coincide with the first cell
-    for ( size_t nodeIndex : mainGrid->cell( 1 ).cornerIndices() )
-    {
-        mainGrid->setNode( nodeIndex, mainGrid->node( nodeIndex ) - cvf::Vec3d( 0.0, 0.0, 0.5 ) );
-    }
-
-    EXPECT_EQ( 0u, mainGrid->removeDuplicateNodes() );
-    EXPECT_EQ( 16u, mainGrid->nodeCount() );
-
-    // Changing a node makes deduplication run again
-    for ( size_t nodeIndex : mainGrid->cell( 1 ).cornerIndices() )
-    {
-        mainGrid->setNode( nodeIndex, mainGrid->node( nodeIndex ) + cvf::Vec3d( 0.0, 0.0, 0.5 ) );
-    }
-
-    EXPECT_EQ( 4u, mainGrid->removeDuplicateNodes() );
-    EXPECT_EQ( 12u, mainGrid->nodeCount() );
-}
-
 /*
 
 //--------------------------------------------------------------------------------------------------

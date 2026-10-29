@@ -212,6 +212,8 @@ bool RifReaderOpmCommonActive::importGrid( RigMainGrid* /* mainGrid*/, RigEclips
                 transferActiveGeometry( opmGrid, lgrGrids[lgrIdx], activeGrid, localGrid, eclipseCaseData );
             }
         }
+
+        activeGrid->releaseNodeLookup();
     }
 
     activeGrid->initAllSubGridsParentGridPointer();
@@ -238,7 +240,6 @@ void RifReaderOpmCommonActive::transferActiveGeometry( Opm::EclIO::EGrid&  opmMa
 {
     int    cellCount      = opmGrid.totalActiveCells();
     size_t cellStartIndex = activeGrid->totalCellCount();
-    size_t nodeStartIndex = activeGrid->nodeCount();
 
     const bool invalidateLongPyramidCells = invalidateLongThinCells();
 
@@ -318,16 +319,16 @@ void RifReaderOpmCommonActive::transferActiveGeometry( Opm::EclIO::EGrid&  opmMa
         std::array<double, 8> opmZ{};
         opmGrid.getCellCorners( opmCellIndex, opmX, opmY, opmZ );
 
-        // Each cell has 8 nodes, use active cell index and multiply to find first node index for cell
-        auto localNodeIndex   = activeCellMap[opmCellIndex] * 8;
-        auto riNodeStartIndex = nodeStartIndex + localNodeIndex;
+        // Each cell has 8 nodes, use active cell index and multiply to find first node index for cell. The corner
+        // indices refer to riNodes until the nodes are added to the grid below.
+        auto riNodeStartIndex = static_cast<size_t>( activeCellMap[opmCellIndex] ) * 8;
 
         for ( size_t opmNodeIndex = 0; opmNodeIndex < 8; opmNodeIndex++ )
         {
             auto   riCornerIndex = cellMappingECLRi[opmNodeIndex];
             size_t riNodeIndex   = riNodeStartIndex + riCornerIndex;
 
-            auto& riNode = riNodes[riNodeIndex - nodeStartIndex];
+            auto& riNode = riNodes[riNodeIndex];
             riNode.x()   = opmX[opmNodeIndex] + xCenterCoordOpm;
             riNode.y()   = opmY[opmNodeIndex] + yCenterCoordOpm;
             riNode.z()   = -opmZ[opmNodeIndex];
@@ -352,7 +353,15 @@ void RifReaderOpmCommonActive::transferActiveGeometry( Opm::EclIO::EGrid&  opmMa
         }
     }
 
-    activeGrid->appendNodes( riNodes );
+    // Nodes with identical coordinates are shared between cells
+    const auto nodeIndices = activeGrid->appendUniqueNodes( riNodes );
+    for ( auto it = riCells.lower_bound( cellStartIndex ); it != riCells.end(); ++it )
+    {
+        for ( size_t& cornerIndex : it->second.cornerIndices() )
+        {
+            cornerIndex = nodeIndices[cornerIndex];
+        }
+    }
 
     // The cell geometry is evaluated from the node table of the main grid, so this must be done after the nodes have
     // been added

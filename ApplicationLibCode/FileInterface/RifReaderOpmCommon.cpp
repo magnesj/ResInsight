@@ -334,6 +334,8 @@ bool RifReaderOpmCommon::importGrid( RigMainGrid* mainGrid, RigEclipseCaseData* 
 
             transferGeometry( opmGrid, lgrGrids[lgrIdx], mainGrid, localGrid, eclipseCaseData );
         }
+
+        mainGrid->releaseNodeLookup();
     }
 
     mainGrid->initAllSubGridsParentGridPointer();
@@ -529,7 +531,6 @@ void RifReaderOpmCommon::transferGeometry( Opm::EclIO::EGrid&  opmMainGrid,
 {
     int    cellCount      = opmGrid.totalNumberOfCells();
     size_t cellStartIndex = mainGrid->reservoirCells().size();
-    size_t nodeStartIndex = mainGrid->nodeCount();
 
     const bool invalidateLongPyramidCells = invalidateLongThinCells();
 
@@ -590,20 +591,17 @@ void RifReaderOpmCommon::transferGeometry( Opm::EclIO::EGrid&  opmMainGrid,
         std::array<double, 8> opmZ{};
         opmGrid.getCellCorners( opmCellIndex, opmX, opmY, opmZ );
 
-        // Each cell has 8 nodes, use reservoir cell index and multiply to find first node index for cell
-        auto riNodeStartIndex = nodeStartIndex + riReservoirIndex * 8;
+        // Each cell has 8 nodes, ordered as the corners of the cell
+        auto riNodeStartIndex = riReservoirIndex * 8;
 
         for ( size_t opmNodeIndex = 0; opmNodeIndex < 8; opmNodeIndex++ )
         {
-            auto   riCornerIndex = cellMappingECLRi[opmNodeIndex];
-            size_t riNodeIndex   = riNodeStartIndex + riCornerIndex;
+            auto riCornerIndex = cellMappingECLRi[opmNodeIndex];
 
-            auto& riNode = riNodes[riNodeIndex - nodeStartIndex];
+            auto& riNode = riNodes[riNodeStartIndex + riCornerIndex];
             riNode.x()   = opmX[opmNodeIndex] + xCenterCoordOpm;
             riNode.y()   = opmY[opmNodeIndex] + yCenterCoordOpm;
             riNode.z()   = -opmZ[opmNodeIndex];
-
-            cell.cornerIndices()[riCornerIndex] = riNodeIndex;
 
             // First grid dimension is radius, check if cell are at the outer-most slice
             if ( isRadialGrid && !hostCellGlobalIndices.empty() && ( gridDimension[0] - 1 == opmIJK[0] ) )
@@ -623,7 +621,8 @@ void RifReaderOpmCommon::transferGeometry( Opm::EclIO::EGrid&  opmMainGrid,
         }
     }
 
-    mainGrid->appendNodes( riNodes );
+    // Nodes with identical coordinates are shared between cells
+    mainGrid->appendUniqueCellNodes( cellStartIndex, riNodes );
 
     // The cell geometry is evaluated from the node table of the main grid, so this must be done after the nodes have
     // been added
