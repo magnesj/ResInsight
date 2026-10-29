@@ -21,9 +21,10 @@
 #include "RiuGroupNetworkLayout.h"
 
 #include <QContextMenuEvent>
+#include <QFont>
 #include <QFontMetrics>
+#include <QGraphicsEllipseItem>
 #include <QGraphicsPathItem>
-#include <QGraphicsRectItem>
 #include <QGraphicsScene>
 #include <QGraphicsSimpleTextItem>
 #include <QMenu>
@@ -34,34 +35,31 @@
 
 namespace
 {
-constexpr qreal nodeWidth    = 170.0;
-constexpr qreal nodeHeight   = 44.0;
-constexpr qreal columnStep   = 290.0;
-constexpr qreal rowStep      = nodeHeight + 22.0;
-constexpr qreal stackOffset  = 4.0;
-constexpr qreal minEdgeWidth = 1.5;
-constexpr qreal maxEdgeWidth = 10.0;
+// The appearance of the group tree plot in webviz: circular nodes with the node value inside, and edges
+// with a width relative to the largest edge value
+constexpr qreal nodeRadius         = 15.0;
+constexpr qreal columnStep         = 290.0;
+constexpr qreal rowStep            = 70.0;
+constexpr qreal minEdgeWidth       = 2.0;
+constexpr qreal maxEdgeWidth       = 100.0;
+constexpr qreal edgeOpacity        = 0.3;
+constexpr qreal labelOffset        = 21.0;
+constexpr qreal nodeBorderLeaf     = 1.0;
+constexpr qreal nodeBorderChildren = 2.5;
 
-// The palette of the workflow graph, with green for producers and blue for injectors
-const QColor groupBorder( 60, 85, 115 );
-const QColor groupBackground( 226, 238, 250 );
-const QColor otherBackground( 232, 232, 232 );
-const QColor producerBorder( 42, 120, 65 );
-const QColor producerBackground( 215, 242, 222 );
-const QColor injectorBorder( 50, 115, 165 );
-const QColor injectorBackground( 214, 230, 248 );
-const QColor edgeColor( 75, 95, 115 );
+const QColor nodeBorderColor( "#60be6c" );
+const QColor nodeBackground( Qt::white );
 const QColor selectedColor( 30, 120, 220 );
-const QColor labelColor( 70, 70, 70 );
+const QColor labelColor( Qt::black );
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QColor flowColor( const RimGroupNetworkGraph::Node& node )
+QFont sansFont( int pixelSize )
 {
-    if ( node.isProducer && !node.isInjector ) return producerBorder;
-    if ( node.isInjector && !node.isProducer ) return injectorBorder;
-    return edgeColor;
+    QFont font( "sans-serif" );
+    font.setPixelSize( pixelSize );
+    return font;
 }
 } // namespace
 
@@ -70,24 +68,21 @@ namespace RiuGroupNetworkGraphViewItems
 //==================================================================================================
 ///
 //==================================================================================================
-class NetworkNode : public QGraphicsRectItem
+class NetworkNode : public QGraphicsEllipseItem
 {
 public:
     explicit NetworkNode( const RimGroupNetworkGraph::Node& node );
 
     const QString& name() const { return m_name; }
-    QPointF        inPoint() const;
-    QPointF        outPoint() const;
+    QPointF        center() const;
     void           applyStyle();
 
 protected:
     QVariant itemChange( GraphicsItemChange change, const QVariant& value ) override;
 
 private:
-    QString                         m_name;
-    QColor                          m_border;
-    QColor                          m_background;
-    std::vector<QGraphicsRectItem*> m_stack;
+    QString m_name;
+    bool    m_hasChildren;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -95,74 +90,49 @@ private:
 //--------------------------------------------------------------------------------------------------
 NetworkNode::NetworkNode( const RimGroupNetworkGraph::Node& node )
     : m_name( node.name )
+    , m_hasChildren( node.childCount > 0 || node.collapsed )
 {
-    setRect( 0, 0, nodeWidth, nodeHeight );
+    setRect( -nodeRadius, -nodeRadius, 2 * nodeRadius, 2 * nodeRadius );
     setFlags( ItemIsSelectable );
     setZValue( 1 );
     setToolTip( node.toolTip );
 
-    if ( !node.isWell )
-    {
-        m_border     = groupBorder;
-        m_background = groupBackground;
-    }
-    else if ( node.isProducer && !node.isInjector )
-    {
-        m_border     = producerBorder;
-        m_background = producerBackground;
-    }
-    else if ( node.isInjector && !node.isProducer )
-    {
-        m_border     = injectorBorder;
-        m_background = injectorBackground;
-    }
-    else
-    {
-        m_border     = groupBorder;
-        m_background = otherBackground;
-    }
-
-    // A collapsed node is drawn as a stack of boxes, as a mapped task in the workflow graph
-    if ( node.collapsed )
-    {
-        for ( int depth = 2; depth >= 1; --depth )
-        {
-            auto* card = new QGraphicsRectItem( rect().translated( depth * stackOffset, depth * stackOffset ), this );
-            card->setFlag( ItemStacksBehindParent );
-            card->setAcceptedMouseButtons( Qt::NoButton );
-            m_stack.push_back( card );
-        }
-    }
-
-    QFont titleFont;
-    titleFont.setBold( true );
-    auto* title = new QGraphicsSimpleTextItem( this );
-    title->setFont( titleFont );
-    title->setText( QFontMetrics( titleFont ).elidedText( node.name, Qt::ElideRight, nodeWidth - ( node.collapsed ? 56 : 16 ) ) );
-    title->setPos( 8, 5 );
+    // The name is to the right of a leaf node, and to the left of a node with children
+    const bool isLeaf = !m_hasChildren;
+    auto*      title  = new QGraphicsSimpleTextItem( this );
+    title->setFont( sansFont( 10 ) );
+    title->setBrush( labelColor );
+    title->setText( node.name );
     title->setAcceptedMouseButtons( Qt::NoButton );
+    const QRectF titleBounds = title->boundingRect();
+    title->setPos( isLeaf ? labelOffset : -labelOffset - titleBounds.width(), -titleBounds.height() / 2 );
 
-    QFont smallFont;
-    smallFont.setPointSize( 8 );
-    if ( !node.valueText.isEmpty() )
+    if ( !node.valueNumber.isEmpty() )
     {
         auto* value = new QGraphicsSimpleTextItem( this );
-        value->setFont( smallFont );
+        value->setFont( sansFont( 10 ) );
         value->setBrush( labelColor );
-        value->setText( QFontMetrics( smallFont ).elidedText( node.valueText, Qt::ElideRight, nodeWidth - 16 ) );
-        value->setPos( 8, 25 );
+        value->setText( node.valueNumber );
         value->setAcceptedMouseButtons( Qt::NoButton );
+        value->setPos( -value->boundingRect().width() / 2, -value->boundingRect().height() );
+
+        auto* unit = new QGraphicsSimpleTextItem( this );
+        unit->setFont( sansFont( 9 ) );
+        unit->setBrush( labelColor );
+        unit->setText( node.valueUnit );
+        unit->setAcceptedMouseButtons( Qt::NoButton );
+        unit->setPos( -unit->boundingRect().width() / 2, 0 );
     }
 
+    // Children hidden by collapsing the node
     if ( node.collapsed )
     {
-        auto* badge = new QGraphicsSimpleTextItem( this );
-        smallFont.setBold( true );
-        badge->setFont( smallFont );
-        badge->setBrush( m_border );
-        badge->setText( QString( "+%1" ).arg( node.hiddenNodeCount ) );
-        badge->setPos( nodeWidth - badge->boundingRect().width() - 8, 6 );
-        badge->setAcceptedMouseButtons( Qt::NoButton );
+        auto* hidden = new QGraphicsSimpleTextItem( this );
+        hidden->setFont( sansFont( 10 ) );
+        hidden->setBrush( labelColor );
+        hidden->setText( QString( "+ %1 %2" ).arg( node.hiddenNodeCount ).arg( node.hiddenNodeCount > 1 ? "children" : "child" ) );
+        hidden->setAcceptedMouseButtons( Qt::NoButton );
+        hidden->setPos( labelOffset, -hidden->boundingRect().height() / 2 );
     }
 
     applyStyle();
@@ -171,17 +141,9 @@ NetworkNode::NetworkNode( const RimGroupNetworkGraph::Node& node )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QPointF NetworkNode::inPoint() const
+QPointF NetworkNode::center() const
 {
-    return mapToScene( QPointF( 0, nodeHeight / 2 ) );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QPointF NetworkNode::outPoint() const
-{
-    return mapToScene( QPointF( nodeWidth, nodeHeight / 2 ) );
+    return scenePos();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -189,13 +151,9 @@ QPointF NetworkNode::outPoint() const
 //--------------------------------------------------------------------------------------------------
 void NetworkNode::applyStyle()
 {
-    setPen( QPen( isSelected() ? selectedColor : m_border, isSelected() ? 2.5 : 1.0 ) );
-    setBrush( m_background );
-    for ( QGraphicsRectItem* card : m_stack )
-    {
-        card->setPen( QPen( m_border, 1.0 ) );
-        card->setBrush( m_background.darker( 104 ) );
-    }
+    const qreal borderWidth = m_hasChildren ? nodeBorderChildren : nodeBorderLeaf;
+    setPen( QPen( isSelected() ? selectedColor : nodeBorderColor, borderWidth ) );
+    setBrush( nodeBackground );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -204,7 +162,7 @@ void NetworkNode::applyStyle()
 QVariant NetworkNode::itemChange( GraphicsItemChange change, const QVariant& value )
 {
     if ( change == ItemSelectedHasChanged ) applyStyle();
-    return QGraphicsRectItem::itemChange( change, value );
+    return QGraphicsEllipseItem::itemChange( change, value );
 }
 } // namespace RiuGroupNetworkGraphViewItems
 
@@ -261,25 +219,28 @@ void RiuGroupNetworkGraphView::setNodes( const std::vector<RimGroupNetworkGraph:
         m_nodes.insert( node.name, item );
     }
 
-    QFont labelFont;
-    labelFont.setPointSize( 8 );
+    QFont labelFont = sansFont( 10 );
     for ( const auto& node : nodes )
     {
         NetworkNode* child  = m_nodes.value( node.name );
         NetworkNode* parent = m_nodes.value( node.parent );
         if ( !child || !parent ) continue;
 
-        const QPointF start = parent->outPoint();
-        const QPointF end   = child->inPoint();
-        const qreal   dx    = ( end.x() - start.x() ) / 2.0;
+        const QPointF start = parent->center();
+        const QPointF end   = child->center();
+        const qreal   midX  = ( start.x() + end.x() ) / 2.0;
 
         QPainterPath path( start );
-        path.cubicTo( start + QPointF( dx, 0 ), end - QPointF( dx, 0 ), end );
+        path.cubicTo( QPointF( midX, start.y() ), QPointF( midX, end.y() ), end );
 
-        const qreal width = node.edgeValue ? minEdgeWidth + ( maxEdgeWidth - minEdgeWidth ) * node.edgeWidthFraction : minEdgeWidth;
-        QPen        pen( flowColor( node ), width );
+        const bool  hasFlow = node.edgeValue && *node.edgeValue != 0.0;
+        const qreal width   = hasFlow ? minEdgeWidth + ( maxEdgeWidth - minEdgeWidth ) * node.edgeWidthFraction : minEdgeWidth;
+
+        QColor color = node.edgeColor.isValid() ? node.edgeColor : QColor( "#5c5c5c" );
+        color.setAlphaF( static_cast<float>( edgeOpacity ) );
+        QPen pen( color, width );
         pen.setCapStyle( Qt::FlatCap );
-        if ( !node.edgeValue ) pen.setStyle( Qt::DashLine );
+        if ( !hasFlow ) pen.setDashPattern( { 5.0 / width, 5.0 / width } );
 
         auto* edge = m_scene->addPath( path, pen );
         edge->setZValue( 0 );
@@ -290,7 +251,9 @@ void RiuGroupNetworkGraphView::setNodes( const std::vector<RimGroupNetworkGraph:
             auto* label = m_scene->addSimpleText( node.edgeText, labelFont );
             label->setBrush( labelColor );
             const QRectF bounds = label->boundingRect();
-            label->setPos( end.x() - bounds.width() - 6, end.y() - bounds.height() - 2 );
+            label->setTransformOriginPoint( bounds.center() );
+            label->setPos( path.pointAtPercent( 0.5 ) - bounds.center() );
+            label->setRotation( -path.angleAtPercent( 0.5 ) );
             label->setZValue( 2 );
         }
     }

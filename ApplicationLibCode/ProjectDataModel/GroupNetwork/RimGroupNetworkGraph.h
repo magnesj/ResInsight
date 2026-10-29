@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <QColor>
 #include <QString>
 
 #include <optional>
@@ -40,8 +41,11 @@ struct Node
     bool    isInjector = false;
 
     QString               valueText; // Node metric shown in the node, such as the pressure
+    QString               valueNumber; // The number and unit of valueText, shown separately in the node
+    QString               valueUnit;
     std::optional<double> edgeValue; // Flow from the node to its parent
     QString               edgeText;
+    QColor                edgeColor; // Colour of the edge, given by the selected edge value
     QString               toolTip;
 
     // Set by visibleNodes()

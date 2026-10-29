@@ -34,8 +34,8 @@ class NetworkNode;
 }
 
 //==================================================================================================
-/// Read-only graph of a production network, drawn in the same style as the workflow graph: nodes as
-/// boxes, edges as curves from a parent to its children. Edge width shows the flow from a node to its
+/// Read-only graph of a production network, drawn in the style of the group tree plot of webviz: circular
+/// nodes and edges as curves from a parent to its children. Edge width shows the flow from a node to its
 /// parent. The view does not change the model; collapse and plot requests are emitted as signals.
 //==================================================================================================
 class RiuGroupNetworkGraphView : public QGraphicsView

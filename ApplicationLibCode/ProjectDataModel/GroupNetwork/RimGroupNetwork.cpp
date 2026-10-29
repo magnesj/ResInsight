@@ -90,6 +90,26 @@ QString valueWithUnit( std::optional<double> value, const std::string& unit )
     return text;
 }
 
+// The colours used for the edge values in the group tree plot of webviz
+QColor edgeMetricColor( RifGroupNetworkSummaryData::EdgeMetric metric )
+{
+    using Metric = RifGroupNetworkSummaryData::EdgeMetric;
+    switch ( metric )
+    {
+        case Metric::OIL_RATE:
+            return QColor( "#60be6c" );
+        case Metric::GAS_RATE:
+            return QColor( "#c5221c" );
+        case Metric::WATER_RATE:
+            return QColor( "#0d1b9e" );
+        case Metric::WATER_INJ_RATE:
+            return QColor( "#00c3ff" );
+        case Metric::GAS_INJ_RATE:
+            return QColor( "#d6397a" );
+    }
+    return QColor( "#5c5c5c" );
+}
+
 const std::vector<RifGroupNetworkSummaryData::EdgeMetric> allEdgeMetrics = { RifGroupNetworkSummaryData::EdgeMetric::OIL_RATE,
                                                                              RifGroupNetworkSummaryData::EdgeMetric::GAS_RATE,
                                                                              RifGroupNetworkSummaryData::EdgeMetric::WATER_RATE,
@@ -178,9 +198,10 @@ std::vector<RimGroupNetworkGraph::Node> RimGroupNetwork::graphNodes() const
     for ( const RigGroupNetwork::Edge& edge : tree->edges )
     {
         RimGroupNetworkGraph::Node node;
-        node.name   = QString::fromStdString( edge.child );
-        node.parent = QString::fromStdString( edge.parent );
-        node.isWell = edge.isWell();
+        node.name      = QString::fromStdString( edge.child );
+        node.parent    = QString::fromStdString( edge.parent );
+        node.isWell    = edge.isWell();
+        node.edgeColor = edgeMetricColor( m_edgeMetric() );
 
         if ( m_summaryData )
         {
@@ -190,8 +211,11 @@ std::vector<RimGroupNetworkGraph::Node> RimGroupNetwork::graphNodes() const
 
             node.edgeValue = m_summaryData->edgeValue( edge.child, edge.isWell(), m_edgeMetric(), timeStep );
             node.edgeText  = valueWithUnit( node.edgeValue, m_summaryData->edgeUnit( m_edgeMetric() ) );
-            node.valueText = valueWithUnit( m_summaryData->nodeValue( edge.child, edge.isWell(), m_nodeMetric(), timeStep ),
-                                            m_summaryData->nodeUnit( m_nodeMetric() ) );
+
+            const auto nodeValue = m_summaryData->nodeValue( edge.child, edge.isWell(), m_nodeMetric(), timeStep );
+            node.valueUnit       = QString::fromStdString( m_summaryData->nodeUnit( m_nodeMetric() ) );
+            node.valueNumber     = nodeValue ? RimGroupNetworkGraph::formatValue( *nodeValue ) : QString();
+            node.valueText       = valueWithUnit( nodeValue, m_summaryData->nodeUnit( m_nodeMetric() ) );
         }
 
         node.toolTip = toolTip( edge, node );
