@@ -144,46 +144,6 @@ uint64_t nodeHash( const cvf::Vec3d& p )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<size_t> RigMainGrid::appendUniqueNodes( const std::vector<cvf::Vec3d>& nodes )
-{
-    syncNodeLookup();
-
-    std::vector<size_t> nodeIndices( nodes.size() );
-    for ( size_t i = 0; i < nodes.size(); i++ )
-    {
-        nodeIndices[i] = appendUniqueNode( nodes[i] );
-    }
-
-    m_isFaceNormalsOutwardsComputed = false;
-
-    return nodeIndices;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RigMainGrid::appendUniqueCellNodes( size_t firstReservoirCellIndex, const std::vector<cvf::Vec3d>& cellCornerNodes )
-{
-    CAF_ASSERT( cellCornerNodes.size() % 8 == 0 );
-
-    syncNodeLookup();
-
-    const size_t cellCount = cellCornerNodes.size() / 8;
-    for ( size_t i = 0; i < cellCount; i++ )
-    {
-        auto& cornerIndices = cell( firstReservoirCellIndex + i ).cornerIndices();
-        for ( size_t corner = 0; corner < 8; corner++ )
-        {
-            cornerIndices[corner] = appendUniqueNode( cellCornerNodes[i * 8 + corner] );
-        }
-    }
-
-    m_isFaceNormalsOutwardsComputed = false;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RigMainGrid::releaseNodeLookup()
 {
     if ( m_nodeLookup.empty() ) return;
@@ -211,14 +171,18 @@ void RigMainGrid::syncNodeLookup()
 //--------------------------------------------------------------------------------------------------
 size_t RigMainGrid::appendUniqueNode( const cvf::Vec3d& node )
 {
+    m_isFaceNormalsOutwardsComputed = false;
+
     const size_t newNodeIndex = m_nodes.size();
 
     // The lookup uses 32-bit node indices. Nodes beyond this are not shared.
-    if ( newNodeIndex >= emptyNodeLookupSlot || m_nodeLookupNodeCount != newNodeIndex )
+    if ( newNodeIndex >= emptyNodeLookupSlot )
     {
         m_nodes.push_back( node );
         return newNodeIndex;
     }
+
+    if ( m_nodeLookupNodeCount != newNodeIndex ) syncNodeLookup();
 
     const size_t nodeIndex = findOrAddToNodeLookup( node, newNodeIndex );
     if ( nodeIndex == newNodeIndex )

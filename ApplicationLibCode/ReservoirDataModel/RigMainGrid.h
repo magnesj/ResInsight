@@ -64,11 +64,8 @@ public:
     // Shared node table construction, used when reading grids. A node with exactly the same coordinates as an
     // existing node is not added again, the existing node is used instead. Nodes appended this way are shared
     // between cells, so setNode() moves the corner of every cell using the node.
-    // Returns the node table index of each of the given nodes.
-    std::vector<size_t> appendUniqueNodes( const std::vector<cvf::Vec3d>& nodes );
-    // Sets the corner indices of the cells starting at firstReservoirCellIndex, using 8 nodes per cell ordered as
-    // RigCell::cornerIndices()
-    void appendUniqueCellNodes( size_t firstReservoirCellIndex, const std::vector<cvf::Vec3d>& cellCornerNodes );
+    // Returns the node table index of the node. Not thread safe.
+    size_t appendUniqueNode( const cvf::Vec3d& node );
     // Frees the lookup table used to find existing nodes. Call when the grid geometry is complete.
     void releaseNodeLookup();
 
@@ -179,7 +176,6 @@ protected: // only for use by file readers and internal services. TODO: replace 
 
 private:
     void   syncNodeLookup();
-    size_t appendUniqueNode( const cvf::Vec3d& node );
     size_t findOrAddToNodeLookup( const cvf::Vec3d& node, size_t nodeIndex );
     void   growNodeLookup();
     void   clearNodeLookup();

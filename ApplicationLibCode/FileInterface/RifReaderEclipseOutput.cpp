@@ -170,11 +170,8 @@ bool RifReaderEclipseOutput::transferGridCellData( RigMainGrid*         mainGrid
     defaultCell.setHostGrid( localGrid );
     mainGrid->reservoirCells().resize( cellStartIndex + cellCount, defaultCell );
 
-    std::vector<cvf::Vec3d> gridNodes( static_cast<size_t>( cellCount ) * 8, cvf::Vec3d( 0, 0, 0 ) );
-
-    // Loop over cells and fill them with data
-
-#pragma omp parallel for
+    // Loop over cells and fill them with data. The loop is serial, as the corner nodes are added to the shared node
+    // table while reading.
     for ( int gridLocalCellIndex = 0; gridLocalCellIndex < cellCount; ++gridLocalCellIndex )
     {
         RigCell& cell = mainGrid->cell( cellStartIndex + gridLocalCellIndex );
@@ -207,13 +204,14 @@ bool RifReaderEclipseOutput::transferGridCellData( RigMainGrid*         mainGrid
             cell.setParentCellIndex( parentCellIndex );
         }
 
-        // Corner coordinates
-        int cIdx;
-        for ( cIdx = 0; cIdx < 8; ++cIdx )
+        // Corner coordinates. Nodes with identical coordinates are shared between cells.
+        for ( int cIdx = 0; cIdx < 8; ++cIdx )
         {
-            double* point = gridNodes[(size_t)gridLocalCellIndex * 8 + cellMappingECLRi[cIdx]].ptr();
+            cvf::Vec3d point;
             ecl_grid_get_cell_corner_xyz1( localEclGrid, gridLocalCellIndex, cIdx, &( point[0] ), &( point[1] ), &( point[2] ) );
             point[2] = -point[2]; // Flipping Z making depth become negative z values
+
+            cell.cornerIndices()[cellMappingECLRi[cIdx]] = mainGrid->appendUniqueNode( point );
         }
 
         // Sub grid in cell
@@ -225,9 +223,6 @@ bool RifReaderEclipseOutput::transferGridCellData( RigMainGrid*         mainGrid
             cell.setSubGrid( static_cast<RigLocalGrid*>( mainGrid->gridById( subGridId ) ) );
         }
     }
-
-    // gridNodes holds 8 nodes per cell in corner order. Nodes with identical coordinates are shared between cells.
-    mainGrid->appendUniqueCellNodes( cellStartIndex, gridNodes );
 
     // Mark inactive long pyramid looking cells as invalid. The cell geometry is evaluated from the node table of the
     // main grid, so this must be done after the nodes have been added.

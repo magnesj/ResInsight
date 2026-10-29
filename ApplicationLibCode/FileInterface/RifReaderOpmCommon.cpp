@@ -539,8 +539,6 @@ void RifReaderOpmCommon::transferGeometry( Opm::EclIO::EGrid&  opmMainGrid,
 
     mainGrid->reservoirCells().resize( cellStartIndex + cellCount, defaultCell );
 
-    std::vector<cvf::Vec3d> riNodes( static_cast<size_t>( cellCount ) * 8, cvf::Vec3d( 0, 0, 0 ) );
-
     opmGrid.loadData();
     opmGrid.load_grid_data();
 
@@ -556,7 +554,7 @@ void RifReaderOpmCommon::transferGeometry( Opm::EclIO::EGrid&  opmMainGrid,
     // use same mapping as resdata
     const size_t cellMappingECLRi[8] = { 0, 1, 3, 2, 4, 5, 7, 6 };
 
-#pragma omp parallel for
+    // The loop is serial, as the corner nodes are added to the shared node table while reading
     for ( int opmCellIndex = 0; opmCellIndex < static_cast<int>( localGrid->cellCount() ); opmCellIndex++ )
     {
         auto opmIJK = opmGrid.ijk_from_global_index( opmCellIndex );
@@ -591,17 +589,11 @@ void RifReaderOpmCommon::transferGeometry( Opm::EclIO::EGrid&  opmMainGrid,
         std::array<double, 8> opmZ{};
         opmGrid.getCellCorners( opmCellIndex, opmX, opmY, opmZ );
 
-        // Each cell has 8 nodes, ordered as the corners of the cell
-        auto riNodeStartIndex = riReservoirIndex * 8;
-
         for ( size_t opmNodeIndex = 0; opmNodeIndex < 8; opmNodeIndex++ )
         {
             auto riCornerIndex = cellMappingECLRi[opmNodeIndex];
 
-            auto& riNode = riNodes[riNodeStartIndex + riCornerIndex];
-            riNode.x()   = opmX[opmNodeIndex] + xCenterCoordOpm;
-            riNode.y()   = opmY[opmNodeIndex] + yCenterCoordOpm;
-            riNode.z()   = -opmZ[opmNodeIndex];
+            cvf::Vec3d riNode( opmX[opmNodeIndex] + xCenterCoordOpm, opmY[opmNodeIndex] + yCenterCoordOpm, -opmZ[opmNodeIndex] );
 
             // First grid dimension is radius, check if cell are at the outer-most slice
             if ( isRadialGrid && !hostCellGlobalIndices.empty() && ( gridDimension[0] - 1 == opmIJK[0] ) )
@@ -618,11 +610,11 @@ void RifReaderOpmCommon::transferGeometry( Opm::EclIO::EGrid&  opmMainGrid,
                                                           xCenterCoordOpm,
                                                           yCenterCoordOpm );
             }
+
+            // Nodes with identical coordinates are shared between cells
+            cell.cornerIndices()[riCornerIndex] = mainGrid->appendUniqueNode( riNode );
         }
     }
-
-    // Nodes with identical coordinates are shared between cells
-    mainGrid->appendUniqueCellNodes( cellStartIndex, riNodes );
 
     // The cell geometry is evaluated from the node table of the main grid, so this must be done after the nodes have
     // been added

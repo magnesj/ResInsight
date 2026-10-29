@@ -207,8 +207,6 @@ bool RifRoffFileTools::openGridFile( std::istream& stream, RigEclipseCaseData* e
         defaultCell.setHostGrid( mainGrid );
         mainGrid->reservoirCells().resize( cellStartIndex + cellCount, defaultCell );
 
-        std::vector<cvf::Vec3d> gridNodes( static_cast<size_t>( cellCount ) * 8, cvf::Vec3d( 0, 0, 0 ) );
-
         // Swap i and j to get correct faces
         const size_t cellMappingECLRi[8] = { 2, 3, 1, 0, 6, 7, 5, 4 };
 
@@ -221,8 +219,8 @@ bool RifRoffFileTools::openGridFile( std::istream& stream, RigEclipseCaseData* e
         // Precompute the active cell matrix index
         size_t numActiveCells = computeActiveCellMatrixIndex( activeCells );
 
-        // Loop over cells and fill them with data
-#pragma omp parallel for
+        // Loop over cells and fill them with data. The loop is serial, as the corner nodes are added to the shared
+        // node table while reading.
         for ( int gridLocalCellIndex = 0; gridLocalCellIndex < cellCount; ++gridLocalCellIndex )
         {
             RigCell& cell = mainGrid->cell( cellStartIndex + gridLocalCellIndex );
@@ -239,20 +237,15 @@ bool RifRoffFileTools::openGridFile( std::istream& stream, RigEclipseCaseData* e
 
             cell.setParentCellIndex( cvf::UNDEFINED_SIZE_T );
 
-            // Corner coordinates
+            // Corner coordinates. Nodes with identical coordinates are shared between cells.
             for ( int cIdx = 0; cIdx < 8; ++cIdx )
             {
-                double* point  = gridNodes[(size_t)gridLocalCellIndex * 8 + cellMappingECLRi[cIdx]].ptr();
-                auto    corner = getCorner( *mainGrid, cornerLines, zCorners, gridLocalCellIndex, cIdx, offset, scale );
+                auto corner = getCorner( *mainGrid, cornerLines, zCorners, gridLocalCellIndex, cIdx, offset, scale );
 
-                point[0] = corner.x();
-                point[1] = corner.y();
-                point[2] = corner.z();
+                cell.cornerIndices()[cellMappingECLRi[cIdx]] = mainGrid->appendUniqueNode( corner );
             }
         }
 
-        // gridNodes holds 8 nodes per cell in corner order. Nodes with identical coordinates are shared between cells.
-        mainGrid->appendUniqueCellNodes( cellStartIndex, gridNodes );
         mainGrid->releaseNodeLookup();
 
         // Mark inactive long pyramid looking cells as invalid. The cell geometry is evaluated from the node table of the

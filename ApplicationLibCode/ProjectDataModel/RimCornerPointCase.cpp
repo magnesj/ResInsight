@@ -266,8 +266,6 @@ void RimCornerPointCase::buildGrid( RigEclipseCaseData&       eclipseCaseData,
     defaultCell.setHostGrid( mainGrid );
     mainGrid->reservoirCells().resize( cellStartIndex + cellCount, defaultCell );
 
-    std::vector<cvf::Vec3d> gridNodes( static_cast<size_t>( cellCount ) * 8, cvf::Vec3d( 0, 0, 0 ) );
-
     const size_t cellMappingECLRi[8] = { 0, 1, 3, 2, 4, 5, 7, 6 };
 
     cvf::Vec3d offset( 0.0, 0.0, 0.0 );
@@ -284,8 +282,8 @@ void RimCornerPointCase::buildGrid( RigEclipseCaseData&       eclipseCaseData,
     // Precompute the active cell matrix index
     size_t numActiveCells = RifRoffFileTools::computeActiveCellMatrixIndex( activeCells );
 
-    // Loop over cells and fill them with data
-#pragma omp parallel for
+    // Loop over cells and fill them with data. The loop is serial, as the corner nodes are added to the shared node
+    // table while reading.
     for ( int gridLocalCellIndex = 0; gridLocalCellIndex < cellCount; ++gridLocalCellIndex )
     {
         RigCell& cell = mainGrid->cell( cellStartIndex + gridLocalCellIndex );
@@ -304,19 +302,15 @@ void RimCornerPointCase::buildGrid( RigEclipseCaseData&       eclipseCaseData,
 
         std::array<cvf::Vec3d, 8> corners = getCorners( *mainGrid, coord, zcorn, gridLocalCellIndex, offset, scale );
 
-        // Corner coordinates
+        // Corner coordinates. Nodes with identical coordinates are shared between cells.
         for ( int cIdx = 0; cIdx < 8; ++cIdx )
         {
-            double* point = gridNodes[(size_t)gridLocalCellIndex * 8 + cellMappingECLRi[cIdx]].ptr();
+            const cvf::Vec3d point( corners[cIdx].x(), corners[cIdx].y(), -corners[cIdx].z() );
 
-            point[0] = corners[cIdx].x();
-            point[1] = corners[cIdx].y();
-            point[2] = -corners[cIdx].z();
+            cell.cornerIndices()[cellMappingECLRi[cIdx]] = mainGrid->appendUniqueNode( point );
         }
     }
 
-    // gridNodes holds 8 nodes per cell in corner order. Nodes with identical coordinates are shared between cells.
-    mainGrid->appendUniqueCellNodes( cellStartIndex, gridNodes );
     mainGrid->releaseNodeLookup();
 
     // Mark inactive long pyramid looking cells as invalid. The cell geometry is evaluated from the node table of the

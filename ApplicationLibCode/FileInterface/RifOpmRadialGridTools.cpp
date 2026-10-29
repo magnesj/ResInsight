@@ -224,25 +224,23 @@ void RifOpmRadialGridTools::transferCylindricalCoords( Opm::EclIO::EGrid& opmMai
 
     bool convertCylindricalCoords = false;
 
-    // 8 nodes per cell in corner order. Nodes can be shared between cells, so the cells get new nodes instead of
-    // modifying the existing ones.
-    std::vector<cvf::Vec3d> cellCornerNodes( cellCount * 8 );
-
     for ( int opmCellIndex = 0; opmCellIndex < static_cast<int>( cellCount ); opmCellIndex++ )
     {
         auto ijkCell = opmGrid.ijk_from_global_index( opmCellIndex );
         opmGrid.getCellCorners( ijkCell, opmX, opmY, opmZ, convertCylindricalCoords );
 
+        // Nodes can be shared between cells, so the cell gets new nodes instead of modifying the existing ones
+        auto& cornerIndices = riMainGrid->cell( riGrid->reservoirCellIndex( opmCellIndex ) ).cornerIndices();
+
         for ( size_t opmNodeIndex = 0; opmNodeIndex < 8; opmNodeIndex++ )
         {
-            size_t riNodeIndex = opmCellIndex * 8 + cellMappingECLRi[opmNodeIndex];
-
             // The radial grid is specified with (0,0) as center, add grid center to get correct global coordinates
-            cellCornerNodes[riNodeIndex] = cvf::Vec3d( opmX[opmNodeIndex], opmY[opmNodeIndex], -opmZ[opmNodeIndex] );
+            const cvf::Vec3d riNode( opmX[opmNodeIndex], opmY[opmNodeIndex], -opmZ[opmNodeIndex] );
+
+            cornerIndices[cellMappingECLRi[opmNodeIndex]] = riMainGrid->appendUniqueNode( riNode );
         }
     }
 
-    riMainGrid->appendUniqueCellNodes( riGrid->reservoirCellIndex( 0 ), cellCornerNodes );
     riMainGrid->releaseNodeLookup();
 }
 
@@ -273,16 +271,14 @@ void RifOpmRadialGridTools::convertRadialGridToCartesianGrid( Opm::EclIO::EGrid&
     const size_t* cellMappingECLRi      = RifReaderEclipseOutput::eclipseCellIndexMapping();
     const auto    gridDimension         = opmGrid.dimension();
 
-    // 8 nodes per cell in corner order. Nodes can be shared between cells, so the cells get new nodes instead of
-    // modifying the existing ones.
-    std::vector<cvf::Vec3d> cellCornerNodes( cellCount * 8 );
-
     for ( int opmCellIndex = 0; opmCellIndex < static_cast<int>( cellCount ); opmCellIndex++ )
     {
         opmGrid.getCellCorners( opmCellIndex, opmX, opmY, opmZ );
 
-        auto riNodeStartIndex = static_cast<size_t>( opmCellIndex ) * 8;
-        auto ijkCell          = opmGrid.ijk_from_global_index( opmCellIndex );
+        auto ijkCell = opmGrid.ijk_from_global_index( opmCellIndex );
+
+        // Nodes can be shared between cells, so the cell gets new nodes instead of modifying the existing ones
+        auto& cornerIndices = riMainGrid->cell( riGrid->reservoirCellIndex( opmCellIndex ) ).cornerIndices();
 
         double xCenterCoordOpm = 0.0;
         double yCenterCoordOpm = 0.0;
@@ -296,8 +292,6 @@ void RifOpmRadialGridTools::convertRadialGridToCartesianGrid( Opm::EclIO::EGrid&
 
         for ( size_t opmNodeIndex = 0; opmNodeIndex < 8; opmNodeIndex++ )
         {
-            size_t riNodeIndex = riNodeStartIndex + cellMappingECLRi[opmNodeIndex];
-
             // The radial grid is specified with (0,0) as center, add grid center to get correct global coordinates
             cvf::Vec3d riNode( opmX[opmNodeIndex] + xCenterCoordOpm, opmY[opmNodeIndex] + yCenterCoordOpm, -opmZ[opmNodeIndex] );
 
@@ -309,11 +303,10 @@ void RifOpmRadialGridTools::convertRadialGridToCartesianGrid( Opm::EclIO::EGrid&
                 lockToHostPillars( riNode, opmMainGrid, opmGrid, ijkCell, hostCellIndex, opmCellIndex, opmNodeIndex, xCenterCoordOpm, yCenterCoordOpm );
             }
 
-            cellCornerNodes[riNodeIndex] = riNode;
+            cornerIndices[cellMappingECLRi[opmNodeIndex]] = riMainGrid->appendUniqueNode( riNode );
         }
     }
 
-    riMainGrid->appendUniqueCellNodes( riGrid->reservoirCellIndex( 0 ), cellCornerNodes );
     riMainGrid->releaseNodeLookup();
 }
 

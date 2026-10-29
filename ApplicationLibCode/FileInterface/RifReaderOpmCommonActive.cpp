@@ -238,7 +238,6 @@ void RifReaderOpmCommonActive::transferActiveGeometry( Opm::EclIO::EGrid&  opmMa
                                                        RigGridBase*        localGrid,
                                                        RigEclipseCaseData* eclipseCaseData )
 {
-    int    cellCount      = opmGrid.totalActiveCells();
     size_t cellStartIndex = activeGrid->totalCellCount();
 
     const bool invalidateLongPyramidCells = invalidateLongThinCells();
@@ -248,7 +247,6 @@ void RifReaderOpmCommonActive::transferActiveGeometry( Opm::EclIO::EGrid&  opmMa
     for ( size_t i = 0; i < 8; i++ )
         defaultCell.cornerIndices()[i] = 0;
 
-    std::vector<cvf::Vec3d> riNodes( 8 * static_cast<size_t>( cellCount ), cvf::Vec3d( 0, 0, 0 ) );
     activeGrid->setTotalCellCount( cellStartIndex + opmGrid.totalNumberOfCells() );
     auto& riCells = activeGrid->nativeCells();
 
@@ -268,21 +266,7 @@ void RifReaderOpmCommonActive::transferActiveGeometry( Opm::EclIO::EGrid&  opmMa
     // use same mapping as resdata
     const size_t cellMappingECLRi[8] = { 0, 1, 3, 2, 4, 5, 7, 6 };
 
-    std::map<int, int> activeCellMap;
-    int                nativeIdx = 0;
-
-    // non-parallel loop to set up and initialize things so that we can run in parallel later
-    for ( int opmCellIndex = 0; opmCellIndex < static_cast<int>( opmGrid.totalNumberOfCells() ); opmCellIndex++ )
-    {
-        if ( ( activeMatIndexes[opmCellIndex] < 0 ) && ( activeFracIndexes[opmCellIndex] < 0 ) ) continue;
-
-        auto opmIJK                          = opmGrid.ijk_from_global_index( opmCellIndex );
-        auto localIndex                      = localGrid->cellIndexFromIJK( opmIJK[0], opmIJK[1], opmIJK[2] );
-        riCells[cellStartIndex + localIndex] = defaultCell;
-        activeCellMap[opmCellIndex]          = nativeIdx++;
-    }
-
-#pragma omp parallel for
+    // The loop is serial, as cells are inserted and the corner nodes are added to the shared node table while reading
     for ( int opmCellIndex = 0; opmCellIndex < static_cast<int>( opmGrid.totalNumberOfCells() ); opmCellIndex++ )
     {
         if ( ( activeMatIndexes[opmCellIndex] < 0 ) && ( activeFracIndexes[opmCellIndex] < 0 ) ) continue;
@@ -301,6 +285,7 @@ void RifReaderOpmCommonActive::transferActiveGeometry( Opm::EclIO::EGrid&  opmMa
 
         auto     localIndex = localGrid->cellIndexFromIJK( opmIJK[0], opmIJK[1], opmIJK[2] );
         RigCell& cell       = riCells[cellStartIndex + localIndex];
+        cell                = defaultCell;
         cell.setGridLocalCellIndex( localIndex );
 
         // parent cell index
@@ -319,21 +304,11 @@ void RifReaderOpmCommonActive::transferActiveGeometry( Opm::EclIO::EGrid&  opmMa
         std::array<double, 8> opmZ{};
         opmGrid.getCellCorners( opmCellIndex, opmX, opmY, opmZ );
 
-        // Each cell has 8 nodes, use active cell index and multiply to find first node index for cell. The corner
-        // indices refer to riNodes until the nodes are added to the grid below.
-        auto riNodeStartIndex = static_cast<size_t>( activeCellMap[opmCellIndex] ) * 8;
-
         for ( size_t opmNodeIndex = 0; opmNodeIndex < 8; opmNodeIndex++ )
         {
-            auto   riCornerIndex = cellMappingECLRi[opmNodeIndex];
-            size_t riNodeIndex   = riNodeStartIndex + riCornerIndex;
+            auto riCornerIndex = cellMappingECLRi[opmNodeIndex];
 
-            auto& riNode = riNodes[riNodeIndex];
-            riNode.x()   = opmX[opmNodeIndex] + xCenterCoordOpm;
-            riNode.y()   = opmY[opmNodeIndex] + yCenterCoordOpm;
-            riNode.z()   = -opmZ[opmNodeIndex];
-
-            cell.cornerIndices()[riCornerIndex] = riNodeIndex;
+            cvf::Vec3d riNode( opmX[opmNodeIndex] + xCenterCoordOpm, opmY[opmNodeIndex] + yCenterCoordOpm, -opmZ[opmNodeIndex] );
 
             // First grid dimension is radius, check if cell are at the outer-most slice
             if ( isRadialGrid && !hostCellGlobalIndices.empty() && ( gridDimension[0] - 1 == opmIJK[0] ) )
@@ -350,16 +325,9 @@ void RifReaderOpmCommonActive::transferActiveGeometry( Opm::EclIO::EGrid&  opmMa
                                                           xCenterCoordOpm,
                                                           yCenterCoordOpm );
             }
-        }
-    }
 
-    // Nodes with identical coordinates are shared between cells
-    const auto nodeIndices = activeGrid->appendUniqueNodes( riNodes );
-    for ( auto it = riCells.lower_bound( cellStartIndex ); it != riCells.end(); ++it )
-    {
-        for ( size_t& cornerIndex : it->second.cornerIndices() )
-        {
-            cornerIndex = nodeIndices[cornerIndex];
+            // Nodes with identical coordinates are shared between cells
+            cell.cornerIndices()[riCornerIndex] = activeGrid->appendUniqueNode( riNode );
         }
     }
 
