@@ -229,17 +229,19 @@ void RifOpmRadialGridTools::transferCylindricalCoords( Opm::EclIO::EGrid& opmMai
         auto ijkCell = opmGrid.ijk_from_global_index( opmCellIndex );
         opmGrid.getCellCorners( ijkCell, opmX, opmY, opmZ, convertCylindricalCoords );
 
-        // Each cell has 8 nodes, use reservoir cell index and multiply to find first node index for cell
-        auto riNodeStartIndex = riGrid->reservoirCellIndex( opmCellIndex ) * 8;
+        // Nodes can be shared between cells, so the cell gets new nodes instead of modifying the existing ones
+        auto& cornerIndices = riMainGrid->cell( riGrid->reservoirCellIndex( opmCellIndex ) ).cornerIndices();
 
         for ( size_t opmNodeIndex = 0; opmNodeIndex < 8; opmNodeIndex++ )
         {
-            size_t riNodeIndex = riNodeStartIndex + cellMappingECLRi[opmNodeIndex];
-
             // The radial grid is specified with (0,0) as center, add grid center to get correct global coordinates
-            riMainGrid->setNode( riNodeIndex, cvf::Vec3d( opmX[opmNodeIndex], opmY[opmNodeIndex], -opmZ[opmNodeIndex] ) );
+            const cvf::Vec3d riNode( opmX[opmNodeIndex], opmY[opmNodeIndex], -opmZ[opmNodeIndex] );
+
+            cornerIndices[cellMappingECLRi[opmNodeIndex]] = riMainGrid->appendUniqueNode( riNode );
         }
     }
+
+    riMainGrid->releaseNodeLookup();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -273,9 +275,10 @@ void RifOpmRadialGridTools::convertRadialGridToCartesianGrid( Opm::EclIO::EGrid&
     {
         opmGrid.getCellCorners( opmCellIndex, opmX, opmY, opmZ );
 
-        // Each cell has 8 nodes, use reservoir cell index and multiply to find first node index for cell
-        auto riNodeStartIndex = riGrid->reservoirCellIndex( opmCellIndex ) * 8;
-        auto ijkCell          = opmGrid.ijk_from_global_index( opmCellIndex );
+        auto ijkCell = opmGrid.ijk_from_global_index( opmCellIndex );
+
+        // Nodes can be shared between cells, so the cell gets new nodes instead of modifying the existing ones
+        auto& cornerIndices = riMainGrid->cell( riGrid->reservoirCellIndex( opmCellIndex ) ).cornerIndices();
 
         double xCenterCoordOpm = 0.0;
         double yCenterCoordOpm = 0.0;
@@ -289,8 +292,6 @@ void RifOpmRadialGridTools::convertRadialGridToCartesianGrid( Opm::EclIO::EGrid&
 
         for ( size_t opmNodeIndex = 0; opmNodeIndex < 8; opmNodeIndex++ )
         {
-            size_t riNodeIndex = riNodeStartIndex + cellMappingECLRi[opmNodeIndex];
-
             // The radial grid is specified with (0,0) as center, add grid center to get correct global coordinates
             cvf::Vec3d riNode( opmX[opmNodeIndex] + xCenterCoordOpm, opmY[opmNodeIndex] + yCenterCoordOpm, -opmZ[opmNodeIndex] );
 
@@ -302,9 +303,11 @@ void RifOpmRadialGridTools::convertRadialGridToCartesianGrid( Opm::EclIO::EGrid&
                 lockToHostPillars( riNode, opmMainGrid, opmGrid, ijkCell, hostCellIndex, opmCellIndex, opmNodeIndex, xCenterCoordOpm, yCenterCoordOpm );
             }
 
-            riMainGrid->setNode( riNodeIndex, riNode );
+            cornerIndices[cellMappingECLRi[opmNodeIndex]] = riMainGrid->appendUniqueNode( riNode );
         }
     }
+
+    riMainGrid->releaseNodeLookup();
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -30,6 +30,10 @@
 
 #include <QString>
 
+#include <algorithm>
+#include <array>
+#include <cstdint>
+#include <future>
 #include <map>
 #include <mutex>
 #include <optional>
@@ -57,9 +61,22 @@ public:
 
     void setNodes( std::vector<cvf::Vec3d> nodes );
     void appendNodes( const std::vector<cvf::Vec3d>& nodes );
-    void reserveNodes( size_t nodeCount );
     void setNode( size_t nodeIndex, const cvf::Vec3d& coordinate );
     void transformNodes( const cvf::Mat4d& transform );
+
+    // Shared node table construction, used when reading grids. A node with exactly the same coordinates as an
+    // existing node is not added again, the existing node is used instead. Nodes appended this way are shared
+    // between cells, so setNode() moves the corner of every cell using the node.
+    // Returns the node table index of the node. Not thread safe.
+    size_t appendUniqueNode( const cvf::Vec3d& node );
+    // Adds the corner nodes of cellCount cells using appendUniqueNode(). readCell( cellIndex, corners ) is called in
+    // parallel. It must fill corners in RigCell::cornerIndices() order and return the corner indices to set, or nullptr
+    // to skip the cell. Cells are processed in chunks, so the temporary memory does not depend on the grid size, and the
+    // nodes are added in cell order independent of the number of threads.
+    template <typename ReadCellFunc>
+    void appendUniqueCellNodes( int cellCount, ReadCellFunc&& readCell );
+    // Frees the lookup table used to find existing nodes. Call when the grid geometry is complete.
+    void releaseNodeLookup();
 
     virtual RigGridBase*       gridAndGridLocalIdxFromGlobalCellIdx( size_t globalCellIdx, size_t* gridLocalCellIdx );
     virtual const RigGridBase* gridAndGridLocalIdxFromGlobalCellIdx( size_t globalCellIdx, size_t* gridLocalCellIdx ) const;
@@ -167,6 +184,22 @@ protected: // only for use by file readers and internal services. TODO: replace 
     const std::vector<RigCell>& reservoirCells() const;
 
 private:
+    struct CellNodeChunk
+    {
+        std::vector<std::array<cvf::Vec3d, 8>> corners;
+        std::vector<std::array<size_t, 8>*>    cornerIndices;
+        std::vector<std::array<uint64_t, 8>>   hashes;
+    };
+    static uint64_t nodeHash( const cvf::Vec3d& node );
+    void            appendUniqueCellNodes( const CellNodeChunk& chunk );
+
+    void   syncNodeLookup();
+    size_t appendUniqueNode( const cvf::Vec3d& node, uint64_t hash );
+    size_t findOrAddToNodeLookup( const cvf::Vec3d& node, uint64_t hash, size_t nodeIndex );
+    void   prefetchNodeLookup( uint64_t hash ) const;
+    void   growNodeLookup();
+    void   clearNodeLookup();
+
     void initAllSubCellsMainGridCellIndex();
     bool hasFaultWithName( const QString& name ) const;
     void computeBoundingBox();
@@ -179,6 +212,10 @@ private:
 
 private:
     std::vector<cvf::Vec3d>       m_nodes; ///< Global vertex table
+    std::vector<uint64_t>         m_nodeLookup; ///< Open addressing hash table of node indices, used to share nodes
+    size_t                        m_nodeLookupSizeLog    = 0; ///< m_nodeLookup has 2^m_nodeLookupSizeLog slots
+    size_t                        m_nodeLookupEntryCount = 0;
+    size_t                        m_nodeLookupNodeCount  = 0; ///< Nodes [0, m_nodeLookupNodeCount) are in the lookup
     std::vector<RigCell>          m_cells; ///< Global array of all cells in the reservoir (including the ones in LGR's)
     cvf::Collection<RigLocalGrid> m_localGrids; ///< List of all the LGR's in this reservoir
     std::vector<size_t>           m_gridIdToIndexMapping; ///< Mapping from LGR Id to index.
@@ -208,6 +245,53 @@ private:
     mutable size_t                         m_cellSearchTreeCellsPerBoundingBox = 1;
     mutable std::mutex                     m_cellSearchTreeMutex;
 };
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+template <typename ReadCellFunc>
+void RigMainGrid::appendUniqueCellNodes( int cellCount, ReadCellFunc&& readCell )
+{
+    constexpr int chunkCellCount = 1 << 15;
+
+    // Two chunk buffers, so the nodes of one chunk are added while the next chunk is read
+    std::array<CellNodeChunk, 2> chunks;
+    std::future<void>            addingNodes;
+
+    for ( int chunkStart = 0, chunkNumber = 0; chunkStart < cellCount; chunkStart += chunkCellCount, chunkNumber++ )
+    {
+        const int chunkSize = std::min( chunkCellCount, cellCount - chunkStart );
+
+        CellNodeChunk& chunk = chunks[chunkNumber % 2];
+        chunk.corners.resize( chunkSize );
+        chunk.cornerIndices.resize( chunkSize );
+        chunk.hashes.resize( chunkSize );
+
+#pragma omp parallel for
+        for ( int i = 0; i < chunkSize; i++ )
+        {
+            chunk.cornerIndices[i] = readCell( chunkStart + i, chunk.corners[i] );
+            if ( chunk.cornerIndices[i] )
+            {
+                for ( size_t corner = 0; corner < 8; corner++ )
+                {
+                    chunk.hashes[i][corner] = nodeHash( chunk.corners[i][corner] );
+                }
+            }
+        }
+
+        if ( addingNodes.valid() ) addingNodes.get();
+
+        if ( chunkStart + chunkSize < cellCount )
+        {
+            addingNodes = std::async( std::launch::async, [this, &chunk]() { appendUniqueCellNodes( chunk ); } );
+        }
+        else
+        {
+            appendUniqueCellNodes( chunk );
+        }
+    }
+}
 
 //==================================================================================================
 /// Read-only indexed view of the node table of a main grid, usable with cvf::ArrayWrapperConst

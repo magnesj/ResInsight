@@ -194,22 +194,18 @@ bool RifRoffFileTools::openGridFile( std::istream& stream, RigEclipseCaseData* e
         activeCellInfo->setReservoirCellCount( totalCellCount );
         fractureActiveCellInfo->setReservoirCellCount( totalCellCount );
 
-        // Reserve room for the cells and nodes and fill them with data
+        // Reserve room for the cells and fill them with data
         mainGrid->reservoirCells().reserve( totalCellCount );
-        mainGrid->reserveNodes( 8 * totalCellCount );
 
         int               progTicks = 100;
         caf::ProgressInfo progInfo( progTicks, "" );
 
         int    cellCount      = static_cast<int>( totalCellCount );
         size_t cellStartIndex = mainGrid->reservoirCells().size();
-        size_t nodeStartIndex = mainGrid->nodeCount();
 
         RigCell defaultCell;
         defaultCell.setHostGrid( mainGrid );
         mainGrid->reservoirCells().resize( cellStartIndex + cellCount, defaultCell );
-
-        std::vector<cvf::Vec3d> gridNodes( static_cast<size_t>( cellCount ) * 8, cvf::Vec3d( 0, 0, 0 ) );
 
         // Swap i and j to get correct faces
         const size_t cellMappingECLRi[8] = { 2, 3, 1, 0, 6, 7, 5, 4 };
@@ -223,9 +219,8 @@ bool RifRoffFileTools::openGridFile( std::istream& stream, RigEclipseCaseData* e
         // Precompute the active cell matrix index
         size_t numActiveCells = computeActiveCellMatrixIndex( activeCells );
 
-        // Loop over cells and fill them with data
-#pragma omp parallel for
-        for ( int gridLocalCellIndex = 0; gridLocalCellIndex < cellCount; ++gridLocalCellIndex )
+        // Loop over cells and fill them with data. Nodes with identical coordinates are shared between cells.
+        auto readCell = [&]( int gridLocalCellIndex, std::array<cvf::Vec3d, 8>& corners )
         {
             RigCell& cell = mainGrid->cell( cellStartIndex + gridLocalCellIndex );
 
@@ -244,18 +239,13 @@ bool RifRoffFileTools::openGridFile( std::istream& stream, RigEclipseCaseData* e
             // Corner coordinates
             for ( int cIdx = 0; cIdx < 8; ++cIdx )
             {
-                double* point  = gridNodes[(size_t)gridLocalCellIndex * 8 + cellMappingECLRi[cIdx]].ptr();
-                auto    corner = getCorner( *mainGrid, cornerLines, zCorners, gridLocalCellIndex, cIdx, offset, scale );
-
-                point[0] = corner.x();
-                point[1] = corner.y();
-                point[2] = corner.z();
-
-                cell.cornerIndices()[cIdx] = nodeStartIndex + (size_t)gridLocalCellIndex * 8 + cIdx;
+                corners[cellMappingECLRi[cIdx]] = getCorner( *mainGrid, cornerLines, zCorners, gridLocalCellIndex, cIdx, offset, scale );
             }
-        }
 
-        mainGrid->appendNodes( gridNodes );
+            return &cell.cornerIndices();
+        };
+        mainGrid->appendUniqueCellNodes( cellCount, readCell );
+        mainGrid->releaseNodeLookup();
 
         // Mark inactive long pyramid looking cells as invalid. The cell geometry is evaluated from the node table of the
         // main grid, so this must be done after the nodes have been added.

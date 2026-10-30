@@ -23,6 +23,7 @@
 #include "RigEclipseCaseData.h"
 #include "RigGridManager.h"
 #include "RigMainGrid.h"
+#include "RigReservoirBuilder.h"
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -150,6 +151,57 @@ TEST( RigMainGridTest, NodeTableAccess )
     EXPECT_EQ( 0u, mainGrid->nodeCount() );
 }
 
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+TEST( RigMainGridTest, AppendUniqueNode )
+{
+    const cvf::Vec3d a( 1, 2, 3 );
+    const cvf::Vec3d b( 4, 5, 6 );
+    const cvf::Vec3d c( 7, 8, 9 );
+
+    cvf::ref<RigMainGrid> mainGrid = new RigMainGrid;
+
+    auto appendUniqueNodes = [&]( const std::vector<cvf::Vec3d>& nodes )
+    {
+        std::vector<size_t> nodeIndices;
+        for ( const auto& node : nodes )
+        {
+            nodeIndices.push_back( mainGrid->appendUniqueNode( node ) );
+        }
+        return nodeIndices;
+    };
+
+    EXPECT_EQ( ( std::vector<size_t>{ 0, 1, 0, 2, 1 } ), appendUniqueNodes( { a, b, a, c, b } ) );
+    EXPECT_EQ( 3u, mainGrid->nodeCount() );
+
+    // -0.0 equals 0.0
+    EXPECT_EQ( ( std::vector<size_t>{ 2, 3, 3 } ), appendUniqueNodes( { c, cvf::Vec3d( 0, 0, 0 ), cvf::Vec3d( -0.0, 0, 0 ) } ) );
+    EXPECT_EQ( 4u, mainGrid->nodeCount() );
+
+    // Nodes appended without the lookup can be shared later
+    mainGrid->appendNodes( { cvf::Vec3d( 10, 10, 10 ) } );
+    EXPECT_EQ( 4u, mainGrid->appendUniqueNode( cvf::Vec3d( 10, 10, 10 ) ) );
+
+    // A modified node is found by its new coordinates
+    mainGrid->setNode( 0, cvf::Vec3d( -1, -1, -1 ) );
+    EXPECT_EQ( ( std::vector<size_t>{ 0, 5 } ), appendUniqueNodes( { cvf::Vec3d( -1, -1, -1 ), a } ) );
+    EXPECT_EQ( 6u, mainGrid->nodeCount() );
+
+    // Grow the lookup table beyond its initial size
+    std::vector<cvf::Vec3d> manyNodes;
+    for ( int i = 0; i < 5000; i++ )
+    {
+        manyNodes.emplace_back( i, 0.5 * i, -i );
+    }
+    const auto firstIndices  = appendUniqueNodes( manyNodes );
+    const auto secondIndices = appendUniqueNodes( manyNodes );
+    EXPECT_EQ( firstIndices, secondIndices );
+    EXPECT_EQ( 6u + 5000u - 1u, mainGrid->nodeCount() ); // ( 0, 0, 0 ) was already present
+
+    mainGrid->releaseNodeLookup();
+    EXPECT_EQ( 1u, mainGrid->appendUniqueNode( b ) );
+}
 /*
 
 //--------------------------------------------------------------------------------------------------
