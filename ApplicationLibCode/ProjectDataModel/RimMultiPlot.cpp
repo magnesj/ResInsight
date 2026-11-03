@@ -688,6 +688,7 @@ QImage RimMultiPlot::captureSnapshot( int width, int height )
         m_viewer->setFixedSize( width, height );
         RiuTools::sendDeferredResizeEvents( m_viewer );
         QApplication::processEvents();
+        m_viewer->performFullUpdateOfHiddenPages();
         RiuTools::sendDeferredResizeEvents( m_viewer );
 
         QPixmap pix( width, height );
