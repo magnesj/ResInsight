@@ -54,8 +54,7 @@ std::expected<void, QString>
     auto* plotWindow = dynamic_cast<RimPlotWindow*>( viewWindow );
     if ( plotWindow && fileName.endsWith( ".pdf" ) )
     {
-        savePlotPdfReportAs( fileName, plotWindow );
-        return {};
+        return savePlotPdfReportAs( fileName, plotWindow );
     }
     else if ( viewWindow )
     {
@@ -97,9 +96,15 @@ std::expected<void, QString> RicSnapshotViewToFileFeature::saveSnapshotAs( const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicSnapshotViewToFileFeature::savePlotPdfReportAs( const QString& fileName, RimPlotWindow* plot )
+std::expected<void, QString> RicSnapshotViewToFileFeature::savePlotPdfReportAs( const QString& fileName, RimPlotWindow* plot )
 {
-    if ( !plot || !plot->viewWidget() ) return;
+    if ( !plot || !plot->viewWidget() )
+    {
+        const QString errorText = QString( "No plot window to create a PDF report from for %1" ).arg( fileName );
+        RiaLogging::error( errorText.toStdString() );
+
+        return std::unexpected( errorText );
+    }
 
     auto viewWidget = plot->viewWidget();
 
@@ -141,8 +146,13 @@ void RicSnapshotViewToFileFeature::savePlotPdfReportAs( const QString& fileName,
     }
     else
     {
-        RiaLogging::error( std::format( "Could not write PDF to {}", fileName ) );
+        const QString errorText = QString( "Could not write PDF to %1" ).arg( fileName );
+        RiaLogging::error( errorText.toStdString() );
+
+        return std::unexpected( errorText );
     }
+
+    return {};
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -157,7 +167,8 @@ void RicSnapshotViewToFileFeature::saveViewWindowToFile( RimViewWindow* viewWind
     {
         if ( plotWindow && fileName.endsWith( "PDF", Qt::CaseInsensitive ) )
         {
-            savePlotPdfReportAs( fileName, plotWindow );
+            // Errors are logged by savePlotPdfReportAs
+            (void)savePlotPdfReportAs( fileName, plotWindow );
         }
         else
         {

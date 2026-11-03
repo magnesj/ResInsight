@@ -37,7 +37,7 @@ public:
     // Returns an error description if no snapshot image could be written to file
     static std::expected<void, QString> saveSnapshotAs( const QString& fileName, RimViewWindow* viewWindow, int width = -1, int height = -1 );
     static std::expected<void, QString> saveSnapshotAs( const QString& fileName, const QImage& image );
-    static void                         savePlotPdfReportAs( const QString& fileName, RimPlotWindow* plotWindow );
+    static std::expected<void, QString> savePlotPdfReportAs( const QString& fileName, RimPlotWindow* plotWindow );
 
     static void saveViewWindowToFile( RimViewWindow* viewWindow, const QString& defaultFileBaseName = "image" );
     static void saveImageToFile( const QImage& image, const QString& defaultFileBaseName = "image" );

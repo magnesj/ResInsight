@@ -986,6 +986,10 @@ RiaApplication::ApplicationStatus RiaGuiApplication::handleArguments( cvf::Progr
                     RicSnapshotAllPlotsToFileFeature::exportSnapshotOfPlotsIntoFolder( snapshotFolder, snapshotWidth, snapshotHeight );
                 if ( !result ) snapshotErrors.push_back( result.error() );
             }
+            else
+            {
+                snapshotErrors.push_back( "No plot window available for plot snapshot export" );
+            }
         }
 
         if ( snapshotViews )

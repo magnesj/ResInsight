@@ -122,6 +122,20 @@ std::expected<void, QString> RicSnapshotAllViewsToFileFeature::exportSnapshotOfV
         }
     }
 
+    // Views without a viewer are not displayed and are skipped, not treated as a failure
+    const size_t matchingViewCount = viewsForSnapshot.size();
+    std::erase_if( viewsForSnapshot, []( Rim3dView* view ) { return !view || !view->viewer() || !view->viewer()->ownerViewWindow(); } );
+
+    if ( viewsForSnapshot.empty() )
+    {
+        if ( matchingViewCount > 0 )
+        {
+            return std::unexpected( QString( "None of the %1 views are displayed, no view snapshots exported" ).arg( matchingViewCount ) );
+        }
+
+        return {};
+    }
+
     RiaLogging::info( std::format( "Exporting snapshot of all views to {}", snapshotFolderName ) );
 
     size_t failedSnapshotCount = 0;
@@ -132,7 +146,6 @@ std::expected<void, QString> RicSnapshotAllViewsToFileFeature::exportSnapshotOfV
         if ( !exportSnapshotOfView( riv, snapshotPath.absolutePath(), width, height, prefix ) ) failedSnapshotCount++;
     }
 
-    if ( !viewsForSnapshot.empty() )
     {
         // The OpenGL strings are populated when the first context is initialized, which for hidden viewers happens
         // inside the first snapshot grab. Useful to verify that the expected renderer (e.g. software/llvmpipe) is used.

@@ -30,5 +30,4 @@ fi
 
 # Start the application making the default file open path become the users cwd
 
-CommandLine="$XVFB_RUN ./ResInsight --startdir $WORKING_DIR $@"
-exec $CommandLine
+exec $XVFB_RUN ./ResInsight --startdir "$WORKING_DIR" "$@"
