@@ -54,6 +54,7 @@
 
 #include "RiuMainWindow.h"
 #include "RiuTimeStepChangedHandler.h"
+#include "RiuTools.h"
 #include "RiuViewer.h"
 
 #include "DockManager.h"
@@ -537,8 +538,7 @@ QImage Rim3dView::captureSnapshot( int width, int height )
                 // Hidden widgets defer resize events (Qt::WA_PendingResizeEvent), so the layout never propagates the
                 // new size to the GL widget. Deliver the resize synchronously so grabFramebuffer() renders at the
                 // requested size when running headless.
-                QResizeEvent resizeEvent( m_viewer->layoutWidget()->size(), orgSize );
-                QCoreApplication::sendEvent( m_viewer->layoutWidget(), &resizeEvent );
+                RiuTools::sendDeferredResizeEvents( m_viewer->layoutWidget() );
             }
 
             image = m_viewer->snapshotImage();

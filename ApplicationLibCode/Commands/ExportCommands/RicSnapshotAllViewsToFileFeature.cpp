@@ -130,7 +130,13 @@ std::expected<void, QString> RicSnapshotAllViewsToFileFeature::exportSnapshotOfV
     {
         if ( matchingViewCount > 0 )
         {
-            return std::unexpected( QString( "None of the %1 views are displayed, no view snapshots exported" ).arg( matchingViewCount ) );
+            const QString message = QString( "None of the %1 views are displayed, no view snapshots exported" ).arg( matchingViewCount );
+
+            // Closed views are a normal state in the GUI. When running headless, all views are expected to have a
+            // viewer, so missing snapshots indicate an error.
+            if ( RiaGuiApplication::isHeadless() ) return std::unexpected( message );
+
+            RiaLogging::warning( message.toStdString() );
         }
 
         return {};
@@ -193,7 +199,7 @@ std::expected<void, QString> RicSnapshotAllViewsToFileFeature::exportSnapshotOfV
         }
     }
 
-    if ( RiuMainWindow* mainWnd = RiuMainWindow::instance(); mainWnd && !mainWnd->isVisible() )
+    if ( RiuMainWindow* mainWnd = RiuMainWindow::instance(); RiaGuiApplication::isHeadless() && mainWnd && !mainWnd->isVisible() )
     {
         // When running headless with a hidden main window, Qt selects the global share context for the OpenGL context
         // of the first rendered view widget. The dock widget activation below gives the main window a native window
