@@ -42,6 +42,7 @@
 #include <cstdlib>
 #include <deque>
 #include <exception>
+#include <iostream>
 #include <map>
 #include <sstream>
 #include <thread>
@@ -109,6 +110,37 @@ FARPROC WINAPI riaDelayLoadHook( unsigned dliNotify, PDelayLoadInfo pdli )
 }
 
 extern "C" const PfnDliHook __pfnDliNotifyHook2 = riaDelayLoadHook;
+
+//--------------------------------------------------------------------------------------------------
+/// ResInsight is built as a GUI application on Windows, so stdout is only available when redirected to a file or
+/// pipe. Attach to the console of the launching process (e.g. PowerShell or cmd) so headless log output is visible.
+//--------------------------------------------------------------------------------------------------
+void riaAttachToParentConsole()
+{
+    // Only files and pipes are real redirections. A GUI process launched from a console (e.g. Windows Terminal) can
+    // inherit the console handles of the parent without being attached to the console, and writing to those blocks
+    auto isRedirected = []( DWORD stdHandle )
+    {
+        HANDLE handle = GetStdHandle( stdHandle );
+        if ( handle == nullptr || handle == INVALID_HANDLE_VALUE ) return false;
+
+        const DWORD fileType = GetFileType( handle );
+        return fileType == FILE_TYPE_DISK || fileType == FILE_TYPE_PIPE;
+    };
+
+    const bool stdOutRedirected = isRedirected( STD_OUTPUT_HANDLE );
+    const bool stdErrRedirected = isRedirected( STD_ERROR_HANDLE );
+    if ( stdOutRedirected && stdErrRedirected ) return;
+
+    if ( !AttachConsole( ATTACH_PARENT_PROCESS ) ) return;
+
+    FILE* stream = nullptr;
+    if ( !stdOutRedirected ) freopen_s( &stream, "CONOUT$", "w", stdout );
+    if ( !stdErrRedirected ) freopen_s( &stream, "CONOUT$", "w", stderr );
+
+    std::cout.clear();
+    std::cerr.clear();
+}
 #endif
 
 namespace internal
@@ -567,6 +599,8 @@ void enableHeadlessRendering()
 #ifndef WIN32
     // On Linux the attribute has no effect, force Mesa software rendering instead
     qputenv( "LIBGL_ALWAYS_SOFTWARE", "1" );
+#else
+    riaAttachToParentConsole();
 #endif
 
     RiaGuiApplication::enableHeadlessMode();
