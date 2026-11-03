@@ -34,29 +34,31 @@ if not os.path.isfile(path_name):
 # Launch ResInsight without showing any windows. Raises rips.RipsError on failure.
 resinsight = rips.Instance.launch(command_line_parameters=["--headless"])
 
-case = resinsight.project.load_case(path_name)
+# Always shut down the headless instance, as it has no window the user could close
+try:
+    case = resinsight.project.load_case(path_name)
 
-# Create a view, as the case is loaded without any views
-view = case.create_view()
-view.apply_cell_result(
-    result_type=rips.PropertyType.DYNAMIC_NATIVE, result_variable="SOIL"
-)
+    # Create a view, as the case is loaded without any views
+    view = case.create_view()
+    view.apply_cell_result(
+        result_type=rips.PropertyType.DYNAMIC_NATIVE, result_variable="SOIL"
+    )
 
-snapshot_folder = os.path.join(os.getcwd(), "snapshots")
-resinsight.set_export_folder(
-    export_type="SNAPSHOTS", path=snapshot_folder, create_folder=True
-)
+    snapshot_folder = os.path.join(os.getcwd(), "snapshots")
+    resinsight.set_export_folder(
+        export_type="SNAPSHOTS", path=snapshot_folder, create_folder=True
+    )
 
-# Export a snapshot of all 3D views in the project
-resinsight.project.export_snapshots(snapshot_type="VIEWS", width=800, height=600)
+    # Export a snapshot of all 3D views in the project
+    resinsight.project.export_snapshots(snapshot_type="VIEWS", width=800, height=600)
 
-exported_files = (
-    sorted(os.listdir(snapshot_folder)) if os.path.isdir(snapshot_folder) else []
-)
-for file_name in exported_files:
-    print("Exported snapshot: " + os.path.join(snapshot_folder, file_name))
-
-resinsight.exit()
+    exported_files = (
+        sorted(os.listdir(snapshot_folder)) if os.path.isdir(snapshot_folder) else []
+    )
+    for file_name in exported_files:
+        print("Exported snapshot: " + os.path.join(snapshot_folder, file_name))
+finally:
+    resinsight.exit()
 
 if not exported_files:
     sys.exit("No snapshots were exported to " + snapshot_folder)

@@ -712,10 +712,28 @@ RiaApplication::ApplicationStatus RiaGuiApplication::handleArguments( cvf::Progr
         // Use a logger writing to stdout instead of message panel
         // This is useful when executing regression tests on a build server, and this is the reason for creating the
         // logger when parsing the command line options
-        auto stdLogger = std::make_unique<RiaStdOutLogger>();
-        stdLogger->setLevel( int( RILogLevel::RI_LL_DEBUG ) );
+        // In headless mode a stdout logger already exists, reuse it to avoid duplicated log lines
+        RiaStdOutLogger* existingStdLogger = nullptr;
+        for ( auto logger : RiaLogging::loggerInstances() )
+        {
+            if ( auto candidate = dynamic_cast<RiaStdOutLogger*>( logger ) )
+            {
+                existingStdLogger = candidate;
+                break;
+            }
+        }
 
-        RiaLogging::appendLoggerInstance( std::move( stdLogger ) );
+        if ( existingStdLogger )
+        {
+            existingStdLogger->setLevel( int( RILogLevel::RI_LL_DEBUG ) );
+        }
+        else
+        {
+            auto stdLogger = std::make_unique<RiaStdOutLogger>();
+            stdLogger->setLevel( int( RILogLevel::RI_LL_DEBUG ) );
+
+            RiaLogging::appendLoggerInstance( std::move( stdLogger ) );
+        }
 
         RiaRegressionTestRunner::instance()->executeRegressionTests( regressionTestPath, QStringList() );
         return ApplicationStatus::EXIT_COMPLETED;
@@ -995,16 +1013,24 @@ RiaApplication::ApplicationStatus RiaGuiApplication::handleArguments( cvf::Progr
         if ( snapshotViews )
         {
             auto mainWnd = RiuMainWindow::instance();
-            if ( !isHeadless() )
+            if ( mainWnd )
             {
-                mainWnd->show();
-                mainWnd->raise();
+                if ( !isHeadless() )
+                {
+                    mainWnd->show();
+                    mainWnd->raise();
+                }
+
+                processEvents();
+
+                auto result =
+                    RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( snapshotFolder, snapshotWidth, snapshotHeight );
+                if ( !result ) snapshotErrors.push_back( result.error() );
             }
-
-            processEvents();
-
-            auto result = RicSnapshotAllViewsToFileFeature::exportSnapshotOfViewsIntoFolder( snapshotFolder, snapshotWidth, snapshotHeight );
-            if ( !result ) snapshotErrors.push_back( result.error() );
+            else
+            {
+                snapshotErrors.push_back( "No main window available for view snapshot export" );
+            }
         }
 
         auto mainPlotWnd = mainPlotWindow();

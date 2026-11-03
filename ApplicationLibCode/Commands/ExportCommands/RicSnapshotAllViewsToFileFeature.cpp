@@ -146,6 +146,8 @@ std::expected<void, QString> RicSnapshotAllViewsToFileFeature::exportSnapshotOfV
         if ( !exportSnapshotOfView( riv, snapshotPath.absolutePath(), width, height, prefix ) ) failedSnapshotCount++;
     }
 
+    // No OpenGL context is initialized if every snapshot failed, and the strings would be empty
+    if ( failedSnapshotCount < viewsForSnapshot.size() )
     {
         // The OpenGL strings are populated when the first context is initialized, which for hidden viewers happens
         // inside the first snapshot grab. Useful to verify that the expected renderer (e.g. software/llvmpipe) is used.

@@ -98,6 +98,9 @@ std::expected<void, QString> RicSnapshotAllPlotsToFileFeature::exportSnapshotOfP
     size_t attemptedSnapshotCount = 0;
     size_t failedSnapshotCount    = 0;
 
+    // Lay out the hidden plot window once, before the plot collection is iterated
+    layoutHiddenPlotWindow();
+
     std::vector<RimViewWindow*> viewWindows = RimMainPlotCollection::current()->descendantsIncludingThisOfType<RimViewWindow>();
     for ( auto viewWindow : viewWindows )
     {
@@ -106,7 +109,7 @@ std::expected<void, QString> RicSnapshotAllPlotsToFileFeature::exportSnapshotOfP
             attemptedSnapshotCount++;
 
             // The error is logged by saveSnapshotAs, only the number of failures is needed here
-            if ( !exportSnapshotOfPlot( viewWindow, snapshotPath.absolutePath(), width, height, activateWidget, prefix, preferredFileSuffix ) )
+            if ( !exportSnapshotOfPlotWithoutLayout( viewWindow, snapshotPath.absolutePath(), width, height, activateWidget, prefix, preferredFileSuffix ) )
             {
                 failedSnapshotCount++;
             }
@@ -133,6 +136,39 @@ std::expected<void, QString> RicSnapshotAllPlotsToFileFeature::exportSnapshotOfP
                                                                                      const QString& prefix,
                                                                                      const QString& preferredFileSuffix )
 {
+    layoutHiddenPlotWindow();
+
+    return exportSnapshotOfPlotWithoutLayout( viewWindow, snapshotFolderName, width, height, activateWidget, prefix, preferredFileSuffix );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// In headless mode the plot window has never been shown, so the dock widgets and plot widgets have never been laid
+/// out. Deliver the deferred resize events so all plot widgets get their proper sizes before rendering.
+//--------------------------------------------------------------------------------------------------
+void RicSnapshotAllPlotsToFileFeature::layoutHiddenPlotWindow()
+{
+    // RiaGuiApplication::instance() asserts when running as a console application, where command files can also
+    // trigger this export
+    if ( !RiaGuiApplication::isRunning() ) return;
+
+    if ( RiuPlotMainWindow* plotWindow = RiaGuiApplication::instance()->mainPlotWindow(); plotWindow && !plotWindow->isVisible() )
+    {
+        RiuTools::sendDeferredResizeEvents( plotWindow );
+        QApplication::processEvents();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::expected<void, QString> RicSnapshotAllPlotsToFileFeature::exportSnapshotOfPlotWithoutLayout( RimViewWindow* viewWindow,
+                                                                                                  const QString& snapshotFolderName,
+                                                                                                  int            width,
+                                                                                                  int            height,
+                                                                                                  bool           activateWidget,
+                                                                                                  const QString& prefix,
+                                                                                                  const QString& preferredFileSuffix )
+{
     if ( !viewWindow ) return std::unexpected( QString( "No plot to create a snapshot from" ) );
 
     QDir snapshotPath( snapshotFolderName );
@@ -141,20 +177,6 @@ std::expected<void, QString> RicSnapshotAllPlotsToFileFeature::exportSnapshotOfP
         if ( !snapshotPath.mkpath( "." ) )
         {
             return std::unexpected( QString( "Not able to create snapshot folder %1" ).arg( snapshotFolderName ) );
-        }
-    }
-
-    // RiaGuiApplication::instance() asserts when running as a console application, where command files can also
-    // trigger this export
-    if ( RiaGuiApplication::isRunning() )
-    {
-        if ( RiuPlotMainWindow* plotWindow = RiaGuiApplication::instance()->mainPlotWindow(); plotWindow && !plotWindow->isVisible() )
-        {
-            // In headless mode the plot window has never been shown, so the dock widgets and plot widgets have never
-            // been laid out. Deliver the deferred resize events so all plot widgets get their proper sizes before
-            // rendering.
-            RiuTools::sendDeferredResizeEvents( plotWindow );
-            QApplication::processEvents();
         }
     }
 

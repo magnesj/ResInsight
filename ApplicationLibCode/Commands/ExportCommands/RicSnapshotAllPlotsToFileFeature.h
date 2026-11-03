@@ -55,4 +55,15 @@ public:
 protected:
     void onActionTriggered( bool isChecked ) override;
     void setupActionLook( QAction* actionToSetup ) override;
+
+private:
+    static void layoutHiddenPlotWindow();
+
+    static std::expected<void, QString> exportSnapshotOfPlotWithoutLayout( RimViewWindow* viewWindow,
+                                                                           const QString& snapshotFolderName,
+                                                                           int            width,
+                                                                           int            height,
+                                                                           bool           activateWidget,
+                                                                           const QString& prefix,
+                                                                           const QString& preferredFileSuffix );
 };
