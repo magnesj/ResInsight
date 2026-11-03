@@ -890,16 +890,17 @@ void RimSummaryTable::createTableData()
 
         m_ensembleStatisticsCase->calculate( m_ensemble->allSummaryCases(), adr, false, { 0, 100 } );
 
+        // Percentiles use the switched (oil industry) convention: percentile 0 is the maximum, percentile 100 is the minimum
         auto statisticsAddress = adr;
         switch ( m_ensembleStatistic() )
         {
             case EnsembleStatistic::MIN:
                 statisticsAddress.setStatisticsType( RifEclipseSummaryAddressDefines::StatisticsType::CUSTOM );
-                statisticsAddress.setPercentile( 0 );
+                statisticsAddress.setPercentile( 100 );
                 break;
             case EnsembleStatistic::MAX:
                 statisticsAddress.setStatisticsType( RifEclipseSummaryAddressDefines::StatisticsType::CUSTOM );
-                statisticsAddress.setPercentile( 100 );
+                statisticsAddress.setPercentile( 0 );
                 break;
             case EnsembleStatistic::P10:
                 statisticsAddress.setStatisticsType( RifEclipseSummaryAddressDefines::StatisticsType::P10 );
