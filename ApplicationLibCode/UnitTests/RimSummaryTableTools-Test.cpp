@@ -35,3 +35,24 @@ TEST( RimSummaryTableToolsTest, SortVectorDataOnDateIsIndependentOfInputOrder )
         EXPECT_EQ( expected, categoryNames( tableData.vectorDataCollection ) );
     }
 }
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+TEST( RimSummaryTableToolsTest, LowerThresholdKeepsLargePositiveAndNegativeValues )
+{
+    using namespace RimSummaryTableTools;
+
+    const std::vector<double> onlyZeros     = { 0.0, 0.0, 0.0 };
+    const std::vector<double> smallValues   = { -10.0, 0.0, 20.0 };
+    const std::vector<double> largePositive = { 0.0, 80.0 };
+    const std::vector<double> largeNegative = { 0.0, -80.0 };
+
+    EXPECT_FALSE( hasValueAboveThreshold( onlyZeros, 50.0, -50.0 ) );
+    EXPECT_FALSE( hasValueAboveThreshold( smallValues, 50.0, -50.0 ) );
+    EXPECT_TRUE( hasValueAboveThreshold( largePositive, 50.0, -50.0 ) );
+    EXPECT_TRUE( hasValueAboveThreshold( largeNegative, 50.0, -50.0 ) );
+
+    // Without lower threshold, negative values are not considered
+    EXPECT_FALSE( hasValueAboveThreshold( largeNegative, 50.0 ) );
+}
