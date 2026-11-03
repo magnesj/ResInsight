@@ -100,7 +100,10 @@ void PdmFieldUiCap<FieldType>::setValueFromUiEditor( const QVariant& uiValue, bo
     if ( setUiValueDirectly )
     {
         typename FieldType::FieldDataType value;
-        PdmUiFieldSpecialization<typename FieldType::FieldDataType>::setFromVariant( uiValue, value );
+        PdmUiFieldSpecialization<typename FieldType::FieldDataType>::setFromVariant( this->m_fromUiConverter
+                                                                                         ? this->m_fromUiConverter( uiValue )
+                                                                                         : uiValue,
+                                                                                     value );
 
         // Clamp value if the field has a clampValue method
         if constexpr ( requires { m_field->clampValue( value ); } )
@@ -279,7 +282,8 @@ QList<PdmOptionItemInfo> PdmFieldUiCap<FieldType>::valueOptions() const
 template <typename FieldType>
 QVariant PdmFieldUiCap<FieldType>::toUiBasedQVariant() const
 {
-    return PdmUiFieldSpecialization<typename FieldType::FieldDataType>::convert( m_field->value() );
+    QVariant variant = PdmUiFieldSpecialization<typename FieldType::FieldDataType>::convert( m_field->value() );
+    return this->m_toUiConverter ? this->m_toUiConverter( variant ) : variant;
 }
 
 //--------------------------------------------------------------------------------------------------

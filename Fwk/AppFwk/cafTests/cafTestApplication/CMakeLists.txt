@@ -62,6 +62,9 @@ set(PROJECT_FILES
     PdmObjects/ApplicationEnum.cpp
     PdmObjects/OptionalFields.h
     PdmObjects/OptionalFields.cpp
+    PdmObjects/UnitQuantity.h
+    PdmObjects/UnitQuantityDemo.h
+    PdmObjects/UnitQuantityDemo.cpp
     PdmObjects/ValidationTest.h
     PdmObjects/ValidationTest.cpp
     PdmObjects/ReentrantEditorRebuild.h
