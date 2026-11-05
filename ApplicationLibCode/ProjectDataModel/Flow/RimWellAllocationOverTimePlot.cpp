@@ -45,6 +45,7 @@
 
 #include "RiuContextMenuLauncher.h"
 #include "RiuPlotCurve.h"
+#include "RiuPlotMainWindowTools.h"
 #include "RiuPlotWidget.h"
 #include "RiuQwtCurvePointTracker.h"
 #include "RiuQwtPlotTools.h"
@@ -222,6 +223,56 @@ QString RimWellAllocationOverTimePlot::asciiDataForPlotExport() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+QString RimWellAllocationOverTimePlot::reportTitle() const
+{
+    return m_userName();
+}
+
+//--------------------------------------------------------------------------------------------------
+/// One row per time step and one column per well, as shown in the plot
+//--------------------------------------------------------------------------------------------------
+std::vector<RiaReportSection> RimWellAllocationOverTimePlot::reportSections() const
+{
+    if ( !m_case || !m_case->eclipseCaseData() ) return {};
+
+    RigWellAllocationOverTime allocationOverTime = createWellAllocationOverTime();
+    const auto&               wellValuesMap      = allocationOverTime.wellValuesMap();
+
+    RiaReportTable table;
+    table.description = getValueTypeText();
+    table.columns.push_back( RiaReportColumn{ .title = "Time Step", .alignment = LEFT } );
+    for ( const auto& [wellName, wellValues] : wellValuesMap )
+    {
+        table.columns.push_back( RiaReportColumn{ .title = wellName, .doubleFormat = RifTextDataTableDoubleFormatting( RIF_FLOAT, 2 ) } );
+    }
+
+    for ( const auto& timeStep : allocationOverTime.timeStepDates() )
+    {
+        std::vector<RiaReportCellValue> row;
+        row.reserve( table.columns.size() );
+        row.emplace_back( timeStep );
+        for ( const auto& [wellName, wellValues] : wellValuesMap )
+        {
+            auto it = wellValues.find( timeStep );
+            row.emplace_back( it != wellValues.end() ? it->second : 0.0 );
+        }
+        table.rows.push_back( std::move( row ) );
+    }
+
+    return { RiaReportSection{ .title = "Allocation", .tables = { std::move( table ) } } };
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimWellAllocationOverTimePlot::supportsLiveUpdate() const
+{
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QString RimWellAllocationOverTimePlot::description() const
 {
     return uiName();
@@ -319,6 +370,8 @@ void RimWellAllocationOverTimePlot::onLoadDataAndUpdate()
 
     // Must be called after curves are added to plot - to apply correct legend font size
     doUpdateLayout();
+
+    RiuPlotMainWindowTools::updateReportWindow( this );
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -260,6 +260,59 @@ QString RimHistogramPlot::asciiDataForPlotExport() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+QString RimHistogramPlot::reportTitle() const
+{
+    return description();
+}
+
+//--------------------------------------------------------------------------------------------------
+/// One section per visible curve, with bin centers and frequencies
+//--------------------------------------------------------------------------------------------------
+std::vector<RiaReportSection> RimHistogramPlot::reportSections() const
+{
+    std::vector<RiaReportSection> sections;
+
+    const RifTextDataTableDoubleFormatting valueFormat( RIF_CONSISE, 6 );
+
+    for ( RimHistogramCurve* curve : histogramCurves() )
+    {
+        if ( !curve->isChecked() || !curve->dataSource() ) continue;
+
+        // Compute as line graph to get one value per bin, independent of how the curve is rendered
+        auto result = curve->dataSource()->compute( GraphType::LINE_GRAPH, frequencyType(), curve->isCumulative() );
+        if ( result.valuesX.empty() || result.valuesX.size() != result.valuesY.size() ) continue;
+
+        QString frequencyTitle = caf::AppEnum<FrequencyType>::uiText( frequencyType() );
+        if ( curve->isCumulative() ) frequencyTitle = "Cumulative " + frequencyTitle;
+
+        RiaReportTable table;
+        table.columns =
+            { RiaReportColumn{ .title = "Bin Center", .unit = QString::fromStdString( curve->unitNameX() ), .doubleFormat = valueFormat },
+              RiaReportColumn{ .title = frequencyTitle, .unit = QString::fromStdString( curve->unitNameY() ), .doubleFormat = valueFormat } };
+
+        table.rows.reserve( result.valuesX.size() );
+        for ( size_t i = 0; i < result.valuesX.size(); i++ )
+        {
+            table.rows.push_back( { result.valuesX[i], result.valuesY[i] } );
+        }
+
+        sections.push_back( RiaReportSection{ .title = curve->curveName(), .tables = { std::move( table ) } } );
+    }
+
+    return sections;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimHistogramPlot::supportsLiveUpdate() const
+{
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimHistogramPlot::onAxisSelected( RiuPlotAxis axis, bool toggle )
 {
     RiuPlotMainWindowTools::showPlotMainWindow();
@@ -774,6 +827,8 @@ void RimHistogramPlot::onLoadDataAndUpdate()
     updateStackedCurveData();
 
     updatePlotInfoLabel();
+
+    RiuPlotMainWindowTools::updateReportWindow( this );
 }
 
 //--------------------------------------------------------------------------------------------------

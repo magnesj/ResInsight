@@ -19,6 +19,7 @@
 #pragma once
 
 #include "RiaPlotDefines.h"
+#include "RiaReportDataProducer.h"
 
 #include "RimPlot.h"
 #include "RimPlotAxisProperties.h"
@@ -53,7 +54,7 @@ class QKeyEvent;
 ///
 ///
 //==================================================================================================
-class RimHistogramPlot : public RimPlot
+class RimHistogramPlot : public RimPlot, public RiaReportDataProducer
 {
     Q_OBJECT;
     CAF_PDM_HEADER_INIT;
@@ -104,6 +105,10 @@ public:
     QWidget* viewWidget() override;
 
     QString asciiDataForPlotExport() const override;
+
+    QString                       reportTitle() const override;
+    std::vector<RiaReportSection> reportSections() const override;
+    bool                          supportsLiveUpdate() const override;
 
     FrequencyType frequencyType() const;
     GraphType     graphType() const;

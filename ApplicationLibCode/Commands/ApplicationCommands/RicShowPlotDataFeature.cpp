@@ -20,6 +20,7 @@
 
 #include "RiaFeatureCommandContext.h"
 #include "RiaGuiApplication.h"
+#include "RiaReportDataProducer.h"
 
 #include "SummaryPlotCommands/RicAsciiExportSummaryPlotFeature.h"
 
@@ -31,6 +32,7 @@
 #include "RimTabbedTextProvider.h"
 
 #include "RiuPlotMainWindow.h"
+#include "RiuPlotMainWindowTools.h"
 #include "RiuTextDialog.h"
 
 #include "cafSelectionManagerTools.h"
@@ -55,6 +57,7 @@ bool RicShowPlotDataFeature::isCommandEnabled() const
 
     for ( auto plot : selection )
     {
+        if ( dynamic_cast<const RiaReportDataProducer*>( plot ) ) return true;
         if ( dynamic_cast<const RimTabbedTextProducer*>( plot ) ) return true;
         if ( dynamic_cast<const RimReportPlotGroup*>( plot ) ) return true;
         if ( dynamic_cast<const RimPlainPlotDataProducer*>( plot ) ) return true;
@@ -92,8 +95,17 @@ void RicShowPlotDataFeature::onActionTriggered( bool isChecked )
         RicShowPlotDataFeature::showTextWindow( title, text );
     };
 
+    bool isReportWindowShown = false;
     for ( auto* plot : selection )
     {
+        if ( dynamic_cast<RiaReportDataProducer*>( plot ) )
+        {
+            // The report window shows one plot at a time
+            if ( !isReportWindowShown ) RiuPlotMainWindowTools::showReportWindow( plot );
+            isReportWindowShown = true;
+            continue;
+        }
+
         if ( auto* producer = dynamic_cast<RimTabbedTextProducer*>( plot ) )
         {
             RicShowPlotDataFeature::showTabbedTextWindow( producer->createTabbedTextProvider() );

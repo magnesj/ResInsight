@@ -46,6 +46,8 @@
 #include "qwt_plot.h"
 #include "qwt_text.h"
 
+#include <algorithm>
+#include <cmath>
 #include <limits>
 #include <map>
 #include <set>
@@ -211,6 +213,8 @@ void RimCorrelationPlot::onLoadDataAndUpdate()
         updatePlotTitle();
         m_plotWidget->scheduleReplot();
     }
+
+    RiuPlotMainWindowTools::updateReportWindow( this );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -321,6 +325,73 @@ QString RimCorrelationPlot::asciiDataForPlotExport() const
     addDataToChartBuilder( chartBuilder );
 
     return chartBuilder.plotContentAsText();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimCorrelationPlot::reportTitle() const
+{
+    return description();
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Correlation per parameter, sorted and filtered as shown in the plot
+//--------------------------------------------------------------------------------------------------
+std::vector<RiaReportSection> RimCorrelationPlot::reportSections() const
+{
+    if ( ensembles().empty() || addresses().empty() ) return {};
+
+    auto ensemble = *ensembles().begin();
+    auto address  = *addresses().begin();
+
+    auto correlations =
+        ensemble->parameterCorrelations( address, m_timeStep().toSecsSinceEpoch(), m_selectedParametersList(), filterEnsembleCases( ensemble ) );
+
+    struct ParameterValue
+    {
+        QString name;
+        double  value;
+        double  sortValue;
+    };
+
+    std::vector<ParameterValue> values;
+    for ( const auto& [parameter, correlation] : correlations )
+    {
+        const double value     = m_showAbsoluteValues() ? std::abs( correlation ) : correlation;
+        const double sortValue = m_sortByAbsoluteValues() ? std::abs( correlation ) : correlation;
+        values.push_back( { parameter.name, value, sortValue } );
+    }
+
+    std::stable_sort( values.begin(), values.end(), []( const auto& a, const auto& b ) { return a.sortValue > b.sortValue; } );
+
+    if ( m_showOnlyTopNCorrelations() && m_topNFilterCount() >= 0 && values.size() > static_cast<size_t>( m_topNFilterCount() ) )
+    {
+        values.resize( static_cast<size_t>( m_topNFilterCount() ) );
+    }
+
+    RiaReportTable table;
+    table.description = QString( "Pearson correlation coefficient%1 between the ensemble parameters and %2 at %3" )
+                            .arg( m_showAbsoluteValues() ? " (absolute value)" : "" )
+                            .arg( QString::fromStdString( address.uiText() ) )
+                            .arg( timeStepString() );
+    table.columns = { RiaReportColumn{ .title = "Parameter", .alignment = LEFT },
+                      RiaReportColumn{ .title = "Correlation", .doubleFormat = RifTextDataTableDoubleFormatting( RIF_FLOAT, 3 ) } };
+
+    for ( const auto& parameterValue : values )
+    {
+        table.rows.push_back( { parameterValue.name, parameterValue.value } );
+    }
+
+    return { RiaReportSection{ .title = "Correlations", .tables = { std::move( table ) } } };
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimCorrelationPlot::supportsLiveUpdate() const
+{
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------
