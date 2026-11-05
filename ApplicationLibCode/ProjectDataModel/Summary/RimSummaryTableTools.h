@@ -20,6 +20,7 @@
 
 #include <QString>
 
+#include <optional>
 #include <set>
 #include <vector>
 
@@ -43,11 +44,15 @@ struct TableData
     double                  maxValue       = 0.0;
     double                  minValue       = 0.0;
     double                  thresholdValue = 0.0;
+    std::optional<double>   lowerThresholdValue;
     QString                 unitName;
 };
 
-bool                    hasValueAboveThreshold( const std::vector<double>& values, double thresholdValue );
-std::vector<VectorData> vectorsAboveThreshold( const std::vector<VectorData>& vectorDataCollection, double thresholdValue );
+// A value is beyond the thresholds if it is above thresholdValue, or below lowerThresholdValue when a lower threshold is given
+bool hasValueAboveThreshold( const std::vector<double>& values, double thresholdValue, std::optional<double> lowerThresholdValue = std::nullopt );
+std::vector<VectorData> vectorsAboveThreshold( const std::vector<VectorData>& vectorDataCollection,
+                                               double                         thresholdValue,
+                                               std::optional<double>          lowerThresholdValue = std::nullopt );
 void                    sortVectorDataOnDate( TableData& rTableData );
 std::vector<QString>    categoryNames( const std::vector<VectorData>& vectorDataCollection );
 } // namespace RimSummaryTableTools
