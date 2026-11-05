@@ -20,6 +20,8 @@
 
 #include "Summary/RiaSummaryCurveDefinition.h" // use of caf::Signal requires this include
 
+#include "RiaReportDataProducer.h"
+
 #include "RimAbstractCorrelationPlot.h"
 
 #include "cafPdmFieldCvfColor.h"
@@ -34,7 +36,7 @@ class RiuPlotItem;
 ///
 ///
 //==================================================================================================
-class RimCorrelationPlot : public RimAbstractCorrelationPlot
+class RimCorrelationPlot : public RimAbstractCorrelationPlot, public RiaReportDataProducer
 {
     CAF_PDM_HEADER_INIT;
 
@@ -44,6 +46,10 @@ public:
 public:
     RimCorrelationPlot();
     ~RimCorrelationPlot() override;
+
+    QString                       reportTitle() const override;
+    std::vector<RiaReportSection> reportSections() const override;
+    bool                          supportsLiveUpdate() const override;
 
     bool showAbsoluteValues() const;
     void setShowAbsoluteValues( bool showAbsoluteValues );

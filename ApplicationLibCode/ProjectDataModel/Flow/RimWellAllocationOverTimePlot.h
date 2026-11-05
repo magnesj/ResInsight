@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "RiaReportDataProducer.h"
+
 #include "RimPlot.h"
 
 #include "cafPdmField.h"
@@ -43,7 +45,7 @@ namespace cvf
 class Color3f;
 }
 
-class RimWellAllocationOverTimePlot : public RimPlot
+class RimWellAllocationOverTimePlot : public RimPlot, public RiaReportDataProducer
 {
     CAF_PDM_HEADER_INIT;
 
@@ -79,6 +81,11 @@ public:
     QString        asciiDataForPlotExport() const override;
     void           reattachAllCurves() override {};
     void           detachAllCurves() override {};
+
+    // RiaReportDataProducer implementations
+    QString                       reportTitle() const override;
+    std::vector<RiaReportSection> reportSections() const override;
+    bool                          supportsLiveUpdate() const override;
 
     // RimPlotWindow implementations
     QString description() const override;
