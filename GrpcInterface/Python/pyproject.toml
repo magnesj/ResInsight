@@ -22,6 +22,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+mcp = ["mcp>=1.30.0,<2"]
 dev = [
     # 1.82.x bundles a protoc that emits protobuf 7.35.x gencode, which no
     # protobuf 6 runtime can load - including its 1.82.0 pre-releases, which
@@ -43,6 +44,9 @@ dev = [
 ]
 # Needed by rips.taskmaestro_helper (the ResInsight workflow editor)
 workflow = ["taskmaestro>=0.4,<0.5"]
+
+[project.scripts]
+rips-mcp = "rips.mcp_server:main"
 
 [project.urls]
 Homepage = "http://www.resinsight.org"
