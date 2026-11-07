@@ -36,6 +36,38 @@ public:
     virtual QString                       reportTitle() const    = 0;
     virtual std::vector<RiaReportSection> reportSections() const = 0;
 
+    // Sections used when the producer is shown together with other plots, e.g. as part of a multi plot.
+    // Override to reduce the number of sections, typically to one.
+    virtual std::vector<RiaReportSection> compactReportSections() const { return reportSections(); }
+
     // If true, an open report window showing this producer is refreshed when the producer is updated
     virtual bool supportsLiveUpdate() const { return false; }
+
+protected:
+    // Combines the compact sections of child producers, used by plots containing other plots.
+    // Section titles are prefixed with the child title when a child has more than one section.
+    static std::vector<RiaReportSection> childReportSections( const std::vector<const RiaReportDataProducer*>& children )
+    {
+        std::vector<RiaReportSection> sections;
+        for ( auto child : children )
+        {
+            if ( !child ) continue;
+
+            const QString childTitle    = child->reportTitle();
+            auto          childSections = child->compactReportSections();
+            for ( auto& section : childSections )
+            {
+                if ( childSections.size() == 1 || section.title.isEmpty() )
+                {
+                    if ( !childTitle.isEmpty() ) section.title = childTitle;
+                }
+                else if ( !childTitle.isEmpty() )
+                {
+                    section.title = childTitle + " - " + section.title;
+                }
+                sections.push_back( std::move( section ) );
+            }
+        }
+        return sections;
+    }
 };

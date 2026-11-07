@@ -94,6 +94,8 @@ private:
 
     void onDisplayModeChanged();
     void onFormatOptionsChanged();
+    void onCurrentTabChanged( int index );
+    void loadAllSections();
 
     static void copySelectedCells( QTableView* tableView );
 

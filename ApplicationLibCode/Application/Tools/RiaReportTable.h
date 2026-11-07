@@ -23,6 +23,7 @@
 #include <QDateTime>
 #include <QString>
 
+#include <functional>
 #include <variant>
 #include <vector>
 
@@ -58,4 +59,17 @@ struct RiaReportSection
 {
     QString                     title;
     std::vector<RiaReportTable> tables;
+
+    // Optional, used for expensive data: the tables are created by the factory the first time they are needed.
+    // The factory must handle that the producer object is deleted before it is called.
+    std::function<std::vector<RiaReportTable>()> tableFactory;
+
+    bool hasPendingTables() const { return tableFactory != nullptr; }
+
+    void loadTables()
+    {
+        if ( !tableFactory ) return;
+        tables       = tableFactory();
+        tableFactory = nullptr;
+    }
 };

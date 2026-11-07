@@ -26,7 +26,6 @@
 
 #include "RimGridCrossPlotCurve.h"
 #include "RimGridCrossPlotDataSet.h"
-#include "RimGridCrossPlotTextProvider.h"
 #include "RimMultiPlot.h"
 #include "RimPlotAxisProperties.h"
 
@@ -475,6 +474,8 @@ void RimGridCrossPlot::onLoadDataAndUpdate()
     updateCurveNamesAndPlotTitle();
     updatePlot();
     updateInfoBox();
+
+    RiuPlotMainWindowTools::updateReportWindow( this );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -645,9 +646,43 @@ QString RimGridCrossPlot::asciiDataForPlotExport() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::unique_ptr<RimTabbedTextProvider> RimGridCrossPlot::createTabbedTextProvider() const
+QString RimGridCrossPlot::reportTitle() const
 {
-    return std::make_unique<RimGridCrossPlotTextProvider>( const_cast<RimGridCrossPlot*>( this ) );
+    return createAutoName();
+}
+
+//--------------------------------------------------------------------------------------------------
+/// One section per data set. The tables are created when shown, as a data set can contain all grid cells.
+//--------------------------------------------------------------------------------------------------
+std::vector<RiaReportSection> RimGridCrossPlot::reportSections() const
+{
+    std::vector<RiaReportSection> sections;
+    for ( RimGridCrossPlotDataSet* dataSet : m_crossPlotDataSets )
+    {
+        RiaReportSection section;
+        section.title = dataSet->createAutoName();
+
+        caf::PdmPointer<RimGridCrossPlotDataSet> dataSetPtr( dataSet );
+        section.tableFactory = [dataSetPtr]() -> std::vector<RiaReportTable>
+        {
+            if ( dataSetPtr.isNull() ) return {};
+
+            auto table = dataSetPtr->createReportTable();
+            if ( table.columns.empty() ) return {};
+            return { std::move( table ) };
+        };
+
+        sections.push_back( std::move( section ) );
+    }
+    return sections;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimGridCrossPlot::supportsLiveUpdate() const
+{
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------

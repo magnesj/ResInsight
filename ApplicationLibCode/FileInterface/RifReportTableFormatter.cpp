@@ -257,6 +257,16 @@ QString RifReportTableFormatter::format( const QString&                       ti
                                          Format                               format,
                                          const RifReportFormatOptions&        options )
 {
+    if ( std::any_of( sections.begin(), sections.end(), []( const RiaReportSection& section ) { return section.hasPendingTables(); } ) )
+    {
+        auto loadedSections = sections;
+        for ( auto& section : loadedSections )
+        {
+            section.loadTables();
+        }
+        return RifReportTableFormatter::format( title, loadedSections, format, options );
+    }
+
     size_t tableCount = 0;
     for ( const auto& section : sections )
     {

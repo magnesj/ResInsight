@@ -1382,6 +1382,46 @@ void RimGridCrossPlotDataSet::exportFormattedData( RifTextDataTableFormatter& fo
 }
 
 //--------------------------------------------------------------------------------------------------
+/// One row per data point, with group index and name if the data set is grouped
+//--------------------------------------------------------------------------------------------------
+RiaReportTable RimGridCrossPlotDataSet::createReportTable() const
+{
+    RiaReportTable table;
+    if ( m_groupedResults.empty() ) return table;
+
+    const RifTextDataTableDoubleFormatting valueFormat( RIF_CONSISE, 6 );
+
+    table.columns = { RiaReportColumn{ .title = m_xAxisProperty->resultVariableUiShortName(), .doubleFormat = valueFormat },
+                      RiaReportColumn{ .title = m_yAxisProperty->resultVariableUiShortName(), .doubleFormat = valueFormat } };
+
+    const bool isGrouped = m_grouping() != NO_GROUPING;
+    if ( isGrouped )
+    {
+        table.columns.push_back( RiaReportColumn{ .title = "Group Index" } );
+        table.columns.push_back( RiaReportColumn{ .title = "Group Description", .alignment = LEFT } );
+    }
+
+    for ( const auto& [groupIndex, result] : m_groupedResults )
+    {
+        const QString groupName = isGrouped ? createGroupName( groupIndex ) : QString();
+        const size_t  count     = std::min( result.xValues.size(), result.yValues.size() );
+        for ( size_t i = 0; i < count; ++i )
+        {
+            if ( isGrouped )
+            {
+                table.rows.push_back( { result.xValues[i], result.yValues[i], groupIndex, groupName } );
+            }
+            else
+            {
+                table.rows.push_back( { result.xValues[i], result.yValues[i] } );
+            }
+        }
+    }
+
+    return table;
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 bool RimGridCrossPlotDataSet::isXAxisLogarithmic() const

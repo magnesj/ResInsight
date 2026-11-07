@@ -163,3 +163,28 @@ TEST( RifReportTableFormatter, CsvOfSingleTableSectionHasNoTitleLines )
     const QString csvTwoTables = RifReportTableFormatter::format( "Report", { section }, RifReportTableFormatter::Format::CSV, options );
     EXPECT_TRUE( csvTwoTables.startsWith( "Section - Rates\nWell,Rate [Sm3/d]\n" ) );
 }
+
+TEST( RifReportTableFormatter, LoadsPendingSectionTablesWhenFormatting )
+{
+    int factoryCallCount = 0;
+
+    RiaReportSection section;
+    section.title        = "Lazy";
+    section.tableFactory = [&factoryCallCount]()
+    {
+        factoryCallCount++;
+        return std::vector<RiaReportTable>{ createTable() };
+    };
+
+    RifReportFormatOptions options;
+    const QString          csv = RifReportTableFormatter::format( QString(), { section }, RifReportTableFormatter::Format::CSV, options );
+
+    EXPECT_EQ( 1, factoryCallCount );
+    EXPECT_TRUE( csv.contains( "A-1,1234.57" ) );
+    EXPECT_TRUE( section.hasPendingTables() );
+
+    section.loadTables();
+    EXPECT_EQ( 2, factoryCallCount );
+    EXPECT_FALSE( section.hasPendingTables() );
+    EXPECT_EQ( 1u, section.tables.size() );
+}

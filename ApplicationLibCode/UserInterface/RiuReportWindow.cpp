@@ -48,6 +48,7 @@
 #include <QMenu>
 #include <QMimeData>
 #include <QPlainTextEdit>
+#include <QSignalBlocker>
 #include <QSpinBox>
 #include <QSplitter>
 #include <QStackedWidget>
@@ -120,6 +121,7 @@ RiuReportWindow::RiuReportWindow( QWidget* parent )
 
     m_tabWidget = new QTabWidget( this );
     m_tabWidget->setDocumentMode( true );
+    connect( m_tabWidget, &QTabWidget::currentChanged, this, &RiuReportWindow::onCurrentTabChanged );
     m_stackedWidget->addWidget( m_tabWidget );
 
     mainLayout->addWidget( m_stackedWidget, 1 );
@@ -210,7 +212,21 @@ void RiuReportWindow::refresh()
 //--------------------------------------------------------------------------------------------------
 void RiuReportWindow::scheduleRefreshIfShowing( const caf::PdmObjectHandle* object )
 {
-    if ( !object || object != m_producerObject.p() ) return;
+    if ( !object || m_producerObject.isNull() ) return;
+
+    // Containers such as multi plots show data from their child plots, so updates of descendants are relevant
+    bool isProducerOrDescendant = false;
+    for ( auto current = object; current; )
+    {
+        if ( current == m_producerObject.p() )
+        {
+            isProducerOrDescendant = true;
+            break;
+        }
+        auto parentField = current->parentField();
+        current          = parentField ? parentField->ownerObject() : nullptr;
+    }
+    if ( !isProducerOrDescendant ) return;
 
     auto dataProducer = producer();
     if ( !dataProducer || !dataProducer->supportsLiveUpdate() ) return;
@@ -317,6 +333,9 @@ QWidget* RiuReportWindow::createToolBar()
 //--------------------------------------------------------------------------------------------------
 void RiuReportWindow::rebuildContent()
 {
+    // Tabs are added and replaced below, and the sections are loaded explicitly
+    QSignalBlocker tabSignalBlocker( m_tabWidget );
+
     const int currentTabIndex = m_tabWidget->currentIndex();
 
     while ( m_tabWidget->count() > 0 )
@@ -342,15 +361,64 @@ void RiuReportWindow::rebuildContent()
         return;
     }
 
+    const int sectionCount  = static_cast<int>( m_sections.size() );
+    const int shownTabIndex = ( currentTabIndex >= 0 && currentTabIndex < sectionCount ) ? currentTabIndex : 0;
+
+    // Sections with pending tables are only loaded when their tab is shown
+    m_sections[shownTabIndex].loadTables();
+
     for ( const auto& section : m_sections )
     {
         const QString tabTitle = section.title.isEmpty() ? QString( "Data" ) : section.title;
-        m_tabWidget->addTab( createSectionWidget( section ), tabTitle );
+
+        QWidget* tabContent = nullptr;
+        if ( section.hasPendingTables() )
+        {
+            tabContent = new QWidget;
+            tabContent->setProperty( "isPendingSection", true );
+        }
+        else
+        {
+            tabContent = createSectionWidget( section );
+        }
+        m_tabWidget->addTab( tabContent, tabTitle );
     }
 
-    if ( currentTabIndex >= 0 && currentTabIndex < m_tabWidget->count() ) m_tabWidget->setCurrentIndex( currentTabIndex );
+    m_tabWidget->setCurrentIndex( shownTabIndex );
 
     m_stackedWidget->setCurrentWidget( m_tabWidget );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuReportWindow::onCurrentTabChanged( int index )
+{
+    if ( index < 0 || index >= static_cast<int>( m_sections.size() ) || index >= m_tabWidget->count() ) return;
+
+    QWidget* tabContent = m_tabWidget->widget( index );
+    if ( !tabContent || !tabContent->property( "isPendingSection" ).toBool() ) return;
+
+    m_sections[index].loadTables();
+
+    QSignalBlocker tabSignalBlocker( m_tabWidget );
+
+    const QString tabTitle = m_tabWidget->tabText( index );
+    m_tabWidget->removeTab( index );
+    tabContent->deleteLater();
+    m_tabWidget->insertTab( index, createSectionWidget( m_sections[index] ), tabTitle );
+    m_tabWidget->setCurrentIndex( index );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuReportWindow::loadAllSections()
+{
+    for ( auto& section : m_sections )
+    {
+        section.loadTables();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -394,6 +462,13 @@ void RiuReportWindow::selectProducerObject()
 QWidget* RiuReportWindow::createSectionWidget( const RiaReportSection& section )
 {
     if ( displayMode() != DisplayMode::TABLE ) return createTextWidget( section );
+
+    if ( section.tables.empty() )
+    {
+        auto label = new QLabel( "No data available." );
+        label->setAlignment( Qt::AlignCenter );
+        return label;
+    }
 
     if ( section.tables.size() == 1 ) return createTableWidget( section.tables.front() );
 
@@ -516,6 +591,7 @@ void RiuReportWindow::copyAllTabs()
 {
     if ( m_sections.empty() ) return;
 
+    loadAllSections();
     copyToClipboard( m_title, m_sections );
 }
 
@@ -576,6 +652,8 @@ void RiuReportWindow::exportToFile()
     if ( fileName.isEmpty() ) return;
 
     RiaApplication::instance()->setLastUsedDialogDirectory( "PLOT_ASCIIEXPORT_DIR", QFileInfo( fileName ).absolutePath() );
+
+    loadAllSections();
 
     const auto format = displayMode() == DisplayMode::TABLE ? RifReportTableFormatter::Format::HTML : textFormat();
     const auto text   = RifReportTableFormatter::format( m_title, m_sections, format, formatOptions() );

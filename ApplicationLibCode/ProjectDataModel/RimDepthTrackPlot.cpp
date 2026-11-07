@@ -918,12 +918,44 @@ QString RimDepthTrackPlot::asciiDataForPlotExport() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+QString RimDepthTrackPlot::reportTitle() const
+{
+    return description();
+}
+
+//--------------------------------------------------------------------------------------------------
+/// One section per visible track
+//--------------------------------------------------------------------------------------------------
+std::vector<RiaReportSection> RimDepthTrackPlot::reportSections() const
+{
+    std::vector<const RiaReportDataProducer*> children;
+    for ( RimPlot* plot : plots() )
+    {
+        if ( plot->showWindow() ) children.push_back( dynamic_cast<const RiaReportDataProducer*>( plot ) );
+    }
+
+    return childReportSections( children );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimDepthTrackPlot::supportsLiveUpdate() const
+{
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimDepthTrackPlot::onPlotAdditionOrRemoval()
 {
     calculateAvailableDepthRange();
     updateZoom();
     updateSubPlotNames();
     updateAllRequiredEditors();
+
+    RiuPlotMainWindowTools::updateReportWindow( this );
 }
 
 //--------------------------------------------------------------------------------------------------
