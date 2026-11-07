@@ -45,7 +45,7 @@ namespace cvf
 class Color3f;
 }
 
-class RimWellAllocationOverTimePlot : public RimPlot, public RiaReportDataProducer
+class RimWellAllocationOverTimePlot : public RimPlot
 {
     CAF_PDM_HEADER_INIT;
 
@@ -78,7 +78,6 @@ public:
     void           setAutoScaleYEnabled( bool enabled ) override {};
     void           updateAxes() override {};
     void           updateLegend() override {};
-    QString        asciiDataForPlotExport() const override;
     void           reattachAllCurves() override {};
     void           detachAllCurves() override {};
 

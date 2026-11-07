@@ -36,7 +36,7 @@ class RiuPlotItem;
 ///
 ///
 //==================================================================================================
-class RimCorrelationPlot : public RimAbstractCorrelationPlot, public RiaReportDataProducer
+class RimCorrelationPlot : public RimAbstractCorrelationPlot
 {
     CAF_PDM_HEADER_INIT;
 
@@ -72,10 +72,9 @@ private:
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
 
-    void    onLoadDataAndUpdate() override;
-    void    onDataSourceChanged() override;
-    void    updateAxes() override;
-    QString asciiDataForPlotExport() const override;
+    void onLoadDataAndUpdate() override;
+    void onDataSourceChanged() override;
+    void updateAxes() override;
 
     // Private methods
     void addDataToChartBuilder( RiuGroupedBarChartBuilder& chartBuilder ) const;

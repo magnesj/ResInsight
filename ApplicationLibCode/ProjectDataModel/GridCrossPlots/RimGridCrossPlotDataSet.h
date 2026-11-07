@@ -132,7 +132,6 @@ public:
     bool           groupingByCategoryResult() const;
     bool           groupingEnabled() const;
     void           swapAxisProperties( bool updatePlot );
-    void           exportFormattedData( RifTextDataTableFormatter& formatter ) const;
     RiaReportTable createReportTable() const;
 
     bool isXAxisLogarithmic() const;

@@ -432,14 +432,6 @@ RiuSummaryPlot* RimSummaryPlot::summaryPlotWidget() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RimSummaryPlot::asciiDataForPlotExport() const
-{
-    return asciiDataForSummaryPlotExport( RiaDefines::DateTimePeriod::YEAR, false );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 QString RimSummaryPlot::reportTitle() const
 {
     return description();

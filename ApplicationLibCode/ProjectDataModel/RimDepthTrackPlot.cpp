@@ -51,6 +51,8 @@
 #include "RimWellLogTrack.h"
 #include "RimWellPath.h"
 
+#include "RifReportTableFormatter.h"
+
 #include "RiuMultiPlotPage.h"
 #include "RiuPlotMainWindow.h"
 #include "RiuPlotMainWindowTools.h"
@@ -902,17 +904,7 @@ void RimDepthTrackPlot::setAvailableDepthTypes( const std::set<DepthTypeEnum>& d
 //--------------------------------------------------------------------------------------------------
 QString RimDepthTrackPlot::asciiDataForPlotExport() const
 {
-    QString plotContentAsText;
-
-    for ( RimPlot* plot : plots() )
-    {
-        if ( plot->showWindow() )
-        {
-            plotContentAsText += plot->asciiDataForPlotExport();
-        }
-    }
-
-    return plotContentAsText;
+    return RifReportTableFormatter::format( QString(), reportSections(), RifReportTableFormatter::Format::TEXT, RifReportFormatOptions() );
 }
 
 //--------------------------------------------------------------------------------------------------

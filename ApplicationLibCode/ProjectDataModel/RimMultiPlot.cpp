@@ -570,24 +570,6 @@ void RimMultiPlot::zoomAllYAxes()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RimMultiPlot::asciiDataForPlotExport() const
-{
-    QString out = multiPlotTitle() + "\n";
-
-    for ( RimPlot* plot : plots() )
-    {
-        if ( plot->showWindow() )
-        {
-            out += plot->asciiDataForPlotExport();
-        }
-    }
-
-    return out;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 QString RimMultiPlot::reportTitle() const
 {
     const QString title = multiPlotTitle();

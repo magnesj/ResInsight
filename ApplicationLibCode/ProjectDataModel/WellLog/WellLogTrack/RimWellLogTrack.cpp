@@ -914,62 +914,6 @@ RimWellLogTrack::ExportData RimWellLogTrack::exportData() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RimWellLogTrack::asciiDataForPlotExport() const
-{
-    QString out = "\n" + description() + "\n";
-
-    const ExportData data = exportData();
-
-    // Header
-
-    if ( data.depthType == RiaDefines::DepthType::CONNECTION_NUMBER )
-    {
-        out += "Connection";
-        if ( data.exportCellTexts ) out += " \tCell (I, J, K)";
-    }
-    else if ( data.depthType == RiaDefines::DepthType::MEASURED_DEPTH )
-    {
-        out += "MD   ";
-    }
-    else if ( data.depthType == RiaDefines::DepthType::PSEUDO_LENGTH )
-    {
-        out += "PL   ";
-    }
-    else if ( data.depthType == RiaDefines::DepthType::TRUE_VERTICAL_DEPTH )
-    {
-        out += "TVDMSL  ";
-    }
-    else if ( data.depthType == RiaDefines::DepthType::TRUE_VERTICAL_DEPTH_RKB )
-    {
-        out += "TVDRKB  ";
-    }
-
-    for ( const QString& name : data.curveNames )
-    {
-        out += "  \t" + name;
-    }
-    out += "\n";
-
-    for ( const ExportRow& row : data.rows )
-    {
-        out += QString::number( row.depth, 'f', 3 );
-        if ( data.exportCellTexts )
-        {
-            out += " \t" + row.cellText;
-        }
-        for ( double value : row.values )
-        {
-            out += QString( " \t%1" ).arg( QString::number( value, 'f', 3 ), 12 );
-        }
-        out += "\n";
-    }
-
-    return out;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 QString RimWellLogTrack::reportTitle() const
 {
     return description();

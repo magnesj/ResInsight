@@ -319,17 +319,6 @@ void RimCorrelationPlot::onPlotItemSelected( std::shared_ptr<RiuPlotItem> plotIt
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RimCorrelationPlot::asciiDataForPlotExport() const
-{
-    RiuGroupedBarChartBuilder chartBuilder;
-    addDataToChartBuilder( chartBuilder );
-
-    return chartBuilder.plotContentAsText();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 QString RimCorrelationPlot::reportTitle() const
 {
     return description();

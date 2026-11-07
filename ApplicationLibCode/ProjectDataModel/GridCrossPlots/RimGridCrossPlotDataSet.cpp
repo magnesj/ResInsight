@@ -1329,59 +1329,6 @@ void RimGridCrossPlotDataSet::swapAxisProperties( bool updatePlot )
 }
 
 //--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimGridCrossPlotDataSet::exportFormattedData( RifTextDataTableFormatter& formatter ) const
-{
-    if ( m_groupedResults.empty() ) return;
-
-    QString xTitle = QString( "%1" ).arg( m_xAxisProperty->resultVariableUiShortName() );
-    QString yTitle = QString( "%1" ).arg( m_yAxisProperty->resultVariableUiShortName() );
-
-    if ( m_grouping != NO_GROUPING )
-    {
-        std::vector<RifTextDataTableColumn> header = { RifTextDataTableColumn( xTitle ),
-                                                       RifTextDataTableColumn( yTitle ),
-                                                       RifTextDataTableColumn( "Group Index" ),
-                                                       RifTextDataTableColumn( "Group Description" ) };
-
-        formatter.header( header );
-    }
-    else
-    {
-        std::vector<RifTextDataTableColumn> header = { RifTextDataTableColumn( xTitle ), RifTextDataTableColumn( yTitle ) };
-        formatter.header( header );
-    }
-
-    caf::ProgressInfo progress( m_groupedResults.size(), "Gathering Data Points" );
-    for ( auto it = m_groupedResults.begin(); it != m_groupedResults.end(); ++it )
-    {
-        auto task = progress.task( QString( "Exporting Group %1" ).arg( it->first ) );
-
-        RigEclipseCrossPlotResult res = it->second;
-
-        for ( size_t i = 0; i < it->second.xValues.size(); ++i )
-        {
-            if ( m_grouping() == NO_GROUPING )
-            {
-                formatter.add( res.xValues[i] );
-                formatter.add( res.yValues[i] );
-            }
-            else
-            {
-                int     groupIndex = it->first;
-                QString groupName  = createGroupName( groupIndex );
-                formatter.add( res.xValues[i] );
-                formatter.add( res.yValues[i] );
-                formatter.add( groupIndex );
-                formatter.add( groupName );
-            }
-            formatter.rowCompleted();
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
 /// One row per data point, with group index and name if the data set is grouped
 //--------------------------------------------------------------------------------------------------
 RiaReportTable RimGridCrossPlotDataSet::createReportTable() const

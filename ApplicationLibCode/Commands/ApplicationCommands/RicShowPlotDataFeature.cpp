@@ -22,10 +22,8 @@
 #include "RiaGuiApplication.h"
 #include "RiaReportDataProducer.h"
 
-#include "RimPlainPlotDataProducer.h"
 #include "RimPlot.h"
 #include "RimPlotWindow.h"
-#include "RimReportPlotGroup.h"
 
 #include "RiuPlotMainWindow.h"
 #include "RiuPlotMainWindowTools.h"
@@ -54,8 +52,6 @@ bool RicShowPlotDataFeature::isCommandEnabled() const
     for ( auto plot : selection )
     {
         if ( dynamic_cast<const RiaReportDataProducer*>( plot ) ) return true;
-        if ( dynamic_cast<const RimReportPlotGroup*>( plot ) ) return true;
-        if ( dynamic_cast<const RimPlainPlotDataProducer*>( plot ) ) return true;
     }
     return false;
 }
@@ -83,36 +79,13 @@ void RicShowPlotDataFeature::onActionTriggered( bool isChecked )
     std::vector<RimPlotWindow*> selection;
     getSelection( selection );
 
-    auto showPlainForProducer = []( RimPlainPlotDataProducer* producer )
-    {
-        QString title = producer->description();
-        QString text  = title + "\n\n" + producer->asciiDataForPlotExport();
-        RicShowPlotDataFeature::showTextWindow( title, text );
-    };
-
-    bool isReportWindowShown = false;
+    // The report window shows one plot at a time
     for ( auto* plot : selection )
     {
         if ( dynamic_cast<RiaReportDataProducer*>( plot ) )
         {
-            // The report window shows one plot at a time
-            if ( !isReportWindowShown ) RiuPlotMainWindowTools::showReportWindow( plot );
-            isReportWindowShown = true;
-            continue;
-        }
-
-        if ( auto* group = dynamic_cast<RimReportPlotGroup*>( plot ) )
-        {
-            for ( auto* child : group->childPlotsForTextExport() )
-            {
-                if ( child ) showPlainForProducer( child );
-            }
-            continue;
-        }
-
-        if ( auto* plainProducer = dynamic_cast<RimPlainPlotDataProducer*>( plot ) )
-        {
-            showPlainForProducer( plainProducer );
+            RiuPlotMainWindowTools::showReportWindow( plot );
+            return;
         }
     }
 }

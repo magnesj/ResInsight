@@ -54,7 +54,7 @@ class QKeyEvent;
 ///
 ///
 //==================================================================================================
-class RimHistogramPlot : public RimPlot, public RiaReportDataProducer
+class RimHistogramPlot : public RimPlot
 {
     Q_OBJECT;
     CAF_PDM_HEADER_INIT;
@@ -103,8 +103,6 @@ public:
     bool isCurveHighlightSupported() const override;
 
     QWidget* viewWidget() override;
-
-    QString asciiDataForPlotExport() const override;
 
     QString                       reportTitle() const override;
     std::vector<RiaReportSection> reportSections() const override;

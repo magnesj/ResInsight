@@ -90,7 +90,7 @@ struct CurveSamplingPointData
 ///
 ///
 //==================================================================================================
-class RimWellLogTrack : public RimPlot, public RiaReportDataProducer
+class RimWellLogTrack : public RimPlot
 {
     CAF_PDM_HEADER_INIT;
 
@@ -224,8 +224,6 @@ public:
     void updatePropertyValueAxisAndGridTickIntervals();
 
     void updateLegend() override;
-
-    QString asciiDataForPlotExport() const override;
 
     QString                       reportTitle() const override;
     std::vector<RiaReportSection> reportSections() const override;

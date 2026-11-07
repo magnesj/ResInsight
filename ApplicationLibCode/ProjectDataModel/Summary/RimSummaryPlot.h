@@ -77,7 +77,7 @@ class QKeyEvent;
 ///
 ///
 //==================================================================================================
-class RimSummaryPlot : public RimPlot, public RimSummaryDataSourceStepping, public RiaReportDataProducer
+class RimSummaryPlot : public RimPlot, public RimSummaryDataSourceStepping
 {
     Q_OBJECT;
     CAF_PDM_HEADER_INIT;
@@ -152,7 +152,6 @@ public:
 
     QWidget* viewWidget() override;
 
-    QString asciiDataForPlotExport() const override;
     QString asciiDataForSummaryPlotExport( RiaDefines::DateTimePeriod resamplingPeriod, bool showTimeAsLongString ) const;
 
     QString                       reportTitle() const override;

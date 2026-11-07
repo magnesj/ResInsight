@@ -191,38 +191,6 @@ RiuPlotWidget* RimWellAllocationOverTimePlot::plotWidget()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RimWellAllocationOverTimePlot::asciiDataForPlotExport() const
-{
-    // Retrieve allocation over time data for wells
-    RigWellAllocationOverTime allocationOverTime = createWellAllocationOverTime();
-
-    QString titleText = m_userName + "\n\n";
-
-    QString dataText = "Time Step\t";
-    for ( auto& [wellName, wellValues] : allocationOverTime.wellValuesMap() )
-    {
-        dataText += wellName + "\t";
-    }
-    dataText += "\n";
-
-    const QString dateFormatStr = dateFormatString();
-    for ( const auto& timeStep : allocationOverTime.timeStepDates() )
-    {
-        dataText += timeStep.toString( dateFormatStr ) + "\t";
-        for ( auto& [wellName, wellValues] : allocationOverTime.wellValuesMap() )
-        {
-            dataText += wellValues.count( timeStep ) == 0 ? QString::number( 0.0 ) : QString::number( wellValues.at( timeStep ) );
-            dataText += "\t";
-        }
-        dataText += "\n";
-    }
-
-    return titleText + dataText;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 QString RimWellAllocationOverTimePlot::reportTitle() const
 {
     return m_userName();

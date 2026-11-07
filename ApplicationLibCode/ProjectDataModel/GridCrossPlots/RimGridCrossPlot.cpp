@@ -632,20 +632,6 @@ void RimGridCrossPlot::swapAxes()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RimGridCrossPlot::asciiDataForPlotExport() const
-{
-    QString fullData;
-    for ( int i = 0; i < (int)m_crossPlotDataSets.size(); ++i )
-    {
-        fullData += asciiTitleForPlotExport( i ) + "\n";
-        fullData += asciiDataForGridCrossPlotExport( i ) + "\n";
-    }
-    return fullData;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 QString RimGridCrossPlot::reportTitle() const
 {
     return createAutoName();
@@ -683,45 +669,6 @@ std::vector<RiaReportSection> RimGridCrossPlot::reportSections() const
 bool RimGridCrossPlot::supportsLiveUpdate() const
 {
     return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QString RimGridCrossPlot::asciiTitleForPlotExport( int dataSetIndex ) const
-{
-    if ( (size_t)dataSetIndex < m_crossPlotDataSets.size() )
-    {
-        return m_crossPlotDataSets[dataSetIndex]->createAutoName();
-    }
-    return "Data invalid";
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QString RimGridCrossPlot::asciiDataForGridCrossPlotExport( int dataSetIndex ) const
-{
-    if ( (size_t)dataSetIndex < m_crossPlotDataSets.size() )
-    {
-        QString     asciiData;
-        QTextStream stringStream( &asciiData );
-
-        RifTextDataTableFormatter formatter( stringStream );
-        formatter.setCommentPrefix( "" );
-        formatter.setHeaderPrefix( "" );
-        formatter.setTableRowPrependText( "" );
-        formatter.setTableRowLineAppendText( "" );
-        formatter.setColumnSpacing( 3 );
-
-        m_crossPlotDataSets[dataSetIndex]->exportFormattedData( formatter );
-        formatter.tableCompleted();
-        return asciiData;
-    }
-    else
-    {
-        return "Data invalid and may have been deleted.";
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

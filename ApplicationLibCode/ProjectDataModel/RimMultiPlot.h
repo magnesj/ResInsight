@@ -106,8 +106,6 @@ public:
     void zoomAll() override;
     void zoomAllYAxes();
 
-    QString asciiDataForPlotExport() const;
-
     QString                       reportTitle() const override;
     std::vector<RiaReportSection> reportSections() const override;
     bool                          supportsLiveUpdate() const override;

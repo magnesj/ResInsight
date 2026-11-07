@@ -55,7 +55,7 @@ private:
     void doEnableAllAutoNameTags( bool enable ) override;
 };
 
-class RimGridCrossPlot : public RimPlot, public RimNameConfigHolderInterface, public RiaReportDataProducer
+class RimGridCrossPlot : public RimPlot, public RimNameConfigHolderInterface
 {
     Q_OBJECT;
     CAF_PDM_HEADER_INIT;
@@ -89,10 +89,6 @@ public:
     void performAutoNameUpdate() override;
     void updateCurveNamesAndPlotTitle();
     void swapAxes();
-
-    QString asciiDataForPlotExport() const override;
-    QString asciiTitleForPlotExport( int dataSetIndex ) const;
-    QString asciiDataForGridCrossPlotExport( int dataSetIndex ) const;
 
     QString                       reportTitle() const override;
     std::vector<RiaReportSection> reportSections() const override;
