@@ -27,11 +27,14 @@
 
 #include "RiuFileDialogTools.h"
 #include "RiuGuiTheme.h"
+#include "RiuPlotMainWindowTools.h"
 #include "RiuReportHeaderView.h"
 #include "RiuReportTableModel.h"
 
 #include "cafPdmFieldHandle.h"
+#include "cafPdmObject.h"
 #include "cafPdmObjectHandle.h"
+#include "cafPdmUiFieldHandle.h"
 #include "cafUtils.h"
 
 #include <QAction>
@@ -98,8 +101,15 @@ RiuReportWindow::RiuReportWindow( QWidget* parent )
     m_titleLabel->setFont( titleFont );
     m_titleLabel->setTextInteractionFlags( Qt::TextSelectableByMouse );
 
+    m_sourceLabel = new QLabel( this );
+    m_sourceLabel->setTextFormat( Qt::RichText );
+    m_sourceLabel->setTextInteractionFlags( Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard );
+    m_sourceLabel->setToolTip( "Select the source object in the project tree" );
+    connect( m_sourceLabel, &QLabel::linkActivated, this, &RiuReportWindow::selectProducerObject );
+
     mainLayout->addWidget( createToolBar() );
     mainLayout->addWidget( m_titleLabel );
+    mainLayout->addWidget( m_sourceLabel );
 
     m_stackedWidget = new QStackedWidget( this );
 
@@ -318,6 +328,7 @@ void RiuReportWindow::rebuildContent()
 
     m_titleLabel->setText( m_title );
     m_titleLabel->setVisible( !m_title.isEmpty() );
+    updateSourceLabel();
 
     const bool hasData = !m_sections.empty();
     m_copyButton->setEnabled( hasData );
@@ -340,6 +351,41 @@ void RiuReportWindow::rebuildContent()
     if ( currentTabIndex >= 0 && currentTabIndex < m_tabWidget->count() ) m_tabWidget->setCurrentIndex( currentTabIndex );
 
     m_stackedWidget->setCurrentWidget( m_tabWidget );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuReportWindow::updateSourceLabel()
+{
+    auto pdmObject = dynamic_cast<caf::PdmObject*>( m_producerObject.p() );
+    if ( !pdmObject )
+    {
+        m_sourceLabel->clear();
+        m_sourceLabel->setVisible( false );
+        return;
+    }
+
+    QString objectName = pdmObject->uiCapability()->uiName();
+    if ( auto descriptionField = pdmObject->userDescriptionField() )
+    {
+        const QString description = descriptionField->uiCapability()->uiValue().toString();
+        if ( !description.isEmpty() ) objectName = QString( "%1 (%2)" ).arg( description, objectName );
+    }
+
+    m_sourceLabel->setText( QString( "Source: <a href=\"select\">%1</a>" ).arg( objectName.toHtmlEscaped() ) );
+    m_sourceLabel->setVisible( true );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuReportWindow::selectProducerObject()
+{
+    if ( auto pdmObject = dynamic_cast<caf::PdmObject*>( m_producerObject.p() ) )
+    {
+        RiuPlotMainWindowTools::selectAsCurrentItem( pdmObject );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------

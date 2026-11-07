@@ -80,6 +80,8 @@ protected:
 private:
     QWidget* createToolBar();
     void     rebuildContent();
+    void     updateSourceLabel();
+    void     selectProducerObject();
 
     QWidget* createSectionWidget( const RiaReportSection& section );
     QWidget* createTableWidget( const RiaReportTable& table );
@@ -109,6 +111,7 @@ private:
     bool                                  m_isRefreshPending;
 
     QLabel*         m_titleLabel;
+    QLabel*         m_sourceLabel;
     QComboBox*      m_displayModeCombo;
     QComboBox*      m_numberFormatCombo;
     QSpinBox*       m_precisionSpinBox;
