@@ -348,16 +348,20 @@ std::vector<RiaReportSection> RimCorrelationPlot::reportSections() const
     for ( const auto& [parameter, correlation] : correlations )
     {
         const double value     = m_showAbsoluteValues() ? std::abs( correlation ) : correlation;
-        const double sortValue = m_sortByAbsoluteValues() ? std::abs( correlation ) : correlation;
+        const double sortValue = m_sortByAbsoluteValues() ? std::abs( value ) : value;
         values.push_back( { parameter.name, value, sortValue } );
     }
 
-    std::stable_sort( values.begin(), values.end(), []( const auto& a, const auto& b ) { return a.sortValue > b.sortValue; } );
-
+    // Like the chart, the top N filter keeps the values with largest magnitude regardless of sorting
     if ( m_showOnlyTopNCorrelations() && m_topNFilterCount() >= 0 && values.size() > static_cast<size_t>( m_topNFilterCount() ) )
     {
+        std::stable_sort( values.begin(),
+                          values.end(),
+                          []( const auto& a, const auto& b ) { return std::abs( a.value ) > std::abs( b.value ); } );
         values.resize( static_cast<size_t>( m_topNFilterCount() ) );
     }
+
+    std::stable_sort( values.begin(), values.end(), []( const auto& a, const auto& b ) { return a.sortValue > b.sortValue; } );
 
     RiaReportTable table;
     table.description = QString( "Pearson correlation coefficient%1 between the ensemble parameters and %2 at %3" )

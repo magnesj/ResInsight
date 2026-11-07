@@ -186,9 +186,9 @@ std::vector<size_t> RifReportTableFormatter::filteredAndSortedRows( const RiaRep
         }
         if ( rankA == 1 )
         {
-            const auto& dateA = std::get<QDateTime>( a );
-            const auto& dateB = std::get<QDateTime>( b );
-            return dateA < dateB ? -1 : ( dateB < dateA ? 1 : 0 );
+            const auto& firstDate  = std::get<QDateTime>( a );
+            const auto& secondDate = std::get<QDateTime>( b );
+            return firstDate < secondDate ? -1 : ( secondDate < firstDate ? 1 : 0 );
         }
         return collator.compare( std::get<QString>( a ), std::get<QString>( b ) );
     };

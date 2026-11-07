@@ -894,7 +894,7 @@ RiaReportTable RiuGroupedBarChartBuilder::reportTable() const
     if ( hasTextForMinor ) table.columns.push_back( RiaReportColumn{ .title = "Minor", .alignment = LEFT } );
     if ( hasTextForLegend ) table.columns.push_back( RiaReportColumn{ .title = "Legend", .alignment = LEFT } );
     if ( hasTextForBar ) table.columns.push_back( RiaReportColumn{ .title = "Bar", .alignment = LEFT } );
-    table.columns.push_back( RiaReportColumn{ .title = "Value", .doubleFormat = RifTextDataTableDoubleFormatting( RIF_CONSISE, 6 ) } );
+    table.columns.push_back( RiaReportColumn{ .title = "Value" } );
 
     table.rows.reserve( m_sortedBarEntries.size() );
     for ( const BarEntry& barDef : m_sortedBarEntries )

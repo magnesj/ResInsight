@@ -24,6 +24,7 @@
 
 #include <QWidget>
 
+#include <map>
 #include <vector>
 
 class RiaReportDataProducer;
@@ -85,7 +86,8 @@ private:
     void     selectProducerObject();
 
     QWidget* createSectionWidget( const RiaReportSection& section );
-    QWidget* createTableWidget( const RiaReportTable& table );
+    QWidget* createTableWidget( const RiaReportTable& table, const QString& viewStateKey );
+    void     saveTableViewStates();
     QWidget* createTextWidget( const RiaReportSection& section );
 
     void copyCurrentTab();
@@ -130,4 +132,8 @@ private:
     QLabel*         m_placeholderLabel;
     QTabWidget*     m_tabWidget;
     QTimer*         m_refreshTimer;
+    QTimer*         m_filterTimer;
+
+    // Sort order, column widths and hidden columns of the table views, restored when the views are recreated
+    std::map<QString, QByteArray> m_tableViewStates;
 };

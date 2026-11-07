@@ -668,6 +668,7 @@ void RimHistogramPlot::fieldChangedByUi( const caf::PdmFieldHandle* changedField
     if ( changedField == &m_description )
     {
         m_useAutoPlotTitle = false;
+        RiuPlotMainWindowTools::updateReportWindow( this );
     }
 
     if ( changedField == &m_useAutoPlotTitle || changedField == &m_description )
@@ -1237,6 +1238,7 @@ void RimHistogramPlot::onCurveCollectionChanged( const SignalEmitter* emitter )
     scheduleReplotIfVisible();
 
     updateAllRequiredEditors();
+    RiuPlotMainWindowTools::updateReportWindow( this );
 }
 
 //--------------------------------------------------------------------------------------------------

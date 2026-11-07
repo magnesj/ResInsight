@@ -617,10 +617,12 @@ void RimWellLogTrack::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
 
         RimDepthTrackPlot* depthTrackPlot = firstAncestorOrThisOfTypeAsserted<RimDepthTrackPlot>();
         depthTrackPlot->updateDepthAxisVisibility();
+        RiuPlotMainWindowTools::updateReportWindow( this );
     }
     else if ( changedField == &m_description )
     {
         updateParentLayout();
+        RiuPlotMainWindowTools::updateReportWindow( this );
     }
     else if ( changedField == &m_autoCheckStateBasedOnCurveData )
     {
@@ -973,7 +975,10 @@ std::vector<RiaReportSection> RimWellLogTrack::reportSections() const
     RiaReportSection section;
     section.title = description();
     section.tables.push_back( std::move( table ) );
-    return { section };
+
+    std::vector<RiaReportSection> sections;
+    sections.push_back( std::move( section ) );
+    return sections;
 }
 
 //--------------------------------------------------------------------------------------------------

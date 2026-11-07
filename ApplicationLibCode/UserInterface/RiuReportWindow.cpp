@@ -83,6 +83,18 @@ QColor mutedTextColor()
 {
     return blendColors( themeColor( "textColor" ), themeColor( "mainBackgroundColor" ), 0.55 );
 }
+
+//--------------------------------------------------------------------------------------------------
+/// Quote text containing tabs, line breaks or quotes, so spreadsheets keep it in one cell
+//--------------------------------------------------------------------------------------------------
+QString escapeClipboardCell( const QString& text )
+{
+    if ( !text.contains( '\t' ) && !text.contains( '\n' ) && !text.contains( '\r' ) && !text.contains( '"' ) ) return text;
+
+    QString escaped = text;
+    escaped.replace( "\"", "\"\"" );
+    return "\"" + escaped + "\"";
+}
 } // namespace
 
 //--------------------------------------------------------------------------------------------------
@@ -132,6 +144,12 @@ RiuReportWindow::RiuReportWindow( QWidget* parent )
     m_refreshTimer->setInterval( 200 );
     connect( m_refreshTimer, &QTimer::timeout, this, &RiuReportWindow::refresh );
 
+    // Filtering large tables is slow, so wait until the user stops typing
+    m_filterTimer = new QTimer( this );
+    m_filterTimer->setSingleShot( true );
+    m_filterTimer->setInterval( 300 );
+    connect( m_filterTimer, &QTimer::timeout, this, &RiuReportWindow::onFilterTextChanged );
+
     rebuildContent();
 }
 
@@ -156,6 +174,8 @@ caf::PdmObjectHandle* RiuReportWindow::findProducerObject( caf::PdmObjectHandle*
 void RiuReportWindow::setProducerObject( caf::PdmObjectHandle* producerObject )
 {
     if ( producerObject && !dynamic_cast<RiaReportDataProducer*>( producerObject ) ) producerObject = nullptr;
+
+    if ( producerObject != m_producerObject.p() ) m_tableViewStates.clear();
 
     m_producerObject = producerObject;
 
@@ -332,7 +352,7 @@ QWidget* RiuReportWindow::createToolBar()
     connect( m_numberFormatCombo, &QComboBox::currentIndexChanged, this, &RiuReportWindow::onFormatOptionsChanged );
     connect( m_precisionSpinBox, &QSpinBox::valueChanged, this, &RiuReportWindow::onFormatOptionsChanged );
     connect( m_delimiterCombo, &QComboBox::currentIndexChanged, this, &RiuReportWindow::onFormatOptionsChanged );
-    connect( m_filterEdit, &QLineEdit::textChanged, this, &RiuReportWindow::onFilterTextChanged );
+    connect( m_filterEdit, &QLineEdit::textChanged, m_filterTimer, qOverload<>( &QTimer::start ) );
 
     m_delimiterCombo->setEnabled( false );
 
@@ -348,6 +368,8 @@ void RiuReportWindow::rebuildContent()
     QSignalBlocker tabSignalBlocker( m_tabWidget );
 
     const int currentTabIndex = m_tabWidget->currentIndex();
+
+    saveTableViewStates();
 
     while ( m_tabWidget->count() > 0 )
     {
@@ -481,12 +503,18 @@ QWidget* RiuReportWindow::createSectionWidget( const RiaReportSection& section )
         return label;
     }
 
-    if ( section.tables.size() == 1 ) return createTableWidget( section.tables.front() );
+    auto viewStateKey = [&section]( size_t tableIndex )
+    {
+        const auto& table = section.tables[tableIndex];
+        return QString( "%1\n%2\n%3\n%4" ).arg( section.title ).arg( tableIndex ).arg( table.title ).arg( table.columns.size() );
+    };
+
+    if ( section.tables.size() == 1 ) return createTableWidget( section.tables.front(), viewStateKey( 0 ) );
 
     auto splitter = new QSplitter( Qt::Vertical );
-    for ( const auto& table : section.tables )
+    for ( size_t tableIndex = 0; tableIndex < section.tables.size(); tableIndex++ )
     {
-        splitter->addWidget( createTableWidget( table ) );
+        splitter->addWidget( createTableWidget( section.tables[tableIndex], viewStateKey( tableIndex ) ) );
     }
     return splitter;
 }
@@ -494,7 +522,23 @@ QWidget* RiuReportWindow::createSectionWidget( const RiaReportSection& section )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QWidget* RiuReportWindow::createTableWidget( const RiaReportTable& table )
+void RiuReportWindow::saveTableViewStates()
+{
+    const auto producerId = QVariant::fromValue( reinterpret_cast<quintptr>( m_producerObject.p() ) );
+
+    for ( auto* tableView : m_tabWidget->findChildren<QTableView*>() )
+    {
+        const QString key = tableView->property( "viewStateKey" ).toString();
+        if ( key.isEmpty() || tableView->property( "producerId" ) != producerId ) continue;
+
+        m_tableViewStates[key] = tableView->horizontalHeader()->saveState();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QWidget* RiuReportWindow::createTableWidget( const RiaReportTable& table, const QString& viewStateKey )
 {
     auto widget = new QWidget;
     auto layout = new QVBoxLayout( widget );
@@ -575,6 +619,14 @@ QWidget* RiuReportWindow::createTableWidget( const RiaReportTable& table )
     onRowsChanged();
     connect( model, &QAbstractItemModel::modelReset, tableView, onRowsChanged );
 
+    tableView->setProperty( "viewStateKey", viewStateKey );
+    tableView->setProperty( "producerId", QVariant::fromValue( reinterpret_cast<quintptr>( m_producerObject.p() ) ) );
+    if ( auto it = m_tableViewStates.find( viewStateKey ); it != m_tableViewStates.end() )
+    {
+        tableView->horizontalHeader()->restoreState( it->second );
+    }
+
+    // Sorts the model on the restored sort column
     tableView->setSortingEnabled( true );
 
     tableView->horizontalHeader()->setContextMenuPolicy( Qt::CustomContextMenu );
@@ -799,7 +851,7 @@ void RiuReportWindow::copySelectedCells( QTableView* tableView )
             if ( tableView->isColumnHidden( col ) ) continue;
 
             auto it = columns.find( col );
-            values.push_back( it != columns.end() ? it->second : QString() );
+            values.push_back( it != columns.end() ? escapeClipboardCell( it->second ) : QString() );
         }
         lines.push_back( values.join( "\t" ) );
     }

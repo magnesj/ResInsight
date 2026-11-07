@@ -655,7 +655,11 @@ std::vector<RiaReportSection> RimGridCrossPlot::reportSections() const
 
             auto table = dataSetPtr->createReportTable();
             if ( table.columns.empty() ) return {};
-            return { std::move( table ) };
+
+            // An initializer list would copy the table
+            std::vector<RiaReportTable> tables;
+            tables.push_back( std::move( table ) );
+            return tables;
         };
 
         sections.push_back( std::move( section ) );

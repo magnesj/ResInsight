@@ -58,6 +58,8 @@
 
 #include "qwt_scale_draw.h"
 
+#include <QRegularExpression>
+
 CAF_PDM_SOURCE_INIT( RimWellAllocationOverTimePlot, "RimWellAllocationOverTimePlot" );
 
 //--------------------------------------------------------------------------------------------------
@@ -207,11 +209,15 @@ std::vector<RiaReportSection> RimWellAllocationOverTimePlot::reportSections() co
     const auto&               wellValuesMap      = allocationOverTime.wellValuesMap();
 
     RiaReportTable table;
-    table.description = getValueTypeText();
+    // The value type text is HTML for the plot axis title
+    QString valueTypeText = getValueTypeText();
+    valueTypeText.replace( QRegularExpression( "<sup>(.*?)</sup>" ), "^\\1" );
+    valueTypeText.remove( QRegularExpression( "<[^>]*>" ) );
+    table.description = valueTypeText;
     table.columns.push_back( RiaReportColumn{ .title = "Time Step", .alignment = LEFT } );
     for ( const auto& [wellName, wellValues] : wellValuesMap )
     {
-        table.columns.push_back( RiaReportColumn{ .title = wellName, .doubleFormat = RifTextDataTableDoubleFormatting( RIF_FLOAT, 2 ) } );
+        table.columns.push_back( RiaReportColumn{ .title = wellName, .doubleFormat = RifTextDataTableDoubleFormatting( RIF_CONSISE, 6 ) } );
     }
 
     for ( const auto& timeStep : allocationOverTime.timeStepDates() )

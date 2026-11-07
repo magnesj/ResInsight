@@ -37,6 +37,7 @@
 
 #include "RiuDraggableOverlayFrame.h"
 #include "RiuGuiTheme.h"
+#include "RiuPlotMainWindowTools.h"
 #include "RiuPlotWidget.h"
 #include "RiuScalarMapperLegendFrame.h"
 
@@ -1442,6 +1443,7 @@ void RimGridCrossPlotDataSet::triggerPlotNameUpdateAndReplot()
     {
         parent->updateCurveNamesAndPlotTitle();
         parent->reattachAllCurves();
+        RiuPlotMainWindowTools::updateReportWindow( parent );
 
         // updateConnectedEditors() causes the UI editor to be recreated (and the widgets contained in the UI editor). The function
         // calling this function can in some cases comes from the widget to be destroyed, typically the tree view selection editor
