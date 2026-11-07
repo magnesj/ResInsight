@@ -26,7 +26,7 @@
 
 //==================================================================================================
 /// Table model for one report table. Large tables show the first and last rows, separated by a
-/// row telling how many rows are omitted.
+/// row telling how many rows are omitted. Rows are filtered and sorted before rows are omitted.
 //==================================================================================================
 class RiuReportTableModel : public QAbstractTableModel
 {
@@ -45,6 +45,13 @@ public:
     QVariant data( const QModelIndex& index, int role = Qt::DisplayRole ) const override;
     QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const override;
 
+    // A negative column restores the original row order
+    void sort( int column, Qt::SortOrder order = Qt::AscendingOrder ) override;
+    void setFilterText( const QString& filterText );
+
+    // Number of rows matching the filter, including omitted rows
+    size_t filteredRowCount() const;
+
     // Row index in the model for the row telling how many rows are omitted, or -1 if no rows are omitted
     int omittedRowIndex() const;
 
@@ -53,11 +60,16 @@ public:
 private:
     QVariant cellData( size_t tableRowIndex, int column, int role ) const;
     int      tableRowIndex( int modelRow ) const;
+    void     updateRowOrder();
 
 private:
     RiaReportTable         m_table;
     RifReportFormatOptions m_options;
     RifReportRowRange      m_rowRange;
+    std::vector<size_t>    m_rowOrder;
+    QString                m_filterText;
+    int                    m_sortColumn;
+    Qt::SortOrder          m_sortOrder;
     QColor                 m_mutedTextColor;
     QFont                  m_numberFont;
 };

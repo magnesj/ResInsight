@@ -45,6 +45,7 @@
 #include <QFontDatabase>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMenu>
 #include <QMimeData>
 #include <QPlainTextEdit>
@@ -283,6 +284,13 @@ QWidget* RiuReportWindow::createToolBar()
     m_delimiterCombo->addItem( "Semicolon", ";" );
     m_delimiterCombo->addItem( "Tab", "\t" );
 
+    m_filterEdit = new QLineEdit( toolBar );
+    m_filterEdit->setPlaceholderText( "Filter rows" );
+    m_filterEdit->setClearButtonEnabled( true );
+    m_filterEdit->setToolTip( "Show only table rows containing this text. Click a column header to sort, right-click to "
+                              "show or hide columns." );
+    m_filterEdit->setMaximumWidth( 200 );
+
     m_refreshButton = new QToolButton( toolBar );
     m_refreshButton->setText( "Refresh" );
     m_refreshButton->setToolTip( "Read the data from the plot again" );
@@ -313,6 +321,8 @@ QWidget* RiuReportWindow::createToolBar()
     layout->addSpacing( 6 );
     layout->addWidget( new QLabel( "Delimiter", toolBar ) );
     layout->addWidget( m_delimiterCombo );
+    layout->addSpacing( 6 );
+    layout->addWidget( m_filterEdit );
     layout->addStretch( 1 );
     layout->addWidget( m_refreshButton );
     layout->addWidget( m_copyButton );
@@ -322,6 +332,7 @@ QWidget* RiuReportWindow::createToolBar()
     connect( m_numberFormatCombo, &QComboBox::currentIndexChanged, this, &RiuReportWindow::onFormatOptionsChanged );
     connect( m_precisionSpinBox, &QSpinBox::valueChanged, this, &RiuReportWindow::onFormatOptionsChanged );
     connect( m_delimiterCombo, &QComboBox::currentIndexChanged, this, &RiuReportWindow::onFormatOptionsChanged );
+    connect( m_filterEdit, &QLineEdit::textChanged, this, &RiuReportWindow::onFilterTextChanged );
 
     m_delimiterCombo->setEnabled( false );
 
@@ -510,8 +521,13 @@ QWidget* RiuReportWindow::createTableWidget( const RiaReportTable& table )
         layout->addWidget( descriptionLabel );
     }
 
+    auto rowCountLabel = new QLabel( widget );
+    rowCountLabel->setStyleSheet( QString( "color: %1;" ).arg( mutedTextColor().name() ) );
+    layout->addWidget( rowCountLabel );
+
     auto tableView = new QTableView( widget );
     auto model     = new RiuReportTableModel( table, formatOptions(), mutedTextColor(), tableView );
+    model->setFilterText( m_filterEdit->text() );
 
     RiuReportHeaderView::Colors headerColors{ .background = themeColor( "backgroundColor2" ),
                                               .text       = themeColor( "textColor" ),
@@ -543,10 +559,29 @@ QWidget* RiuReportWindow::createTableWidget( const RiaReportTable& table )
         if ( tableView->columnWidth( col ) > maxInitialColumnWidth ) tableView->setColumnWidth( col, maxInitialColumnWidth );
     }
 
-    if ( model->omittedRowIndex() >= 0 && model->columnCount() > 1 )
+    // The omitted row and the row count change when the table is filtered or sorted
+    auto onRowsChanged = [tableView, model, rowCountLabel]()
     {
-        tableView->setSpan( model->omittedRowIndex(), 0, 1, model->columnCount() );
-    }
+        tableView->clearSpans();
+        if ( model->omittedRowIndex() >= 0 && model->columnCount() > 1 )
+        {
+            tableView->setSpan( model->omittedRowIndex(), 0, 1, model->columnCount() );
+        }
+
+        const size_t totalRowCount = model->table().rows.size();
+        rowCountLabel->setText( QString( "Showing %1 of %2 rows" ).arg( model->filteredRowCount() ).arg( totalRowCount ) );
+        rowCountLabel->setVisible( model->filteredRowCount() != totalRowCount );
+    };
+    onRowsChanged();
+    connect( model, &QAbstractItemModel::modelReset, tableView, onRowsChanged );
+
+    tableView->setSortingEnabled( true );
+
+    tableView->horizontalHeader()->setContextMenuPolicy( Qt::CustomContextMenu );
+    connect( tableView->horizontalHeader(),
+             &QHeaderView::customContextMenuRequested,
+             tableView,
+             [tableView]( const QPoint& position ) { showColumnMenu( tableView, position ); } );
 
     auto copyAction = new QAction( "Copy", tableView );
     copyAction->setShortcut( QKeySequence::Copy );
@@ -669,6 +704,7 @@ void RiuReportWindow::exportToFile()
 void RiuReportWindow::onDisplayModeChanged()
 {
     m_delimiterCombo->setEnabled( displayMode() == DisplayMode::CSV );
+    m_filterEdit->setEnabled( displayMode() == DisplayMode::TABLE );
     rebuildContent();
 }
 
@@ -678,6 +714,56 @@ void RiuReportWindow::onDisplayModeChanged()
 void RiuReportWindow::onFormatOptionsChanged()
 {
     rebuildContent();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuReportWindow::onFilterTextChanged()
+{
+    for ( auto* model : m_tabWidget->findChildren<RiuReportTableModel*>() )
+    {
+        model->setFilterText( m_filterEdit->text() );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Menu for showing and hiding columns. The last visible column cannot be hidden.
+//--------------------------------------------------------------------------------------------------
+void RiuReportWindow::showColumnMenu( QTableView* tableView, const QPoint& position )
+{
+    auto* model = tableView->model();
+    if ( !model ) return;
+
+    int visibleColumnCount = 0;
+    for ( int col = 0; col < model->columnCount(); col++ )
+    {
+        if ( !tableView->isColumnHidden( col ) ) visibleColumnCount++;
+    }
+
+    QMenu menu( tableView );
+    for ( int col = 0; col < model->columnCount(); col++ )
+    {
+        const bool isVisible = !tableView->isColumnHidden( col );
+
+        auto action = menu.addAction( model->headerData( col, Qt::Horizontal, Qt::ToolTipRole ).toString() );
+        action->setCheckable( true );
+        action->setChecked( isVisible );
+        action->setEnabled( !isVisible || visibleColumnCount > 1 );
+        connect( action, &QAction::toggled, tableView, [tableView, col]( bool checked ) { tableView->setColumnHidden( col, !checked ); } );
+    }
+
+    menu.addSeparator();
+    menu.addAction( "Show All Columns",
+                    [tableView, model]()
+                    {
+                        for ( int col = 0; col < model->columnCount(); col++ )
+                        {
+                            tableView->setColumnHidden( col, false );
+                        }
+                    } );
+
+    menu.exec( tableView->horizontalHeader()->mapToGlobal( position ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -695,10 +781,14 @@ void RiuReportWindow::copySelectedCells( QTableView* tableView )
     int                                   maxColumn = 0;
     for ( const auto& index : selectedIndexes )
     {
+        if ( tableView->isColumnHidden( index.column() ) ) continue;
+
         cells[index.row()][index.column()] = index.data( Qt::DisplayRole ).toString();
         minColumn                          = std::min( minColumn, index.column() );
         maxColumn                          = std::max( maxColumn, index.column() );
     }
+
+    if ( cells.empty() ) return;
 
     QStringList lines;
     for ( const auto& [row, columns] : cells )
@@ -706,6 +796,8 @@ void RiuReportWindow::copySelectedCells( QTableView* tableView )
         QStringList values;
         for ( int col = minColumn; col <= maxColumn; col++ )
         {
+            if ( tableView->isColumnHidden( col ) ) continue;
+
             auto it = columns.find( col );
             values.push_back( it != columns.end() ? it->second : QString() );
         }

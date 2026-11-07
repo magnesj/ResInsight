@@ -21,6 +21,7 @@
 #include "RifCsvDataTableFormatter.h"
 #include "RifTextDataTableFormatter.h"
 
+#include <QCollator>
 #include <QTextStream>
 
 #include <algorithm>
@@ -122,6 +123,93 @@ RifReportRowRange RifReportTableFormatter::htmlRowRange( size_t rowCount, const 
 QString RifReportTableFormatter::omittedRowsText( size_t omittedRowCount )
 {
     return QString( "... %1 rows omitted ..." ).arg( omittedRowCount );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<size_t> RifReportTableFormatter::filteredAndSortedRows( const RiaReportTable&         table,
+                                                                    const QString&                filterText,
+                                                                    int                           sortColumn,
+                                                                    bool                          ascending,
+                                                                    const RifReportFormatOptions& options )
+{
+    const QString filter = filterText.trimmed();
+
+    auto cellValue = []( const std::vector<RiaReportCellValue>& row, size_t column ) -> RiaReportCellValue
+    { return column < row.size() ? row[column] : RiaReportCellValue(); };
+
+    std::vector<size_t> rowIndices;
+    rowIndices.reserve( table.rows.size() );
+    for ( size_t rowIndex = 0; rowIndex < table.rows.size(); rowIndex++ )
+    {
+        bool isMatch = filter.isEmpty();
+        for ( size_t col = 0; col < table.columns.size() && !isMatch; col++ )
+        {
+            isMatch = formatCell( cellValue( table.rows[rowIndex], col ), table.columns[col], options ).contains( filter, Qt::CaseInsensitive );
+        }
+        if ( isMatch ) rowIndices.push_back( rowIndex );
+    }
+
+    if ( sortColumn < 0 || sortColumn >= static_cast<int>( table.columns.size() ) ) return rowIndices;
+
+    QCollator collator;
+    collator.setNumericMode( true );
+    collator.setCaseSensitivity( Qt::CaseInsensitive );
+
+    // Numbers, then dates, then text
+    auto typeRank = []( const RiaReportCellValue& value )
+    {
+        if ( isNumeric( value ) ) return 0;
+        if ( std::holds_alternative<QDateTime>( value ) ) return 1;
+        return 2;
+    };
+
+    auto toDouble = []( const RiaReportCellValue& value )
+    {
+        if ( const auto* intValue = std::get_if<int>( &value ) ) return static_cast<double>( *intValue );
+        return std::get<double>( value );
+    };
+
+    // Returns negative, zero or positive like strcmp
+    auto compare = [&]( const RiaReportCellValue& a, const RiaReportCellValue& b ) -> int
+    {
+        const int rankA = typeRank( a );
+        const int rankB = typeRank( b );
+        if ( rankA != rankB ) return rankA - rankB;
+
+        if ( rankA == 0 )
+        {
+            const double valueA = toDouble( a );
+            const double valueB = toDouble( b );
+            return valueA < valueB ? -1 : ( valueB < valueA ? 1 : 0 );
+        }
+        if ( rankA == 1 )
+        {
+            const auto& dateA = std::get<QDateTime>( a );
+            const auto& dateB = std::get<QDateTime>( b );
+            return dateA < dateB ? -1 : ( dateB < dateA ? 1 : 0 );
+        }
+        return collator.compare( std::get<QString>( a ), std::get<QString>( b ) );
+    };
+
+    const size_t column = static_cast<size_t>( sortColumn );
+    std::stable_sort( rowIndices.begin(),
+                      rowIndices.end(),
+                      [&]( size_t rowA, size_t rowB )
+                      {
+                          const auto valueA = cellValue( table.rows[rowA], column );
+                          const auto valueB = cellValue( table.rows[rowB], column );
+
+                          const bool isUndefinedA = isUndefined( valueA );
+                          const bool isUndefinedB = isUndefined( valueB );
+                          if ( isUndefinedA || isUndefinedB ) return !isUndefinedA && isUndefinedB;
+
+                          const int result = compare( valueA, valueB );
+                          return ascending ? result < 0 : result > 0;
+                      } );
+
+    return rowIndices;
 }
 
 //--------------------------------------------------------------------------------------------------

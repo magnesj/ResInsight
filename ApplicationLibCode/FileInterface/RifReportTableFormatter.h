@@ -79,6 +79,14 @@ public:
     static RifReportRowRange htmlRowRange( size_t rowCount, const RifReportFormatOptions& options );
     static QString           omittedRowsText( size_t omittedRowCount );
 
+    // Indices of the rows where any formatted cell contains the filter text (case insensitive), sorted on
+    // the given column. A negative sort column keeps the original order. Undefined values are sorted last.
+    static std::vector<size_t> filteredAndSortedRows( const RiaReportTable&         table,
+                                                      const QString&                filterText,
+                                                      int                           sortColumn,
+                                                      bool                          ascending,
+                                                      const RifReportFormatOptions& options );
+
     static QString toText( const RiaReportTable& table, const RifReportFormatOptions& options );
     static QString toCsv( const RiaReportTable& table, const RifReportFormatOptions& options );
     static QString toHtml( const RiaReportTable& table, const RifReportFormatOptions& options, bool includeStyleSheet = true );

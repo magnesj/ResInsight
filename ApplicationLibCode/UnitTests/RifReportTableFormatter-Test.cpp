@@ -188,3 +188,31 @@ TEST( RifReportTableFormatter, LoadsPendingSectionTablesWhenFormatting )
     EXPECT_FALSE( section.hasPendingTables() );
     EXPECT_EQ( 1u, section.tables.size() );
 }
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+TEST( RifReportTableFormatter, FiltersAndSortsRows )
+{
+    RiaReportTable table;
+    table.columns = { RiaReportColumn{ .title = "Well", .alignment = LEFT }, RiaReportColumn{ .title = "Rate" } };
+    table.rows    = { { QString( "P-10" ), 3.0 },
+                      { QString( "P-2" ), std::numeric_limits<double>::quiet_NaN() },
+                      { QString( "I-1" ), 1 },
+                      { QString( "P-1" ), 2.5 } };
+
+    const RifReportFormatOptions options;
+
+    EXPECT_EQ( ( std::vector<size_t>{ 0, 1, 2, 3 } ), RifReportTableFormatter::filteredAndSortedRows( table, "", -1, true, options ) );
+
+    // Text is sorted in natural order
+    EXPECT_EQ( ( std::vector<size_t>{ 2, 3, 1, 0 } ), RifReportTableFormatter::filteredAndSortedRows( table, "", 0, true, options ) );
+
+    // Undefined values are last in both directions
+    EXPECT_EQ( ( std::vector<size_t>{ 2, 3, 0, 1 } ), RifReportTableFormatter::filteredAndSortedRows( table, "", 1, true, options ) );
+    EXPECT_EQ( ( std::vector<size_t>{ 0, 3, 2, 1 } ), RifReportTableFormatter::filteredAndSortedRows( table, "", 1, false, options ) );
+
+    // The filter is case insensitive and is applied before sorting
+    EXPECT_EQ( ( std::vector<size_t>{ 0, 3, 1 } ), RifReportTableFormatter::filteredAndSortedRows( table, " p-", 1, false, options ) );
+    EXPECT_TRUE( RifReportTableFormatter::filteredAndSortedRows( table, "no match", 0, true, options ).empty() );
+}

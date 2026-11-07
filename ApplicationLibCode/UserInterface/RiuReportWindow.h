@@ -30,6 +30,7 @@ class RiaReportDataProducer;
 
 class QComboBox;
 class QLabel;
+class QLineEdit;
 class QSpinBox;
 class QStackedWidget;
 class QTabWidget;
@@ -96,6 +97,9 @@ private:
     void onFormatOptionsChanged();
     void onCurrentTabChanged( int index );
     void loadAllSections();
+    void onFilterTextChanged();
+
+    static void showColumnMenu( QTableView* tableView, const QPoint& position );
 
     static void copySelectedCells( QTableView* tableView );
 
@@ -118,6 +122,7 @@ private:
     QComboBox*      m_numberFormatCombo;
     QSpinBox*       m_precisionSpinBox;
     QComboBox*      m_delimiterCombo;
+    QLineEdit*      m_filterEdit;
     QToolButton*    m_copyButton;
     QToolButton*    m_exportButton;
     QToolButton*    m_refreshButton;

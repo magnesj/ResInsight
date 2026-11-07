@@ -27,6 +27,9 @@ namespace
 {
 constexpr int horizontalPadding = 10;
 constexpr int verticalPadding   = 5;
+
+const QString ascendingArrow  = QString( " " ) + QChar( 0x25B2 );
+const QString descendingArrow = QString( " " ) + QChar( 0x25BC );
 } // namespace
 
 //--------------------------------------------------------------------------------------------------
@@ -36,7 +39,13 @@ RiuReportHeaderView::RiuReportHeaderView( const Colors& colors, QWidget* parent 
     : QHeaderView( Qt::Horizontal, parent )
     , m_colors( colors )
 {
-    setSectionsClickable( false );
+    setSectionsClickable( true );
+    setSortIndicatorShown( true );
+    setSortIndicator( -1, Qt::AscendingOrder );
+#if QT_VERSION >= QT_VERSION_CHECK( 6, 1, 0 )
+    // Clicking a sorted column a third time restores the original order
+    setSortIndicatorClearable( true );
+#endif
     setHighlightSections( false );
     setDefaultAlignment( Qt::AlignLeft | Qt::AlignVCenter );
     setTextElideMode( Qt::ElideRight );
@@ -66,9 +75,17 @@ void RiuReportHeaderView::paintSection( QPainter* painter, const QRect& rect, in
     QRect              titleRect = contentRect;
     if ( anyColumnHasUnit() ) titleRect.setHeight( titleMetrics.height() );
 
+    QString arrow;
+    if ( isSortIndicatorShown() && sortIndicatorSection() == logicalIndex )
+    {
+        arrow = sortIndicatorOrder() == Qt::AscendingOrder ? ascendingArrow : descendingArrow;
+    }
+    const int arrowWidth = titleMetrics.horizontalAdvance( arrow );
+
     painter->setFont( titleFnt );
     painter->setPen( m_colors.text );
-    painter->drawText( titleRect, horizontalAlignment | Qt::AlignVCenter, titleMetrics.elidedText( title, Qt::ElideRight, titleRect.width() ) );
+    const QString elidedTitle = titleMetrics.elidedText( title, Qt::ElideRight, std::max( 0, titleRect.width() - arrowWidth ) );
+    painter->drawText( titleRect, horizontalAlignment | Qt::AlignVCenter, elidedTitle + arrow );
 
     if ( !unit.isEmpty() )
     {
@@ -97,8 +114,10 @@ QSize RiuReportHeaderView::sectionSizeFromContents( int logicalIndex ) const
     const QFontMetrics titleMetrics( titleFont() );
     const QFontMetrics unitMetrics( unitFont() );
 
-    const int width  = std::max( titleMetrics.horizontalAdvance( title ), unitMetrics.horizontalAdvance( unit ) );
-    int       height = titleMetrics.height();
+    // Reserve space for the sort arrow so sorting does not elide the title
+    const int titleWidth = titleMetrics.horizontalAdvance( title ) + titleMetrics.horizontalAdvance( descendingArrow );
+    const int width      = std::max( titleWidth, unitMetrics.horizontalAdvance( unit ) );
+    int       height     = titleMetrics.height();
     if ( anyColumnHasUnit() ) height += unitMetrics.height() + 1;
 
     return { width + 2 * horizontalPadding, height + 2 * verticalPadding };

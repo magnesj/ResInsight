@@ -29,8 +29,10 @@ RiuReportTableModel::RiuReportTableModel( const RiaReportTable&         table,
     , m_table( table )
     , m_options( options )
     , m_mutedTextColor( mutedTextColor )
+    , m_sortColumn( -1 )
+    , m_sortOrder( Qt::AscendingOrder )
 {
-    m_rowRange = RifReportTableFormatter::htmlRowRange( m_table.rows.size(), m_options );
+    updateRowOrder();
 
 #if QT_VERSION >= QT_VERSION_CHECK( 6, 7, 0 )
     // Tabular digits make numbers in a column line up
@@ -121,6 +123,41 @@ QVariant RiuReportTableModel::headerData( int section, Qt::Orientation orientati
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RiuReportTableModel::sort( int column, Qt::SortOrder order )
+{
+    if ( column == m_sortColumn && ( column < 0 || order == m_sortOrder ) ) return;
+
+    beginResetModel();
+    m_sortColumn = column;
+    m_sortOrder  = order;
+    updateRowOrder();
+    endResetModel();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuReportTableModel::setFilterText( const QString& filterText )
+{
+    if ( filterText == m_filterText ) return;
+
+    beginResetModel();
+    m_filterText = filterText;
+    updateRowOrder();
+    endResetModel();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+size_t RiuReportTableModel::filteredRowCount() const
+{
+    return m_rowOrder.size();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 int RiuReportTableModel::omittedRowIndex() const
 {
     if ( m_rowRange.omittedRowCount == 0 ) return -1;
@@ -176,13 +213,23 @@ int RiuReportTableModel::tableRowIndex( int modelRow ) const
     if ( modelRow < 0 ) return -1;
 
     const size_t row = static_cast<size_t>( modelRow );
-    if ( row < m_rowRange.headRowCount ) return modelRow;
+    if ( row < m_rowRange.headRowCount ) return static_cast<int>( m_rowOrder[row] );
 
     const size_t tailFirstModelRow = m_rowRange.headRowCount + ( m_rowRange.omittedRowCount > 0 ? 1 : 0 );
     if ( row >= tailFirstModelRow && row < tailFirstModelRow + m_rowRange.tailRowCount )
     {
-        return static_cast<int>( m_rowRange.tailStartRowIndex + row - tailFirstModelRow );
+        return static_cast<int>( m_rowOrder[m_rowRange.tailStartRowIndex + row - tailFirstModelRow] );
     }
 
     return -1;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuReportTableModel::updateRowOrder()
+{
+    m_rowOrder =
+        RifReportTableFormatter::filteredAndSortedRows( m_table, m_filterText, m_sortColumn, m_sortOrder == Qt::AscendingOrder, m_options );
+    m_rowRange = RifReportTableFormatter::htmlRowRange( m_rowOrder.size(), m_options );
 }
