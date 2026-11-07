@@ -35,9 +35,9 @@ using RiaReportCellValue = std::variant<std::monostate, double, int, QString, QD
 //==================================================================================================
 struct RiaReportColumn
 {
-    QString                          title;
-    QString                          unit; // optional, shown as sub-title
-    RifTextDataTableDoubleFormatting doubleFormat; // default precision hint, user can override
+    QString                          title{};
+    QString                          unit{}; // optional, shown as sub-title
+    RifTextDataTableDoubleFormatting doubleFormat{}; // default precision hint, user can override
     RifTextDataTableAlignment        alignment = RIGHT;
 };
 
@@ -46,10 +46,10 @@ struct RiaReportColumn
 //==================================================================================================
 struct RiaReportTable
 {
-    QString                                      title;
-    QString                                      description; // free text shown above the table
-    std::vector<RiaReportColumn>                 columns;
-    std::vector<std::vector<RiaReportCellValue>> rows;
+    QString                                      title{};
+    QString                                      description{}; // free text shown above the table
+    std::vector<RiaReportColumn>                 columns{};
+    std::vector<std::vector<RiaReportCellValue>> rows{};
 };
 
 //==================================================================================================
@@ -57,12 +57,12 @@ struct RiaReportTable
 //==================================================================================================
 struct RiaReportSection
 {
-    QString                     title;
-    std::vector<RiaReportTable> tables;
+    QString                     title{};
+    std::vector<RiaReportTable> tables{};
 
     // Optional, used for expensive data: the tables are created by the factory the first time they are needed.
     // The factory must handle that the producer object is deleted before it is called.
-    std::function<std::vector<RiaReportTable>()> tableFactory;
+    std::function<std::vector<RiaReportTable>()> tableFactory{};
 
     bool hasPendingTables() const { return tableFactory != nullptr; }
 
