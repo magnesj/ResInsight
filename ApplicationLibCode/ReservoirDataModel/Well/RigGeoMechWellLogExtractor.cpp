@@ -1161,12 +1161,7 @@ void RigGeoMechWellLogExtractor::calculateIntersection()
             hexCorners[6] = cvf::Vec3d( nodeCoords[cornerIndices[6]] );
             hexCorners[7] = cvf::Vec3d( nodeCoords[cornerIndices[7]] );
 
-            RigHexIntersectionTools::lineHexCellIntersection( p1,
-                                                              p2,
-                                                              hexCorners,
-                                                              closeCells[ccIdx],
-                                                              &intersections,
-                                                              RigWellLogExtractionTools::intersectionParametricTolerance );
+            RigHexIntersectionTools::lineHexCellIntersection( p1, p2, hexCorners, closeCells[ccIdx], &intersections );
         }
 
         // Now, with all the intersections of this piece of line, we need to

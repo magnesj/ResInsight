@@ -86,13 +86,14 @@ struct RigHexIntersectionTools
     template <typename Visitor>
     static bool forEachCellSurfaceTriangle( const std::array<cvf::Vec3d, 8>& hexCorners, Visitor&& visitor );
 
-    // Intersections are deduplicated deterministically and returned sorted by the parameter along p1 -> p2
+    // Intersections are deduplicated deterministically and returned sorted by the parameter along p1 -> p2. The
+    // segment is closed and the decisions are exact, with no tolerances: a crossing is never missed, also when
+    // an end point is on the surface, and a segment in the plane of a triangle does not intersect it
     static int lineHexCellIntersection( const cvf::Vec3d&                 p1,
                                         const cvf::Vec3d&                 p2,
                                         const std::array<cvf::Vec3d, 8>&  hexCorners,
                                         const size_t                      hexIndex,
-                                        std::vector<HexIntersectionInfo>* intersections,
-                                        double                            parametricTolerance = 0.0 );
+                                        std::vector<HexIntersectionInfo>* intersections );
 
     static bool lineIntersectsHexCell( const cvf::Vec3d& p1, const cvf::Vec3d& p2, const std::array<cvf::Vec3d, 8>& hexCorners );
 

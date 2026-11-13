@@ -73,9 +73,10 @@ int filteredOrient2d( const cvf::Vec2d& a, const cvf::Vec2d& b, const cvf::Vec2d
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// The value has the exact sign. The magnitude is exact only if the filter could not decide, otherwise it is an
+/// approximation that is accurate enough to interpolate along a segment.
 //--------------------------------------------------------------------------------------------------
-int filteredOrient3d( const cvf::Vec3d& a, const cvf::Vec3d& b, const cvf::Vec3d& c, const cvf::Vec3d& d )
+double filteredOrient3dValue( const cvf::Vec3d& a, const cvf::Vec3d& b, const cvf::Vec3d& c, const cvf::Vec3d& d )
 {
     const double adx = a.x() - d.x();
     const double bdx = b.x() - d.x();
@@ -101,9 +102,105 @@ int filteredOrient3d( const cvf::Vec3d& a, const cvf::Vec3d& b, const cvf::Vec3d
                              ( std::abs( adxbdy ) + std::abs( bdxady ) ) * std::abs( cdz );
     const double errBound = 16.0 * std::numeric_limits<double>::epsilon() * permanent;
 
-    if ( det > errBound ) return 1;
-    if ( det < -errBound ) return -1;
-    return static_cast<int>( cvf::robust::orient3d( a, b, c, d ) );
+    if ( det > errBound || det < -errBound ) return det;
+    return cvf::robust::orient3dValue( a, b, c, d );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+int filteredOrient3d( const cvf::Vec3d& a, const cvf::Vec3d& b, const cvf::Vec3d& c, const cvf::Vec3d& d )
+{
+    const double value = filteredOrient3dValue( a, b, c, d );
+    return value > 0.0 ? 1 : ( value < 0.0 ? -1 : 0 );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Calls handler( face, a, b, c, valueP, valueQ ) for every triangle of the canonical cell surface that is hit by
+/// the closed segment p - q, where valueP and valueQ are the orient3d values of p and q relative to the triangle
+/// (a, b, c). The decisions are exact. The three triangle edges are tested with the sign of orient3d( p, q, u, v ),
+/// which is shared between triangles with a common edge, so a segment crossing the surface hits at least one
+/// triangle and there are no gaps between neighbour triangles. A segment in the plane of a triangle is not a hit.
+/// The handler returns false to stop the iteration, and the function returns false if it was stopped.
+//--------------------------------------------------------------------------------------------------
+template <typename Handler>
+bool forEachSegmentTriangleHit( const cvf::Vec3d& p, const cvf::Vec3d& q, const std::array<cvf::Vec3d, 8>& hexCorners, Handler&& handler )
+{
+    auto sign = []( double value ) { return value > 0.0 ? 1 : ( value < 0.0 ? -1 : 0 ); };
+
+    cvf::Vec3d segmentMin( std::min( p.x(), q.x() ), std::min( p.y(), q.y() ), std::min( p.z(), q.z() ) );
+    cvf::Vec3d segmentMax( std::max( p.x(), q.x() ), std::max( p.y(), q.y() ), std::max( p.z(), q.z() ) );
+
+    // The cell edges are shared by two faces, the sign is computed once. 2 = not computed yet
+    std::array<std::array<int, 8>, 8> cellEdgeSigns;
+    for ( auto& row : cellEdgeSigns )
+        row.fill( 2 );
+
+    auto edgeSign = [&]( int cornerU, int cornerV )
+    {
+        int& cached = cellEdgeSigns[cornerU][cornerV];
+        if ( cached == 2 )
+        {
+            cached                          = filteredOrient3d( p, q, hexCorners[cornerU], hexCorners[cornerV] );
+            cellEdgeSigns[cornerV][cornerU] = -cached;
+        }
+        return cached;
+    };
+
+    for ( int faceIdx = 0; faceIdx < 6; ++faceIdx )
+    {
+        const auto face = static_cast<cvf::StructGridInterface::FaceType>( faceIdx );
+
+        cvf::ubyte faceVertexIndices[4];
+        cvf::StructGridInterface::cellFaceVertexIndices( face, faceVertexIndices );
+
+        const std::array<const cvf::Vec3d*, 4> corners = { &hexCorners[faceVertexIndices[0]],
+                                                           &hexCorners[faceVertexIndices[1]],
+                                                           &hexCorners[faceVertexIndices[2]],
+                                                           &hexCorners[faceVertexIndices[3]] };
+
+        // Exact culling of faces away from the segment. The face center is inside the bounding box of the corners
+        bool isCulled = false;
+        for ( int axis = 0; axis < 3 && !isCulled; ++axis )
+        {
+            const double minimum = std::min( { ( *corners[0] )[axis], ( *corners[1] )[axis], ( *corners[2] )[axis], ( *corners[3] )[axis] } );
+            const double maximum = std::max( { ( *corners[0] )[axis], ( *corners[1] )[axis], ( *corners[2] )[axis], ( *corners[3] )[axis] } );
+            isCulled = segmentMax[axis] < minimum || segmentMin[axis] > maximum;
+        }
+        if ( isCulled ) continue;
+
+        const cvf::Vec3d faceCenter = RigHexIntersectionTools::canonicalFaceCenter( *corners[0], *corners[1], *corners[2], *corners[3] );
+
+        // Sign of the spoke edge from corner k to the face center. The edge in the opposite direction has the opposite sign
+        std::array<int, 4> spokeSigns;
+        for ( int k = 0; k < 4; ++k )
+            spokeSigns[k] = filteredOrient3d( p, q, *corners[k], faceCenter );
+
+        for ( int i = 0; i < 4; ++i )
+        {
+            const int next = i < 3 ? i + 1 : 0;
+
+            const int s1 = edgeSign( faceVertexIndices[i], faceVertexIndices[next] );
+            const int s2 = spokeSigns[next];
+            const int s3 = -spokeSigns[i];
+
+            // The line through p and q passes through the closed triangle if no edge is on the opposite side
+            const bool hasPositive = s1 > 0 || s2 > 0 || s3 > 0;
+            const bool hasNegative = s1 < 0 || s2 < 0 || s3 < 0;
+            if ( hasPositive == hasNegative ) continue;
+
+            const double valueP = filteredOrient3dValue( *corners[i], *corners[next], faceCenter, p );
+            const double valueQ = filteredOrient3dValue( *corners[i], *corners[next], faceCenter, q );
+
+            const int signP = sign( valueP );
+            const int signQ = sign( valueQ );
+            if ( signP * signQ > 0 || ( signP == 0 && signQ == 0 ) ) continue;
+
+            if ( !handler( face, *corners[i], *corners[next], faceCenter, valueP, valueQ ) ) return false;
+        }
+    }
+
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -184,8 +281,7 @@ int RigHexIntersectionTools::lineHexCellIntersection( const cvf::Vec3d&         
                                                       const cvf::Vec3d&                 p2,
                                                       const std::array<cvf::Vec3d, 8>&  hexCorners,
                                                       const size_t                      hexIndex,
-                                                      std::vector<HexIntersectionInfo>* intersections,
-                                                      double                            parametricTolerance )
+                                                      std::vector<HexIntersectionInfo>* intersections )
 {
     CAF_ASSERT( intersections != nullptr );
 
@@ -196,27 +292,32 @@ int RigHexIntersectionTools::lineHexCellIntersection( const cvf::Vec3d&         
     std::array<SegmentHit, 24> hits;
     size_t                     hitCount = 0;
 
-    forEachCellSurfaceTriangle( hexCorners,
-                                [&]( cvf::StructGridInterface::FaceType face, const cvf::Vec3d& t0, const cvf::Vec3d& t1, const cvf::Vec3d& t2 )
-                                {
-                                    cvf::Vec3d intersection;
-                                    bool       isEntering = false;
+    forEachSegmentTriangleHit( p1,
+                               p2,
+                               hexCorners,
+                               [&]( cvf::StructGridInterface::FaceType face,
+                                    const cvf::Vec3d&,
+                                    const cvf::Vec3d&,
+                                    const cvf::Vec3d&,
+                                    double valueP,
+                                    double valueQ )
+                               {
+                                   // The values have opposite signs or one of them is zero. The segment enters the cell if
+                                   // it moves to the side of the triangle plane that has the larger orient3d value
+                                   const bool isEntering = valueQ > valueP;
 
-                                    int intsStatus = cvf::GeometryTools::intersectLineSegmentTriangle( p1,
-                                                                                                       p2,
-                                                                                                       t0,
-                                                                                                       t1,
-                                                                                                       t2,
-                                                                                                       &intersection,
-                                                                                                       &isEntering,
-                                                                                                       parametricTolerance );
-                                    if ( intsStatus == 1 )
-                                    {
-                                        const double t = lengthSquared > 0.0 ? ( intersection - p1 ).dot( direction ) / lengthSquared : 0.0;
-                                        hits[hitCount++] = { t, intersection, isEntering, face };
-                                    }
-                                    return true;
-                                } );
+                                   double t = 0.0;
+                                   if ( valueP == 0.0 )
+                                       t = 0.0;
+                                   else if ( valueQ == 0.0 )
+                                       t = 1.0;
+                                   else
+                                       t = std::abs( valueP ) / ( std::abs( valueP ) + std::abs( valueQ ) );
+
+                                   const cvf::Vec3d point = t == 1.0 ? p2 : p1 + t * direction;
+                                   hits[hitCount++]       = { t, point, isEntering, face };
+                                   return true;
+                               } );
 
     if ( hitCount == 0 ) return 0;
 
@@ -281,16 +382,13 @@ int RigHexIntersectionTools::sortMergeAndAppendHits( std::span<SegmentHit>      
 //--------------------------------------------------------------------------------------------------
 bool RigHexIntersectionTools::lineIntersectsHexCell( const cvf::Vec3d& p1, const cvf::Vec3d& p2, const std::array<cvf::Vec3d, 8>& hexCorners )
 {
-    const bool allVisited =
-        forEachCellSurfaceTriangle( hexCorners,
-                                    [&]( cvf::StructGridInterface::FaceType, const cvf::Vec3d& t0, const cvf::Vec3d& t1, const cvf::Vec3d& t2 )
-                                    {
-                                        cvf::Vec3d intersection;
-                                        bool       isEntering = false;
-                                        return cvf::GeometryTools::intersectLineSegmentTriangle( p1, p2, t0, t1, t2, &intersection, &isEntering ) !=
-                                               1;
-                                    } );
-    return !allVisited;
+    const bool noHit =
+        forEachSegmentTriangleHit( p1,
+                                   p2,
+                                   hexCorners,
+                                   []( cvf::StructGridInterface::FaceType, const cvf::Vec3d&, const cvf::Vec3d&, const cvf::Vec3d&, double, double )
+                                   { return false; } );
+    return !noHit;
 }
 
 //--------------------------------------------------------------------------------------------------

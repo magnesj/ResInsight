@@ -23,16 +23,17 @@
 #include <QElapsedTimer>
 
 #include "RigHexIntersectionTools.h"
-#include "Well/RigWellLogExtractionTools.h"
 
 #include "cvfGeometryTools.h"
 #include "cvfRay.h"
 #include "cvfStructGrid.h"
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <iostream>
 #include <limits>
+#include <optional>
 #include <random>
 
 //--------------------------------------------------------------------------------------------------
@@ -137,9 +138,11 @@ static std::array<cvf::Vec3d, 8> createDistortedHex( std::mt19937& rng, const cv
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Count the face centres where neither of the two well path segments sharing the point reports the crossing
+/// Count the face centres where neither of the two well path segments sharing the point reports the crossing.
+/// The well path vertex is either the canonical face center or the face center summed in the corner order, which can
+/// differ in the last bits.
 //--------------------------------------------------------------------------------------------------
-static int countMissedFaceCenterCrossings( double parametricTolerance, int hexCount )
+static int countMissedFaceCenterCrossings( bool useCanonicalCenter, int hexCount )
 {
     std::mt19937                           rng( 15088 );
     std::uniform_real_distribution<double> easting( 400000.0, 600000.0 );
@@ -162,18 +165,21 @@ static int countMissedFaceCenterCrossings( double parametricTolerance, int hexCo
             cvf::ubyte faceVertexIndices[4];
             cvf::StructGridInterface::cellFaceVertexIndices( static_cast<cvf::StructGridInterface::FaceType>( face ), faceVertexIndices );
 
-            // Same face center as in RigHexIntersectionTools::lineHexCellIntersection, so the well path point is
-            // bit-identical to the triangle apex
-            cvf::Vec3d faceCenter = RigHexIntersectionTools::canonicalFaceCenter( hexCorners[faceVertexIndices[0]],
-                                                                                  hexCorners[faceVertexIndices[1]],
-                                                                                  hexCorners[faceVertexIndices[2]],
-                                                                                  hexCorners[faceVertexIndices[3]] );
+            // The canonical face center is bit-identical to the triangle apex
+            cvf::Vec3d faceCenter = useCanonicalCenter ? RigHexIntersectionTools::canonicalFaceCenter( hexCorners[faceVertexIndices[0]],
+                                                                                                       hexCorners[faceVertexIndices[1]],
+                                                                                                       hexCorners[faceVertexIndices[2]],
+                                                                                                       hexCorners[faceVertexIndices[3]] )
+                                                       : cvf::GeometryTools::computeFaceCenter( hexCorners[faceVertexIndices[0]],
+                                                                                                hexCorners[faceVertexIndices[1]],
+                                                                                                hexCorners[faceVertexIndices[2]],
+                                                                                                hexCorners[faceVertexIndices[3]] );
 
             cvf::Vec3d outsidePoint = faceCenter + ( faceCenter - cellCenter );
 
             std::vector<HexIntersectionInfo> intersections;
-            RigHexIntersectionTools::lineHexCellIntersection( outsidePoint, faceCenter, hexCorners, 0, &intersections, parametricTolerance );
-            RigHexIntersectionTools::lineHexCellIntersection( faceCenter, cellCenter, hexCorners, 0, &intersections, parametricTolerance );
+            RigHexIntersectionTools::lineHexCellIntersection( outsidePoint, faceCenter, hexCorners, 0, &intersections );
+            RigHexIntersectionTools::lineHexCellIntersection( faceCenter, cellCenter, hexCorners, 0, &intersections );
 
             bool found = false;
             for ( const auto& intersection : intersections )
@@ -197,18 +203,15 @@ TEST( RigHexIntersectionTools, lineHexCellIntersectionAtFaceCenters )
 {
     const int hexCount = 500;
 
-    int missedExact = countMissedFaceCenterCrossings( 0.0, hexCount );
-    std::cout << "Face centre crossings missed with parametric tolerance 0: " << missedExact << " of " << 6 * hexCount << std::endl;
-
-    int missedWithTolerance = countMissedFaceCenterCrossings( RigWellLogExtractionTools::intersectionParametricTolerance, hexCount );
-    EXPECT_EQ( 0, missedWithTolerance );
+    EXPECT_EQ( 0, countMissedFaceCenterCrossings( true, hexCount ) );
+    EXPECT_EQ( 0, countMissedFaceCenterCrossings( false, hexCount ) );
 }
 
 //--------------------------------------------------------------------------------------------------
-/// The parametric tolerance does not change the result for segments clearly inside or outside the cell, and a
-/// segment ending just short of a face is only accepted with a tolerance, with the point kept on the segment
+/// The decisions are exact: a segment ending just short of a face does not intersect it, a segment ending on the
+/// face does, and a segment in the plane of a face does not
 //--------------------------------------------------------------------------------------------------
-TEST( RigHexIntersectionTools, lineHexCellIntersectionParametricTolerance )
+TEST( RigHexIntersectionTools, lineHexCellIntersectionIsExact )
 {
     std::array<cvf::Vec3d, 8> hexCorners = { cvf::Vec3d( 0, 0, 0 ),
                                              cvf::Vec3d( 1, 0, 0 ),
@@ -219,57 +222,189 @@ TEST( RigHexIntersectionTools, lineHexCellIntersectionParametricTolerance )
                                              cvf::Vec3d( 1, 1, 1 ),
                                              cvf::Vec3d( 0, 1, 1 ) };
 
-    const double tolerance = RigWellLogExtractionTools::intersectionParametricTolerance;
+    {
+        std::vector<HexIntersectionInfo> intersections;
+        RigHexIntersectionTools::lineHexCellIntersection( cvf::Vec3d( 0.5, 0.5, -1 ), cvf::Vec3d( 0.5, 0.5, 2 ), hexCorners, 0, &intersections );
+
+        ASSERT_EQ( 2u, intersections.size() );
+        EXPECT_NE( intersections[0].m_isIntersectionEntering, intersections[1].m_isIntersectionEntering );
+        EXPECT_EQ( cvf::Vec3d( 0.5, 0.5, 0 ), intersections[0].m_intersectionPoint );
+        EXPECT_EQ( cvf::Vec3d( 0.5, 0.5, 1 ), intersections[1].m_intersectionPoint );
+    }
 
     {
-        std::vector<HexIntersectionInfo> exact;
-        std::vector<HexIntersectionInfo> withTolerance;
-        RigHexIntersectionTools::lineHexCellIntersection( cvf::Vec3d( 0.5, 0.5, -1 ), cvf::Vec3d( 0.5, 0.5, 2 ), hexCorners, 0, &exact );
-        RigHexIntersectionTools::lineHexCellIntersection( cvf::Vec3d( 0.5, 0.5, -1 ),
-                                                          cvf::Vec3d( 0.5, 0.5, 2 ),
-                                                          hexCorners,
-                                                          0,
-                                                          &withTolerance,
-                                                          tolerance );
+        std::vector<HexIntersectionInfo> intersections;
+        RigHexIntersectionTools::lineHexCellIntersection( cvf::Vec3d( 0.5, 0.5, -1 ), cvf::Vec3d( 0.5, 0.5, -0.1 ), hexCorners, 0, &intersections );
+        EXPECT_EQ( 0u, intersections.size() );
+    }
 
-        ASSERT_EQ( 2u, exact.size() );
-        ASSERT_EQ( 2u, withTolerance.size() );
-        for ( size_t i = 0; i < exact.size(); ++i )
+    {
+        // Ends just short of the bottom face
+        const cvf::Vec3d                 p1( 0.5, 0.5, -1 );
+        const cvf::Vec3d                 p2( 0.5, 0.5, -1e-12 );
+        std::vector<HexIntersectionInfo> intersections;
+        RigHexIntersectionTools::lineHexCellIntersection( p1, p2, hexCorners, 0, &intersections );
+        EXPECT_EQ( 0u, intersections.size() );
+
+        // Ends exactly on the face
+        const cvf::Vec3d p3( 0.5, 0.5, 0.0 );
+        RigHexIntersectionTools::lineHexCellIntersection( p1, p3, hexCorners, 0, &intersections );
+        ASSERT_EQ( 1u, intersections.size() );
+        EXPECT_EQ( p3, intersections[0].m_intersectionPoint );
+        EXPECT_TRUE( RigHexIntersectionTools::lineIntersectsHexCell( p1, p3, hexCorners ) );
+        EXPECT_FALSE( RigHexIntersectionTools::lineIntersectsHexCell( p1, p2, hexCorners ) );
+    }
+
+    {
+        // In the plane of the bottom face, outside the other faces
+        std::vector<HexIntersectionInfo> intersections;
+        RigHexIntersectionTools::lineHexCellIntersection( cvf::Vec3d( -1, 0.5, 0 ), cvf::Vec3d( 0.5, 0.5, 0 ), hexCorners, 0, &intersections );
+        for ( const auto& intersection : intersections )
+            EXPECT_NE( cvf::StructGridInterface::NEG_K, intersection.m_face );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// The hits of a segment starting and ending outside a cell alternate between entering and leaving, and an odd
+/// number of hits means that exactly one of the end points is inside the cell
+//--------------------------------------------------------------------------------------------------
+TEST( RigHexIntersectionTools, lineHexCellIntersectionAlternatesAndMatchesPointInCell )
+{
+    std::mt19937                           rng( 15163 );
+    std::uniform_real_distribution<double> easting( 400000.0, 600000.0 );
+    std::uniform_real_distribution<double> northing( 6000000.0, 7000000.0 );
+    std::uniform_real_distribution<double> depth( -4000.0, -1000.0 );
+    std::uniform_real_distribution<double> unit( -0.5, 1.5 );
+
+    std::optional<bool> firstHitIsEnteringFromOutside;
+    int                 crossingCount = 0;
+
+    for ( int hexIdx = 0; hexIdx < 500; ++hexIdx )
+    {
+        const cvf::Vec3d origin( easting( rng ), northing( rng ), depth( rng ) );
+        const auto       hexCorners = createDistortedHex( rng, origin );
+
+        for ( int q = 0; q < 20; ++q )
         {
-            EXPECT_EQ( exact[i].m_face, withTolerance[i].m_face );
-            EXPECT_EQ( exact[i].m_isIntersectionEntering, withTolerance[i].m_isIntersectionEntering );
-            EXPECT_EQ( exact[i].m_intersectionPoint, withTolerance[i].m_intersectionPoint );
+            const cvf::Vec3d p1 = origin + cvf::Vec3d( 100.0 * unit( rng ), 100.0 * unit( rng ), 10.0 * unit( rng ) );
+            const cvf::Vec3d p2 = origin + cvf::Vec3d( 100.0 * unit( rng ), 100.0 * unit( rng ), 10.0 * unit( rng ) );
+
+            std::vector<HexIntersectionInfo> intersections;
+            RigHexIntersectionTools::lineHexCellIntersection( p1, p2, hexCorners, 0, &intersections );
+
+            const bool inside1 = RigHexIntersectionTools::isPointInCell( p1, hexCorners );
+            const bool inside2 = RigHexIntersectionTools::isPointInCell( p2, hexCorners );
+
+            EXPECT_EQ( inside1 != inside2, intersections.size() % 2 == 1 );
+            EXPECT_EQ( intersections.size() != 0, RigHexIntersectionTools::lineIntersectsHexCell( p1, p2, hexCorners ) );
+
+            for ( size_t i = 1; i < intersections.size(); ++i )
+                EXPECT_NE( intersections[i - 1].m_isIntersectionEntering, intersections[i].m_isIntersectionEntering );
+
+            // The direction is relative to the face orientation, which is the same for all cells
+            if ( !inside1 && !intersections.empty() )
+            {
+                if ( !firstHitIsEnteringFromOutside ) firstHitIsEnteringFromOutside = intersections.front().m_isIntersectionEntering;
+                EXPECT_EQ( *firstHitIsEnteringFromOutside, intersections.front().m_isIntersectionEntering );
+                ++crossingCount;
+            }
         }
     }
 
-    {
-        std::vector<HexIntersectionInfo> exact;
-        std::vector<HexIntersectionInfo> withTolerance;
-        RigHexIntersectionTools::lineHexCellIntersection( cvf::Vec3d( 0.5, 0.5, -1 ), cvf::Vec3d( 0.5, 0.5, -0.1 ), hexCorners, 0, &exact );
-        RigHexIntersectionTools::lineHexCellIntersection( cvf::Vec3d( 0.5, 0.5, -1 ),
-                                                          cvf::Vec3d( 0.5, 0.5, -0.1 ),
-                                                          hexCorners,
-                                                          0,
-                                                          &withTolerance,
-                                                          tolerance );
+    EXPECT_GT( crossingCount, 1000 );
+}
 
-        EXPECT_EQ( 0u, exact.size() );
-        EXPECT_EQ( 0u, withTolerance.size() );
+//--------------------------------------------------------------------------------------------------
+/// Segments through the shared face center of two neighbour cells are reported once by each cell, in opposite
+/// directions, also when the segment passes exactly through the apex of the four face triangles
+//--------------------------------------------------------------------------------------------------
+TEST( RigHexIntersectionTools, lineHexCellIntersectionThroughSharedFaceCenter )
+{
+    std::mt19937                           rng( 15163 );
+    std::uniform_real_distribution<double> easting( 400000.0, 600000.0 );
+    std::uniform_real_distribution<double> northing( 6000000.0, 7000000.0 );
+    std::uniform_real_distribution<double> depth( -4000.0, -1000.0 );
+    std::uniform_int_distribution<int>     grid( -1024, 1024 );
+
+    for ( int cellIdx = 0; cellIdx < 500; ++cellIdx )
+    {
+        const std::array<cvf::Vec3d, 8> cellA = createDistortedHex( rng, cvf::Vec3d( easting( rng ), northing( rng ), depth( rng ) ) );
+
+        const cvf::Vec3d          offset( 100.0, 0.0, 0.0 );
+        std::array<cvf::Vec3d, 8> cellB =
+            { cellA[1], cellA[1] + offset, cellA[2] + offset, cellA[2], cellA[5], cellA[5] + offset, cellA[6] + offset, cellA[6] };
+
+        const cvf::Vec3d faceCenter = RigHexIntersectionTools::canonicalFaceCenter( cellA[1], cellA[2], cellA[6], cellA[5] );
+
+        // Offsets on a binary grid, so that the segment end points are exact mirrors around the face center
+        const double     step = 1.0 / 1048576.0;
+        const cvf::Vec3d d( 20.0 + grid( rng ) * step, grid( rng ) * 0.001, grid( rng ) * 0.0001 );
+        const cvf::Vec3d p = faceCenter - d;
+        const cvf::Vec3d q = faceCenter + d;
+        ASSERT_EQ( faceCenter, 0.5 * ( p + q ) );
+
+        std::vector<HexIntersectionInfo> hitsA;
+        std::vector<HexIntersectionInfo> hitsB;
+        RigHexIntersectionTools::lineHexCellIntersection( p, q, cellA, 0, &hitsA );
+        RigHexIntersectionTools::lineHexCellIntersection( p, q, cellB, 1, &hitsB );
+
+        ASSERT_EQ( 1u, hitsA.size() );
+        ASSERT_EQ( 1u, hitsB.size() );
+        EXPECT_NE( hitsA[0].m_isIntersectionEntering, hitsB[0].m_isIntersectionEntering );
+        EXPECT_LT( hitsA[0].m_intersectionPoint.pointDistance( faceCenter ), 1e-6 );
+        EXPECT_LT( hitsB[0].m_intersectionPoint.pointDistance( faceCenter ), 1e-6 );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Segments with end points on a binary grid pass through cell corners, edges and faces. The result does not
+/// change when the cell and the segment are translated to UTM coordinates, which is exact for these values.
+//--------------------------------------------------------------------------------------------------
+TEST( RigHexIntersectionTools, lineHexCellIntersectionIsTranslationInvariant )
+{
+    const std::array<cvf::Vec3d, 8> unitCell = { cvf::Vec3d( 0, 0, 0 ),
+                                                 cvf::Vec3d( 1, 0, 0 ),
+                                                 cvf::Vec3d( 1, 1, 0 ),
+                                                 cvf::Vec3d( 0, 1, 0 ),
+                                                 cvf::Vec3d( 0, 0, 1 ),
+                                                 cvf::Vec3d( 1, 0, 1 ),
+                                                 cvf::Vec3d( 1, 1, 1 ),
+                                                 cvf::Vec3d( 0, 1, 1 ) };
+
+    const cvf::Vec3d translation( 512345.0, 6712345.0, -2345.0 );
+
+    std::array<cvf::Vec3d, 8> translated = unitCell;
+    for ( auto& corner : translated )
+        corner += translation;
+
+    std::mt19937                       rng( 15163 );
+    std::uniform_int_distribution<int> grid( -4, 8 );
+
+    int hitSegments = 0;
+    for ( int i = 0; i < 5000; ++i )
+    {
+        const cvf::Vec3d p1( 0.25 * grid( rng ), 0.25 * grid( rng ), 0.25 * grid( rng ) );
+        const cvf::Vec3d p2( 0.25 * grid( rng ), 0.25 * grid( rng ), 0.25 * grid( rng ) );
+
+        std::vector<HexIntersectionInfo> hits;
+        std::vector<HexIntersectionInfo> translatedHits;
+        RigHexIntersectionTools::lineHexCellIntersection( p1, p2, unitCell, 0, &hits );
+        RigHexIntersectionTools::lineHexCellIntersection( p1 + translation, p2 + translation, translated, 0, &translatedHits );
+
+        ASSERT_EQ( hits.size(), translatedHits.size() ) << i;
+        for ( size_t h = 0; h < hits.size(); ++h )
+        {
+            EXPECT_EQ( hits[h].m_isIntersectionEntering, translatedHits[h].m_isIntersectionEntering ) << i;
+            EXPECT_LT( ( hits[h].m_intersectionPoint + translation ).pointDistance( translatedHits[h].m_intersectionPoint ), 1e-6 ) << i;
+        }
+
+        EXPECT_EQ( RigHexIntersectionTools::lineIntersectsHexCell( p1, p2, unitCell ),
+                   RigHexIntersectionTools::lineIntersectsHexCell( p1 + translation, p2 + translation, translated ) );
+
+        if ( !hits.empty() ) ++hitSegments;
     }
 
-    {
-        const cvf::Vec3d p1( 0.5, 0.5, -1 );
-        const cvf::Vec3d p2( 0.5, 0.5, -1e-12 );
-
-        std::vector<HexIntersectionInfo> exact;
-        std::vector<HexIntersectionInfo> withTolerance;
-        RigHexIntersectionTools::lineHexCellIntersection( p1, p2, hexCorners, 0, &exact );
-        RigHexIntersectionTools::lineHexCellIntersection( p1, p2, hexCorners, 0, &withTolerance, tolerance );
-
-        EXPECT_EQ( 0u, exact.size() );
-        ASSERT_EQ( 1u, withTolerance.size() );
-        EXPECT_LT( withTolerance[0].m_intersectionPoint.pointDistance( p2 ), 1e-12 );
-    }
+    EXPECT_GT( hitSegments, 500 );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -691,8 +826,7 @@ TEST( RigHexIntersectionTools, DISABLED_lineAndPointCellIntersectionPerformance 
                                                                                  segments[q].second,
                                                                                  hexes[q / queriesPerHex],
                                                                                  q,
-                                                                                 &intersections,
-                                                                                 RigWellLogExtractionTools::intersectionParametricTolerance );
+                                                                                 &intersections );
             }
         } );
 
