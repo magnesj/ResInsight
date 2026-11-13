@@ -26,6 +26,7 @@
 #include "Well/RigWellLogExtractionTools.h"
 
 #include "cvfGeometryTools.h"
+#include "cvfRay.h"
 #include "cvfStructGrid.h"
 
 #include <algorithm>
@@ -455,6 +456,165 @@ TEST( RigHexIntersectionTools, sortMergeAndAppendHits )
 }
 
 //--------------------------------------------------------------------------------------------------
+/// The previous point in cell test: parity of the intersections of a ray with the surface triangles. Used as a
+/// reference for points that are not close to the cell surface.
+//--------------------------------------------------------------------------------------------------
+static bool isPointInCellRayReference( const cvf::Vec3d& point, const std::array<cvf::Vec3d, 8>& hexCorners )
+{
+    cvf::Ray ray;
+    ray.setOrigin( point );
+    size_t intersections = 0;
+
+    RigHexIntersectionTools::forEachCellSurfaceTriangle( hexCorners,
+                                                         [&]( cvf::StructGridInterface::FaceType,
+                                                              const cvf::Vec3d& t0,
+                                                              const cvf::Vec3d& t1,
+                                                              const cvf::Vec3d& t2 )
+                                                         {
+                                                             if ( ray.triangleIntersect( t0, t1, t2 ) ) ++intersections;
+                                                             return true;
+                                                         } );
+
+    return intersections % 2 == 1;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Points clearly inside or outside distorted cells at UTM coordinates agree with the ray reference
+//--------------------------------------------------------------------------------------------------
+TEST( RigHexIntersectionTools, isPointInCellAgreesWithRayReference )
+{
+    std::mt19937                           rng( 15163 );
+    std::uniform_real_distribution<double> easting( 400000.0, 600000.0 );
+    std::uniform_real_distribution<double> northing( 6000000.0, 7000000.0 );
+    std::uniform_real_distribution<double> depth( -4000.0, -1000.0 );
+    std::uniform_real_distribution<double> unit( -0.5, 1.5 );
+
+    int inside  = 0;
+    int outside = 0;
+    for ( int hexIdx = 0; hexIdx < 500; ++hexIdx )
+    {
+        const cvf::Vec3d origin( easting( rng ), northing( rng ), depth( rng ) );
+        const auto       hexCorners = createDistortedHex( rng, origin );
+
+        for ( int q = 0; q < 50; ++q )
+        {
+            const cvf::Vec3d point = origin + cvf::Vec3d( 100.0 * unit( rng ), 100.0 * unit( rng ), 10.0 * unit( rng ) );
+
+            const bool isInside = RigHexIntersectionTools::isPointInCell( point, hexCorners );
+            EXPECT_EQ( isPointInCellRayReference( point, hexCorners ), isInside );
+            isInside ? ++inside : ++outside;
+        }
+    }
+
+    EXPECT_GT( inside, 1000 );
+    EXPECT_GT( outside, 1000 );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// A point on the shared face of two neighbour cells is inside exactly one of them
+//--------------------------------------------------------------------------------------------------
+TEST( RigHexIntersectionTools, isPointInCellOnSharedSurfaceIsOwnedByOneCell )
+{
+    std::mt19937                           rng( 15163 );
+    std::uniform_real_distribution<double> easting( 400000.0, 600000.0 );
+    std::uniform_real_distribution<double> northing( 6000000.0, 7000000.0 );
+    std::uniform_real_distribution<double> depth( -4000.0, -1000.0 );
+
+    for ( int cellIdx = 0; cellIdx < 500; ++cellIdx )
+    {
+        const std::array<cvf::Vec3d, 8> cellA = createDistortedHex( rng, cvf::Vec3d( easting( rng ), northing( rng ), depth( rng ) ) );
+
+        const cvf::Vec3d          offset( 100.0, 0.0, 0.0 );
+        std::array<cvf::Vec3d, 8> cellB =
+            { cellA[1], cellA[1] + offset, cellA[2] + offset, cellA[2], cellA[5], cellA[5] + offset, cellA[6] + offset, cellA[6] };
+
+        // The shared face center is a vertex of the triangulation and inside exactly one of the cells. The corners are
+        // shared with other cells as well, so at most one of the two cells contains them.
+        const cvf::Vec3d faceCenter = RigHexIntersectionTools::canonicalFaceCenter( cellA[1], cellA[2], cellA[6], cellA[5] );
+        EXPECT_NE( RigHexIntersectionTools::isPointInCell( faceCenter, cellA ), RigHexIntersectionTools::isPointInCell( faceCenter, cellB ) );
+
+        for ( const cvf::Vec3d& corner : { cellA[1], cellA[2], cellA[5], cellA[6] } )
+        {
+            EXPECT_FALSE( RigHexIntersectionTools::isPointInCell( corner, cellA ) && RigHexIntersectionTools::isPointInCell( corner, cellB ) );
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Collapsed cells have no volume, and the top and bottom faces of a pinched cell are not counted as one crossing
+//--------------------------------------------------------------------------------------------------
+TEST( RigHexIntersectionTools, isPointInCellCollapsedAndPinchedCells )
+{
+    const std::array<cvf::Vec3d, 8> unitCell = { cvf::Vec3d( 0, 0, 0 ),
+                                                 cvf::Vec3d( 1, 0, 0 ),
+                                                 cvf::Vec3d( 1, 1, 0 ),
+                                                 cvf::Vec3d( 0, 1, 0 ),
+                                                 cvf::Vec3d( 0, 0, 1 ),
+                                                 cvf::Vec3d( 1, 0, 1 ),
+                                                 cvf::Vec3d( 1, 1, 1 ),
+                                                 cvf::Vec3d( 0, 1, 1 ) };
+
+    EXPECT_TRUE( RigHexIntersectionTools::isPointInCell( cvf::Vec3d( 0.5, 0.5, 0.5 ), unitCell ) );
+    EXPECT_FALSE( RigHexIntersectionTools::isPointInCell( cvf::Vec3d( 0.5, 0.5, 1.5 ), unitCell ) );
+    EXPECT_FALSE( RigHexIntersectionTools::isPointInCell( cvf::Vec3d( 0.5, 0.5, -0.5 ), unitCell ) );
+    EXPECT_FALSE( RigHexIntersectionTools::isPointInCell( cvf::Vec3d( 1.5, 0.5, 0.5 ), unitCell ) );
+
+    // Fully collapsed: top corners equal the bottom corners
+    std::array<cvf::Vec3d, 8> collapsed = unitCell;
+    for ( int i = 4; i < 8; ++i )
+        collapsed[i] = unitCell[i - 4];
+
+    for ( const cvf::Vec3d& point :
+          { cvf::Vec3d( 0.5, 0.5, 0.0 ), cvf::Vec3d( 0.5, 0.5, -1.0 ), cvf::Vec3d( 0.5, 0.5, 1.0 ), cvf::Vec3d( 0.25, 0.75, 0.0 ) } )
+    {
+        EXPECT_FALSE( RigHexIntersectionTools::isPointInCell( point, collapsed ) );
+    }
+
+    // Pinched along one edge: the top face touches the bottom face along the edge from corner 0 to corner 3
+    std::array<cvf::Vec3d, 8> pinched = unitCell;
+    pinched[4]                        = unitCell[0];
+    pinched[7]                        = unitCell[3];
+    EXPECT_TRUE( RigHexIntersectionTools::isPointInCell( cvf::Vec3d( 0.75, 0.5, 0.25 ), pinched ) );
+    EXPECT_FALSE( RigHexIntersectionTools::isPointInCell( cvf::Vec3d( 0.25, 0.5, 0.75 ), pinched ) );
+    EXPECT_FALSE( RigHexIntersectionTools::isPointInCell( cvf::Vec3d( 0.1, 0.5, 0.5 ), pinched ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// The answer does not depend on the coordinate magnitude, also for points exactly on the surface
+//--------------------------------------------------------------------------------------------------
+TEST( RigHexIntersectionTools, isPointInCellIsTranslationInvariant )
+{
+    const std::array<cvf::Vec3d, 8> unitCell = { cvf::Vec3d( 0, 0, 0 ),
+                                                 cvf::Vec3d( 1, 0, 0 ),
+                                                 cvf::Vec3d( 1, 1, 0 ),
+                                                 cvf::Vec3d( 0, 1, 0 ),
+                                                 cvf::Vec3d( 0, 0, 1 ),
+                                                 cvf::Vec3d( 1, 0, 1 ),
+                                                 cvf::Vec3d( 1, 1, 1 ),
+                                                 cvf::Vec3d( 0, 1, 1 ) };
+
+    const cvf::Vec3d translation( 512345.0, 6712345.0, -2345.0 );
+
+    std::array<cvf::Vec3d, 8> translated = unitCell;
+    for ( auto& corner : translated )
+        corner += translation;
+
+    for ( int i = -2; i <= 6; ++i )
+    {
+        for ( int j = -2; j <= 6; ++j )
+        {
+            for ( int k = -2; k <= 6; ++k )
+            {
+                const cvf::Vec3d point( 0.25 * i, 0.25 * j, 0.25 * k );
+                EXPECT_EQ( RigHexIntersectionTools::isPointInCell( point, unitCell ),
+                           RigHexIntersectionTools::isPointInCell( point + translation, translated ) )
+                    << i << " " << j << " " << k;
+            }
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
 /// Timing of the line and point vs cell queries on distorted cells at UTM coordinates. Disabled by default, run with
 /// --gtest_also_run_disabled_tests --gtest_filter=*IntersectionPerformance*
 //--------------------------------------------------------------------------------------------------
@@ -559,7 +719,44 @@ TEST( RigHexIntersectionTools, DISABLED_lineAndPointCellIntersectionPerformance 
             }
         } );
 
-    auto nsPerQuery = [&]( double ms ) { return 1.0e6 * ms / static_cast<double>( queryCount ); };
+    size_t pointInCellRefCount = 0;
+    double pointInCellRefMs    = bestOf(
+        [&]()
+        {
+            pointInCellRefCount = 0;
+            for ( size_t q = 0; q < queryCount; ++q )
+            {
+                if ( isPointInCellRayReference( segments[q].first, hexes[q / queriesPerHex] ) ) ++pointInCellRefCount;
+            }
+        } );
+
+    // Points inside the cells, where the cell bounding box does not reject the query
+    std::vector<size_t> insideQueries;
+    for ( size_t q = 0; q < queryCount; ++q )
+    {
+        if ( RigHexIntersectionTools::isPointInCell( segments[q].first, hexes[q / queriesPerHex] ) ) insideQueries.push_back( q );
+    }
+
+    size_t insideCount = 0;
+    double insideMs    = bestOf(
+        [&]()
+        {
+            insideCount = 0;
+            for ( size_t q : insideQueries )
+                if ( RigHexIntersectionTools::isPointInCell( segments[q].first, hexes[q / queriesPerHex] ) ) ++insideCount;
+        } );
+
+    size_t insideRefCount = 0;
+    double insideRefMs    = bestOf(
+        [&]()
+        {
+            insideRefCount = 0;
+            for ( size_t q : insideQueries )
+                if ( isPointInCellRayReference( segments[q].first, hexes[q / queriesPerHex] ) ) ++insideRefCount;
+        } );
+
+    auto nsPerQuery       = [&]( double ms ) { return 1.0e6 * ms / static_cast<double>( queryCount ); };
+    auto nsPerInsideQuery = [&]( double ms ) { return 1.0e6 * ms / static_cast<double>( insideQueries.size() ); };
 
     std::cout << "Queries: " << queryCount << ", best of " << runCount << " runs" << std::endl;
     std::cout << "lineHexCellIntersection: " << lineHexMs << " ms (" << nsPerQuery( lineHexMs ) << " ns/query), hits " << lineHexHits
@@ -568,4 +765,11 @@ TEST( RigHexIntersectionTools, DISABLED_lineAndPointCellIntersectionPerformance 
               << lineIntersectsCount << std::endl;
     std::cout << "isPointInCell:           " << pointInCellMs << " ms (" << nsPerQuery( pointInCellMs ) << " ns/query), inside "
               << pointInCellCount << std::endl;
+    std::cout << "isPointInCell (ray ref): " << pointInCellRefMs << " ms (" << nsPerQuery( pointInCellRefMs ) << " ns/query), inside "
+              << pointInCellRefCount << std::endl;
+    std::cout << "isPointInCell, inside points only:           " << nsPerInsideQuery( insideMs ) << " ns/query" << std::endl;
+    std::cout << "isPointInCell, inside points only (ray ref): " << nsPerInsideQuery( insideRefMs ) << " ns/query" << std::endl;
+
+    EXPECT_EQ( pointInCellRefCount, pointInCellCount );
+    EXPECT_EQ( insideRefCount, insideCount );
 }
