@@ -7,6 +7,8 @@ endif(MSVC)
 
 set(SOURCE_UNITTEST_FILES
     ${CMAKE_CURRENT_LIST_DIR}/cvfGeometryTools-Test.cpp
+    # LibGeometry_UnitTests are not run in CI, compile the same source here
+    ${CMAKE_CURRENT_LIST_DIR}/../../Fwk/VizFwk/Tests/LibGeometry_UnitTests/cvfRobustPredicates-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/Ert-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigModelPaddingSettings-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigPadModel-Test.cpp
@@ -403,8 +405,10 @@ endif()
 target_link_libraries(
   ResInsight-tests
   PUBLIC ${LINK_LIBRARIES} GTest::gtest
-  PRIVATE ResInsightCommonSettings
+  PRIVATE ResInsightCommonSettings ShewchukPredicatesFmaProbe
 )
+
+target_compile_definitions(ResInsight-tests PRIVATE CVF_HAS_FMA_PROBE)
 
 if(MSVC)
   add_custom_command(

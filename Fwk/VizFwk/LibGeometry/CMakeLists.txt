@@ -32,6 +32,7 @@ cvfOutlineEdgeExtractor.h
 cvfPatchGenerator.h
 cvfPrimitiveTests.h
 cvfRay.h
+cvfRobustPredicates.h
 cvfTriangleMeshEdgeExtractor.h
 cvfTriangleVertexSplitter.h
 cvfVertexCompactor.h
@@ -54,11 +55,17 @@ cvfOutlineEdgeExtractor.cpp
 cvfPatchGenerator.cpp
 cvfPrimitiveTests.cpp
 cvfRay.cpp
+cvfRobustPredicates.cpp
 cvfTriangleMeshEdgeExtractor.cpp
 cvfTriangleVertexSplitter.cpp
 cvfVertexCompactor.cpp
 cvfVertexWelder.cpp
 )
+
+# Vendored exact geometric predicates, compiled with its own flags (not subject to strict flags)
+if (NOT TARGET ShewchukPredicates)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/ShewchukPredicates ${CMAKE_CURRENT_BINARY_DIR}/ShewchukPredicates)
+endif()
 
 add_library(${PROJECT_NAME} ${CEE_HEADER_FILES} ${CEE_SOURCE_FILES})
 
@@ -68,7 +75,8 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_link_libraries ( ${PROJECT_NAME}
-    LibCore
+    PUBLIC LibCore
+    PRIVATE ShewchukPredicates
 )
 
 set(PROJECT_FILES ${CEE_HEADER_FILES} ${CEE_SOURCE_FILES})

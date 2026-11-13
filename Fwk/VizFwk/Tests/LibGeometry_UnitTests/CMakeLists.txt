@@ -26,6 +26,7 @@ cvfOutlineEdgeExtractor-Test.cpp
 cvfPatchGenerator-Test.cpp
 cvfPrimitiveTests-Test.cpp
 cvfRay-Test.cpp
+cvfRobustPredicates-Test.cpp
 cvfTriangleMeshEdgeExtractor-Test.cpp
 cvfTriangleVertexSplitter-Test.cpp
 cvfVertexCompactor-Test.cpp
@@ -38,3 +39,6 @@ add_definitions(-D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
 add_executable(${PROJECT_NAME} ${CEE_SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} ${CEE_LIBS} ${CEE_PLATFORM_LIBS} )
 
+
+target_link_libraries(${PROJECT_NAME} ShewchukPredicatesFmaProbe)
+target_compile_definitions(${PROJECT_NAME} PRIVATE CVF_HAS_FMA_PROBE)
