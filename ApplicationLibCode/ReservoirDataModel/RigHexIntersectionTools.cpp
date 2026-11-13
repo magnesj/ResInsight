@@ -116,6 +116,113 @@ int filteredOrient3d( const cvf::Vec3d& a, const cvf::Vec3d& b, const cvf::Vec3d
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Conservative floating point test that is true only if the segment, given as a ball with a center and a radius,
+/// certainly does not touch the four triangles ( corner i, corner i + 1, faceCenter ) of a face. The triangles are
+/// inside the slab of points with a distance to the plane through the face center, with normal along the face
+/// diagonals' cross product, that is at most the largest corner distance. Rounding errors are bounded and added,
+/// so a face that is not rejected is decided by the exact predicates.
+//--------------------------------------------------------------------------------------------------
+bool isSegmentOutsideFaceSlab( const cvf::Vec3d&                       segmentCenter,
+                               double                                  segmentRadius,
+                               const std::array<const cvf::Vec3d*, 4>& corners,
+                               const cvf::Vec3d&                       faceCenter )
+{
+    const cvf::Vec3d normal = ( *corners[2] - *corners[0] ) ^ ( *corners[3] - *corners[1] );
+    const cvf::Vec3d absNormal( std::abs( normal.x() ), std::abs( normal.y() ), std::abs( normal.z() ) );
+    const double     normalL1 = absNormal.x() + absNormal.y() + absNormal.z();
+    if ( normalL1 == 0.0 ) return false;
+
+    // Bound of the rounding error of normal . ( x - faceCenter ), with the computed normal taken as exact
+    const double errorFactor = 8.0 * std::numeric_limits<double>::epsilon();
+    auto         errorBound  = [&]( const cvf::Vec3d& x )
+    {
+        return errorFactor * ( absNormal.x() * ( std::abs( x.x() ) + std::abs( faceCenter.x() ) ) +
+                               absNormal.y() * ( std::abs( x.y() ) + std::abs( faceCenter.y() ) ) +
+                               absNormal.z() * ( std::abs( x.z() ) + std::abs( faceCenter.z() ) ) );
+    };
+
+    double slabHalfWidth = 0.0;
+    for ( const cvf::Vec3d* corner : corners )
+    {
+        slabHalfWidth = std::max( slabHalfWidth, std::abs( normal * ( *corner - faceCenter ) ) + errorBound( *corner ) );
+    }
+
+    // The L1 norm of the normal bounds the L2 norm, so the radius term bounds the distance of any segment point
+    const double centerDistance = std::abs( normal * ( segmentCenter - faceCenter ) ) - errorBound( segmentCenter );
+    return centerDistance > ( segmentRadius * normalL1 + slabHalfWidth ) * ( 1.0 + errorFactor );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Outcodes of the cell corners relative to the segment p - q. Bits 0-5 are set when a corner is below or above the
+/// bounding box of the segment along x, y and z, and are exact. Bits 6-9 are set when a corner is certainly on one
+/// side of one of two planes containing the segment, with a margin many times larger than the rounding errors.
+/// A set of corners with a common bit is separated from the segment, and so is their convex hull.
+//--------------------------------------------------------------------------------------------------
+std::array<unsigned, 8> segmentOutcodes( const cvf::Vec3d&                p,
+                                         const cvf::Vec3d&                q,
+                                         const cvf::Vec3d&                segmentMin,
+                                         const cvf::Vec3d&                segmentMax,
+                                         const std::array<cvf::Vec3d, 8>& hexCorners )
+{
+    // Two directions perpendicular to the segment, built from the axis with the smallest direction component
+    const cvf::Vec3d direction = q - p;
+    const cvf::Vec3d absDirection( std::abs( direction.x() ), std::abs( direction.y() ), std::abs( direction.z() ) );
+    cvf::Vec3d       axis = cvf::Vec3d::X_AXIS;
+    if ( absDirection.y() < absDirection.x() && absDirection.y() <= absDirection.z() )
+        axis = cvf::Vec3d::Y_AXIS;
+    else if ( absDirection.z() < absDirection.x() && absDirection.z() < absDirection.y() )
+        axis = cvf::Vec3d::Z_AXIS;
+
+    const cvf::Vec3d u = direction ^ axis;
+    const cvf::Vec3d v = direction ^ u;
+
+    auto l1      = []( const cvf::Vec3d& w ) { return std::abs( w.x() ) + std::abs( w.y() ) + std::abs( w.z() ); };
+    auto maxNorm = []( const cvf::Vec3d& w ) { return std::max( { std::abs( w.x() ), std::abs( w.y() ), std::abs( w.z() ) } ); };
+
+    double magnitude = std::max( maxNorm( p ), maxNorm( q ) );
+    for ( const auto& corner : hexCorners )
+        magnitude = std::max( magnitude, maxNorm( corner ) );
+
+    // Bound of the rounding errors of ( x - p ) . n for the segment points and the corners, with n taken as exact
+    const double errorFactor = 64.0 * std::numeric_limits<double>::epsilon() * magnitude;
+    const double marginU     = errorFactor * l1( u );
+    const double marginV     = errorFactor * l1( v );
+
+    const double qU = direction * u;
+    const double qV = direction * v;
+
+    const double maxU = std::max( 0.0, qU ) + marginU;
+    const double minU = std::min( 0.0, qU ) - marginU;
+    const double maxV = std::max( 0.0, qV ) + marginV;
+    const double minV = std::min( 0.0, qV ) - marginV;
+
+    std::array<unsigned, 8> outcodes;
+    for ( size_t i = 0; i < 8; ++i )
+    {
+        const cvf::Vec3d& corner = hexCorners[i];
+
+        unsigned code = 0;
+        for ( int axisIdx = 0; axisIdx < 3; ++axisIdx )
+        {
+            if ( corner[axisIdx] < segmentMin[axisIdx] ) code |= 1u << ( 2 * axisIdx );
+            if ( corner[axisIdx] > segmentMax[axisIdx] ) code |= 2u << ( 2 * axisIdx );
+        }
+
+        const cvf::Vec3d w      = corner - p;
+        const double     valueU = w * u;
+        const double     valueV = w * v;
+        if ( valueU < minU ) code |= 1u << 6;
+        if ( valueU > maxU ) code |= 1u << 7;
+        if ( valueV < minV ) code |= 1u << 8;
+        if ( valueV > maxV ) code |= 1u << 9;
+
+        outcodes[i] = code;
+    }
+
+    return outcodes;
+}
+
+//--------------------------------------------------------------------------------------------------
 /// Calls handler( face, a, b, c, valueP, valueQ ) for every triangle of the canonical cell surface that is hit by
 /// the closed segment p - q, where valueP and valueQ are the orient3d values of p and q relative to the triangle
 /// (a, b, c). The decisions are exact. The three triangle edges are tested with the sign of orient3d( p, q, u, v ),
@@ -130,6 +237,20 @@ bool forEachSegmentTriangleHit( const cvf::Vec3d& p, const cvf::Vec3d& q, const 
 
     cvf::Vec3d segmentMin( std::min( p.x(), q.x() ), std::min( p.y(), q.y() ), std::min( p.z(), q.z() ) );
     cvf::Vec3d segmentMax( std::max( p.x(), q.x() ), std::max( p.y(), q.y() ), std::max( p.z(), q.z() ) );
+
+    // Ball around the segment for the face slab test. The radius bounds the half length and the rounding of the center
+    const double     epsilon       = std::numeric_limits<double>::epsilon();
+    const cvf::Vec3d segmentCenter = 0.5 * ( p + q );
+    const double     segmentRadius =
+        0.5 * ( ( segmentMax.x() - segmentMin.x() ) + ( segmentMax.y() - segmentMin.y() ) + ( segmentMax.z() - segmentMin.z() ) ) *
+            ( 1.0 + 8.0 * epsilon ) +
+        2.0 * epsilon * ( std::abs( segmentCenter.x() ) + std::abs( segmentCenter.y() ) + std::abs( segmentCenter.z() ) );
+
+    const std::array<unsigned, 8> outcodes = segmentOutcodes( p, q, segmentMin, segmentMax, hexCorners );
+    if ( ( outcodes[0] & outcodes[1] & outcodes[2] & outcodes[3] & outcodes[4] & outcodes[5] & outcodes[6] & outcodes[7] ) != 0 )
+    {
+        return true;
+    }
 
     // The cell edges are shared by two faces, the sign is computed once. 2 = not computed yet
     std::array<std::array<int, 8>, 8> cellEdgeSigns;
@@ -150,26 +271,23 @@ bool forEachSegmentTriangleHit( const cvf::Vec3d& p, const cvf::Vec3d& q, const 
     for ( int faceIdx = 0; faceIdx < 6; ++faceIdx )
     {
         const auto face = static_cast<cvf::StructGridInterface::FaceType>( faceIdx );
-
         cvf::ubyte faceVertexIndices[4];
         cvf::StructGridInterface::cellFaceVertexIndices( face, faceVertexIndices );
+
+        // Culling of faces away from the segment. The face center is inside the convex hull of the corners
+        if ( ( outcodes[faceVertexIndices[0]] & outcodes[faceVertexIndices[1]] & outcodes[faceVertexIndices[2]] &
+               outcodes[faceVertexIndices[3]] ) != 0 )
+        {
+            continue;
+        }
 
         const std::array<const cvf::Vec3d*, 4> corners = { &hexCorners[faceVertexIndices[0]],
                                                            &hexCorners[faceVertexIndices[1]],
                                                            &hexCorners[faceVertexIndices[2]],
                                                            &hexCorners[faceVertexIndices[3]] };
 
-        // Exact culling of faces away from the segment. The face center is inside the bounding box of the corners
-        bool isCulled = false;
-        for ( int axis = 0; axis < 3 && !isCulled; ++axis )
-        {
-            const double minimum = std::min( { ( *corners[0] )[axis], ( *corners[1] )[axis], ( *corners[2] )[axis], ( *corners[3] )[axis] } );
-            const double maximum = std::max( { ( *corners[0] )[axis], ( *corners[1] )[axis], ( *corners[2] )[axis], ( *corners[3] )[axis] } );
-            isCulled = segmentMax[axis] < minimum || segmentMin[axis] > maximum;
-        }
-        if ( isCulled ) continue;
-
         const cvf::Vec3d faceCenter = RigHexIntersectionTools::canonicalFaceCenter( *corners[0], *corners[1], *corners[2], *corners[3] );
+        if ( isSegmentOutsideFaceSlab( segmentCenter, segmentRadius, corners, faceCenter ) ) continue;
 
         // Sign of the spoke edge from corner k to the face center. The edge in the opposite direction has the opposite sign
         std::array<int, 4> spokeSigns;

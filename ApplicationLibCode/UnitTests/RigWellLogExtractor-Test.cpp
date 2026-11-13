@@ -18,8 +18,12 @@
 
 #include "gtest/gtest.h"
 
-#include "RifReaderMockModel.h"
+#include "RiaTestDataDirectory.h"
 
+#include "RifReaderMockModel.h"
+#include "RifReaderOpmCommon.h"
+
+#include "RigActiveCellInfo.h"
 #include "RigEclipseCaseData.h"
 #include "RigGridManager.h"
 #include "RigMainGrid.h"
@@ -27,6 +31,11 @@
 #include "Well/RigWellLogExtractor.h"
 #include "Well/RigWellPath.h"
 
+#include <QDir>
+
+#include <chrono>
+#include <cmath>
+#include <iostream>
 #include <set>
 #include <tuple>
 
@@ -454,4 +463,126 @@ TEST( RigWellLogExtractor, LimitsPointsBetweenEnterAndLeave )
     std::vector<double> discarded;
     EXPECT_TRUE( pairPoints( pointsWithStrays( limit + 1 ), &discarded ).empty() );
     EXPECT_EQ( limit + 3, discarded.size() );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Timing of well log extraction for long horizontal, deviated and vertical wells in the faulted TEST10K_FLT_LGR_NNC
+/// model. Disabled by default, run with --gtest_also_run_disabled_tests --gtest_filter=*ExtractionPerformance*
+//--------------------------------------------------------------------------------------------------
+TEST( RigEclipseWellLogExtractor, DISABLED_ExtractionPerformance )
+{
+    QDir    baseFolder( TEST_MODEL_DIR );
+    QString filename = baseFolder.absoluteFilePath( "TEST10K_FLT_LGR_NNC/TEST10K_FLT_LGR_NNC.EGRID" );
+    ASSERT_TRUE( QFile::exists( filename ) );
+
+    cvf::ref<RigEclipseCaseData> caseData = new RigEclipseCaseData( nullptr );
+    cvf::ref<RifReaderOpmCommon> reader   = new RifReaderOpmCommon;
+    ASSERT_TRUE( reader->open( filename, caseData.p() ) );
+
+    RigMainGrid* mainGrid = caseData->mainGrid();
+    mainGrid->computeCachedData();
+    {
+        auto                activeCellInfo = caseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
+        std::vector<size_t> activeCells;
+        for ( size_t i = 0; i < mainGrid->cellCount(); i++ )
+        {
+            if ( activeCellInfo->isActive( ReservoirCellIndex( i ) ) ) activeCells.push_back( i );
+        }
+        mainGrid->computeCharacteristicCellSize( activeCells );
+        mainGrid->computeFaceNormalsDirection( activeCells );
+    }
+
+    const cvf::BoundingBox bb   = mainGrid->boundingBox();
+    const cvf::Vec3d       minP = bb.min();
+    const cvf::Vec3d       maxP = bb.max();
+    const cvf::Vec3d       size = maxP - minP;
+
+    // Well paths sampled every 5 m, as imported well paths typically are
+    auto createWellPath = []( const cvf::Vec3d& from, const cvf::Vec3d& to )
+    {
+        const double            length       = ( to - from ).length();
+        const size_t            segmentCount = std::max( size_t( 1 ), static_cast<size_t>( length / 5.0 ) );
+        std::vector<cvf::Vec3d> points;
+        std::vector<double>     mds;
+        for ( size_t i = 0; i <= segmentCount; i++ )
+        {
+            const double t = static_cast<double>( i ) / static_cast<double>( segmentCount );
+            points.push_back( from + t * ( to - from ) );
+            mds.push_back( 1000.0 + t * length );
+        }
+        cvf::ref<RigWellPath> wellPath = new RigWellPath;
+        wellPath->setWellPathPoints( points, mds );
+        return wellPath;
+    };
+
+    std::vector<cvf::ref<RigWellPath>> wellPaths;
+    const int                          wellCountPerType = 8;
+    for ( int i = 0; i < wellCountPerType; i++ )
+    {
+        const double f = ( i + 0.5 ) / wellCountPerType;
+
+        // Horizontal along x and y
+        const double z = minP.z() + ( 0.2 + 0.6 * f ) * size.z();
+        wellPaths.push_back( createWellPath( cvf::Vec3d( minP.x() - 10, minP.y() + f * size.y(), z ),
+                                             cvf::Vec3d( maxP.x() + 10, minP.y() + f * size.y(), z ) ) );
+        wellPaths.push_back( createWellPath( cvf::Vec3d( minP.x() + f * size.x(), minP.y() - 10, z ),
+                                             cvf::Vec3d( minP.x() + f * size.x(), maxP.y() + 10, z ) ) );
+
+        // Deviated through the full depth
+        wellPaths.push_back( createWellPath( cvf::Vec3d( minP.x() + f * size.x(), minP.y(), maxP.z() + 10 ),
+                                             cvf::Vec3d( maxP.x() - f * size.x(), maxP.y(), minP.z() - 10 ) ) );
+
+        // Vertical
+        wellPaths.push_back( createWellPath( cvf::Vec3d( minP.x() + f * size.x(), minP.y() + ( 1.0 - f ) * size.y(), maxP.z() + 10 ),
+                                             cvf::Vec3d( minP.x() + f * size.x(), minP.y() + ( 1.0 - f ) * size.y(), minP.z() - 10 ) ) );
+    }
+
+    // The search tree candidates per segment include degenerate inactive cells that collapse towards a point
+    size_t segmentCount   = 0;
+    size_t candidateCount = 0;
+    for ( const auto& wellPath : wellPaths )
+    {
+        const auto& points = wellPath->wellPathPoints();
+        for ( size_t i = 0; i + 1 < points.size(); i++ )
+        {
+            cvf::BoundingBox segmentBB;
+            segmentBB.add( points[i] );
+            segmentBB.add( points[i + 1] );
+            candidateCount += mainGrid->findIntersectingCells( segmentBB ).size();
+            segmentCount++;
+        }
+    }
+
+    const int runCount  = 3;
+    double    bestMs    = std::numeric_limits<double>::infinity();
+    size_t    cellCount = 0;
+    double    mdInCells = 0.0;
+    for ( int run = 0; run < runCount; run++ )
+    {
+        cellCount = 0;
+        mdInCells = 0.0;
+
+        auto start = std::chrono::steady_clock::now();
+        for ( const auto& wellPath : wellPaths )
+        {
+            cvf::ref<RigEclipseWellLogExtractor> extractor = new RigEclipseWellLogExtractor( caseData.p(), wellPath.p(), "" );
+            for ( const auto& info : extractor->cellIntersectionInfosAlongWellPath() )
+            {
+                cellCount++;
+                mdInCells += info.endMD - info.startMD;
+            }
+        }
+        auto stop = std::chrono::steady_clock::now();
+        bestMs    = std::min( bestMs, std::chrono::duration<double, std::milli>( stop - start ).count() );
+    }
+
+    double totalLength = 0.0;
+    for ( const auto& wellPath : wellPaths )
+    {
+        totalLength += wellPath->measuredDepths().back() - wellPath->measuredDepths().front();
+    }
+
+    std::cout << "Well log extraction, " << wellPaths.size() << " wells, " << totalLength << " m, " << segmentCount << " segments, "
+              << candidateCount << " candidate cells: " << bestMs << " ms, " << cellCount << " cell intervals, " << mdInCells
+              << " m in cells" << std::endl;
 }
