@@ -26,7 +26,6 @@
 #include "RigEclipseResultAddress.h"
 #include "RigMainGrid.h"
 #include "RigResultAccessor.h"
-#include "RigWellLogExtractionTools.h"
 #include "RigWellPath.h"
 #include "RigWellPathGeometryTools.h"
 #include "RigWellPathIntersectionTools.h"
@@ -61,34 +60,35 @@ RigEclipseWellLogExtractor::RigEclipseWellLogExtractor( const RigEclipseCaseData
 //--------------------------------------------------------------------------------------------------
 void RigEclipseWellLogExtractor::calculateIntersection()
 {
-    std::map<RigMDCellIdxEnterLeaveKey, HexIntersectionInfo> uniqueIntersections;
+    const std::vector<cvf::Vec3d>& wellPathPoints = m_wellPathGeometry->wellPathPoints();
+    const std::vector<double>&     measuredDepths = m_wellPathGeometry->measuredDepths();
+    if ( wellPathPoints.size() < 2 ) return;
 
-    bool isCellFaceNormalsOut = m_caseData->mainGrid()->isFaceNormalsOutwards();
+    const RigMainGrid* mainGrid             = m_caseData->mainGrid();
+    const bool         isCellFaceNormalsOut = mainGrid->isFaceNormalsOutwards();
 
-    if ( m_wellPathGeometry->wellPathPoints().empty() ) return;
+    auto isCellUsed = [mainGrid]( size_t globalCellIndex )
+    {
+        const RigCell& cell = mainGrid->cell( globalCellIndex );
+        return !cell.isInvalid() && cell.subGrid() == nullptr;
+    };
 
-    double tolerance = computeLengthThreshold();
-
-    for ( size_t wpp = 0; wpp < m_wellPathGeometry->wellPathPoints().size() - 1; ++wpp )
+    std::vector<WellPathCellCrossing> crossings;
+    for ( size_t wpp = 0; wpp < wellPathPoints.size() - 1; ++wpp )
     {
         std::vector<HexIntersectionInfo> intersections;
-        cvf::Vec3d                       p1 = m_wellPathGeometry->wellPathPoints()[wpp];
-        cvf::Vec3d                       p2 = m_wellPathGeometry->wellPathPoints()[wpp + 1];
+        const cvf::Vec3d&                p1 = wellPathPoints[wpp];
+        const cvf::Vec3d&                p2 = wellPathPoints[wpp + 1];
 
         cvf::BoundingBox bb;
-
         bb.add( p1 );
         bb.add( p2 );
 
-        std::vector<size_t> closeCellIndices = findCloseCellIndices( bb );
-
-        for ( const auto& globalCellIndex : closeCellIndices )
+        for ( const auto& globalCellIndex : findCloseCellIndices( bb ) )
         {
-            const RigCell& cell = m_caseData->mainGrid()->cell( globalCellIndex );
+            if ( !isCellUsed( globalCellIndex ) ) continue;
 
-            if ( cell.isInvalid() || cell.subGrid() != nullptr ) continue;
-
-            std::array<cvf::Vec3d, 8> hexCorners = m_caseData->mainGrid()->cellCornerVertices( globalCellIndex );
+            std::array<cvf::Vec3d, 8> hexCorners = mainGrid->cellCornerVertices( globalCellIndex );
             RigHexIntersectionTools::lineHexCellIntersection( p1, p2, hexCorners, globalCellIndex, &intersections );
         }
 
@@ -100,85 +100,32 @@ void RigEclipseWellLogExtractor::calculateIntersection()
             }
         }
 
-        // Now, with all the intersections of this piece of line, we need to
-        // sort them in order, and set the measured depth and corresponding cell index
-
-        // Inserting the intersections in this map will remove identical intersections
-        // and sort them according to MD, CellIdx, Leave/enter
-
-        double md1 = m_wellPathGeometry->measuredDepths()[wpp];
-        double md2 = m_wellPathGeometry->measuredDepths()[wpp + 1];
-
-        insertIntersectionsInMap( intersections, p1, md1, p2, md2, tolerance, &uniqueIntersections );
+        appendSegmentCrossings( intersections, p1, measuredDepths[wpp], p2, measuredDepths[wpp + 1], &crossings );
     }
 
-    if ( uniqueIntersections.empty() && m_caseData->mainGrid()->isRadial() )
+    auto candidateCellsAtPoint = [this, &isCellUsed]( const cvf::Vec3d& point )
     {
-        uniqueIntersections = radialGridAxisIntersections( tolerance );
-    }
+        cvf::BoundingBox bb;
+        bb.add( point );
 
-    if ( uniqueIntersections.empty() && m_wellPathGeometry->wellPathPoints().size() > 1 )
+        std::vector<size_t> cells = findCloseCellIndices( bb );
+        cells.erase( std::remove_if( cells.begin(), cells.end(), [&isCellUsed]( size_t cellIndex ) { return !isCellUsed( cellIndex ); } ),
+                     cells.end() );
+        return cells;
+    };
+
+    auto isPointInCell = [mainGrid]( size_t globalCellIndex, const cvf::Vec3d& point )
+    { return RigHexIntersectionTools::isPointInCell( point, mainGrid->cellCornerVertices( globalCellIndex ) ); };
+
+    std::vector<WellPathCellIntersectionInfo> cellIntervals =
+        assignCellIntervals( wellPathPoints, measuredDepths, std::move( crossings ), computeLengthThreshold(), candidateCellsAtPoint, isPointInCell );
+
+    if ( cellIntervals.empty() && mainGrid->isRadial() )
     {
-        // When entering this function, all well path points are either completely outside the grid
-        // or all well path points are inside one cell
-
-        cvf::Vec3d firstPoint = m_wellPathGeometry->wellPathPoints().front();
-        cvf::Vec3d lastPoint  = m_wellPathGeometry->wellPathPoints().back();
-
-        {
-            cvf::BoundingBox bb;
-            bb.add( firstPoint );
-
-            std::vector<size_t> closeCellIndices = findCloseCellIndices( bb );
-
-            for ( const auto& globalCellIndex : closeCellIndices )
-            {
-                const RigCell& cell = m_caseData->mainGrid()->cell( globalCellIndex );
-
-                if ( cell.isInvalid() ) continue;
-
-                std::array<cvf::Vec3d, 8> hexCorners = m_caseData->mainGrid()->cellCornerVertices( globalCellIndex );
-                if ( RigHexIntersectionTools::isPointInCell( firstPoint, hexCorners ) )
-                {
-                    if ( RigHexIntersectionTools::isPointInCell( lastPoint, hexCorners ) )
-                    {
-                        {
-                            // Mark the first well path point as entering the cell
-
-                            bool                      isEntering = true;
-                            HexIntersectionInfo       info( firstPoint, isEntering, cvf::StructGridInterface::NO_FACE, globalCellIndex );
-                            RigMDCellIdxEnterLeaveKey enterLeaveKey( m_wellPathGeometry->measuredDepths().front(),
-                                                                     globalCellIndex,
-                                                                     isEntering,
-                                                                     tolerance );
-
-                            uniqueIntersections.insert( std::make_pair( enterLeaveKey, info ) );
-                        }
-
-                        {
-                            // Mark the last well path point as leaving cell
-
-                            bool                      isEntering = false;
-                            HexIntersectionInfo       info( lastPoint, isEntering, cvf::StructGridInterface::NO_FACE, globalCellIndex );
-                            RigMDCellIdxEnterLeaveKey enterLeaveKey( m_wellPathGeometry->measuredDepths().back(),
-                                                                     globalCellIndex,
-                                                                     isEntering,
-                                                                     tolerance );
-
-                            uniqueIntersections.insert( std::make_pair( enterLeaveKey, info ) );
-                        }
-                    }
-                    else
-                    {
-                        QString txt = "Detected two points assumed to be in the same cell, but they are in two different cells";
-                        RiaLogging::debug( txt.toStdString() );
-                    }
-                }
-            }
-        }
+        cellIntervals = radialGridAxisIntervals();
     }
 
-    populateReturnArrays( uniqueIntersections );
+    setCellIntervals( cellIntervals );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -186,19 +133,19 @@ void RigEclipseWellLogExtractor::calculateIntersection()
 /// intersected by any cell. Use the innermost cell column and place the cells along the well path by depth. Requires the innermost
 /// ring to consist of a single 360 degree cell for every layer, as picking one of several angular sectors would be arbitrary.
 //--------------------------------------------------------------------------------------------------
-std::map<RigMDCellIdxEnterLeaveKey, HexIntersectionInfo> RigEclipseWellLogExtractor::radialGridAxisIntersections( double tolerance )
+std::vector<WellPathCellIntersectionInfo> RigEclipseWellLogExtractor::radialGridAxisIntervals() const
 {
-    std::map<RigMDCellIdxEnterLeaveKey, HexIntersectionInfo> uniqueIntersections;
+    std::vector<WellPathCellIntersectionInfo> cellIntervals;
 
     const RigMainGrid* mainGrid = m_caseData->mainGrid();
 
     // Only the innermost ring can safely represent the well's position when its cells span the full 360 degrees for every layer.
     // If the ring is split into several angular sectors, picking a single sector would be an arbitrary and potentially wrong choice.
-    if ( mainGrid->cellCountJ() != 1 ) return uniqueIntersections;
+    if ( mainGrid->cellCountJ() != 1 ) return cellIntervals;
 
     const std::vector<double>& wellPathMds  = m_wellPathGeometry->measuredDepths();
     const std::vector<double>  wellPathTvds = m_wellPathGeometry->trueVerticalDepths();
-    if ( wellPathMds.size() < 2 ) return uniqueIntersections;
+    if ( wellPathMds.size() < 2 ) return cellIntervals;
 
     const auto [minTvdIt, maxTvdIt] = std::minmax_element( wellPathTvds.begin(), wellPathTvds.end() );
     const double minTvd             = *minTvdIt;
@@ -223,7 +170,7 @@ std::map<RigMDCellIdxEnterLeaveKey, HexIntersectionInfo> RigEclipseWellLogExtrac
         cellDepths.emplace_back( std::max( topTvd, minTvd ), std::min( bottomTvd, maxTvd ), cellIndex );
     }
 
-    if ( cellDepths.empty() ) return uniqueIntersections;
+    if ( cellDepths.empty() ) return cellIntervals;
 
     // MD interpolation requires unique TVD values ordered along the well path. K is not guaranteed to increase with depth, and
     // neighbour cells share their boundary TVD.
@@ -237,7 +184,7 @@ std::map<RigMDCellIdxEnterLeaveKey, HexIntersectionInfo> RigEclipseWellLogExtrac
     boundaryTvds.erase( std::unique( boundaryTvds.begin(), boundaryTvds.end() ), boundaryTvds.end() );
 
     const std::vector<double> boundaryMds = RigWellPathGeometryTools::interpolateMdFromTvd( wellPathMds, wellPathTvds, boundaryTvds );
-    if ( boundaryMds.size() != boundaryTvds.size() ) return uniqueIntersections;
+    if ( boundaryMds.size() != boundaryTvds.size() ) return cellIntervals;
 
     auto mdAtTvd = [&]( double tvd )
     {
@@ -247,18 +194,27 @@ std::map<RigMDCellIdxEnterLeaveKey, HexIntersectionInfo> RigEclipseWellLogExtrac
 
     for ( const auto& [topTvd, bottomTvd, cellIndex] : cellDepths )
     {
-        for ( bool isEntering : { true, false } )
-        {
-            const double     md    = mdAtTvd( isEntering ? topTvd : bottomTvd );
-            const cvf::Vec3d point = m_wellPathGeometry->interpolatedPointAlongWellPath( md );
+        const double startMd = std::min( mdAtTvd( topTvd ), mdAtTvd( bottomTvd ) );
+        const double endMd   = std::max( mdAtTvd( topTvd ), mdAtTvd( bottomTvd ) );
+        if ( !( endMd > startMd ) ) continue;
 
-            HexIntersectionInfo       info( point, isEntering, cvf::StructGridInterface::NO_FACE, cellIndex );
-            RigMDCellIdxEnterLeaveKey enterLeaveKey( md, cellIndex, isEntering, tolerance );
-            uniqueIntersections.insert( std::make_pair( enterLeaveKey, info ) );
-        }
+        WellPathCellIntersectionInfo cellInterval;
+        cellInterval.globCellIndex               = cellIndex;
+        cellInterval.startMD                     = startMd;
+        cellInterval.endMD                       = endMd;
+        cellInterval.startPoint                  = m_wellPathGeometry->interpolatedPointAlongWellPath( startMd );
+        cellInterval.endPoint                    = m_wellPathGeometry->interpolatedPointAlongWellPath( endMd );
+        cellInterval.intersectionLengthsInCellCS = cvf::Vec3d::ZERO;
+        cellInterval.intersectedCellFaceIn       = cvf::StructGridInterface::NO_FACE;
+        cellInterval.intersectedCellFaceOut      = cvf::StructGridInterface::NO_FACE;
+        cellIntervals.push_back( cellInterval );
     }
 
-    return uniqueIntersections;
+    std::sort( cellIntervals.begin(),
+               cellIntervals.end(),
+               []( const WellPathCellIntersectionInfo& a, const WellPathCellIntersectionInfo& b ) { return a.startMD < b.startMD; } );
+
+    return cellIntervals;
 }
 
 //--------------------------------------------------------------------------------------------------

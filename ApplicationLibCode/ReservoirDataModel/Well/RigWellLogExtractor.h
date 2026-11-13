@@ -20,15 +20,13 @@
 #pragma once
 
 #include "RigHexIntersectionTools.h"
-#include "RigWellLogExtractionTools.h"
 
 #include "cvfObject.h"
 #include "cvfStructGrid.h"
 #include "cvfVector3.h"
 
-#include <map>
+#include <functional>
 #include <optional>
-#include <utility>
 #include <vector>
 
 //==================================================================================================
@@ -48,6 +46,15 @@ struct WellPathCellIntersectionInfo
 
     double startTVD() const { return -startPoint.z(); }
     double endTVD() const { return -endPoint.z(); }
+};
+
+//==================================================================================================
+/// A crossing of the well path and a cell surface, with the measured depth of the crossing point
+//==================================================================================================
+struct WellPathCellCrossing
+{
+    double              measuredDepth;
+    HexIntersectionInfo intersection;
 };
 
 class RigWellPath;
@@ -75,24 +82,25 @@ public:
 
     std::optional<double> averageMdForCell( size_t cellIndex ) const;
 
-    // Number of other points allowed between the entering and the leaving point of a cell. Chosen to cover the stray points seen
-    // next to an LGR in the 10k test case (two in a row for GP1, #15088) with some margin; it is not derived from the grid.
-    static constexpr size_t maxPointsBetweenEnterAndLeave = 4;
+    using CandidateCellsAtPoint = std::function<std::vector<size_t>( const cvf::Vec3d& point )>;
+    using IsPointInCell         = std::function<bool( size_t cellIndex, const cvf::Vec3d& point )>;
 
-    static std::vector<std::pair<size_t, size_t>> pairCellEnterLeavePoints( const std::vector<RigMDEnterLeaveCellIdxKey>& sortedPoints,
-                                                                            std::vector<size_t>*                          discardedPoints );
+    static std::vector<WellPathCellIntersectionInfo> assignCellIntervals( const std::vector<cvf::Vec3d>&    wellPathPoints,
+                                                                          const std::vector<double>&        measuredDepths,
+                                                                          std::vector<WellPathCellCrossing> crossings,
+                                                                          double                            mergeTolerance,
+                                                                          const CandidateCellsAtPoint&      candidateCellsAtPoint,
+                                                                          const IsPointInCell&              isPointInCell );
 
 protected:
-    static void insertIntersectionsInMap( const std::vector<HexIntersectionInfo>&                   intersections,
-                                          cvf::Vec3d                                                p1,
-                                          double                                                    md1,
-                                          cvf::Vec3d                                                p2,
-                                          double                                                    md2,
-                                          double                                                    tolerance,
-                                          std::map<RigMDCellIdxEnterLeaveKey, HexIntersectionInfo>* uniqueIntersections );
+    static void appendSegmentCrossings( const std::vector<HexIntersectionInfo>& intersections,
+                                        const cvf::Vec3d&                       p1,
+                                        double                                  md1,
+                                        const cvf::Vec3d&                       p2,
+                                        double                                  md2,
+                                        std::vector<WellPathCellCrossing>*      crossings );
 
-    void populateReturnArrays( std::map<RigMDCellIdxEnterLeaveKey, HexIntersectionInfo>& uniqueIntersections );
-    void appendIntersectionToArrays( double measuredDepth, const HexIntersectionInfo& intersection, QStringList* errorMessages );
+    void setCellIntervals( const std::vector<WellPathCellIntersectionInfo>& cellIntervals );
 
     virtual cvf::Vec3d calculateLengthInCell( size_t cellIndex, const cvf::Vec3d& startPoint, const cvf::Vec3d& endPoint ) const = 0;
 

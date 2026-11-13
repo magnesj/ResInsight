@@ -37,7 +37,6 @@
 
 #include "RigFemAddressDefines.h"
 #include "RigWbsParameter.h"
-#include "RigWellLogExtractionTools.h"
 #include "RigWellPath.h"
 #include "RigWellPathGeometryTools.h"
 #include "RigWellPathIntersectionTools.h"
@@ -1125,59 +1124,70 @@ size_t RigGeoMechWellLogExtractor::gridResultIndexFace( size_t elementIdx, cvf::
 //--------------------------------------------------------------------------------------------------
 void RigGeoMechWellLogExtractor::calculateIntersection()
 {
-    std::map<RigMDCellIdxEnterLeaveKey, HexIntersectionInfo> uniqueIntersections;
+    const std::vector<cvf::Vec3d>& wellPathPoints = m_wellPathGeometry->wellPathPoints();
+    const std::vector<double>&     measuredDepths = m_wellPathGeometry->measuredDepths();
+    if ( wellPathPoints.size() < 2 ) return;
 
     const RigFemPart*              femPart    = m_caseData->femParts()->part( m_partId );
     const std::vector<cvf::Vec3f>& nodeCoords = femPart->nodes().coordinates;
 
-    for ( size_t wpp = 0; wpp < m_wellPathGeometry->wellPathPoints().size() - 1; ++wpp )
+    auto isHexElement = [femPart]( size_t elementIndex )
+    {
+        RigElementType elmType = femPart->elementType( elementIndex );
+        return elmType == RigElementType::HEX8 || elmType == RigElementType::HEX8P;
+    };
+
+    auto hexCornersOf = [femPart, &nodeCoords]( size_t elementIndex )
+    {
+        const int*                cornerIndices = femPart->connectivities( elementIndex );
+        std::array<cvf::Vec3d, 8> hexCorners;
+        for ( size_t i = 0; i < 8; i++ )
+        {
+            hexCorners[i] = cvf::Vec3d( nodeCoords[cornerIndices[i]] );
+        }
+        return hexCorners;
+    };
+
+    std::vector<WellPathCellCrossing> crossings;
+    for ( size_t wpp = 0; wpp < wellPathPoints.size() - 1; ++wpp )
     {
         std::vector<HexIntersectionInfo> intersections;
-        cvf::Vec3d                       p1 = m_wellPathGeometry->wellPathPoints()[wpp];
-        cvf::Vec3d                       p2 = m_wellPathGeometry->wellPathPoints()[wpp + 1];
+        const cvf::Vec3d&                p1 = wellPathPoints[wpp];
+        const cvf::Vec3d&                p2 = wellPathPoints[wpp + 1];
 
         cvf::BoundingBox bb;
-
         bb.add( p1 );
         bb.add( p2 );
 
-        std::vector<size_t> closeCells = findCloseCells( bb );
-
-        for ( size_t ccIdx = 0; ccIdx < closeCells.size(); ++ccIdx )
+        for ( size_t elementIndex : findCloseCells( bb ) )
         {
-            RigElementType elmType = femPart->elementType( closeCells[ccIdx] );
-            if ( elmType != RigElementType::HEX8 && elmType != RigElementType::HEX8P ) continue;
+            if ( !isHexElement( elementIndex ) ) continue;
 
-            const int* cornerIndices = femPart->connectivities( closeCells[ccIdx] );
-
-            std::array<cvf::Vec3d, 8> hexCorners;
-
-            hexCorners[0] = cvf::Vec3d( nodeCoords[cornerIndices[0]] );
-            hexCorners[1] = cvf::Vec3d( nodeCoords[cornerIndices[1]] );
-            hexCorners[2] = cvf::Vec3d( nodeCoords[cornerIndices[2]] );
-            hexCorners[3] = cvf::Vec3d( nodeCoords[cornerIndices[3]] );
-            hexCorners[4] = cvf::Vec3d( nodeCoords[cornerIndices[4]] );
-            hexCorners[5] = cvf::Vec3d( nodeCoords[cornerIndices[5]] );
-            hexCorners[6] = cvf::Vec3d( nodeCoords[cornerIndices[6]] );
-            hexCorners[7] = cvf::Vec3d( nodeCoords[cornerIndices[7]] );
-
-            RigHexIntersectionTools::lineHexCellIntersection( p1, p2, hexCorners, closeCells[ccIdx], &intersections );
+            RigHexIntersectionTools::lineHexCellIntersection( p1, p2, hexCornersOf( elementIndex ), elementIndex, &intersections );
         }
 
-        // Now, with all the intersections of this piece of line, we need to
-        // sort them in order, and set the measured depth and corresponding cell index
-
-        // Inserting the intersections in this map will remove identical intersections
-        // and sort them according to MD, CellIdx, Leave/enter
-
-        double md1 = m_wellPathGeometry->measuredDepths()[wpp];
-        double md2 = m_wellPathGeometry->measuredDepths()[wpp + 1];
-
-        const double tolerance = 0.1;
-        insertIntersectionsInMap( intersections, p1, md1, p2, md2, tolerance, &uniqueIntersections );
+        appendSegmentCrossings( intersections, p1, measuredDepths[wpp], p2, measuredDepths[wpp + 1], &crossings );
     }
 
-    populateReturnArrays( uniqueIntersections );
+    auto candidateCellsAtPoint = [this, &isHexElement]( const cvf::Vec3d& point )
+    {
+        cvf::BoundingBox bb;
+        bb.add( point );
+
+        std::vector<size_t> elements = findCloseCells( bb );
+        elements.erase( std::remove_if( elements.begin(),
+                                        elements.end(),
+                                        [&isHexElement]( size_t elementIndex ) { return !isHexElement( elementIndex ); } ),
+                        elements.end() );
+        return elements;
+    };
+
+    auto isPointInCell = [&hexCornersOf]( size_t elementIndex, const cvf::Vec3d& point )
+    { return RigHexIntersectionTools::isPointInCell( point, hexCornersOf( elementIndex ) ); };
+
+    const double tolerance = 0.1;
+    setCellIntervals(
+        assignCellIntervals( wellPathPoints, measuredDepths, std::move( crossings ), tolerance, candidateCellsAtPoint, isPointInCell ) );
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -19,12 +19,13 @@
 
 #include "RigWellLogExtractor.h"
 
-#include "RiaLogging.h"
 #include "RigWellPath.h"
 
 #include "cafAssert.h"
 
 #include <algorithm>
+#include <cmath>
+#include <tuple>
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -213,272 +214,258 @@ const RigWellPath* RigWellLogExtractor::wellPathGeometry() const
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Appends the crossings of the well path segment p1 - p2, with the measured depth of each crossing point
 //--------------------------------------------------------------------------------------------------
-void RigWellLogExtractor::insertIntersectionsInMap( const std::vector<HexIntersectionInfo>&                   intersections,
-                                                    cvf::Vec3d                                                p1,
-                                                    double                                                    md1,
-                                                    cvf::Vec3d                                                p2,
-                                                    double                                                    md2,
-                                                    double                                                    tolerance,
-                                                    std::map<RigMDCellIdxEnterLeaveKey, HexIntersectionInfo>* uniqueIntersections )
+void RigWellLogExtractor::appendSegmentCrossings( const std::vector<HexIntersectionInfo>& intersections,
+                                                  const cvf::Vec3d&                       p1,
+                                                  double                                  md1,
+                                                  const cvf::Vec3d&                       p2,
+                                                  double                                  md2,
+                                                  std::vector<WellPathCellCrossing>*      crossings )
 {
-    for ( size_t intIdx = 0; intIdx < intersections.size(); ++intIdx )
+    for ( const auto& intersection : intersections )
     {
-        double lengthAlongLineSegment1 = ( intersections[intIdx].m_intersectionPoint - p1 ).length();
-        double lengthAlongLineSegment2 = ( p2 - intersections[intIdx].m_intersectionPoint ).length();
-        double measuredDepthDiff       = md2 - md1;
-        double lineLength              = lengthAlongLineSegment1 + lengthAlongLineSegment2;
-        double measuredDepthOfPoint    = 0.0;
+        const double lengthFromP1 = ( intersection.m_intersectionPoint - p1 ).length();
+        const double lengthToP2   = ( p2 - intersection.m_intersectionPoint ).length();
+        const double lineLength   = lengthFromP1 + lengthToP2;
 
-        if ( lineLength > 0.00001 )
-        {
-            measuredDepthOfPoint = md1 + measuredDepthDiff * lengthAlongLineSegment1 / ( lineLength );
-        }
-        else
-        {
-            measuredDepthOfPoint = md1;
-        }
+        double measuredDepth = md1;
+        if ( lineLength > 0.00001 ) measuredDepth = md1 + ( md2 - md1 ) * lengthFromP1 / lineLength;
 
-        uniqueIntersections->insert( std::make_pair( RigMDCellIdxEnterLeaveKey( measuredDepthOfPoint,
-                                                                                intersections[intIdx].m_hexIndex,
-                                                                                intersections[intIdx].m_isIntersectionEntering,
-                                                                                tolerance ),
-                                                     intersections[intIdx] ) );
+        crossings->push_back( { measuredDepth, intersection } );
     }
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Splits the well path into intervals at the cell surface crossings and assigns each interval to the cell containing its
+/// midpoint. Crossings closer than mergeTolerance to the first crossing of a group are merged into one breakpoint, and
+/// crossings closer than mergeTolerance to the well path ends are merged into the end points. Where cells overlap, typically at
+/// faults, the lowest cell index wins, so every measured depth belongs to at most one cell and the intervals never overlap.
+/// Consecutive intervals in the same cell are merged, so touches of other cells do not split an interval.
 ///
+/// A cell containing the midpoint of an interval either contains the midpoint of the previous interval or has a crossing at the
+/// breakpoint between them, so the candidates are the cells containing the previous midpoint and the cells crossed at the
+/// breakpoint. candidateCellsAtPoint is only used for the first interval and when no candidate contains the midpoint.
 //--------------------------------------------------------------------------------------------------
-void RigWellLogExtractor::populateReturnArrays( std::map<RigMDCellIdxEnterLeaveKey, HexIntersectionInfo>& uniqueIntersections )
+std::vector<WellPathCellIntersectionInfo> RigWellLogExtractor::assignCellIntervals( const std::vector<cvf::Vec3d>&    wellPathPoints,
+                                                                                    const std::vector<double>&        measuredDepths,
+                                                                                    std::vector<WellPathCellCrossing> crossings,
+                                                                                    double                            mergeTolerance,
+                                                                                    const CandidateCellsAtPoint&      candidateCellsAtPoint,
+                                                                                    const IsPointInCell&              isPointInCell )
 {
-    QStringList errorMessages;
-    // For same MD and same cell, remove enter/leave pairs, as they only touches the wellpath, and should not contribute.
+    std::vector<WellPathCellIntersectionInfo> cellIntervals;
+    if ( wellPathPoints.size() < 2 || wellPathPoints.size() != measuredDepths.size() ) return cellIntervals;
+
+    const double startMd = measuredDepths.front();
+    const double endMd   = measuredDepths.back();
+    if ( !( endMd > startMd ) ) return cellIntervals;
+
+    // Deterministic order, independent of the order of the candidate cells
+    for ( auto& crossing : crossings )
     {
-        std::map<RigMDCellIdxEnterLeaveKey, HexIntersectionInfo>::iterator it1 = uniqueIntersections.begin();
-        std::map<RigMDCellIdxEnterLeaveKey, HexIntersectionInfo>::iterator it2 = uniqueIntersections.begin();
+        crossing.measuredDepth = std::clamp( crossing.measuredDepth, startMd, endMd );
+    }
 
-        std::vector<std::map<RigMDCellIdxEnterLeaveKey, HexIntersectionInfo>::iterator> iteratorsToIntersectonsToErase;
+    auto sortKey = []( const WellPathCellCrossing& crossing )
+    {
+        const HexIntersectionInfo& info = crossing.intersection;
+        return std::make_tuple( crossing.measuredDepth,
+                                info.m_hexIndex,
+                                info.m_isIntersectionEntering,
+                                static_cast<int>( info.m_face ),
+                                info.m_intersectionPoint.x(),
+                                info.m_intersectionPoint.y(),
+                                info.m_intersectionPoint.z() );
+    };
+    std::sort( crossings.begin(),
+               crossings.end(),
+               [&sortKey]( const WellPathCellCrossing& a, const WellPathCellCrossing& b ) { return sortKey( a ) < sortKey( b ); } );
 
-        while ( it2 != uniqueIntersections.end() )
+    struct Breakpoint
+    {
+        double measuredDepth;
+        double firstCrossingMd;
+        double lastCrossingMd;
+        size_t crossingBegin;
+        size_t crossingEnd;
+    };
+
+    std::vector<Breakpoint> breakpoints;
+
+    size_t crossingIdx = 0;
+    while ( crossingIdx < crossings.size() && crossings[crossingIdx].measuredDepth <= startMd + mergeTolerance )
+    {
+        crossingIdx++;
+    }
+    breakpoints.push_back( { startMd, startMd, crossingIdx > 0 ? crossings[crossingIdx - 1].measuredDepth : startMd, 0, crossingIdx } );
+
+    while ( crossingIdx < crossings.size() )
+    {
+        Breakpoint breakpoint;
+        breakpoint.firstCrossingMd = crossings[crossingIdx].measuredDepth;
+        breakpoint.crossingBegin   = crossingIdx;
+        while ( crossingIdx < crossings.size() && crossings[crossingIdx].measuredDepth < breakpoint.firstCrossingMd + mergeTolerance )
         {
-            ++it2;
-            if ( it2 != uniqueIntersections.end() )
+            crossingIdx++;
+        }
+        breakpoint.crossingEnd    = crossingIdx;
+        breakpoint.lastCrossingMd = crossings[crossingIdx - 1].measuredDepth;
+        breakpoint.measuredDepth  = 0.5 * ( breakpoint.firstCrossingMd + breakpoint.lastCrossingMd );
+        breakpoints.push_back( breakpoint );
+    }
+
+    if ( breakpoints.size() > 1 && breakpoints.back().firstCrossingMd >= endMd - mergeTolerance )
+    {
+        breakpoints.back().measuredDepth = endMd;
+    }
+    else
+    {
+        breakpoints.push_back( { endMd, endMd, endMd, crossings.size(), crossings.size() } );
+    }
+
+    // Points along the well path for increasing measured depths
+    auto pointAtMd = [&]( double measuredDepth, size_t* segmentIdx )
+    {
+        while ( *segmentIdx + 2 < measuredDepths.size() && measuredDepths[*segmentIdx + 1] < measuredDepth )
+        {
+            ( *segmentIdx )++;
+        }
+
+        const double md1 = measuredDepths[*segmentIdx];
+        const double md2 = measuredDepths[*segmentIdx + 1];
+        const double t   = md2 > md1 ? std::clamp( ( measuredDepth - md1 ) / ( md2 - md1 ), 0.0, 1.0 ) : 0.0;
+
+        const cvf::Vec3d& p1 = wellPathPoints[*segmentIdx];
+        const cvf::Vec3d& p2 = wellPathPoints[*segmentIdx + 1];
+        return cvf::Vec3d( p1 + t * ( p2 - p1 ) );
+    };
+
+    std::vector<cvf::Vec3d> breakpointPoints;
+    {
+        size_t segmentIdx = 0;
+        for ( const auto& breakpoint : breakpoints )
+        {
+            breakpointPoints.push_back( pointAtMd( breakpoint.measuredDepth, &segmentIdx ) );
+        }
+        breakpointPoints.front() = wellPathPoints.front();
+        breakpointPoints.back()  = wellPathPoints.back();
+    }
+
+    // The face of the cell at a breakpoint is taken from a crossing of the cell, preferably entering at the start of an interval
+    // and leaving at the end. The well path end points are used as they are.
+    auto cellEndpoint = [&]( size_t breakpointIdx, size_t cellIndex, bool preferEntering )
+    {
+        const Breakpoint&          breakpoint = breakpoints[breakpointIdx];
+        const HexIntersectionInfo* found      = nullptr;
+        for ( size_t i = breakpoint.crossingBegin; i < breakpoint.crossingEnd; ++i )
+        {
+            const HexIntersectionInfo& info = crossings[i].intersection;
+            if ( info.m_hexIndex != cellIndex ) continue;
+
+            if ( found == nullptr || ( info.m_isIntersectionEntering == preferEntering && found->m_isIntersectionEntering != preferEntering ) )
             {
-                if ( RigWellLogExtractionTools::isEqualDepth( it1->first.measuredDepth, it2->first.measuredDepth, it1->first.tolerance ) )
-                {
-                    if ( it1->first.hexIndex == it2->first.hexIndex )
-                    {
-                        // Remove the two from the map, as they just are a touch of the cell surface
-                        CAF_ASSERT( !it1->first.isEnteringCell && it2->first.isEnteringCell );
-
-                        iteratorsToIntersectonsToErase.push_back( it1 );
-                        iteratorsToIntersectonsToErase.push_back( it2 );
-                    }
-                }
+                found = &info;
             }
-            ++it1;
         }
 
-        // Erase all the intersections that is not needed
-        for ( size_t erItIdx = 0; erItIdx < iteratorsToIntersectonsToErase.size(); ++erItIdx )
-        {
-            uniqueIntersections.erase( iteratorsToIntersectonsToErase[erItIdx] );
-        }
-    }
+        const bool isWellPathEnd = breakpointIdx == 0 || breakpointIdx + 1 == breakpoints.size();
+        if ( found == nullptr ) return std::make_pair( breakpointPoints[breakpointIdx], cvf::StructGridInterface::NO_FACE );
+        return std::make_pair( isWellPathEnd ? breakpointPoints[breakpointIdx] : found->m_intersectionPoint, found->m_face );
+    };
 
-    // Copy the map into a different sorting regime, with enter leave more significant than cell index
-
-    std::map<RigMDEnterLeaveCellIdxKey, HexIntersectionInfo> sortedUniqueIntersections;
+    auto containingCellsFrom = [&isPointInCell]( std::vector<size_t> candidates, const cvf::Vec3d& point )
     {
-        std::map<RigMDCellIdxEnterLeaveKey, HexIntersectionInfo>::iterator it = uniqueIntersections.begin();
-        while ( it != uniqueIntersections.end() )
-        {
-            sortedUniqueIntersections.insert(
-                std::make_pair( RigMDEnterLeaveCellIdxKey( it->first.measuredDepth, it->first.isEnteringCell, it->first.hexIndex, it->first.tolerance ),
-                                it->second ) );
-            ++it;
-        }
-    }
+        std::sort( candidates.begin(), candidates.end() );
+        candidates.erase( std::unique( candidates.begin(), candidates.end() ), candidates.end() );
 
-    // Add points for the endpoint of the wellpath, if it starts/ends inside a cell
+        std::vector<size_t> containingCells;
+        for ( size_t cellIndex : candidates )
+        {
+            if ( isPointInCell( cellIndex, point ) ) containingCells.push_back( cellIndex );
+        }
+        return containingCells;
+    };
+
+    std::vector<size_t> containingCells;
+    size_t              midpointSegmentIdx = 0;
+    for ( size_t i = 0; i + 1 < breakpoints.size(); ++i )
     {
-        // Add an intersection for the well startpoint that is inside the first cell
-        std::map<RigMDEnterLeaveCellIdxKey, HexIntersectionInfo>::iterator it = sortedUniqueIntersections.begin();
-        if ( it != sortedUniqueIntersections.end() && !it->first.isEnteringCell ) // Leaving a cell as first
-                                                                                  // intersection. Well starts inside a
-                                                                                  // cell.
-        {
-            // Needs wellpath start point in front
-            HexIntersectionInfo firstLeavingPoint      = it->second;
-            firstLeavingPoint.m_intersectionPoint      = m_wellPathGeometry->wellPathPoints()[0];
-            firstLeavingPoint.m_face                   = cvf::StructGridInterface::NO_FACE;
-            firstLeavingPoint.m_isIntersectionEntering = true;
+        const Breakpoint& start = breakpoints[i];
+        const Breakpoint& end   = breakpoints[i + 1];
 
-            sortedUniqueIntersections.insert( std::make_pair( RigMDEnterLeaveCellIdxKey( m_wellPathGeometry->measuredDepths()[0],
-                                                                                         true,
-                                                                                         firstLeavingPoint.m_hexIndex,
-                                                                                         it->first.tolerance ),
-                                                              firstLeavingPoint ) );
+        // The midpoint is between the crossings, also when merged crossings are spread out
+        const cvf::Vec3d midpoint = pointAtMd( 0.5 * ( start.lastCrossingMd + end.firstCrossingMd ), &midpointSegmentIdx );
+
+        std::vector<size_t> candidates = containingCells;
+        for ( size_t c = start.crossingBegin; c < start.crossingEnd; ++c )
+        {
+            candidates.push_back( crossings[c].intersection.m_hexIndex );
+        }
+        if ( i == 0 )
+        {
+            const std::vector<size_t> cellsAtPoint = candidateCellsAtPoint( midpoint );
+            candidates.insert( candidates.end(), cellsAtPoint.begin(), cellsAtPoint.end() );
         }
 
-        // Add an intersection for the well endpoint possibly inside the last cell.
-        std::map<RigMDEnterLeaveCellIdxKey, HexIntersectionInfo>::reverse_iterator rit = sortedUniqueIntersections.rbegin();
-        if ( rit != sortedUniqueIntersections.rend() && rit->first.isEnteringCell ) // Entering a cell as last
-                                                                                    // intersection. Well ends inside a
-                                                                                    // cell.
+        containingCells = containingCellsFrom( candidates, midpoint );
+        if ( containingCells.empty() && i > 0 )
         {
-            // Needs wellpath end point at end
-            HexIntersectionInfo lastEnterPoint      = rit->second;
-            lastEnterPoint.m_intersectionPoint      = m_wellPathGeometry->wellPathPoints().back();
-            lastEnterPoint.m_isIntersectionEntering = false;
-            lastEnterPoint.m_face                   = cvf::StructGridInterface::NO_FACE;
-
-            sortedUniqueIntersections.insert( std::make_pair( RigMDEnterLeaveCellIdxKey( m_wellPathGeometry->measuredDepths().back(),
-                                                                                         false,
-                                                                                         lastEnterPoint.m_hexIndex,
-                                                                                         rit->first.tolerance ),
-                                                              lastEnterPoint ) );
+            containingCells = containingCellsFrom( candidateCellsAtPoint( midpoint ), midpoint );
         }
+
+        if ( containingCells.empty() || !( end.measuredDepth > start.measuredDepth ) ) continue;
+
+        const size_t cellIndex = containingCells.front();
+
+        const auto [startPoint, startFace] = cellEndpoint( i, cellIndex, true );
+        const auto [endPoint, endFace]     = cellEndpoint( i + 1, cellIndex, false );
+
+        if ( !cellIntervals.empty() && cellIntervals.back().globCellIndex == cellIndex && cellIntervals.back().endMD == start.measuredDepth )
+        {
+            cellIntervals.back().endPoint               = endPoint;
+            cellIntervals.back().endMD                  = end.measuredDepth;
+            cellIntervals.back().intersectedCellFaceOut = endFace;
+            continue;
+        }
+
+        WellPathCellIntersectionInfo cellInterval;
+        cellInterval.globCellIndex               = cellIndex;
+        cellInterval.startPoint                  = startPoint;
+        cellInterval.endPoint                    = endPoint;
+        cellInterval.startMD                     = start.measuredDepth;
+        cellInterval.endMD                       = end.measuredDepth;
+        cellInterval.intersectionLengthsInCellCS = cvf::Vec3d::ZERO;
+        cellInterval.intersectedCellFaceIn       = startFace;
+        cellInterval.intersectedCellFaceOut      = endFace;
+        cellIntervals.push_back( cellInterval );
     }
 
-    // Store the intersections pairwise as cell enter-leave pairs, see pairCellEnterLeavePoints()
-    {
-        std::vector<RigMDEnterLeaveCellIdxKey>  sortedPoints;
-        std::vector<const HexIntersectionInfo*> sortedInfos;
-        for ( const auto& [key, info] : sortedUniqueIntersections )
-        {
-            sortedPoints.push_back( key );
-            sortedInfos.push_back( &info );
-        }
-
-        std::vector<size_t> discardedPoints;
-        for ( const auto& [enterIdx, leaveIdx] : pairCellEnterLeavePoints( sortedPoints, &discardedPoints ) )
-        {
-            appendIntersectionToArrays( sortedPoints[enterIdx].measuredDepth, *sortedInfos[enterIdx], &errorMessages );
-            appendIntersectionToArrays( sortedPoints[leaveIdx].measuredDepth, *sortedInfos[leaveIdx], &errorMessages );
-        }
-
-        for ( size_t idx : discardedPoints )
-        {
-            errorMessages += QString( "Well Log Extraction : " ) + QString::fromStdString( m_wellCaseErrorMsgName ) +
-                             ( " Discards a point at MD:  " ) + QString::number( (double)( sortedPoints[idx].measuredDepth ) );
-        }
-    }
-
-    bool reportErrorMessages = false;
-    if ( reportErrorMessages )
-    {
-        errorMessages.removeDuplicates();
-        for ( auto message : errorMessages )
-        {
-            RiaLogging::warning( message.toStdString() );
-        }
-    }
+    return cellIntervals;
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Pairs the entering and leaving points of each cell. The points are sorted by RigMDEnterLeaveCellIdxKey. Returns index pairs
-/// (enter, leave) in the order the leaving points are reached. Points without a match are returned in discardedPoints.
-///
-/// A leaving point is matched with the latest entering point of the same cell, so points without a match (touches along cell
-/// edges, cells next to an LGR, overlapping cells at faults) are discarded without breaking the pairs around them. A pair is
-/// discarded when more than maxPointsBetweenEnterAndLeave points lie between its two points, and when a pair already found
-/// lies entirely inside it: writing it would make the measured depths go back and count the inner interval twice.
+/// Stores the cell intervals as pairs of points, the start and the end point of each interval
 //--------------------------------------------------------------------------------------------------
-std::vector<std::pair<size_t, size_t>> RigWellLogExtractor::pairCellEnterLeavePoints( const std::vector<RigMDEnterLeaveCellIdxKey>& sortedPoints,
-                                                                                      std::vector<size_t>* discardedPoints )
+void RigWellLogExtractor::setCellIntervals( const std::vector<WellPathCellIntersectionInfo>& cellIntervals )
 {
-    std::vector<std::pair<size_t, size_t>> pairs;
-    std::vector<size_t>                    discarded;
+    m_intersections.clear();
+    m_intersectedCellsGlobIdx.clear();
+    m_intersectedCellFaces.clear();
+    m_intersectionMeasuredDepths.clear();
+    m_intersectionTVDs.clear();
 
-    std::map<size_t, size_t> openEnterPoints; // cell index -> position of the latest entering point
-    std::optional<size_t>    latestPairedEnterPoint;
-
-    for ( size_t position = 0; position < sortedPoints.size(); ++position )
+    for ( const auto& cellInterval : cellIntervals )
     {
-        const RigMDEnterLeaveCellIdxKey& point  = sortedPoints[position];
-        auto                             openIt = openEnterPoints.find( point.hexIndex );
-
-        if ( point.isEnteringCell )
+        for ( bool isStart : { true, false } )
         {
-            if ( openIt != openEnterPoints.end() ) discarded.push_back( openIt->second );
+            const cvf::Vec3d& point = isStart ? cellInterval.startPoint : cellInterval.endPoint;
 
-            openEnterPoints[point.hexIndex] = position;
-            continue;
-        }
-
-        if ( openIt == openEnterPoints.end() )
-        {
-            discarded.push_back( position );
-            continue;
-        }
-
-        const size_t enterPosition = openIt->second;
-        openEnterPoints.erase( openIt );
-
-        const bool isClose            = ( position - enterPosition - 1 ) <= maxPointsBetweenEnterAndLeave;
-        const bool isAroundPairedCell = latestPairedEnterPoint.has_value() && *latestPairedEnterPoint > enterPosition;
-
-        if ( isClose && !isAroundPairedCell && RigMDEnterLeaveCellIdxKey::isProperCellEnterLeavePair( sortedPoints[enterPosition], point ) )
-        {
-            pairs.emplace_back( enterPosition, position );
-            latestPairedEnterPoint = enterPosition;
-            continue;
-        }
-
-        discarded.push_back( enterPosition );
-        discarded.push_back( position );
-    }
-
-    for ( const auto& [cellIndex, enterPosition] : openEnterPoints )
-    {
-        discarded.push_back( enterPosition );
-    }
-
-    if ( discardedPoints )
-    {
-        std::sort( discarded.begin(), discarded.end() );
-        *discardedPoints = discarded;
-    }
-
-    return pairs;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RigWellLogExtractor::appendIntersectionToArrays( double measuredDepth, const HexIntersectionInfo& intersection, QStringList* errorMessages )
-{
-    QString errorMessage; // This error message is currently not displayed anywhere, as the output caused noise in
-                          // several situations https://github.com/OPM/ResInsight/issues/7126
-
-    if ( !m_intersectionMeasuredDepths.empty() && measuredDepth < m_intersectionMeasuredDepths.back() )
-    {
-        const double warningLimit = 0.01;
-        double       diff         = std::fabs( measuredDepth - m_intersectionMeasuredDepths.back() );
-        if ( diff > warningLimit )
-        {
-            errorMessage += QString( "Well Log Extraction : %1 does not have a monotonically increasing measured depth." )
-                                .arg( QString::fromStdString( m_wellCaseErrorMsgName ) );
-        }
-
-        // Allow alterations of up to 0.1 percent as long as we keep the measured depth monotonically increasing.
-        const double tolerance = std::max( 1.0, measuredDepth ) * 1.0e-3;
-        if ( RigWellLogExtractionTools::isEqualDepth( measuredDepth, m_intersectionMeasuredDepths.back(), tolerance ) )
-        {
-            if ( diff > warningLimit )
-            {
-                errorMessage += "The well path has been slightly adjusted";
-            }
-            measuredDepth = m_intersectionMeasuredDepths.back();
+            m_intersections.push_back( point );
+            m_intersectedCellsGlobIdx.push_back( cellInterval.globCellIndex );
+            m_intersectedCellFaces.push_back( isStart ? cellInterval.intersectedCellFaceIn : cellInterval.intersectedCellFaceOut );
+            m_intersectionMeasuredDepths.push_back( isStart ? cellInterval.startMD : cellInterval.endMD );
+            m_intersectionTVDs.push_back( std::fabs( point.z() ) );
         }
     }
-
-    m_intersectionMeasuredDepths.push_back( measuredDepth );
-    m_intersectionTVDs.push_back( fabs( intersection.m_intersectionPoint[2] ) );
-    m_intersections.push_back( intersection.m_intersectionPoint );
-    m_intersectedCellsGlobIdx.push_back( intersection.m_hexIndex );
-    m_intersectedCellFaces.push_back( intersection.m_face );
 }

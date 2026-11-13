@@ -36,7 +36,6 @@
 #include <chrono>
 #include <cmath>
 #include <iostream>
-#include <set>
 #include <tuple>
 
 //--------------------------------------------------------------------------------------------------
@@ -314,155 +313,207 @@ TEST( RigMainGrid, SetFlipAxisMirrorsNodeCoordinates )
 
 namespace
 {
-struct CellPoint
+struct TestCell
 {
-    double md;
-    bool   isEntering;
-    size_t cellIndex;
+    size_t index;
+    double start;
+    double end;
 };
 
-using CellPair = std::tuple<size_t, double, double>; // cell index, entering MD, leaving MD
+using CellInterval = std::tuple<size_t, double, double>; // cell index, start MD, end MD
 
 //--------------------------------------------------------------------------------------------------
-/// Sorts the points as populateReturnArrays() does, pairs them, and returns the pairs as (cell, enter MD, leave MD)
+/// Assigns cell intervals for a well path along the x axis, with MD = x, through one-dimensional cells [start, end]. The
+/// crossings are reported per well path segment, so a crossing at a well path vertex is reported twice.
 //--------------------------------------------------------------------------------------------------
-std::vector<CellPair> pairPoints( const std::vector<CellPoint>& points, std::vector<double>* discardedMds = nullptr )
+std::vector<CellInterval> assignIntervals( const std::vector<TestCell>& cells, const std::vector<double>& wellMds, double tolerance = 0.01 )
 {
-    const double tolerance = 0.01;
-
-    std::set<RigMDEnterLeaveCellIdxKey> sorted;
-    for ( const auto& p : points )
+    std::vector<cvf::Vec3d> wellPathPoints;
+    for ( double md : wellMds )
     {
-        sorted.insert( RigMDEnterLeaveCellIdxKey( p.md, p.isEntering, p.cellIndex, tolerance ) );
-    }
-    std::vector<RigMDEnterLeaveCellIdxKey> sortedPoints( sorted.begin(), sorted.end() );
-
-    std::vector<size_t>   discarded;
-    std::vector<CellPair> pairs;
-    for ( const auto& [enterIdx, leaveIdx] : RigWellLogExtractor::pairCellEnterLeavePoints( sortedPoints, &discarded ) )
-    {
-        EXPECT_EQ( sortedPoints[enterIdx].hexIndex, sortedPoints[leaveIdx].hexIndex );
-        pairs.emplace_back( sortedPoints[enterIdx].hexIndex, sortedPoints[enterIdx].measuredDepth, sortedPoints[leaveIdx].measuredDepth );
+        wellPathPoints.emplace_back( md, 0.0, 0.0 );
     }
 
-    if ( discardedMds )
+    std::vector<WellPathCellCrossing> crossings;
+    for ( size_t segment = 0; segment + 1 < wellMds.size(); segment++ )
     {
-        for ( size_t idx : discarded )
+        for ( const auto& cell : cells )
         {
-            discardedMds->push_back( sortedPoints[idx].measuredDepth );
+            for ( bool isEntering : { true, false } )
+            {
+                const double x = isEntering ? cell.start : cell.end;
+                if ( x < wellMds[segment] || x > wellMds[segment + 1] ) continue;
+
+                crossings.push_back(
+                    { x, HexIntersectionInfo( cvf::Vec3d( x, 0.0, 0.0 ), isEntering, cvf::StructGridInterface::NO_FACE, cell.index ) } );
+            }
         }
     }
 
-    return pairs;
+    auto candidateCellsAtPoint = [&cells]( const cvf::Vec3d& )
+    {
+        std::vector<size_t> indices;
+        for ( const auto& cell : cells )
+        {
+            indices.push_back( cell.index );
+        }
+        return indices;
+    };
+
+    auto isPointInCell = [&cells]( size_t cellIndex, const cvf::Vec3d& point )
+    {
+        for ( const auto& cell : cells )
+        {
+            if ( cell.index == cellIndex ) return cell.start <= point.x() && point.x() <= cell.end;
+        }
+        return false;
+    };
+
+    auto infos =
+        RigWellLogExtractor::assignCellIntervals( wellPathPoints, wellMds, crossings, tolerance, candidateCellsAtPoint, isPointInCell );
+
+    std::vector<CellInterval> intervals;
+    for ( size_t i = 0; i < infos.size(); i++ )
+    {
+        EXPECT_LT( infos[i].startMD, infos[i].endMD );
+        if ( i > 0 ) EXPECT_LE( infos[i - 1].endMD, infos[i].startMD );
+
+        intervals.emplace_back( infos[i].globCellIndex, infos[i].startMD, infos[i].endMD );
+    }
+    return intervals;
 }
 } // namespace
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-TEST( RigWellLogExtractor, PairsNormalEnterLeaveChain )
+TEST( RigWellLogExtractor, AssignsCellChain )
 {
-    std::vector<double> discarded;
-    auto                pairs =
-        pairPoints( { { 0, true, 1 }, { 10, false, 1 }, { 10, true, 2 }, { 20, false, 2 }, { 20, true, 3 }, { 30, false, 3 } }, &discarded );
-
-    std::vector<CellPair> expected = { { 1, 0, 10 }, { 2, 10, 20 }, { 3, 20, 30 } };
-    EXPECT_EQ( expected, pairs );
-    EXPECT_TRUE( discarded.empty() );
+    std::vector<CellInterval> expected = { { 1, 0, 10 }, { 2, 10, 20 }, { 3, 20, 30 } };
+    EXPECT_EQ( expected, assignIntervals( { { 1, 0, 10 }, { 2, 10, 20 }, { 3, 20, 30 } }, { 0, 30 } ) );
 }
 
 //--------------------------------------------------------------------------------------------------
-/// A leaving point of a main grid cell next to an LGR, between the entering and leaving point of the LGR cell
+/// Crossings at a well path vertex are reported by both segments
 //--------------------------------------------------------------------------------------------------
-TEST( RigWellLogExtractor, PairsAcrossStrayPointNextToLgr )
+TEST( RigWellLogExtractor, AssignsCellChainWithCrossingAtWellPathVertex )
 {
-    std::vector<double> discarded;
-    auto                pairs =
-        pairPoints( { { 0, true, 1 }, { 10, false, 1 }, { 10, true, 100 }, { 15, false, 7 }, { 20, false, 100 }, { 20, true, 3 }, { 30, false, 3 } },
-                    &discarded );
-
-    std::vector<CellPair> expected = { { 1, 0, 10 }, { 100, 10, 20 }, { 3, 20, 30 } };
-    EXPECT_EQ( expected, pairs );
-    EXPECT_EQ( std::vector<double>( { 15 } ), discarded );
+    std::vector<CellInterval> expected = { { 1, 0, 10 }, { 2, 10, 20 }, { 3, 20, 30 } };
+    EXPECT_EQ( expected, assignIntervals( { { 1, 0, 10 }, { 2, 10, 20 }, { 3, 20, 30 } }, { 0, 10, 20, 30 } ) );
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Two stray leaving points at the same depth inside an LGR cell, as for well GP1 in the 10k test case (#15088)
+/// Partly overlapping cells, typically at a fault. The lowest cell index wins in the overlap
 //--------------------------------------------------------------------------------------------------
-TEST( RigWellLogExtractor, PairsAcrossTwoStrayPointsInARow )
+TEST( RigWellLogExtractor, AssignsOverlapToLowestCellIndex )
 {
-    std::vector<double> discarded;
-    auto                pairs = pairPoints( { { 0, true, 1 },
-                                              { 10, false, 1 },
-                                              { 10, true, 100 },
-                                              { 18, false, 7 },
-                                              { 18, false, 8 },
-                                              { 20, false, 100 },
-                                              { 20, true, 3 },
-                                              { 30, false, 3 } },
-                             &discarded );
-
-    std::vector<CellPair> expected = { { 1, 0, 10 }, { 100, 10, 20 }, { 3, 20, 30 } };
-    EXPECT_EQ( expected, pairs );
-    EXPECT_EQ( std::vector<double>( { 18, 18 } ), discarded );
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Partly overlapping cells, typically at a fault, keep both cells as before #15088
-//--------------------------------------------------------------------------------------------------
-TEST( RigWellLogExtractor, KeepsPartlyOverlappingCells )
-{
-    std::vector<double> discarded;
-    auto                pairs = pairPoints( { { 0, true, 1 }, { 10, true, 2 }, { 20, false, 1 }, { 30, false, 2 } }, &discarded );
-
-    std::vector<CellPair> expected = { { 1, 0, 20 }, { 2, 10, 30 } };
-    EXPECT_EQ( expected, pairs );
-    EXPECT_TRUE( discarded.empty() );
-}
-
-//--------------------------------------------------------------------------------------------------
-/// A cell whose interval contains another cell's interval is discarded, so depths are not counted twice or written out of order
-//--------------------------------------------------------------------------------------------------
-TEST( RigWellLogExtractor, DiscardsCellAroundNestedCell )
-{
-    std::vector<double> discarded;
-    auto                pairs =
-        pairPoints( { { 0, true, 1 }, { 10, true, 2 }, { 20, false, 2 }, { 30, false, 1 }, { 30, true, 3 }, { 40, false, 3 } }, &discarded );
-
-    std::vector<CellPair> expected = { { 2, 10, 20 }, { 3, 30, 40 } };
-    EXPECT_EQ( expected, pairs );
-    EXPECT_EQ( std::vector<double>( { 0, 30 } ), discarded );
-
-    for ( size_t i = 1; i < pairs.size(); i++ )
     {
-        EXPECT_LE( std::get<2>( pairs[i - 1] ), std::get<1>( pairs[i] ) );
+        std::vector<CellInterval> expected = { { 1, 0, 20 }, { 2, 20, 30 } };
+        EXPECT_EQ( expected, assignIntervals( { { 1, 0, 20 }, { 2, 10, 30 } }, { 0, 30 } ) );
     }
+    {
+        std::vector<CellInterval> expected = { { 2, 0, 10 }, { 1, 10, 30 } };
+        EXPECT_EQ( expected, assignIntervals( { { 2, 0, 20 }, { 1, 10, 30 } }, { 0, 30 } ) );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// A cell inside another cell, as an LGR cell inside its host cell
+//--------------------------------------------------------------------------------------------------
+TEST( RigWellLogExtractor, AssignsNestedCells )
+{
+    {
+        std::vector<CellInterval> expected = { { 1, 0, 40 } };
+        EXPECT_EQ( expected, assignIntervals( { { 1, 0, 40 }, { 2, 10, 20 } }, { 0, 40 } ) );
+    }
+    {
+        std::vector<CellInterval> expected = { { 5, 0, 10 }, { 2, 10, 20 }, { 5, 20, 40 } };
+        EXPECT_EQ( expected, assignIntervals( { { 5, 0, 40 }, { 2, 10, 20 } }, { 0, 40 } ) );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// A cell touched at a single point does not split the interval of the cell around it
+//--------------------------------------------------------------------------------------------------
+TEST( RigWellLogExtractor, IgnoresTouchedCell )
+{
+    std::vector<CellInterval> expected = { { 3, 0, 30 } };
+    EXPECT_EQ( expected, assignIntervals( { { 3, 0, 30 }, { 1, 15, 15 } }, { 0, 30 } ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// The well path starts and ends inside cells, with no crossings at the well path ends
+//--------------------------------------------------------------------------------------------------
+TEST( RigWellLogExtractor, AssignsCellsAtWellPathEnds )
+{
+    std::vector<CellInterval> expected = { { 1, 5, 10 }, { 2, 10, 25 } };
+    EXPECT_EQ( expected, assignIntervals( { { 1, 0, 10 }, { 2, 10, 30 } }, { 5, 25 } ) );
+
+    std::vector<CellInterval> insideOneCell = { { 2, 12, 13 } };
+    EXPECT_EQ( insideOneCell, assignIntervals( { { 1, 0, 10 }, { 2, 10, 30 } }, { 12, 13 } ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Crossings closer than the tolerance are merged into one breakpoint, also next to the well path ends
+//--------------------------------------------------------------------------------------------------
+TEST( RigWellLogExtractor, MergesCrossingsWithinTolerance )
+{
+    auto intervals = assignIntervals( { { 1, 0.01, 10 }, { 2, 10.004, 20 }, { 3, 20, 29.995 } }, { 0.005, 30 } );
+    ASSERT_EQ( 3u, intervals.size() );
+
+    EXPECT_EQ( 1u, std::get<0>( intervals[0] ) );
+    EXPECT_DOUBLE_EQ( 0.005, std::get<1>( intervals[0] ) );
+    EXPECT_DOUBLE_EQ( 10.002, std::get<2>( intervals[0] ) );
+
+    EXPECT_EQ( 2u, std::get<0>( intervals[1] ) );
+    EXPECT_DOUBLE_EQ( 10.002, std::get<1>( intervals[1] ) );
+    EXPECT_DOUBLE_EQ( 20.0, std::get<2>( intervals[1] ) );
+
+    EXPECT_EQ( CellInterval( 3, 20, 30 ), intervals[2] );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-TEST( RigWellLogExtractor, LimitsPointsBetweenEnterAndLeave )
+TEST( RigWellLogExtractor, SkipsGapBetweenCells )
 {
-    auto pointsWithStrays = []( size_t strayCount )
+    std::vector<CellInterval> expected = { { 1, 0, 10 }, { 2, 15, 20 } };
+    EXPECT_EQ( expected, assignIntervals( { { 1, 0, 10 }, { 2, 15, 20 } }, { 0, 20 } ) );
+
+    EXPECT_TRUE( assignIntervals( { { 1, 0, 10 } }, { 20, 30 } ).empty() );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// A well path vertex exactly on the faces between cells gives contiguous cell intervals without gaps or overlaps
+//--------------------------------------------------------------------------------------------------
+TEST( RigEclipseWellLogExtractor, WellPathVertexOnCellFace )
+{
+    cvf::ref<RigEclipseCaseData> reservoir         = new RigEclipseCaseData( nullptr );
+    cvf::ref<RifReaderMockModel> mockFileInterface = new RifReaderMockModel;
+
+    mockFileInterface->setWorldCoordinates( cvf::Vec3d( 10, 10, 10 ), cvf::Vec3d( 20, 20, 20 ) );
+    mockFileInterface->setCellCounts( cvf::Vec3st( 5, 5, 5 ) );
+    mockFileInterface->enableWellData( false );
+    mockFileInterface->open( "", reservoir.p() );
+    reservoir->mainGrid()->computeCachedData();
+
+    // Horizontal, then bending downwards at x = 14 on the face between two cells, which is also the face between two layers
+    cvf::ref<RigWellPath> wellPathGeometry = new RigWellPath;
+    wellPathGeometry->setWellPathPoints( { cvf::Vec3d( 10.5, 13.0, 14.0 ), cvf::Vec3d( 14.0, 13.0, 14.0 ), cvf::Vec3d( 19.5, 13.0, 19.5 ) },
+                                         { 0.0, 3.5, 3.5 + std::sqrt( 2.0 * 5.5 * 5.5 ) } );
+
+    cvf::ref<RigEclipseWellLogExtractor> e = new RigEclipseWellLogExtractor( reservoir.p(), wellPathGeometry.p(), "" );
+
+    auto intersections = e->cellIntersectionInfosAlongWellPath();
+    ASSERT_FALSE( intersections.empty() );
+
+    EXPECT_DOUBLE_EQ( 0.0, intersections.front().startMD );
+    EXPECT_DOUBLE_EQ( wellPathGeometry->measuredDepths().back(), intersections.back().endMD );
+    for ( size_t i = 1; i < intersections.size(); i++ )
     {
-        std::vector<CellPoint> points = { { 0, true, 1 } };
-        for ( size_t i = 0; i < strayCount; i++ )
-        {
-            points.push_back( { 1.0 + i, false, 10 + i } );
-        }
-        points.push_back( { 100, false, 1 } );
-        return points;
-    };
-
-    const size_t limit = RigWellLogExtractor::maxPointsBetweenEnterAndLeave;
-
-    std::vector<CellPair> expected = { { 1, 0, 100 } };
-    EXPECT_EQ( expected, pairPoints( pointsWithStrays( limit ) ) );
-
-    std::vector<double> discarded;
-    EXPECT_TRUE( pairPoints( pointsWithStrays( limit + 1 ), &discarded ).empty() );
-    EXPECT_EQ( limit + 3, discarded.size() );
+        EXPECT_DOUBLE_EQ( intersections[i - 1].endMD, intersections[i].startMD );
+        EXPECT_NE( intersections[i - 1].globCellIndex, intersections[i].globCellIndex );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -492,10 +543,23 @@ TEST( RigEclipseWellLogExtractor, DISABLED_ExtractionPerformance )
         mainGrid->computeFaceNormalsDirection( activeCells );
     }
 
-    const cvf::BoundingBox bb   = mainGrid->boundingBox();
-    const cvf::Vec3d       minP = bb.min();
-    const cvf::Vec3d       maxP = bb.max();
-    const cvf::Vec3d       size = maxP - minP;
+    const RigActiveCellInfo* activeCellInfo = caseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
+
+    // Span the active cells, as the full grid bounding box includes inactive cells with corners far outside the reservoir
+    cvf::BoundingBox bb;
+    for ( size_t cellIndex = 0; cellIndex < mainGrid->totalCellCount(); cellIndex++ )
+    {
+        if ( activeCellInfo->isActive( ReservoirCellIndex( cellIndex ) ) )
+        {
+            for ( const auto& corner : mainGrid->cellCornerVertices( cellIndex ) )
+            {
+                bb.add( corner );
+            }
+        }
+    }
+    const cvf::Vec3d minP = bb.min();
+    const cvf::Vec3d maxP = bb.max();
+    const cvf::Vec3d size = maxP - minP;
 
     // Well paths sampled every 5 m, as imported well paths typically are
     auto createWellPath = []( const cvf::Vec3d& from, const cvf::Vec3d& to )
@@ -553,14 +617,16 @@ TEST( RigEclipseWellLogExtractor, DISABLED_ExtractionPerformance )
         }
     }
 
-    const int runCount  = 3;
-    double    bestMs    = std::numeric_limits<double>::infinity();
-    size_t    cellCount = 0;
-    double    mdInCells = 0.0;
+    const int runCount        = 3;
+    double    bestMs          = std::numeric_limits<double>::infinity();
+    size_t    cellCount       = 0;
+    double    mdInCells       = 0.0;
+    double    mdInActiveCells = 0.0;
     for ( int run = 0; run < runCount; run++ )
     {
-        cellCount = 0;
-        mdInCells = 0.0;
+        cellCount       = 0;
+        mdInCells       = 0.0;
+        mdInActiveCells = 0.0;
 
         auto start = std::chrono::steady_clock::now();
         for ( const auto& wellPath : wellPaths )
@@ -570,6 +636,7 @@ TEST( RigEclipseWellLogExtractor, DISABLED_ExtractionPerformance )
             {
                 cellCount++;
                 mdInCells += info.endMD - info.startMD;
+                if ( activeCellInfo->isActive( ReservoirCellIndex( info.globCellIndex ) ) ) mdInActiveCells += info.endMD - info.startMD;
             }
         }
         auto stop = std::chrono::steady_clock::now();
@@ -584,5 +651,5 @@ TEST( RigEclipseWellLogExtractor, DISABLED_ExtractionPerformance )
 
     std::cout << "Well log extraction, " << wellPaths.size() << " wells, " << totalLength << " m, " << segmentCount << " segments, "
               << candidateCount << " candidate cells: " << bestMs << " ms, " << cellCount << " cell intervals, " << mdInCells
-              << " m in cells" << std::endl;
+              << " m in cells, " << mdInActiveCells << " m in active cells" << std::endl;
 }

@@ -25,7 +25,6 @@
 #include "RigEclipseWellLogExtractor.h"
 #include "RigMainGrid.h"
 #include "RigSimulationWellCoordsAndMD.h"
-#include "RigWellLogExtractionTools.h"
 #include "RigWellPath.h"
 
 #include "RimEclipseCase.h"
