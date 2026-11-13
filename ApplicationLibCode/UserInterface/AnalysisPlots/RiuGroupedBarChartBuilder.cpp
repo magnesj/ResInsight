@@ -21,8 +21,6 @@
 #include "RiaColorTables.h"
 #include "RiaPreferences.h"
 
-#include "RifCsvDataTableFormatter.h"
-
 #include "RiuGuiTheme.h"
 
 #include "cafFontTools.h"
@@ -873,15 +871,8 @@ void RiuGroupedBarChartBuilder::setBarTextAnchor( double valueAxisPosition )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RiuGroupedBarChartBuilder::plotContentAsText() const
+RiaReportTable RiuGroupedBarChartBuilder::reportTable() const
 {
-    QString text;
-
-    QTextStream              stream( &text );
-    QString                  fieldSeparator = "\t";
-    RifCsvDataTableFormatter formatter( stream, fieldSeparator );
-    formatter.setUseQuotes( false );
-
     bool hasTextForMajor  = false;
     bool hasTextForMid    = false;
     bool hasTextForMinor  = false;
@@ -897,33 +888,28 @@ QString RiuGroupedBarChartBuilder::plotContentAsText() const
         if ( !barDef.m_barText.isEmpty() && barDef.m_barText != barDef.m_legendText ) hasTextForBar = true;
     }
 
-    std::vector<RifTextDataTableColumn> header;
-    if ( hasTextForMajor ) header.emplace_back( RifTextDataTableColumn( "Major" ) );
-    if ( hasTextForMid ) header.emplace_back( RifTextDataTableColumn( "Mid" ) );
-    if ( hasTextForMinor ) header.emplace_back( RifTextDataTableColumn( "Minor" ) );
-    if ( hasTextForLegend ) header.emplace_back( RifTextDataTableColumn( "Legend" ) );
-    if ( hasTextForBar ) header.emplace_back( RifTextDataTableColumn( "Bar" ) );
+    RiaReportTable table;
+    if ( hasTextForMajor ) table.columns.push_back( RiaReportColumn{ .title = "Major", .alignment = LEFT } );
+    if ( hasTextForMid ) table.columns.push_back( RiaReportColumn{ .title = "Mid", .alignment = LEFT } );
+    if ( hasTextForMinor ) table.columns.push_back( RiaReportColumn{ .title = "Minor", .alignment = LEFT } );
+    if ( hasTextForLegend ) table.columns.push_back( RiaReportColumn{ .title = "Legend", .alignment = LEFT } );
+    if ( hasTextForBar ) table.columns.push_back( RiaReportColumn{ .title = "Bar", .alignment = LEFT } );
+    table.columns.push_back( RiaReportColumn{ .title = "Value" } );
 
-    header.emplace_back( RifTextDataTableColumn( "Value", RifTextDataTableDoubleFormat::RIF_FLOAT ) );
-
-    formatter.header( header );
-
+    table.rows.reserve( m_sortedBarEntries.size() );
     for ( const BarEntry& barDef : m_sortedBarEntries )
     {
-        if ( hasTextForMajor ) formatter.add( barDef.m_majTickText );
-        if ( hasTextForMid ) formatter.add( barDef.m_midTickText );
-        if ( hasTextForMinor ) formatter.add( barDef.m_minTickText );
-        if ( hasTextForLegend ) formatter.add( barDef.m_legendText );
-        if ( hasTextForBar ) formatter.add( barDef.m_barText );
-
-        formatter.add( barDef.m_value );
-
-        formatter.rowCompleted();
+        std::vector<RiaReportCellValue> row;
+        if ( hasTextForMajor ) row.emplace_back( barDef.m_majTickText );
+        if ( hasTextForMid ) row.emplace_back( barDef.m_midTickText );
+        if ( hasTextForMinor ) row.emplace_back( barDef.m_minTickText );
+        if ( hasTextForLegend ) row.emplace_back( barDef.m_legendText );
+        if ( hasTextForBar ) row.emplace_back( barDef.m_barText );
+        row.emplace_back( barDef.m_value );
+        table.rows.push_back( std::move( row ) );
     }
 
-    formatter.tableCompleted();
-
-    return text;
+    return table;
 }
 
 //--------------------------------------------------------------------------------------------------
