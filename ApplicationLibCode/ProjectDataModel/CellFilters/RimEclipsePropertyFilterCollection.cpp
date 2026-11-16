@@ -294,6 +294,7 @@ RimEclipsePropertyFilter* RimEclipsePropertyFilterCollection::addFilterLinkedToC
 void RimEclipsePropertyFilterCollection::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
 {
     menuBuilder << "RicEclipsePropertyFilterNewFeature";
+    menuBuilder << "RicEclipseFormationFilterNewFeature";
     menuBuilder << "RicAddLinkedEclipsePropertyFilterFeature";
     menuBuilder << "Separator";
     menuBuilder << "RicEclipseCombinedPropertyFilterNewFeature";

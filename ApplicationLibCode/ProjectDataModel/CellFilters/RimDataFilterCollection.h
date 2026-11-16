@@ -55,6 +55,7 @@ public:
     bool shouldBeVisibleInTree() const { return !filters().empty(); }
 
     RimEclipsePropertyFilter* addNewPropertyFilter();
+    RimEclipsePropertyFilter* addNewFormationFilter();
     RimCellRangeFilter*       addNewRangeFilter();
     RimCombinedFilter*        addNewCombinedFilter();
 

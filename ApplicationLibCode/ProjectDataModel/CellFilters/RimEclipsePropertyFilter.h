@@ -53,6 +53,7 @@ public:
     void setCase( RimCase* srcCase ) override;
 
     void setToDefaultValues();
+    void setToFormationNames();
     void updateFilterName();
     void computeResultValueRange();
     void updateFromCurrentTimeStep();

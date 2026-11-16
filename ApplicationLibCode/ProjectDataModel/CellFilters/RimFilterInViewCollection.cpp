@@ -235,6 +235,7 @@ void RimFilterInViewCollection::appendMenuItems( caf::CmdFeatureMenuBuilder& men
     // Property-filter menu (mirrors RimEclipsePropertyFilterCollection::appendMenuItems).
     menuBuilder << "Separator";
     menuBuilder << "RicEclipsePropertyFilterNewFeature";
+    menuBuilder << "RicEclipseFormationFilterNewFeature";
     menuBuilder << "RicAddLinkedEclipsePropertyFilterFeature";
     menuBuilder << "Separator";
     menuBuilder << "RicEclipseCombinedPropertyFilterNewFeature";

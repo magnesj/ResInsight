@@ -70,11 +70,11 @@ RimEclipsePropertyFilterCollection* RicEclipsePropertyFilterFeatureImpl::resolve
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicEclipsePropertyFilterFeatureImpl::addPropertyFilter( RimEclipsePropertyFilterCollection* propertyFilterCollection )
+void RicEclipsePropertyFilterFeatureImpl::addPropertyFilter( RimEclipsePropertyFilterCollection* propertyFilterCollection, bool formationNames )
 {
     RimEclipsePropertyFilter* propertyFilter = new RimEclipsePropertyFilter();
     propertyFilterCollection->propertyFiltersField().push_back( propertyFilter );
-    setDefaults( propertyFilter );
+    setDefaults( propertyFilter, formationNames );
 
     RimQuickAccessCollection::instance()->addQuickAccessFields( propertyFilter );
 
@@ -94,14 +94,15 @@ void RicEclipsePropertyFilterFeatureImpl::addPropertyFilter( RimEclipsePropertyF
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimEclipsePropertyFilter* RicEclipsePropertyFilterFeatureImpl::addPropertyFilterToCombinedFilter( RimCombinedFilter* combined )
+RimEclipsePropertyFilter* RicEclipsePropertyFilterFeatureImpl::addPropertyFilterToCombinedFilter( RimCombinedFilter* combined,
+                                                                                                  bool               formationNames )
 {
     if ( !combined ) return nullptr;
 
     auto* propertyFilter = new RimEclipsePropertyFilter();
     combined->addFilter( propertyFilter );
 
-    setDefaults( propertyFilter );
+    setDefaults( propertyFilter, formationNames );
 
     RimQuickAccessCollection::instance()->addQuickAccessFields( propertyFilter );
 
@@ -169,17 +170,24 @@ bool RicEclipsePropertyFilterFeatureImpl::isPropertyFilterCommandAvailable( caf:
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicEclipsePropertyFilterFeatureImpl::setDefaults( RimEclipsePropertyFilter* propertyFilter )
+void RicEclipsePropertyFilterFeatureImpl::setDefaults( RimEclipsePropertyFilter* propertyFilter, bool formationNames )
 {
     CAF_ASSERT( propertyFilter );
 
     // View-tolerant: case-level data filters have no RimEclipseView ancestor; the result
     // definition's eclipse case is already wired by RimEclipsePropertyFilter::setCase via the
     // owning collection's onItemsChanged hook.
-    if ( auto* reservoirView = propertyFilter->firstAncestorOrThisOfType<RimEclipseView>() )
-    {
-        propertyFilter->resultDefinition()->setEclipseCase( reservoirView->eclipseCase() );
+    auto* reservoirView = propertyFilter->firstAncestorOrThisOfType<RimEclipseView>();
+    if ( reservoirView ) propertyFilter->resultDefinition()->setEclipseCase( reservoirView->eclipseCase() );
 
+    if ( formationNames )
+    {
+        propertyFilter->setToFormationNames();
+        return;
+    }
+
+    if ( reservoirView )
+    {
         if ( !RiaResultNames::isPerCellFaceResult( reservoirView->cellResult()->resultVariable() ) )
         {
             propertyFilter->resultDefinition()->simpleCopy( reservoirView->cellResult() );

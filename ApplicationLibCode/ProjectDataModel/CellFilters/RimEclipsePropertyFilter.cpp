@@ -255,6 +255,20 @@ void RimEclipsePropertyFilter::setToDefaultValues()
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Configure the filter as a formation filter: a category property filter on the active formation
+/// names, with all formations initially selected. The eclipse case must be set before calling.
+//--------------------------------------------------------------------------------------------------
+void RimEclipsePropertyFilter::setToFormationNames()
+{
+    m_resultDefinition->setResultType( RiaDefines::ResultCatType::FORMATION_NAMES );
+    m_resultDefinition->setResultVariable( RiaResultNames::activeFormationNamesResultName() );
+    m_resultDefinition->loadResult();
+
+    setToDefaultValues();
+    updateFilterName();
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 void RimEclipsePropertyFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )

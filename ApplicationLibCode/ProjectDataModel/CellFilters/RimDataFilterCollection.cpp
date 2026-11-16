@@ -102,6 +102,19 @@ RimEclipsePropertyFilter* RimDataFilterCollection::addNewPropertyFilter()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+RimEclipsePropertyFilter* RimDataFilterCollection::addNewFormationFilter()
+{
+    auto* propertyFilter = new RimEclipsePropertyFilter();
+    addFilter( propertyFilter );
+    propertyFilter->setCase( ownerCase() );
+    propertyFilter->setToFormationNames();
+    updateConnectedEditors();
+    return propertyFilter;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RimCellRangeFilter* RimDataFilterCollection::addNewRangeFilter()
 {
     // No setDefaultValues call: it asserts on a Rim3dView ancestor, which the case-level
@@ -217,6 +230,7 @@ void RimDataFilterCollection::initAfterRead()
 void RimDataFilterCollection::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
 {
     menuBuilder << "RicEclipsePropertyFilterNewFeature";
+    menuBuilder << "RicEclipseFormationFilterNewFeature";
     menuBuilder << "Separator";
 
     menuBuilder.subMenuStart( "Polygon Filter", QIcon( ":/CellFilter_Polygon.png" ) );
