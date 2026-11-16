@@ -378,6 +378,16 @@ TEST( RimCellFilterToolsTest, FormationFilterUsesKLayersOfEachCase )
     selectedValuesField->setValue( { 0 } );
     ASSERT_TRUE( propertyFilter.isCategorySelectionActive() );
 
+    propertyFilter.updateFilterName();
+    EXPECT_TRUE( propertyFilter.name().endsWith( "(Upper)" ) ) << propertyFilter.name().toStdString();
+
+    selectedValuesField->setValue( { 0, 1 } );
+    propertyFilter.updateFilterName();
+    EXPECT_TRUE( propertyFilter.name().endsWith( "(all)" ) ) << propertyFilter.name().toStdString();
+
+    selectedValuesField->setValue( { 0 } );
+    propertyFilter.updateFilterName();
+
     auto visibleKLayers = []( const cvf::UByteArray* visibility, const RimEclipseCase* eclipseCase )
     {
         const RigMainGrid* mainGrid = eclipseCase->eclipseCaseData()->mainGrid();

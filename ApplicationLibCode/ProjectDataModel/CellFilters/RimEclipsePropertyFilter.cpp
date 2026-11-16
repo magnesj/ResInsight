@@ -57,7 +57,9 @@
 
 #include "cafAssert.h"
 
+#include <algorithm>
 #include <cmath> // Needed for HUGE_VAL on Linux
+#include <iterator>
 #include <limits>
 
 CAF_PDM_SOURCE_INIT( RimEclipsePropertyFilter, "CellPropertyFilter" );
@@ -711,6 +713,45 @@ void RimEclipsePropertyFilter::updateFromCurrentTimeStep()
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Comma separated names of the selected categories. At most maxLength characters are used for
+/// the names; remaining selected categories are summarized as "+N".
+//--------------------------------------------------------------------------------------------------
+QString RimEclipsePropertyFilter::compressedSelectedCategoryNames( int maxLength ) const
+{
+    if ( m_selectedCategoryValues().empty() ) return "none";
+    if ( m_selectedCategoryValues().size() == m_categoryValues.size() ) return "all";
+
+    QStringList names;
+    for ( int value : m_selectedCategoryValues() )
+    {
+        auto it = std::find( m_categoryValues.begin(), m_categoryValues.end(), value );
+        if ( it == m_categoryValues.end() ) continue;
+
+        const size_t index = std::distance( m_categoryValues.begin(), it );
+        if ( index < m_categoryNames.size() ) names.push_back( m_categoryNames[index] );
+    }
+
+    QString text;
+    int     numIncluded = 0;
+    for ( const QString& name : names )
+    {
+        const QString candidate = text.isEmpty() ? name : text + ", " + name;
+        if ( candidate.size() > maxLength )
+        {
+            if ( numIncluded == 0 ) text = name.left( maxLength - 3 ) + "...";
+            break;
+        }
+        text = candidate;
+        numIncluded++;
+    }
+
+    if ( numIncluded < names.size() && numIncluded > 0 ) text += QString( ", +%1" ).arg( names.size() - numIncluded );
+    if ( numIncluded == 0 && !names.isEmpty() && names.size() > 1 ) text += QString( ", +%1" ).arg( names.size() - 1 );
+
+    return text;
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 void RimEclipsePropertyFilter::updateFilterName()
@@ -719,7 +760,11 @@ void RimEclipsePropertyFilter::updateFilterName()
 
     if ( isCategorySelectionActive() )
     {
-        if ( m_categoryNames.empty() )
+        if ( m_resultDefinition->resultType() == RiaDefines::ResultCatType::FORMATION_NAMES && !m_categoryNames.empty() )
+        {
+            newFiltername += " (" + compressedSelectedCategoryNames( 50 ) + ")";
+        }
+        else if ( m_categoryNames.empty() )
         {
             newFiltername += " (";
 

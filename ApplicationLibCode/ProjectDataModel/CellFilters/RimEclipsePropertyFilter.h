@@ -84,13 +84,14 @@ private:
     friend class RimEclipsePropertyFilterCollection;
     friend class RicEclipsePropertyFilterFeatureImpl;
 
-    void updateActiveState();
-    void updateReadOnlyStateOfAllFields();
-    void updateRangeLabel();
-    void updateBoundEditorTypes();
-    bool isEnsembleDataFilter() const;
-    bool isPropertyFilterControlled();
-    void setCategoriesFromTracerNames( const std::vector<QString>& tracerNames );
+    void    updateActiveState();
+    void    updateReadOnlyStateOfAllFields();
+    void    updateRangeLabel();
+    void    updateBoundEditorTypes();
+    bool    isEnsembleDataFilter() const;
+    bool    isPropertyFilterControlled();
+    void    setCategoriesFromTracerNames( const std::vector<QString>& tracerNames );
+    QString compressedSelectedCategoryNames( int maxLength ) const;
 
     RimEclipsePropertyFilterCollection* parentContainer();
 
