@@ -23,6 +23,7 @@
 #include "RigReservoirGridTools.h"
 #include "Rim3dView.h"
 #include "RimCase.h"
+#include "RimDataFilterCollection.h"
 #include "RimEclipseCase.h"
 #include "RimGeoMechCase.h"
 #include "RimTools.h"
@@ -89,6 +90,17 @@ RimCellFilter::~RimCellFilter()
 caf::PdmFieldHandle* RimCellFilter::userDescriptionField()
 {
     return &m_nameProxy;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Filters listed under a case-level data filter collection are always on, and have no checkbox in
+/// the project tree. Per-view on/off is controlled by the RimDataFilterInView wrappers.
+//--------------------------------------------------------------------------------------------------
+caf::PdmFieldHandle* RimCellFilter::objectToggleField()
+{
+    if ( parentField() && dynamic_cast<RimDataFilterCollection*>( parentField()->ownerObject() ) ) return nullptr;
+
+    return RimCheckableNamedObject::objectToggleField();
 }
 
 //--------------------------------------------------------------------------------------------------

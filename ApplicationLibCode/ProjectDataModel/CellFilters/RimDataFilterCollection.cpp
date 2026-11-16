@@ -160,6 +160,7 @@ void RimDataFilterCollection::onItemsChanged()
     for ( RimCellFilter* child : items() )
     {
         connectChildSignal( child );
+        if ( child ) child->setCheckState( true );
         if ( child && m_srcCase() ) child->setCase( m_srcCase() );
     }
     filtersChanged.send();
@@ -204,6 +205,9 @@ void RimDataFilterCollection::initAfterRead()
     for ( RimCellFilter* child : items() )
     {
         connectChildSignal( child );
+
+        // The filters have no checkbox in the tree, so a stored unchecked state could not be undone
+        if ( child ) child->setCheckState( true );
     }
 }
 
