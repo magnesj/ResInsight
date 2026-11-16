@@ -110,6 +110,9 @@ private:
 
     void computeStatistics();
     void onComputeStatisticsClicked();
+    void onNewFormationFilterClicked();
+    void onDataFilterChanged( const caf::SignalEmitter* emitter );
+    void connectToDataFilter();
     void doStatisticsCalculation( TimestepResultsMap& timestep_results );
 
     // Project-adjacent statistics cache, keyed by a hash of all settings affecting the results.

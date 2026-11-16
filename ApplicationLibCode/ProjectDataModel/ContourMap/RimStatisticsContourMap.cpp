@@ -48,6 +48,7 @@
 #include "RimEclipseCase.h"
 #include "RimEclipseCaseEnsemble.h"
 #include "RimEclipseContourMapProjection.h"
+#include "RimEclipsePropertyFilter.h"
 #include "RimEclipseResultCase.h"
 #include "RimEclipseResultDefinition.h"
 #include "RimGridCalculation.h"
@@ -324,11 +325,19 @@ void RimStatisticsContourMap::defineUiOrdering( QString uiConfigName, caf::PdmUi
 
     if ( auto* gridEnsemble = firstAncestorOrThisOfType<RimReservoirGridEnsemble>() )
     {
-        if ( m_dataFilter() || ( gridEnsemble->dataFilterCollection() && !gridEnsemble->dataFilterCollection()->filters().empty() ) )
+        auto dataFilterGrp = uiOrdering.addNewGroup( "Data Filter" );
+        dataFilterGrp->add( &m_dataFilter );
+
+        if ( gridEnsemble->dataFilterCollection() )
         {
-            auto dataFilterGrp = uiOrdering.addNewGroup( "Data Filter" );
-            if ( !m_dataFilter() ) dataFilterGrp->setCollapsedByDefault();
-            dataFilterGrp->add( &m_dataFilter );
+            dataFilterGrp->addNewButton( "New Formation Filter", [this]() { onNewFormationFilterClicked(); } );
+        }
+
+        // Embed the selected filter's own fields so it can be edited without leaving the contour map
+        if ( m_dataFilter() )
+        {
+            auto filterGrp = dataFilterGrp->addNewGroup( "Selected Filter: " + m_dataFilter()->fullName() );
+            m_dataFilter()->uiOrdering( uiConfigName, *filterGrp );
         }
     }
 
@@ -433,12 +442,16 @@ void RimStatisticsContourMap::fieldChangedByUi( const caf::PdmFieldHandle* chang
     }
     else if ( &m_dataFilter == changedField )
     {
+        connectToDataFilter();
+
         // Refresh the filter label overlay immediately. The contour map data itself still requires
         // an explicit "Compute Statistics" to reflect the new filter selection.
         for ( auto& view : m_views )
         {
             view->updateFilterLabel();
         }
+
+        updateConnectedEditors();
     }
 }
 
@@ -542,6 +555,8 @@ void RimStatisticsContourMap::initAfterRead()
 
     if ( ensembleCases().empty() ) return;
 
+    connectToDataFilter();
+
     switchToSelectedSourceCase();
 
     for ( auto view : m_views.childrenByType() )
@@ -608,6 +623,52 @@ void RimStatisticsContourMap::doStatisticsCalculation( TimestepResultsMap& times
         m_timeResults[timeStep][RiaDefines::StatisticsType::MEAN] = meanResults;
         m_timeResults[timeStep][RiaDefines::StatisticsType::MIN]  = minResults;
         m_timeResults[timeStep][RiaDefines::StatisticsType::MAX]  = maxResults;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimStatisticsContourMap::onNewFormationFilterClicked()
+{
+    auto* gridEnsemble = firstAncestorOrThisOfType<RimReservoirGridEnsemble>();
+    if ( !gridEnsemble || !gridEnsemble->dataFilterCollection() ) return;
+
+    auto* filter = gridEnsemble->dataFilterCollection()->addNewFormationFilter();
+    if ( !filter ) return;
+
+    m_dataFilter = filter;
+    connectToDataFilter();
+
+    for ( auto& view : m_views )
+    {
+        view->updateFilterLabel();
+    }
+
+    gridEnsemble->updateConnectedEditors();
+    updateConnectedEditors();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimStatisticsContourMap::onDataFilterChanged( const caf::SignalEmitter* /*emitter*/ )
+{
+    for ( auto& view : m_views )
+    {
+        view->updateFilterLabel();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimStatisticsContourMap::connectToDataFilter()
+{
+    if ( auto* filter = m_dataFilter() )
+    {
+        filter->filterChanged.disconnect( this );
+        filter->filterChanged.connect( this, &RimStatisticsContourMap::onDataFilterChanged );
     }
 }
 
