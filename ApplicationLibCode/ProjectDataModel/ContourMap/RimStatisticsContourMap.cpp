@@ -337,7 +337,7 @@ void RimStatisticsContourMap::defineUiOrdering( QString uiConfigName, caf::PdmUi
         if ( m_dataFilter() )
         {
             auto filterGrp = dataFilterGrp->addNewGroup( "Selected Filter: " + m_dataFilter()->fullName() );
-            m_dataFilter()->uiOrdering( uiConfigName, *filterGrp );
+            m_dataFilter()->uiOrdering( RimEclipsePropertyFilter::embeddedUiConfigName(), *filterGrp );
         }
     }
 

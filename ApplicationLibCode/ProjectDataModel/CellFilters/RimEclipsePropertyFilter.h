@@ -52,11 +52,12 @@ public:
 
     void setCase( RimCase* srcCase ) override;
 
-    void setToDefaultValues();
-    void setToFormationNames();
-    void updateFilterName();
-    void computeResultValueRange();
-    void updateFromCurrentTimeStep();
+    void           setToDefaultValues();
+    void           setToFormationNames();
+    static QString embeddedUiConfigName();
+    void           updateFilterName();
+    void           computeResultValueRange();
+    void           updateFromCurrentTimeStep();
 
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     void initAfterRead() override;
@@ -110,6 +111,7 @@ private:
     caf::PdmField<bool> m_isDuplicatedFromLinkedView;
 
     caf::PdmField<bool> m_useCategorySelection;
+    caf::PdmField<bool> m_hasUserDefinedName;
 
     double m_minimumResultValue;
     double m_maximumResultValue;

@@ -388,6 +388,26 @@ TEST( RimCellFilterToolsTest, FormationFilterUsesKLayersOfEachCase )
     selectedValuesField->setValue( { 0 } );
     propertyFilter.updateFilterName();
 
+    propertyFilter.setFilterMode( RimCellFilter::EXCLUDE );
+    propertyFilter.updateFilterName();
+    EXPECT_TRUE( propertyFilter.name().contains( "excl. (Upper)" ) ) << propertyFilter.name().toStdString();
+    propertyFilter.setFilterMode( RimCellFilter::INCLUDE );
+
+    auto* nameField = dynamic_cast<caf::PdmField<QString>*>( propertyFilter.findField( "Name" ) );
+    ASSERT_TRUE( nameField != nullptr );
+
+    // A user defined name is kept when the selection changes, and clearing it restores the generated name
+    nameField->setValueWithFieldChanged( "My formations" );
+    selectedValuesField->setValue( { 0, 1 } );
+    propertyFilter.updateFilterName();
+    EXPECT_EQ( QString( "My formations" ), propertyFilter.name() );
+
+    nameField->setValueWithFieldChanged( "" );
+    EXPECT_TRUE( propertyFilter.name().endsWith( "(all)" ) ) << propertyFilter.name().toStdString();
+
+    selectedValuesField->setValue( { 0 } );
+    propertyFilter.updateFilterName();
+
     auto visibleKLayers = []( const cvf::UByteArray* visibility, const RimEclipseCase* eclipseCase )
     {
         const RigMainGrid* mainGrid = eclipseCase->eclipseCaseData()->mainGrid();

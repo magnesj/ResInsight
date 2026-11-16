@@ -112,6 +112,9 @@ RimEclipsePropertyFilter::RimEclipsePropertyFilter()
     CAF_PDM_InitField( &m_isDuplicatedFromLinkedView, "IsDuplicatedFromLinkedView", false, "Duplicated" );
     m_isDuplicatedFromLinkedView.uiCapability()->setUiHidden( true );
 
+    CAF_PDM_InitField( &m_hasUserDefinedName, "HasUserDefinedName", false, "Has User Defined Name" );
+    m_hasUserDefinedName.uiCapability()->setUiHidden( true );
+
     // HEADLESS HACK
     if ( RiaGuiApplication::isRunning() )
     {
@@ -185,6 +188,14 @@ void RimEclipsePropertyFilter::setIsDuplicatedFromLinkedView( bool isDuplicated 
 void RimEclipsePropertyFilter::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     RimCellFilter::fieldChangedByUi( changedField, oldValue, newValue );
+
+    // A name entered by the user is kept when the filter settings change. Clearing the name makes the
+    // filter generate its name again.
+    if ( nameField() == changedField )
+    {
+        m_hasUserDefinedName = !name().trimmed().isEmpty();
+        if ( !m_hasUserDefinedName ) updateFilterName();
+    }
 
     if ( &m_lowerBound == changedField || &m_integerLowerBound == changedField )
     {
@@ -271,18 +282,34 @@ void RimEclipsePropertyFilter::setToFormationNames()
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Config name to use when the fields of the filter are shown inside the editor of another object.
+/// The result settings are then left out for formation filters, as the result is fixed.
+//--------------------------------------------------------------------------------------------------
+QString RimEclipsePropertyFilter::embeddedUiConfigName()
+{
+    return "EmbeddedPropertyFilter";
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 void RimEclipsePropertyFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     updateBoundEditorTypes();
 
+    const bool isEmbeddedFormationFilter = uiConfigName == embeddedUiConfigName() &&
+                                           m_resultDefinition->resultType() == RiaDefines::ResultCatType::FORMATION_NAMES;
+
+    // Formation filters always select formations, so the selection mode is only shown if a stored
+    // project has range selection enabled
+    const bool hideSelectionModeSettings = isEmbeddedFormationFilter && m_useCategorySelection();
+
     // Fields declared in RimCellFilter
     uiOrdering.add( nameField() );
 
-    uiOrdering.add( &m_linkedWithCellResult );
+    if ( !isEmbeddedFormationFilter ) uiOrdering.add( &m_linkedWithCellResult );
 
-    if ( !m_linkedWithCellResult )
+    if ( !m_linkedWithCellResult && !isEmbeddedFormationFilter )
     {
         // Fields declared in Rimm_resultDefinition
         caf::PdmUiGroup* group1 = uiOrdering.addNewGroup( "Result" );
@@ -294,9 +321,9 @@ void RimEclipsePropertyFilter::defineUiOrdering( QString uiConfigName, caf::PdmU
     // Fields declared in RimCellFilter
     group2.add( &m_filterMode );
 
-    group2.add( &m_rangeLabelText );
+    if ( !hideSelectionModeSettings ) group2.add( &m_rangeLabelText );
 
-    if ( m_resultDefinition->hasCategoryResult() )
+    if ( m_resultDefinition->hasCategoryResult() && !hideSelectionModeSettings )
     {
         group2.add( &m_useCategorySelection );
     }
@@ -756,12 +783,15 @@ QString RimEclipsePropertyFilter::compressedSelectedCategoryNames( int maxLength
 //--------------------------------------------------------------------------------------------------
 void RimEclipsePropertyFilter::updateFilterName()
 {
+    if ( m_hasUserDefinedName() ) return;
+
     QString newFiltername = m_resultDefinition->resultVariableUiShortName();
 
     if ( isCategorySelectionActive() )
     {
         if ( m_resultDefinition->resultType() == RiaDefines::ResultCatType::FORMATION_NAMES && !m_categoryNames.empty() )
         {
+            if ( filterMode() == EXCLUDE ) newFiltername += " excl.";
             newFiltername += " (" + compressedSelectedCategoryNames( 50 ) + ")";
         }
         else if ( m_categoryNames.empty() )
