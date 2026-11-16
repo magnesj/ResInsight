@@ -29,6 +29,7 @@
 #include "RimTools.h"
 #include "RimViewController.h"
 
+#include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmUiComboBoxEditor.h"
 
 #include "cvfStructGridGeometryGenerator.h"
@@ -101,6 +102,14 @@ caf::PdmFieldHandle* RimCellFilter::objectToggleField()
     if ( parentField() && dynamic_cast<RimDataFilterCollection*>( parentField()->ownerObject() ) ) return nullptr;
 
     return RimCheckableNamedObject::objectToggleField();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCellFilter::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
+{
+    menuBuilder << "RicCombineSelectedFiltersFeature";
 }
 
 //--------------------------------------------------------------------------------------------------

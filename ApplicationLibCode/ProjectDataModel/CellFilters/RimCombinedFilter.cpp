@@ -489,6 +489,7 @@ void RimCombinedFilter::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder
     menuBuilder << "RicNewUserDefinedIndexFilterFeature";
     menuBuilder << "Separator";
     menuBuilder << "RicEclipseCombinedPropertyFilterNewFeature";
+    menuBuilder << "RicCombineSelectedFiltersFeature";
 }
 
 //--------------------------------------------------------------------------------------------------

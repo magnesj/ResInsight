@@ -33,6 +33,8 @@
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObjectScriptingCapability.h"
 
+#include <algorithm>
+
 CAF_PDM_SOURCE_INIT( RimDataFilterCollection, "DataFilterCollection" );
 
 //--------------------------------------------------------------------------------------------------
@@ -131,6 +133,39 @@ RimCombinedFilter* RimDataFilterCollection::addNewCombinedFilter()
 {
     auto* combined = new RimCombinedFilter();
     addFilter( combined );
+    return combined;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// The selected filters are detached from this collection (not deleted) and re-parented under the
+/// new combined filter, which takes the position of the first of them. Nested filters of a
+/// selected combined filter are left in place.
+//--------------------------------------------------------------------------------------------------
+RimCombinedFilter* RimDataFilterCollection::combineFilters( const std::vector<RimCellFilter*>& filtersToCombine )
+{
+    const std::vector<RimCellFilter*> existing = items();
+
+    std::vector<RimCellFilter*> children;
+    for ( RimCellFilter* candidate : existing )
+    {
+        if ( std::find( filtersToCombine.begin(), filtersToCombine.end(), candidate ) != filtersToCombine.end() )
+            children.push_back( candidate );
+    }
+    if ( children.size() < 2 ) return nullptr;
+
+    auto* combined = new RimCombinedFilter();
+    combined->setCase( ownerCase() );
+    insertItem( children.front(), combined );
+
+    for ( RimCellFilter* child : children )
+    {
+        child->filterChanged.disconnect( this );
+        m_items.removeChild( child );
+        combined->addFilter( child );
+    }
+
+    onItemsChanged();
+    updateConnectedEditors();
     return combined;
 }
 

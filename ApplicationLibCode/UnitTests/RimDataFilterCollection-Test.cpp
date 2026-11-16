@@ -153,6 +153,36 @@ TEST( RimDataFilterCollection, hasActiveFiltersReflectsChildState )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+TEST( RimDataFilterCollection, combineFiltersMovesChildrenIntoCombinedFilterAtFirstPosition )
+{
+    RimDataFilterCollection coll;
+
+    auto* a = new RimCellRangeFilter();
+    auto* b = new RimCellRangeFilter();
+    auto* c = new RimCellRangeFilter();
+    coll.addFilter( a );
+    coll.addFilter( b );
+    coll.addFilter( c );
+
+    EXPECT_EQ( nullptr, coll.combineFilters( { a } ) );
+    EXPECT_EQ( size_t{ 3 }, coll.count() );
+
+    RimCombinedFilter* combined = coll.combineFilters( { b, c } );
+    ASSERT_NE( nullptr, combined );
+
+    ASSERT_EQ( size_t{ 2 }, coll.count() );
+    EXPECT_EQ( a, coll.filters()[0] );
+    EXPECT_EQ( combined, coll.filters()[1] );
+
+    const auto children = combined->filters();
+    ASSERT_EQ( size_t{ 2 }, children.size() );
+    EXPECT_EQ( b, children[0] );
+    EXPECT_EQ( c, children[1] );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 TEST( RimDataFilterCollection, addNewRangeFilterReturnsConfigured )
 {
     RimDataFilterCollection coll;
