@@ -1057,7 +1057,9 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   )
 endif()
 
-set_property(TARGET ${VIZ_FWK_LIBRARIES} ShewchukPredicates PROPERTY FOLDER "VizFwk")
+set_property(
+  TARGET ${VIZ_FWK_LIBRARIES} ShewchukPredicates PROPERTY FOLDER "VizFwk"
+)
 if(WIN32)
   set_property(TARGET run_Glsl2Include PROPERTY FOLDER "VizFwk")
 endif()
