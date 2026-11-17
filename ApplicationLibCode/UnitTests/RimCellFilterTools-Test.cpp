@@ -379,6 +379,7 @@ TEST( RimCellFilterToolsTest, FormationFilterUsesKLayersOfEachCase )
     ASSERT_TRUE( propertyFilter.isCategorySelectionActive() );
 
     propertyFilter.updateFilterName();
+    EXPECT_TRUE( propertyFilter.name().startsWith( "Formation Names (" ) ) << propertyFilter.name().toStdString();
     EXPECT_TRUE( propertyFilter.name().endsWith( "(Upper)" ) ) << propertyFilter.name().toStdString();
 
     selectedValuesField->setValue( { 0, 1 } );
@@ -390,7 +391,7 @@ TEST( RimCellFilterToolsTest, FormationFilterUsesKLayersOfEachCase )
 
     propertyFilter.setFilterMode( RimCellFilter::EXCLUDE );
     propertyFilter.updateFilterName();
-    EXPECT_TRUE( propertyFilter.name().contains( "excl. (Upper)" ) ) << propertyFilter.name().toStdString();
+    EXPECT_TRUE( propertyFilter.name().contains( "Formation Names excl. (Upper)" ) ) << propertyFilter.name().toStdString();
     propertyFilter.setFilterMode( RimCellFilter::INCLUDE );
 
     auto* nameField = dynamic_cast<caf::PdmField<QString>*>( propertyFilter.findField( "Name" ) );

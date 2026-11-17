@@ -283,7 +283,7 @@ void RimEclipsePropertyFilter::setToFormationNames()
 
 //--------------------------------------------------------------------------------------------------
 /// Config name to use when the fields of the filter are shown inside the editor of another object.
-/// The result settings are then left out for formation filters, as the result is fixed.
+/// The link to the cell result, and the selection mode settings, are then left out for formation filters.
 //--------------------------------------------------------------------------------------------------
 QString RimEclipsePropertyFilter::embeddedUiConfigName()
 {
@@ -297,8 +297,8 @@ void RimEclipsePropertyFilter::defineUiOrdering( QString uiConfigName, caf::PdmU
 {
     updateBoundEditorTypes();
 
-    const bool isEmbeddedFormationFilter = uiConfigName == embeddedUiConfigName() &&
-                                           m_resultDefinition->resultType() == RiaDefines::ResultCatType::FORMATION_NAMES;
+    const bool isFormationFilter         = m_resultDefinition->resultType() == RiaDefines::ResultCatType::FORMATION_NAMES;
+    const bool isEmbeddedFormationFilter = uiConfigName == embeddedUiConfigName() && isFormationFilter;
 
     // Formation filters always select formations, so the selection mode is only shown if a stored
     // project has range selection enabled
@@ -309,7 +309,7 @@ void RimEclipsePropertyFilter::defineUiOrdering( QString uiConfigName, caf::PdmU
 
     if ( !isEmbeddedFormationFilter ) uiOrdering.add( &m_linkedWithCellResult );
 
-    if ( !m_linkedWithCellResult && !isEmbeddedFormationFilter )
+    if ( !m_linkedWithCellResult && !isFormationFilter )
     {
         // Fields declared in Rimm_resultDefinition
         caf::PdmUiGroup* group1 = uiOrdering.addNewGroup( "Result" );
@@ -791,6 +791,7 @@ void RimEclipsePropertyFilter::updateFilterName()
     {
         if ( m_resultDefinition->resultType() == RiaDefines::ResultCatType::FORMATION_NAMES && !m_categoryNames.empty() )
         {
+            newFiltername = "Formation Names";
             if ( filterMode() == EXCLUDE ) newFiltername += " excl.";
             newFiltername += " (" + compressedSelectedCategoryNames( 50 ) + ")";
         }
