@@ -65,7 +65,7 @@
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmUiButton.h"
 #include "cafPdmUiDoubleSliderEditor.h"
-#include "cafPdmUiLabelEditor.h"
+#include "cafPdmUiLabel.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 #include "cafProgressInfo.h"
 
@@ -232,15 +232,6 @@ RimStatisticsContourMap::RimStatisticsContourMap()
 
     CAF_PDM_InitFieldNoDefault( &m_dataFilter, "DataFilter", "Data Filter", "", "Only cells accepted by the ensemble data filter are used." );
 
-    CAF_PDM_InitFieldNoDefault( &m_goToDataFilters, "GoToDataFilters", "" );
-    m_goToDataFilters.uiCapability()->setUiEditorTypeName( caf::PdmUiLabelEditor::uiEditorTypeName() );
-    m_goToDataFilters.uiCapability()->setAttribute( caf::PdmUiLabelEditor::Keys::LINK_TEXT,
-                                                    "Select <a href=\"dummy\">Data Filters</a> to create filters." );
-    m_goToDataFilters.uiCapability()->setAttribute<std::function<void( const QString& )>>( caf::PdmUiLabelEditor::Keys::LINK_ACTIVATED_CALLBACK,
-                                                                                           [this]( const QString& )
-                                                                                           { selectDataFilterCollection(); } );
-    m_goToDataFilters.xmlCapability()->disableIO();
-
     CAF_PDM_InitField( &m_cacheFileBaseName, "CacheFileBaseName", QString(), "Cache File Base Name" );
     m_cacheFileBaseName.uiCapability()->setUiHidden( true );
 
@@ -337,7 +328,8 @@ void RimStatisticsContourMap::defineUiOrdering( QString uiConfigName, caf::PdmUi
     {
         auto dataFilterGrp = uiOrdering.addNewGroup( "Data Filter" );
         dataFilterGrp->add( &m_dataFilter );
-        dataFilterGrp->add( &m_goToDataFilters );
+        auto* goToDataFiltersLabel = dataFilterGrp->addNewLabel( "Select <a href=\"dummy\">Data Filters</a> to create filters." );
+        goToDataFiltersLabel->setLinkActivatedCallback( [this]( const QString& ) { selectDataFilterCollection(); } );
         // Embed the selected filter's own fields so it can be edited without leaving the contour map
         if ( m_dataFilter() )
         {
