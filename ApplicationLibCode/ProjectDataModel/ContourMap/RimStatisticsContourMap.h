@@ -110,7 +110,7 @@ private:
 
     void computeStatistics();
     void onComputeStatisticsClicked();
-    void onNewFormationFilterClicked();
+    void selectDataFilterCollection();
     void onDataFilterChanged( const caf::SignalEmitter* emitter );
     void connectToDataFilter();
     void doStatisticsCalculation( TimestepResultsMap& timestep_results );
@@ -140,6 +140,7 @@ private:
     caf::PdmPtrField<RimEclipseCase*>                         m_primaryCase;
     caf::PdmPtrArrayField<RimPolygon*>                        m_selectedPolygons;
     caf::PdmPtrField<RimCellFilter*>                          m_dataFilter;
+    caf::PdmField<QString>                                    m_goToDataFilters;
 
     caf::PdmField<caf::AppEnum<GridImportMode>>                                   m_gridImportMode;
     caf::PdmField<caf::AppEnum<RimContourMapResolutionTools::SamplingResolution>> m_resolution;
