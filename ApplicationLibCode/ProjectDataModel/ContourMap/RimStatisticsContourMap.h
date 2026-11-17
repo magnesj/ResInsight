@@ -68,6 +68,7 @@ public:
     RimEclipseCase* eclipseCase() const;
 
     RimCellFilter* dataFilter() const;
+    void           setDataFilter( RimCellFilter* filter );
 
     void setGridImportMode( GridImportMode mode );
 

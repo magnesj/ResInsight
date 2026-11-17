@@ -984,6 +984,15 @@ RimCellFilter* RimStatisticsContourMap::dataFilter() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimStatisticsContourMap::setDataFilter( RimCellFilter* filter )
+{
+    m_dataFilter = filter;
+    connectToDataFilter();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimStatisticsContourMap::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
 {
     menuBuilder << "RicNewStatisticsContourMapViewFeature";

@@ -299,6 +299,20 @@ void RimDataFilterCollection::appendMenuItems( caf::CmdFeatureMenuBuilder& menuB
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimDataFilterCollection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
+{
+    if ( firstAncestorOfType<RimReservoirGridEnsemble>() )
+    {
+        uiOrdering.addNewLabel( "These are ensemble filters. They can be used in the 3D views of the ensemble, and by other ensemble "
+                                "operations, such as ensemble contour maps." );
+    }
+
+    caf::PdmObjectCollection<RimCellFilter>::defineUiOrdering( uiConfigName, uiOrdering );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimDataFilterCollection::connectChildSignal( RimCellFilter* child )
 {
     if ( !child ) return;
