@@ -279,6 +279,20 @@ void RimEclipsePropertyFilter::setToFormationNames()
 
     setToDefaultValues();
     updateFilterName();
+    updateIconState();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimEclipsePropertyFilter::iconResourceString() const
+{
+    if ( m_resultDefinition && m_resultDefinition->resultType() == RiaDefines::ResultCatType::FORMATION_NAMES )
+    {
+        return ":/Formations16x16.png";
+    }
+
+    return ":/CellFilter_Values.png";
 }
 
 //--------------------------------------------------------------------------------------------------

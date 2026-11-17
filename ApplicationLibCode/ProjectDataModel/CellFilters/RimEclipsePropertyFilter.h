@@ -72,6 +72,7 @@ public:
     std::map<QString, std::vector<caf::PdmFieldHandle*>> quickAccessFields() override;
 
 private:
+    QString                                iconResourceString() const override;
     void                                   defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void                                   defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName ) override;
     std::vector<caf::PdmUiTreeViewItemTag> treeItemTags() override;

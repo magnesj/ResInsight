@@ -111,6 +111,9 @@ public:
                                         RimEclipseCase*    sourceCaseOverride = nullptr );
 
 protected:
+    // Resource string of the icon to use for the filter. An empty string keeps the icon set at construction.
+    virtual QString iconResourceString() const;
+
     caf::PdmFieldHandle* userDescriptionField() override;
     caf::PdmFieldHandle* objectToggleField() override;
     void                 appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
