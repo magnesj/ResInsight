@@ -109,46 +109,19 @@ void RimCurveStyleRule::onAppearanceChanged( const caf::SignalEmitter* emitter )
 //--------------------------------------------------------------------------------------------------
 void RimCurveStyleRule::applyToCurve( RimPlotCurve* curve, bool applyColor, bool applySymbol ) const
 {
+    if ( m_mode() != Mode::CUSTOM ) return;
+
     auto*       curveAppearance = curve->curveAppearance();
     const auto& rule            = *m_curveAppearance;
 
-    // The base styles define the line style and thickness, or the symbol size, shared by all items
-    if ( m_baseKind != BaseKind::NONE )
-    {
-        if ( m_mode() != Mode::CUSTOM ) return;
-
-        if ( m_baseKind == BaseKind::COLOR && applyColor )
-        {
-            curveAppearance->setLineStyle( rule.lineStyle() );
-            curveAppearance->setLineThickness( rule.lineThickness() );
-        }
-        if ( m_baseKind == BaseKind::SYMBOL && applySymbol )
-        {
-            curveAppearance->setSymbolSize( rule.symbolSize() );
-            curveAppearance->setSymbolSkipDistance( rule.symbolSkipDistance() );
-        }
-        return;
-    }
-
-    if ( m_mode() != Mode::CUSTOM ) return;
-
-    // Only the explicit overrides are applied. Line stepping, fill, labels and curve fitting are never controlled by the rule.
-    // Color settings are only edited for color rules, and symbol settings for symbol rules.
     if ( applyColor )
     {
         curveAppearance->setColor( rule.color() );
         curveAppearance->setCurveColorOpacity( rule.curveColorOpacity() );
         curveAppearance->setSymbolEdgeColor( rule.symbolEdgeColor() );
-        curveAppearance->setLineStyle( rule.lineStyle() );
-        curveAppearance->setLineThickness( rule.lineThickness() );
     }
 
-    if ( applySymbol )
-    {
-        curveAppearance->setSymbol( rule.symbol() );
-        curveAppearance->setSymbolSize( rule.symbolSize() );
-        curveAppearance->setSymbolSkipDistance( rule.symbolSkipDistance() );
-    }
+    if ( applySymbol ) curveAppearance->setSymbol( rule.symbol() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -156,7 +129,7 @@ void RimCurveStyleRule::applyToCurve( RimPlotCurve* curve, bool applyColor, bool
 //--------------------------------------------------------------------------------------------------
 std::optional<cvf::Color3f> RimCurveStyleRule::overriddenColor() const
 {
-    if ( m_mode() != Mode::CUSTOM || m_baseKind != BaseKind::NONE ) return std::nullopt;
+    if ( m_mode() != Mode::CUSTOM ) return std::nullopt;
     return m_curveAppearance->color();
 }
 
@@ -289,7 +262,7 @@ QStringList RimCurveStyleRule::availableNames( Dimension dimension )
 
             for ( const auto& address : reader->allResultAddresses() )
             {
-                const auto value = RimCurveStyleSettings::dimensionValue( dimension, address, {} );
+                const auto value = RimNamedCurveStyleRule::dimensionValue( dimension, address, {} );
                 if ( !value.empty() ) names.insert( QString::fromStdString( value ) );
             }
         }
@@ -309,8 +282,8 @@ QStringList RimCurveStyleRule::availableNames( Dimension dimension )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::map<QString, RimCurveStyleRule::PlotAppearance> RimCurveStyleRule::appearancesFromPlots( Dimension                    dimension,
-                                                                                              const RimCurveStyleSettings* settings )
+std::map<QString, RimCurveStyleRule::PlotAppearance> RimCurveStyleRule::appearancesFromPlots( Dimension                     dimension,
+                                                                                              const RimNamedCurveStyleRule* namedRule )
 {
     std::map<QString, PlotAppearance> appearances;
 
@@ -319,13 +292,13 @@ std::map<QString, RimCurveStyleRule::PlotAppearance> RimCurveStyleRule::appearan
 
     for ( auto plot : project->descendantsIncludingThisOfType<RimSummaryPlot>() )
     {
-        if ( !plot->usesCurveStyleSettings( settings ) ) continue;
+        if ( !plot->usesNamedRule( namedRule ) ) continue;
 
         for ( auto curve : plot->summaryCurves() )
         {
-            const auto value = RimCurveStyleSettings::dimensionValue( dimension,
-                                                                      curve->summaryAddressY(),
-                                                                      RimCurveStyleSettings::caseName( curve->summaryCaseY() ) );
+            const auto value = RimNamedCurveStyleRule::dimensionValue( dimension,
+                                                                       curve->summaryAddressY(),
+                                                                       RimNamedCurveStyleRule::caseName( curve->summaryCaseY() ) );
 
             auto& appearance = appearances[QString::fromStdString( value )];
             if ( !appearance.color ) appearance.color = curve->color();
@@ -334,7 +307,7 @@ std::map<QString, RimCurveStyleRule::PlotAppearance> RimCurveStyleRule::appearan
 
         for ( auto curveSet : plot->ensembleCurveSetCollection()->curveSets() )
         {
-            const auto value = RimCurveStyleSettings::dimensionValue( dimension, curveSet->summaryAddressY(), ensembleCaseName( curveSet ) );
+            const auto value = RimNamedCurveStyleRule::dimensionValue( dimension, curveSet->summaryAddressY(), ensembleCaseName( curveSet ) );
 
             auto& appearance = appearances[QString::fromStdString( value )];
             if ( !appearance.color ) appearance.color = curveSet->color();
@@ -365,37 +338,6 @@ void RimCurveStyleRule::fieldChangedByUi( const caf::PdmFieldHandle* changedFiel
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimCurveStyleRule::appendBaseStyleToUiOrdering( caf::PdmUiOrdering& uiOrdering )
-{
-    m_curveAppearance->setColorVisible( false );
-    m_curveAppearance->setSymbolVisible( false );
-    m_curveAppearance->setLineVisible( true );
-
-    auto appearanceGroup = uiOrdering.addNewGroup( "Curve Style" );
-    m_curveAppearance->uiOrdering( "AppearanceOrdering", *appearanceGroup );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimCurveStyleRule::setBaseKind( BaseKind kind )
-{
-    m_baseKind = kind;
-
-    // Unedited base styles start with the default line thickness and symbol size
-    if ( kind == BaseKind::NONE || m_mode() == Mode::CUSTOM ) return;
-
-    if ( kind == BaseKind::COLOR )
-    {
-        m_curveAppearance->setLineThickness( 2 );
-        m_mode = Mode::CUSTOM;
-    }
-    if ( kind == BaseKind::SYMBOL ) setSymbolSize( 10 );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 bool RimCurveStyleRule::isHighlighted() const
 {
     return m_highlighted();
@@ -407,24 +349,6 @@ bool RimCurveStyleRule::isHighlighted() const
 void RimCurveStyleRule::setHighlighted( bool highlighted )
 {
     m_highlighted = highlighted;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-int RimCurveStyleRule::symbolSize() const
-{
-    return m_curveAppearance->symbolSize();
-}
-
-//--------------------------------------------------------------------------------------------------
-/// The skip distance is derived from the size, so symbols do not overlap
-//--------------------------------------------------------------------------------------------------
-void RimCurveStyleRule::setSymbolSize( int size )
-{
-    m_curveAppearance->setSymbolSize( size );
-    m_curveAppearance->setSymbolSkipDistance( 10.0f * size );
-    m_mode = Mode::CUSTOM;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -575,7 +499,7 @@ caf::IconProvider RimCurveStyleRule::dimensionColorIcon( Dimension              
 //--------------------------------------------------------------------------------------------------
 std::optional<RiuPlotCurveSymbol::PointSymbolEnum> RimCurveStyleRule::overriddenSymbol() const
 {
-    if ( m_mode() != Mode::CUSTOM || m_baseKind != BaseKind::NONE ) return std::nullopt;
+    if ( m_mode() != Mode::CUSTOM ) return std::nullopt;
     return m_curveAppearance->symbol();
 }
 

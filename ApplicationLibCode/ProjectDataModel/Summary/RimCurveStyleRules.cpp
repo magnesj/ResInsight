@@ -196,8 +196,7 @@ RimCurveStyleSettings* RimCurveStyleRules::duplicatePreset( const RimCurveStyleS
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Named rules using the deleted setting are moved to the first remaining one, plots using it as
-/// global setting lose it
+/// Plots using the deleted setting lose it
 //--------------------------------------------------------------------------------------------------
 void RimCurveStyleRules::deletePreset( RimCurveStyleSettings* settings )
 {
@@ -213,10 +212,6 @@ void RimCurveStyleRules::deletePreset( RimCurveStyleSettings* settings )
         }
     }
 
-    for ( auto rule : m_namedRules )
-    {
-        if ( rule->settings() == settings ) rule->setSettings( fallback );
-    }
     if ( m_selectedPreset() == settings ) m_selectedPreset = fallback;
 
     m_presets.removeChild( settings );
@@ -242,7 +237,6 @@ RimNamedCurveStyleRule* RimCurveStyleRules::addNamedRule( const QString& name )
 {
     auto rule = new RimNamedCurveStyleRule;
     rule->setName( name );
-    rule->setSettings( m_selectedPreset() ? m_selectedPreset() : defaultSettings() );
     m_namedRules.push_back( rule );
     m_selectedNamedRule = rule;
 
@@ -267,34 +261,19 @@ void RimCurveStyleRules::deleteNamedRule( RimNamedCurveStyleRule* rule )
 }
 
 //--------------------------------------------------------------------------------------------------
-/// The named rules have precedence over the global setting, and later named rules over earlier ones.
-/// Item rules of the setting a property is assigned from are applied by RimCurveStyleSettings::rulesFor
+/// Later named rules take precedence over earlier ones. A rule only assigns a property if it has a value for the curve.
 //--------------------------------------------------------------------------------------------------
-RimCurveStyleSettings::Resolved RimCurveStyleRules::resolve( const RimCurveStyleSettings*                      globalSettings,
-                                                             const std::vector<const RimNamedCurveStyleRule*>& namedRules,
-                                                             const RifEclipseSummaryAddress&                   address,
-                                                             const std::string&                                caseName )
+RimNamedCurveStyleRule::Resolved RimCurveStyleRules::resolve( const std::vector<const RimNamedCurveStyleRule*>& namedRules,
+                                                              const RifEclipseSummaryAddress&                   address,
+                                                              const std::string&                                caseName )
 {
-    using Settings = RimCurveStyleSettings;
-
-    const auto hasValue = [&]( Settings::Dimension dimension )
-    { return dimension != Settings::Dimension::NONE && !Settings::dimensionValue( dimension, address, caseName ).empty(); };
-
-    Settings::Resolved resolved;
-    if ( globalSettings )
-    {
-        if ( hasValue( globalSettings->colorDimension() ) )
-            resolved.color = Settings::Source{ globalSettings, globalSettings->colorDimension() };
-        if ( hasValue( globalSettings->symbolDimension() ) )
-            resolved.symbol = Settings::Source{ globalSettings, globalSettings->symbolDimension() };
-    }
-
+    RimNamedCurveStyleRule::Resolved resolved;
     for ( auto rule : namedRules )
     {
         if ( !rule->matches( address, caseName ) ) continue;
 
-        if ( rule->appliesToColor() ) resolved.color = Settings::Source{ rule->settings(), rule->dimension() };
-        if ( rule->appliesToSymbol() ) resolved.symbol = Settings::Source{ rule->settings(), rule->dimension() };
+        if ( rule->appliesToColor() ) resolved.color = rule;
+        if ( rule->appliesToSymbol() ) resolved.symbol = rule;
     }
 
     return resolved;
@@ -432,14 +411,13 @@ std::vector<caf::PdmUiTreeViewItemTag> RimCurveStyleRules::curveStyleRuleTags( R
     std::vector<caf::PdmUiTreeViewItemTag> tags;
     if ( name.isEmpty() ) return tags;
 
-    // The settings assigning color or symbol to the item in plots. Named rules come first as they take precedence
-    std::vector<const RimCurveStyleSettings*> colorSettings;
-    std::vector<const RimCurveStyleSettings*> symbolSettings;
+    // The named rules assigning color or symbol to the item in plots. Later rules take precedence
+    std::vector<const RimNamedCurveStyleRule*> colorRules;
+    std::vector<const RimNamedCurveStyleRule*> symbolRules;
 
-    const auto addUnique = []( std::vector<const RimCurveStyleSettings*>& settingsList, const RimCurveStyleSettings* settings )
+    const auto addUnique = []( std::vector<const RimNamedCurveStyleRule*>& rules, const RimNamedCurveStyleRule* rule )
     {
-        if ( settings && std::find( settingsList.begin(), settingsList.end(), settings ) == settingsList.end() )
-            settingsList.push_back( settings );
+        if ( std::find( rules.begin(), rules.end(), rule ) == rules.end() ) rules.push_back( rule );
     };
 
     for ( auto multiPlot : summaryMultiPlots() )
@@ -450,45 +428,35 @@ std::vector<caf::PdmUiTreeViewItemTag> RimCurveStyleRules::curveStyleRuleTags( R
         {
             if ( rule->dimension() != dimension ) continue;
 
-            const auto items = rule->items();
-            if ( !items.empty() && std::find( items.begin(), items.end(), name ) == items.end() ) continue;
-
-            if ( rule->appliesToColor() ) addUnique( colorSettings, rule->settings() );
-            if ( rule->appliesToSymbol() ) addUnique( symbolSettings, rule->settings() );
-        }
-
-        if ( auto global = multiPlot->globalSettings() )
-        {
-            if ( global->colorDimension() == dimension ) addUnique( colorSettings, global );
-            if ( global->symbolDimension() == dimension ) addUnique( symbolSettings, global );
+            if ( rule->appliesToColor() ) addUnique( colorRules, rule );
+            if ( rule->appliesToSymbol() ) addUnique( symbolRules, rule );
         }
     }
 
-    if ( colorSettings.empty() && symbolSettings.empty() ) return tags;
+    if ( colorRules.empty() && symbolRules.empty() ) return tags;
 
-    const auto appearanceFor = [this, dimension, &name]( const RimCurveStyleSettings* settings ) -> RimCurveStyleSettings::ItemAppearance
+    const auto appearanceFor = [this, &name]( const RimNamedCurveStyleRule* rule ) -> RimNamedCurveStyleRule::ItemAppearance
     {
-        const auto key     = std::make_pair( settings, dimension );
-        auto       cacheIt = m_tagCache.find( key );
+        auto cacheIt = m_tagCache.find( rule );
 
         // Items added after the cache was built are not in the cache, rebuild to include them
         if ( cacheIt == m_tagCache.end() || !cacheIt->second.contains( name ) )
         {
-            auto appearances = settings->itemAppearances( dimension );
+            auto appearances = rule->itemAppearances();
 
             // Names without an assigned appearance get an empty entry, to avoid rebuilding the cache on every repaint
-            if ( !appearances.contains( name ) ) appearances[name] = RimCurveStyleSettings::ItemAppearance();
+            if ( !appearances.contains( name ) ) appearances[name] = RimNamedCurveStyleRule::ItemAppearance();
 
-            cacheIt = m_tagCache.insert_or_assign( key, std::move( appearances ) ).first;
+            cacheIt = m_tagCache.insert_or_assign( rule, std::move( appearances ) ).first;
         }
 
         return cacheIt->second.at( name );
     };
 
     std::vector<cvf::Color3f> shownColors;
-    for ( auto settings : colorSettings )
+    for ( auto rule : colorRules )
     {
-        const auto color = appearanceFor( settings ).color;
+        const auto color = appearanceFor( rule ).color;
         if ( !color || std::find( shownColors.begin(), shownColors.end(), *color ) != shownColors.end() ) continue;
         shownColors.push_back( *color );
 
@@ -499,9 +467,9 @@ std::vector<caf::PdmUiTreeViewItemTag> RimCurveStyleRules::curveStyleRuleTags( R
     }
 
     std::vector<RiuPlotCurveSymbol::PointSymbolEnum> shownSymbols;
-    for ( auto settings : symbolSettings )
+    for ( auto rule : symbolRules )
     {
-        const auto symbol = appearanceFor( settings ).symbol;
+        const auto symbol = appearanceFor( rule ).symbol;
         if ( !symbol || std::find( shownSymbols.begin(), shownSymbols.end(), *symbol ) != shownSymbols.end() ) continue;
         shownSymbols.push_back( *symbol );
 
@@ -544,12 +512,12 @@ void RimCurveStyleRules::applyGlobalAppearance( const std::vector<RimSummaryPlot
 /// The settings are saved when the global appearance takes control of them, so they can be restored when it no
 /// longer does. Settings the global appearance does not control are never saved, they stay editable per curve.
 //--------------------------------------------------------------------------------------------------
-void RimCurveStyleRules::updateSavedAppearance( RimPlotCurve* curve, bool colorControlled, bool symbolControlled )
+void RimCurveStyleRules::updateSavedAppearance( RimPlotCurve* curve, bool colorControlled, bool symbolControlled, bool otherControlled )
 {
     auto saved = findSavedAppearance( curve );
     if ( !saved )
     {
-        if ( !colorControlled && !symbolControlled ) return;
+        if ( !colorControlled && !symbolControlled && !otherControlled ) return;
 
         saved = new RimSavedCurveAppearance;
         saved->setCurve( curve );
@@ -557,7 +525,7 @@ void RimCurveStyleRules::updateSavedAppearance( RimPlotCurve* curve, bool colorC
         m_savedLookup[curve] = saved;
     }
 
-    saved->update( colorControlled, symbolControlled );
+    saved->update( colorControlled, symbolControlled, otherControlled );
     if ( !saved->isControlled() ) removeSavedAppearance( curve, saved );
 }
 
@@ -577,7 +545,7 @@ void RimCurveStyleRules::updateSavedAppearance( RimEnsembleCurveSet* curveSet, b
         m_savedLookup[curveSet] = saved;
     }
 
-    saved->update( colorControlled, false );
+    saved->update( colorControlled, false, false );
     if ( !saved->isControlled() ) removeSavedAppearance( curveSet, saved );
 }
 
@@ -616,7 +584,7 @@ void RimCurveStyleRules::releaseAppearances( RimSummaryPlot* plot )
     {
         if ( !findSavedAppearance( curve ) ) continue;
 
-        updateSavedAppearance( curve, false, false );
+        updateSavedAppearance( curve, false, false, false );
         changed = true;
     }
 
@@ -699,12 +667,13 @@ void RimCurveStyleRules::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
     if ( auto preset = m_selectedPreset() )
     {
         auto settingGroup = presetGroup->addNewGroup( "Selected Global Setting" );
-        preset->appendFieldsToUiOrdering( *settingGroup );
+        preset->uiOrdering( uiConfigName, *settingGroup );
     }
 
     auto ruleGroup = uiOrdering.addNewGroup( "Named Rules" );
     ruleGroup->addNewLabel(
-        "A named rule applies a global setting to a dimension. Rules are selected per plot and take precedence over the global setting." );
+        "A named rule distributes either color or symbol over a dimension. Rules are selected per plot and take precedence over "
+        "the global setting." );
     ruleGroup->add( &m_selectedNamedRule );
     ruleGroup->addNewButton( "New",
                              [this]()

@@ -163,14 +163,13 @@ void RimSummaryMultiPlot::setNamedRules( const std::vector<RimNamedCurveStyleRul
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimSummaryMultiPlot::usesSettings( const RimCurveStyleSettings* settings ) const
+bool RimSummaryMultiPlot::usesNamedRule( const RimNamedCurveStyleRule* rule ) const
 {
-    if ( !settings ) return false;
-    if ( globalSettings() == settings ) return true;
+    if ( !rule ) return false;
 
-    for ( auto rule : namedRules() )
+    for ( auto namedRule : namedRules() )
     {
-        if ( rule->settings() == settings ) return true;
+        if ( namedRule == rule ) return true;
     }
 
     return false;
@@ -578,8 +577,8 @@ void RimSummaryMultiPlot::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
         appearanceGroup->add( &m_globalSettings );
         appearanceGroup->add( &m_namedRules );
         RimCurveStyleRules::addGlobalAppearanceLink( *appearanceGroup,
-                                                     "Named rules take precedence over the global setting. Edit them in the <a "
-                                                     "href=\"dummy\">curve appearance</a> view." );
+                                                     "Named rules take precedence over the global setting for color and symbol. Edit them "
+                                                     "in the <a href=\"dummy\">curve appearance</a> view." );
     }
 
     auto legendsGroup = uiOrdering.addNewGroup( "Legends" );

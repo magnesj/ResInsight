@@ -3392,12 +3392,7 @@ RimCurveStyleRules - class RimCurveStyleRules
 
 RimCurveStyleSettings - class RimCurveStyleSettings
   Name
-  ColorDimension
-  SymbolDimension
-  Rules
-  ColorBaseStyle
-  SymbolBaseStyle
-  AutoColorLegend
+  CurveAppearance
 
 RimCustomObjectiveFunction - class RimCustomObjectiveFunction
   CustomFunctionTitle
@@ -4127,10 +4122,10 @@ RimMultipleValveLocations - class RimMultipleValveLocations
 
 RimNamedCurveStyleRule - class RimNamedCurveStyleRule
   Name
-  Dimension
-  Settings
   AppliesTo
-  Items
+  Dimension
+  Rules
+  AutoColorLegend
 
 RimNonDarcyPerforationParameters - class RimNonDarcyPerforationParameters
   NonDarcyFlowType

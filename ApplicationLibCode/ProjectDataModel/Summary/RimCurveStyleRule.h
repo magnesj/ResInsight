@@ -17,7 +17,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "RimCurveStyleSettings.h"
+#include "RimNamedCurveStyleRule.h"
 #include "RimPlotCurveAppearance.h"
 
 #include "RiuPlotCurveSymbol.h"
@@ -47,7 +47,7 @@ class RimCurveStyleRule : public caf::PdmObject
     CAF_PDM_HEADER_INIT;
 
 public:
-    using Dimension = RimCurveStyleSettings::Dimension;
+    using Dimension = RimNamedCurveStyleRule::Dimension;
 
     enum class Mode
     {
@@ -85,10 +85,10 @@ public:
         bool m_isOwner;
     };
 
-    using PlotAppearance = RimCurveStyleSettings::ItemAppearance;
+    using PlotAppearance = RimNamedCurveStyleRule::ItemAppearance;
 
-    // The appearance of the first curve for each item in plots using the settings
-    static std::map<QString, PlotAppearance> appearancesFromPlots( Dimension dimension, const RimCurveStyleSettings* settings );
+    // The appearance of the first curve for each item in plots using the named rule
+    static std::map<QString, PlotAppearance> appearancesFromPlots( Dimension dimension, const RimNamedCurveStyleRule* namedRule );
 
     static caf::IconProvider swatchIcon( const cvf::Color3f& color );
     static caf::IconProvider paletteIcon();
@@ -103,23 +103,6 @@ public:
 
     // The custom symbol, if the rule is custom
     std::optional<RiuPlotCurveSymbol::PointSymbolEnum> overriddenSymbol() const;
-
-    // Base rules hold the style shared by all items, they are not tied to a specific item. The color base defines line
-    // style and thickness for items controlled by color, the symbol base the symbol size.
-    enum class BaseKind
-    {
-        NONE,
-        COLOR,
-        SYMBOL
-    };
-    void setBaseKind( BaseKind kind );
-
-    // Adds the line style and thickness fields of the color base rule
-    void appendBaseStyleToUiOrdering( caf::PdmUiOrdering& uiOrdering );
-
-    // The symbol base rule. Setting the size also sets a matching symbol skip distance
-    int  symbolSize() const;
-    void setSymbolSize( int size );
 
     // Highlighted items are highlighted in the plots
     bool isHighlighted() const;
@@ -146,6 +129,4 @@ private:
 
     // Color, symbol, line and fill settings that can be overridden
     caf::PdmChildField<RimPlotCurveAppearance*> m_curveAppearance;
-
-    BaseKind m_baseKind = BaseKind::NONE;
 };

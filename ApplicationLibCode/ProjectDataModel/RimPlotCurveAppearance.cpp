@@ -248,29 +248,36 @@ void RimPlotCurveAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiO
     uiOrdering.add( &m_curveInterpolation );
     m_curveInterpolation.uiCapability()->setUiHidden( !m_interpolationVisible );
 
-    for ( auto field :
-          std::vector<caf::PdmFieldHandle*>{ &m_curveColor, &m_curveColorOpacity, &m_symbolEdgeColor, &m_lineStyle, &m_curveThickness } )
+    for ( auto field : std::vector<caf::PdmFieldHandle*>{ &m_curveColor, &m_symbolEdgeColor } )
     {
         field->uiCapability()->setUiReadOnly( m_colorLocked );
     }
 
-    for ( auto field : std::vector<caf::PdmFieldHandle*>{ &m_pointSymbol, &m_symbolSize, &m_symbolSkipPixelDistance } )
-    {
-        field->uiCapability()->setUiReadOnly( m_symbolLocked );
-    }
+    m_pointSymbol.uiCapability()->setUiReadOnly( m_symbolLocked );
 
-    for ( auto field : std::vector<caf::PdmFieldHandle*>{ &m_fillStyle, &m_fillColor, &m_fillColorOpacity, &m_curveInterpolation } )
+    for ( auto field : std::vector<caf::PdmFieldHandle*>{ &m_curveColorOpacity,
+                                                          &m_lineStyle,
+                                                          &m_curveThickness,
+                                                          &m_symbolSize,
+                                                          &m_symbolSkipPixelDistance,
+                                                          &m_fillStyle,
+                                                          &m_fillColor,
+                                                          &m_fillColorOpacity,
+                                                          &m_curveInterpolation,
+                                                          &m_curveFittingTolerance } )
     {
-        field->uiCapability()->setUiReadOnly( false );
+        field->uiCapability()->setUiReadOnly( m_otherLocked );
     }
 
     // Keep the fields that are irrelevant for the current symbol and line style read-only
     const bool noSymbol = m_pointSymbol() == RiuPlotCurveSymbol::SYMBOL_NONE;
     const bool noLine   = m_lineStyle() == RiuQwtPlotCurveDefines::LineStyleEnum::STYLE_NONE;
-    m_symbolSize.uiCapability()->setUiReadOnly( m_symbolLocked || noSymbol );
-    m_symbolSkipPixelDistance.uiCapability()->setUiReadOnly( m_symbolLocked || noSymbol );
-    m_curveThickness.uiCapability()->setUiReadOnly( m_colorLocked || noLine );
-    m_curveInterpolation.uiCapability()->setUiReadOnly( noLine );
+    m_symbolSize.uiCapability()->setUiReadOnly( m_otherLocked || noSymbol );
+    m_symbolSkipPixelDistance.uiCapability()->setUiReadOnly( m_otherLocked || noSymbol );
+    m_curveThickness.uiCapability()->setUiReadOnly( m_otherLocked || noLine );
+    m_curveInterpolation.uiCapability()->setUiReadOnly( m_otherLocked || noLine );
+    m_curveFittingTolerance.uiCapability()->setUiReadOnly( m_otherLocked ||
+                                                           m_lineStyle() == RiuQwtPlotCurveDefines::LineStyleEnum::STYLE_SOLID );
 
     uiOrdering.skipRemainingFields();
 }
@@ -278,10 +285,11 @@ void RimPlotCurveAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiO
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimPlotCurveAppearance::setUiLocked( bool colorLocked, bool symbolLocked )
+void RimPlotCurveAppearance::setUiLocked( bool colorLocked, bool symbolLocked, bool otherLocked )
 {
     m_colorLocked  = colorLocked;
     m_symbolLocked = symbolLocked;
+    m_otherLocked  = otherLocked;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -478,8 +486,6 @@ void RimPlotCurveAppearance::copyColorSettingsFrom( const RimPlotCurveAppearance
     m_curveColor        = other.m_curveColor();
     m_curveColorOpacity = other.m_curveColorOpacity();
     m_symbolEdgeColor   = other.m_symbolEdgeColor();
-    m_lineStyle         = other.m_lineStyle();
-    m_curveThickness    = other.m_curveThickness();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -487,9 +493,25 @@ void RimPlotCurveAppearance::copyColorSettingsFrom( const RimPlotCurveAppearance
 //--------------------------------------------------------------------------------------------------
 void RimPlotCurveAppearance::copySymbolSettingsFrom( const RimPlotCurveAppearance& other )
 {
-    m_pointSymbol             = other.m_pointSymbol();
+    m_pointSymbol = other.m_pointSymbol();
+}
+
+//--------------------------------------------------------------------------------------------------
+/// All settings not controlled by color and symbol rules: line, symbol size, fill, interpolation and labels
+//--------------------------------------------------------------------------------------------------
+void RimPlotCurveAppearance::copyOtherSettingsFrom( const RimPlotCurveAppearance& other )
+{
+    m_symbolLabel             = other.m_symbolLabel();
     m_symbolSize              = other.m_symbolSize();
+    m_curveThickness          = other.m_curveThickness();
     m_symbolSkipPixelDistance = other.m_symbolSkipPixelDistance();
+    m_curveFittingTolerance   = other.m_curveFittingTolerance();
+    m_lineStyle               = other.m_lineStyle();
+    m_fillStyle               = other.m_fillStyle();
+    m_fillColor               = other.m_fillColor();
+    m_fillColorOpacity        = other.m_fillColorOpacity();
+    m_curveInterpolation      = other.m_curveInterpolation();
+    m_symbolLabelPosition     = other.m_symbolLabelPosition();
 }
 
 //--------------------------------------------------------------------------------------------------

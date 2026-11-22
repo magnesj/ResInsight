@@ -2,16 +2,22 @@
 
 #include "RifEclipseSummaryAddress.h"
 #include "RimCurveStyleSettings.h"
+#include "RimNamedCurveStyleRule.h"
+#include "RimPlotCurveAppearance.h"
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-TEST( RimCurveStyleSettingsTest, DefaultsControlColorByCase )
+TEST( RimCurveStyleSettingsTest, SettingHoldsFullAppearance )
 {
-    RimCurveStyleSettings settings;
+    RimCurveStyleSettings source;
+    source.setName( "Thick" );
+    source.curveAppearance()->setLineThickness( 6 );
 
-    EXPECT_EQ( RimCurveStyleSettings::Dimension::CASE, settings.colorDimension() );
-    EXPECT_EQ( RimCurveStyleSettings::Dimension::NONE, settings.symbolDimension() );
+    RimCurveStyleSettings target;
+    target.copyAppearanceFrom( source );
+
+    EXPECT_EQ( 6, target.curveAppearance()->lineThickness() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -19,14 +25,14 @@ TEST( RimCurveStyleSettingsTest, DefaultsControlColorByCase )
 //--------------------------------------------------------------------------------------------------
 TEST( RimCurveStyleSettingsTest, DimensionValues )
 {
-    using D = RimCurveStyleSettings::Dimension;
+    using D = RimNamedCurveStyleRule::Dimension;
 
     const auto well   = RifEclipseSummaryAddress::wellAddress( "WOPR", "A-1" );
     const auto region = RifEclipseSummaryAddress::regionAddress( "ROPR", 3 );
 
-    EXPECT_EQ( "A-1", RimCurveStyleSettings::dimensionValue( D::WELL, well, "case" ) );
-    EXPECT_EQ( "case", RimCurveStyleSettings::dimensionValue( D::CASE, well, "case" ) );
-    EXPECT_EQ( "WOPR", RimCurveStyleSettings::dimensionValue( D::VECTOR, well, "case" ) );
-    EXPECT_TRUE( RimCurveStyleSettings::dimensionValue( D::REGION, well, "case" ).empty() );
-    EXPECT_EQ( "3", RimCurveStyleSettings::dimensionValue( D::REGION, region, "case" ) );
+    EXPECT_EQ( "A-1", RimNamedCurveStyleRule::dimensionValue( D::WELL, well, "case" ) );
+    EXPECT_EQ( "case", RimNamedCurveStyleRule::dimensionValue( D::CASE, well, "case" ) );
+    EXPECT_EQ( "WOPR", RimNamedCurveStyleRule::dimensionValue( D::VECTOR, well, "case" ) );
+    EXPECT_TRUE( RimNamedCurveStyleRule::dimensionValue( D::REGION, well, "case" ).empty() );
+    EXPECT_EQ( "3", RimNamedCurveStyleRule::dimensionValue( D::REGION, region, "case" ) );
 }

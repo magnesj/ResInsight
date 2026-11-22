@@ -69,7 +69,7 @@ caf::PdmObject* RimSavedCurveAppearance::object() const
 /// the group becomes controlled, so edits made while it was not controlled are kept. Restoring also when the group is
 /// still controlled removes values left by rules that no longer apply.
 //--------------------------------------------------------------------------------------------------
-void RimSavedCurveAppearance::update( bool colorControlled, bool symbolControlled )
+void RimSavedCurveAppearance::update( bool colorControlled, bool symbolControlled, bool otherControlled )
 {
     if ( m_curve() && m_appearance() )
     {
@@ -84,6 +84,11 @@ void RimSavedCurveAppearance::update( bool colorControlled, bool symbolControlle
             m_appearance()->copySymbolSettingsFrom( *current );
         else if ( m_symbolControlled )
             current->copySymbolSettingsFrom( *m_appearance() );
+
+        if ( otherControlled && !m_otherControlled )
+            m_appearance()->copyOtherSettingsFrom( *current );
+        else if ( m_otherControlled )
+            current->copyOtherSettingsFrom( *m_appearance() );
     }
 
     if ( m_ensembleCurveSet() )
@@ -96,6 +101,7 @@ void RimSavedCurveAppearance::update( bool colorControlled, bool symbolControlle
 
     m_colorControlled  = colorControlled;
     m_symbolControlled = symbolControlled;
+    m_otherControlled  = otherControlled;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -103,5 +109,5 @@ void RimSavedCurveAppearance::update( bool colorControlled, bool symbolControlle
 //--------------------------------------------------------------------------------------------------
 bool RimSavedCurveAppearance::isControlled() const
 {
-    return m_colorControlled || m_symbolControlled;
+    return m_colorControlled || m_symbolControlled || m_otherControlled;
 }

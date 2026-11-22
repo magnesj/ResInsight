@@ -85,6 +85,7 @@ public:
     void           copyFrom( const RimPlotCurveAppearance& other );
     void           copyColorSettingsFrom( const RimPlotCurveAppearance& other );
     void           copySymbolSettingsFrom( const RimPlotCurveAppearance& other );
+    void           copyOtherSettingsFrom( const RimPlotCurveAppearance& other );
     Qt::BrushStyle fillStyle() const;
     void           setFillStyle( Qt::BrushStyle brushStyle );
 
@@ -109,9 +110,9 @@ public:
     void setFillOptionsVisible( bool isVisible );
     void setCurveFittingToleranceVisible( bool isVisible );
 
-    // Shows the color settings (color, opacity, edge color, line style and thickness) and the symbol settings (symbol, size and
-    // skip distance) as read-only, used when they are controlled elsewhere. All other settings stay editable.
-    void setUiLocked( bool colorLocked, bool symbolLocked );
+    // Shows settings as read-only when they are controlled elsewhere: the color settings (color, opacity and edge color), the
+    // symbol (the symbol type) and all other settings (line, symbol size, fill, interpolation and labels)
+    void setUiLocked( bool colorLocked, bool symbolLocked, bool otherLocked );
 
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
 
@@ -150,4 +151,5 @@ protected:
     bool m_curveFittingToleranceVisible;
     bool m_colorLocked  = false;
     bool m_symbolLocked = false;
+    bool m_otherLocked  = false;
 };

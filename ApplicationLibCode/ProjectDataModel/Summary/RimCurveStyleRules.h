@@ -41,9 +41,9 @@ class RimSummaryPlot;
 class RifEclipseSummaryAddress;
 
 //==================================================================================================
-/// Project-stored curve appearance: the global curve settings, which can be several, and the named
-/// rules applying a global setting to a data dimension. Summary multi plots select which global
-/// setting and named rules to use.
+/// Project-stored curve appearance: the global curve settings, which each define a full curve appearance,
+/// and the named rules distributing either color or symbol over a data dimension. Summary multi plots
+/// select which global setting and named rules to use.
 //==================================================================================================
 class RimCurveStyleRules : public caf::PdmObject
 {
@@ -63,12 +63,10 @@ public:
     RimNamedCurveStyleRule*              addNamedRule( const QString& name );
     void                                 deleteNamedRule( RimNamedCurveStyleRule* rule );
 
-    // Where the color and symbol of a curve are assigned from. The named rules are expected in increasing precedence.
-    // A property is only assigned if the source has a value for the curve
-    static RimCurveStyleSettings::Resolved resolve( const RimCurveStyleSettings*                      globalSettings,
-                                                    const std::vector<const RimNamedCurveStyleRule*>& namedRules,
-                                                    const RifEclipseSummaryAddress&                   address,
-                                                    const std::string&                                caseName );
+    // Later named rules take precedence over earlier ones
+    static RimNamedCurveStyleRule::Resolved resolve( const std::vector<const RimNamedCurveStyleRule*>& namedRules,
+                                                     const RifEclipseSummaryAddress&                   address,
+                                                     const std::string&                                caseName );
 
     // Re-applies the global appearance to all plots using it
     void rulesChanged();
@@ -91,7 +89,7 @@ public:
 
     // Saves the settings the global appearance takes control of, and restores those it no longer controls. Called before the
     // global appearance is applied to a curve.
-    void updateSavedAppearance( RimPlotCurve* curve, bool colorControlled, bool symbolControlled );
+    void updateSavedAppearance( RimPlotCurve* curve, bool colorControlled, bool symbolControlled, bool otherControlled );
     void updateSavedAppearance( RimEnsembleCurveSet* curveSet, bool colorControlled );
 
 protected:
@@ -127,5 +125,5 @@ private:
     caf::PdmPtrField<RimNamedCurveStyleRule*> m_selectedNamedRule;
 
     // Appearances shown as tags in the data source tree, built on demand and cleared when the rules change
-    mutable std::map<std::pair<const RimCurveStyleSettings*, RimCurveStyleRule::Dimension>, std::map<QString, RimCurveStyleSettings::ItemAppearance>> m_tagCache;
+    mutable std::map<const RimNamedCurveStyleRule*, std::map<QString, RimNamedCurveStyleRule::ItemAppearance>> m_tagCache;
 };

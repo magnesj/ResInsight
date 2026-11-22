@@ -28,7 +28,6 @@
 
 class RimSummaryCurve;
 class RimSummaryCase;
-class RimCurveStyleSettings;
 class RifEclipseSummaryAddress;
 class RiaSummaryCurveDefinition;
 
@@ -50,13 +49,10 @@ public:
 
     void setupCurveLook( RimSummaryCurve* curve );
 
-    // Colors are picked from the palette of the setting, if it has one
-    void setPaletteSettings( const RimCurveStyleSettings* settings ) { m_paletteSettings = settings; }
-
     static cvf::Color3f assignColorByPhase( const RifEclipseSummaryAddress& address );
     static cvf::Color3f computeTintedCurveColorForAddress( const RifEclipseSummaryAddress& address, int colorIndex );
 
-    static cvf::Color3f                        cycledPaletteColor( int colorIndex, const RimCurveStyleSettings* settings = nullptr );
+    static cvf::Color3f                        cycledPaletteColor( int colorIndex );
     static cvf::Color3f                        cycledNoneRGBBrColor( int colorIndex );
     static cvf::Color3f                        cycledGreenColor( int colorIndex );
     static cvf::Color3f                        cycledBlueColor( int colorIndex );
@@ -78,8 +74,6 @@ private:
 
     cvf::Color3f m_currentCurveBaseColor;
     float        m_currentCurveGradient;
-
-    const RimCurveStyleSettings* m_paletteSettings = nullptr;
 
     int m_dimensionCount;
 

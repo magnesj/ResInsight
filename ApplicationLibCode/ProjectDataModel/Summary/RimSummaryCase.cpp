@@ -24,7 +24,7 @@
 #include "RifSummaryReaderInterface.h"
 #include "RimCurveStyleRule.h"
 #include "RimCurveStyleRules.h"
-#include "RimCurveStyleSettings.h"
+#include "RimNamedCurveStyleRule.h"
 #include "RimProject.h"
 #include "RimSummaryAddressCollection.h"
 #include "RimSummaryEnsemble.h"
@@ -303,7 +303,7 @@ std::vector<caf::PdmUiTreeViewItemTag> RimSummaryCase::treeItemTags()
     {
         const auto globalTags =
             project->curveStyleRules()->curveStyleRuleTags( RimCurveStyleRule::Dimension::CASE,
-                                                            QString::fromStdString( RimCurveStyleSettings::caseName( this ) ) );
+                                                            QString::fromStdString( RimNamedCurveStyleRule::caseName( this ) ) );
         tags.insert( tags.end(), globalTags.begin(), globalTags.end() );
     }
 

@@ -195,9 +195,10 @@ public:
     bool   useGlobalCurveAppearance() const;
     const RimCurveStyleSettings*               globalCurveSettings() const;
     std::vector<const RimNamedCurveStyleRule*> namedCurveRules() const;
-    bool                                       usesCurveStyleSettings( const RimCurveStyleSettings* settings ) const;
+    bool                                       usesNamedRule( const RimNamedCurveStyleRule* rule ) const;
     bool controlsGlobalColor( const RifEclipseSummaryAddress& address, const std::string& caseName ) const;
     bool controlsGlobalSymbol( const RifEclipseSummaryAddress& address, const std::string& caseName ) const;
+    bool controlsGlobalOtherSettings() const;
     void updateCurveAppearanceFromGlobalSettings();
     void applyGlobalCurveAppearance();
 

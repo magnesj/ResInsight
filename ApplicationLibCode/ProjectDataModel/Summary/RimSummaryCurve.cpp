@@ -900,21 +900,22 @@ void RimSummaryCurve::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering
     RimStackablePlotCurve::stackingUiOrdering( *stackingGroup );
 
     const auto plot     = firstAncestorOrThisOfType<RimSummaryPlot>();
-    const auto caseName = RimCurveStyleSettings::caseName( summaryCaseY() );
+    const auto caseName = RimNamedCurveStyleRule::caseName( summaryCaseY() );
 
     // Only the settings controlled by the global appearance are locked, all others can be edited per curve
-    const bool isColorGlobal = plot && firstAncestorOrThisOfType<RimSummaryCurveCollection>() &&
-                               plot->controlsGlobalColor( summaryAddressY(), caseName );
-    const bool isSymbolGlobal = plot && firstAncestorOrThisOfType<RimSummaryCurveCollection>() &&
-                                plot->controlsGlobalSymbol( summaryAddressY(), caseName );
-    m_curveAppearance->setUiLocked( isColorGlobal, isSymbolGlobal );
+    const bool inCollection   = plot && firstAncestorOrThisOfType<RimSummaryCurveCollection>();
+    const bool isColorGlobal  = inCollection && plot->controlsGlobalColor( summaryAddressY(), caseName );
+    const bool isSymbolGlobal = inCollection && plot->controlsGlobalSymbol( summaryAddressY(), caseName );
+    const bool isOtherGlobal  = inCollection && plot->controlsGlobalOtherSettings();
+    m_curveAppearance->setUiLocked( isColorGlobal, isSymbolGlobal, isOtherGlobal );
 
     caf::PdmUiGroup* appearanceGroup = uiOrdering.addNewGroup( "Appearance" );
     if ( isColorGlobal || isSymbolGlobal )
     {
-        const QString what = isColorGlobal && isSymbolGlobal ? "The color and symbol are"
-                             : isColorGlobal                 ? "The color is"
-                                                             : "The symbol is";
+        const QString what = isOtherGlobal                     ? "The appearance is"
+                             : isColorGlobal && isSymbolGlobal ? "The color and symbol are"
+                             : isColorGlobal                   ? "The color is"
+                                                               : "The symbol is";
         RimCurveStyleRules::addGlobalAppearanceLink( *appearanceGroup,
                                                      what + " controlled by the <a href=\"dummy\">global curve appearance</a>." );
     }

@@ -10,39 +10,45 @@
 #include "RimSavedCurveAppearance.h"
 #include "RimSummaryCurve.h"
 
-using D = RimCurveStyleSettings::Dimension;
+using D = RimNamedCurveStyleRule::Dimension;
 
 //--------------------------------------------------------------------------------------------------
-/// Rules for the selected dimensions are returned ordered by dimension, independent of creation order
+/// The item rules of the rules assigning color and symbol apply to the matching items only, with the
+/// property of the rule they belong to
 //--------------------------------------------------------------------------------------------------
-TEST( RimCurveStyleRulesTest, RulesForOrderedByDimension )
+TEST( RimCurveStyleRulesTest, ItemRulesFollowTheRuleAssigningTheProperty )
 {
-    RimCurveStyleSettings settings;
-    settings.setColorDimension( D::WELL );
-    settings.setSymbolDimension( D::CASE );
-
-    auto wellRule = settings.findOrCreateRule( D::WELL, "A-1" );
+    RimNamedCurveStyleRule colorRule;
+    colorRule.setDimension( D::WELL );
+    colorRule.setAppliesTo( RimNamedCurveStyleRule::AppliesTo::COLOR );
+    auto wellRule = colorRule.findOrCreateRule( D::WELL, "A-1" );
     wellRule->setCustom( true );
-    settings.findOrCreateRule( D::WELL, "B-2" )->setCustom( true );
-    settings.findOrCreateRule( D::VECTOR, "WOPR" )->setCustom( true );
-    settings.findOrCreateRule( D::CASE, "auto case" );
-    auto caseRule = settings.findOrCreateRule( D::CASE, "case" );
+    colorRule.findOrCreateRule( D::WELL, "B-2" )->setCustom( true );
+    EXPECT_EQ( wellRule, colorRule.findOrCreateRule( D::WELL, "A-1" ) );
+
+    RimNamedCurveStyleRule symbolRule;
+    symbolRule.setDimension( D::CASE );
+    symbolRule.setAppliesTo( RimNamedCurveStyleRule::AppliesTo::SYMBOL );
+    auto caseRule = symbolRule.findOrCreateRule( D::CASE, "case" );
     caseRule->setCustom( true );
+    symbolRule.findOrCreateRule( D::CASE, "auto case" );
 
-    EXPECT_EQ( wellRule, settings.findOrCreateRule( D::WELL, "A-1" ) );
+    const auto address = RifEclipseSummaryAddress::wellAddress( "WOPR", "A-1" );
 
-    const auto address  = RifEclipseSummaryAddress::wellAddress( "WOPR", "A-1" );
-    const auto matching = RimCurveStyleSettings::rulesFor( settings.resolved(), address, "case" );
+    RimNamedCurveStyleRule::Resolved resolved{ &colorRule, &symbolRule };
+    const auto                       matching = RimNamedCurveStyleRule::rulesFor( resolved, address, "case" );
+    ASSERT_EQ( 2u, matching.size() );
+    EXPECT_EQ( wellRule, matching[0].rule );
+    EXPECT_TRUE( matching[0].applyColor && !matching[0].applySymbol );
+    EXPECT_EQ( caseRule, matching[1].rule );
+    EXPECT_TRUE( matching[1].applySymbol && !matching[1].applyColor );
 
-    // The two base styles come first, followed by the item rules ordered by dimension
-    ASSERT_EQ( 4u, matching.size() );
-    EXPECT_EQ( caseRule, matching[2].rule );
-    EXPECT_TRUE( matching[2].applySymbol && !matching[2].applyColor );
-    EXPECT_EQ( wellRule, matching[3].rule );
-    EXPECT_TRUE( matching[3].applyColor && !matching[3].applySymbol );
+    // The rule for "auto case" is neither custom nor highlighted, and there is no rule for other cases
+    EXPECT_EQ( 1u, RimNamedCurveStyleRule::rulesFor( resolved, address, "auto case" ).size() );
+    EXPECT_EQ( 1u, RimNamedCurveStyleRule::rulesFor( resolved, address, "other" ).size() );
 
-    // The base styles and the well rule apply, as there is no custom rule for the case
-    EXPECT_EQ( 3u, RimCurveStyleSettings::rulesFor( settings.resolved(), address, "auto case" ).size() );
+    // Rules not assigning the property do not apply
+    EXPECT_TRUE( RimNamedCurveStyleRule::rulesFor( {}, address, "case" ).empty() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -63,90 +69,45 @@ TEST( RimCurveStyleRulesTest, AlwaysAtLeastOnePreset )
 }
 
 //--------------------------------------------------------------------------------------------------
-/// The global setting assigns color and symbol by its own dimensions, but named rules take precedence
+/// A rule only assigns the property it applies to, for curves with a value for its dimension. Later rules win.
 //--------------------------------------------------------------------------------------------------
-TEST( RimCurveStyleRulesTest, NamedRulesTakePrecedence )
+TEST( RimCurveStyleRulesTest, NamedRulesPrecedence )
 {
     RimCurveStyleRules rules;
 
-    auto global = rules.defaultSettings();
-    global->setColorDimension( D::WELL );
-    global->setSymbolDimension( D::NONE );
+    auto wellColor = rules.addNamedRule( "Color by well" );
+    wellColor->setDimension( D::WELL );
+    wellColor->setAppliesTo( RimNamedCurveStyleRule::AppliesTo::COLOR );
 
-    auto vectorSettings = rules.addPreset( "Vectors" );
-    vectorSettings->setColorDimension( D::VECTOR );
-    vectorSettings->setSymbolDimension( D::CASE );
+    auto vectorColor = rules.addNamedRule( "Color by vector" );
+    vectorColor->setDimension( D::VECTOR );
+    vectorColor->setAppliesTo( RimNamedCurveStyleRule::AppliesTo::COLOR );
 
-    auto colorRule = rules.addNamedRule( "Color by vector" );
-    colorRule->setDimension( D::VECTOR );
-    colorRule->setSettings( vectorSettings );
-    colorRule->setAppliesTo( RimNamedCurveStyleRule::AppliesTo::COLOR );
-
-    auto symbolRule = rules.addNamedRule( "Symbol by case" );
-    symbolRule->setDimension( D::CASE );
-    symbolRule->setSettings( vectorSettings );
-    symbolRule->setAppliesTo( RimNamedCurveStyleRule::AppliesTo::SYMBOL );
+    auto caseSymbol = rules.addNamedRule( "Symbol by case" );
+    caseSymbol->setDimension( D::CASE );
+    caseSymbol->setAppliesTo( RimNamedCurveStyleRule::AppliesTo::SYMBOL );
 
     const auto wellAddress  = RifEclipseSummaryAddress::wellAddress( "WOPR", "A-1" );
     const auto fieldAddress = RifEclipseSummaryAddress::fieldAddress( "FOPT" );
 
-    // Only the global setting
-    auto resolved = RimCurveStyleRules::resolve( global, {}, wellAddress, "case" );
-    EXPECT_EQ( D::WELL, resolved.color.dimension );
-    EXPECT_EQ( global, resolved.color.settings );
-    EXPECT_FALSE( resolved.symbol.isSet() );
+    EXPECT_TRUE( wellColor->matches( wellAddress, "case" ) );
+    EXPECT_FALSE( wellColor->matches( fieldAddress, "case" ) );
 
-    // No value for the well dimension
-    EXPECT_FALSE( RimCurveStyleRules::resolve( global, {}, fieldAddress, "case" ).color.isSet() );
+    auto resolved = RimCurveStyleRules::resolve( { wellColor, caseSymbol }, wellAddress, "case" );
+    EXPECT_EQ( wellColor, resolved.color );
+    EXPECT_EQ( caseSymbol, resolved.symbol );
 
-    // The color rule replaces the color of the global setting
-    resolved = RimCurveStyleRules::resolve( global, { colorRule }, wellAddress, "case" );
-    EXPECT_EQ( D::VECTOR, resolved.color.dimension );
-    EXPECT_EQ( vectorSettings, resolved.color.settings );
-    EXPECT_FALSE( resolved.symbol.isSet() );
+    // No value for the well dimension, but the other rule applies
+    resolved = RimCurveStyleRules::resolve( { wellColor, vectorColor }, fieldAddress, "case" );
+    EXPECT_EQ( vectorColor, resolved.color );
+    EXPECT_EQ( nullptr, resolved.symbol );
 
-    // The symbol rule only affects the symbol
-    resolved = RimCurveStyleRules::resolve( global, { symbolRule }, wellAddress, "case" );
-    EXPECT_EQ( D::WELL, resolved.color.dimension );
-    EXPECT_EQ( D::CASE, resolved.symbol.dimension );
+    EXPECT_EQ( vectorColor, RimCurveStyleRules::resolve( { wellColor, vectorColor }, wellAddress, "case" ).color );
+    EXPECT_EQ( wellColor, RimCurveStyleRules::resolve( { vectorColor, wellColor }, wellAddress, "case" ).color );
 
-    // Named rules work without a global setting
-    resolved = RimCurveStyleRules::resolve( nullptr, { colorRule, symbolRule }, wellAddress, "case" );
-    EXPECT_EQ( D::VECTOR, resolved.color.dimension );
-    EXPECT_EQ( D::CASE, resolved.symbol.dimension );
-    EXPECT_FALSE( RimCurveStyleRules::resolve( nullptr, {}, wellAddress, "case" ).color.isSet() );
-}
-
-//--------------------------------------------------------------------------------------------------
-/// A named rule with selected items only applies to those items. Later rules win over earlier ones.
-//--------------------------------------------------------------------------------------------------
-TEST( RimCurveStyleRulesTest, NamedRuleItemsAndOrder )
-{
-    RimCurveStyleRules rules;
-
-    auto first = rules.addPreset( "First" );
-    first->setColorDimension( D::WELL );
-    auto second = rules.addPreset( "Second" );
-    second->setColorDimension( D::CASE );
-
-    auto wellRule = rules.addNamedRule( "Wells" );
-    wellRule->setDimension( D::WELL );
-    wellRule->setSettings( first );
-    wellRule->setItems( { "A-1" } );
-
-    auto caseRule = rules.addNamedRule( "Cases" );
-    caseRule->setDimension( D::CASE );
-    caseRule->setSettings( second );
-
-    const auto a1 = RifEclipseSummaryAddress::wellAddress( "WOPR", "A-1" );
-    const auto b2 = RifEclipseSummaryAddress::wellAddress( "WOPR", "B-2" );
-
-    EXPECT_TRUE( wellRule->matches( a1, "case" ) );
-    EXPECT_FALSE( wellRule->matches( b2, "case" ) );
-
-    EXPECT_EQ( D::WELL, RimCurveStyleRules::resolve( nullptr, { caseRule, wellRule }, a1, "case" ).color.dimension );
-    EXPECT_EQ( D::CASE, RimCurveStyleRules::resolve( nullptr, { wellRule, caseRule }, a1, "case" ).color.dimension );
-    EXPECT_EQ( D::CASE, RimCurveStyleRules::resolve( nullptr, { caseRule, wellRule }, b2, "case" ).color.dimension );
+    resolved = RimCurveStyleRules::resolve( {}, wellAddress, "case" );
+    EXPECT_EQ( nullptr, resolved.color );
+    EXPECT_EQ( nullptr, resolved.symbol );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -194,31 +155,41 @@ TEST( RimCurveStyleRulesTest, CopyAppearance )
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Only the settings the global appearance controlled are restored, local edits of the others are kept
+/// Only the groups the global appearance controlled are restored, local edits of the others are kept
 //--------------------------------------------------------------------------------------------------
 TEST( RimCurveStyleRulesTest, SavedAppearanceRestore )
 {
     auto curve = new RimSummaryCurve;
     curve->setColor( cvf::Color3f::RED );
     curve->setSymbol( RiuPlotCurveSymbol::SYMBOL_NONE );
+    curve->curveAppearance()->setLineThickness( 1 );
 
     RimSavedCurveAppearance saved;
     saved.setCurve( curve );
     EXPECT_FALSE( saved.isControlled() );
 
-    // The color is taken over by the global appearance, the symbol is edited locally
-    saved.update( true, false );
+    // The color and the other settings are taken over by the global appearance, the symbol is edited locally
+    saved.update( true, false, true );
     EXPECT_TRUE( saved.isControlled() );
     curve->setColor( cvf::Color3f::BLUE );
+    curve->curveAppearance()->setLineThickness( 5 );
     curve->setSymbol( RiuPlotCurveSymbol::SYMBOL_DIAMOND );
 
     // Still controlled, values left by rules that no longer apply are removed
-    saved.update( true, false );
+    saved.update( true, false, true );
     EXPECT_TRUE( curve->color() == cvf::Color3f::RED );
+    EXPECT_EQ( 1, curve->curveAppearance()->lineThickness() );
     EXPECT_EQ( RiuPlotCurveSymbol::SYMBOL_DIAMOND, curve->symbol() );
 
+    // Only the color is controlled after this, the line thickness stays as it is
     curve->setColor( cvf::Color3f::BLUE );
-    saved.update( false, false );
+    curve->curveAppearance()->setLineThickness( 5 );
+    saved.update( true, false, false );
+    EXPECT_TRUE( curve->color() == cvf::Color3f::RED );
+    EXPECT_EQ( 1, curve->curveAppearance()->lineThickness() );
+
+    curve->setColor( cvf::Color3f::BLUE );
+    saved.update( false, false, false );
     EXPECT_FALSE( saved.isControlled() );
     EXPECT_TRUE( curve->color() == cvf::Color3f::RED );
     EXPECT_EQ( RiuPlotCurveSymbol::SYMBOL_DIAMOND, curve->symbol() );

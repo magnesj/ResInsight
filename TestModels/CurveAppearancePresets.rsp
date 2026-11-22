@@ -9012,9 +9012,77 @@
         <RimCurveStyleRules>
             <Presets>
                 <RimCurveStyleSettings>
+                    <Name>Thick lines</Name>
+                    <CurveAppearance>
+                        <PlotCurveAppearance>
+                            <Color>0.2 0.2 0.8</Color>
+                            <CurveColorOpacity>1</CurveColorOpacity>
+                            <FillColor>-1 -1 -1</FillColor>
+                            <FillColorOpacity>1</FillColorOpacity>
+                            <Thickness>3</Thickness>
+                            <CurveInterpolation>INTERPOLATION_POINT_TO_POINT</CurveInterpolation>
+                            <LineStyle>STYLE_SOLID</LineStyle>
+                            <FillStyle>NO_FILL</FillStyle>
+                            <PointSymbol>SYMBOL_NONE</PointSymbol>
+                            <SymbolEdgeColor>0.2 0.2 0.8</SymbolEdgeColor>
+                            <SymbolSkipPxDist>0</SymbolSkipPxDist>
+                            <CurveFittingTolerance>1</CurveFittingTolerance>
+                            <SymbolLabel></SymbolLabel>
+                            <SymbolSize>6</SymbolSize>
+                            <SymbolLabelPosition>LABEL_ABOVE_SYMBOL</SymbolLabelPosition>
+                        </PlotCurveAppearance>
+                    </CurveAppearance>
+                </RimCurveStyleSettings>
+                <RimCurveStyleSettings>
+                    <Name>Thin lines with symbols</Name>
+                    <CurveAppearance>
+                        <PlotCurveAppearance>
+                            <Color>0.1 0.5 0.1</Color>
+                            <CurveColorOpacity>1</CurveColorOpacity>
+                            <FillColor>-1 -1 -1</FillColor>
+                            <FillColorOpacity>1</FillColorOpacity>
+                            <Thickness>1</Thickness>
+                            <CurveInterpolation>INTERPOLATION_POINT_TO_POINT</CurveInterpolation>
+                            <LineStyle>STYLE_SOLID</LineStyle>
+                            <FillStyle>NO_FILL</FillStyle>
+                            <PointSymbol>SYMBOL_ELLIPSE</PointSymbol>
+                            <SymbolEdgeColor>0.1 0.5 0.1</SymbolEdgeColor>
+                            <SymbolSkipPxDist>40</SymbolSkipPxDist>
+                            <CurveFittingTolerance>1</CurveFittingTolerance>
+                            <SymbolLabel></SymbolLabel>
+                            <SymbolSize>8</SymbolSize>
+                            <SymbolLabelPosition>LABEL_ABOVE_SYMBOL</SymbolLabelPosition>
+                        </PlotCurveAppearance>
+                    </CurveAppearance>
+                </RimCurveStyleSettings>
+                <RimCurveStyleSettings>
+                    <Name>Step lines</Name>
+                    <CurveAppearance>
+                        <PlotCurveAppearance>
+                            <Color>0.8 0.3 0.1</Color>
+                            <CurveColorOpacity>1</CurveColorOpacity>
+                            <FillColor>-1 -1 -1</FillColor>
+                            <FillColorOpacity>1</FillColorOpacity>
+                            <Thickness>2</Thickness>
+                            <CurveInterpolation>INTERPOLATION_STEP_LEFT</CurveInterpolation>
+                            <LineStyle>STYLE_SOLID</LineStyle>
+                            <FillStyle>NO_FILL</FillStyle>
+                            <PointSymbol>SYMBOL_NONE</PointSymbol>
+                            <SymbolEdgeColor>0.8 0.3 0.1</SymbolEdgeColor>
+                            <SymbolSkipPxDist>0</SymbolSkipPxDist>
+                            <CurveFittingTolerance>1</CurveFittingTolerance>
+                            <SymbolLabel></SymbolLabel>
+                            <SymbolSize>6</SymbolSize>
+                            <SymbolLabelPosition>LABEL_ABOVE_SYMBOL</SymbolLabelPosition>
+                        </PlotCurveAppearance>
+                    </CurveAppearance>
+                </RimCurveStyleSettings>
+            </Presets>
+            <NamedRules>
+                <RimNamedCurveStyleRule>
                     <Name>Color by well</Name>
-                    <ColorDimension>WELL</ColorDimension>
-                    <SymbolDimension>NONE</SymbolDimension>
+                    <AppliesTo>COLOR</AppliesTo>
+                    <Dimension>WELL</Dimension>
                     <Rules>
                         <RimCurveStyleRule>
                             <Dimension>WELL</Dimension>
@@ -9042,206 +9110,21 @@
                             </CurveAppearance>
                         </RimCurveStyleRule>
                     </Rules>
-                    <ColorBaseStyle>
-                        <RimCurveStyleRule>
-                            <Dimension>NONE</Dimension>
-                            <ItemName></ItemName>
-                            <Mode>CUSTOM</Mode>
-                            <Highlighted>False </Highlighted>
-                            <CurveAppearance>
-                                <PlotCurveAppearance>
-                                    <Color>0 0 0</Color>
-                                    <CurveColorOpacity>1</CurveColorOpacity>
-                                    <FillColor>-1 -1 -1</FillColor>
-                                    <FillColorOpacity>1</FillColorOpacity>
-                                    <Thickness>2</Thickness>
-                                    <CurveInterpolation>INTERPOLATION_POINT_TO_POINT</CurveInterpolation>
-                                    <LineStyle>STYLE_SOLID</LineStyle>
-                                    <FillStyle>NO_FILL</FillStyle>
-                                    <PointSymbol>SYMBOL_NONE</PointSymbol>
-                                    <SymbolEdgeColor>0 0 0</SymbolEdgeColor>
-                                    <SymbolSkipPxDist>0</SymbolSkipPxDist>
-                                    <CurveFittingTolerance>1</CurveFittingTolerance>
-                                    <SymbolLabel></SymbolLabel>
-                                    <SymbolSize>6</SymbolSize>
-                                    <SymbolLabelPosition>LABEL_ABOVE_SYMBOL</SymbolLabelPosition>
-                                </PlotCurveAppearance>
-                            </CurveAppearance>
-                        </RimCurveStyleRule>
-                    </ColorBaseStyle>
-                    <SymbolBaseStyle>
-                        <RimCurveStyleRule>
-                            <Dimension>NONE</Dimension>
-                            <ItemName></ItemName>
-                            <Mode>CUSTOM</Mode>
-                            <Highlighted>False </Highlighted>
-                            <CurveAppearance>
-                                <PlotCurveAppearance>
-                                    <Color>0 0 0</Color>
-                                    <CurveColorOpacity>1</CurveColorOpacity>
-                                    <FillColor>-1 -1 -1</FillColor>
-                                    <FillColorOpacity>1</FillColorOpacity>
-                                    <Thickness>1</Thickness>
-                                    <CurveInterpolation>INTERPOLATION_POINT_TO_POINT</CurveInterpolation>
-                                    <LineStyle>STYLE_SOLID</LineStyle>
-                                    <FillStyle>NO_FILL</FillStyle>
-                                    <PointSymbol>SYMBOL_NONE</PointSymbol>
-                                    <SymbolEdgeColor>0 0 0</SymbolEdgeColor>
-                                    <SymbolSkipPxDist>100</SymbolSkipPxDist>
-                                    <CurveFittingTolerance>1</CurveFittingTolerance>
-                                    <SymbolLabel></SymbolLabel>
-                                    <SymbolSize>10</SymbolSize>
-                                    <SymbolLabelPosition>LABEL_ABOVE_SYMBOL</SymbolLabelPosition>
-                                </PlotCurveAppearance>
-                            </CurveAppearance>
-                        </RimCurveStyleRule>
-                    </SymbolBaseStyle>
                     <AutoColorLegend></AutoColorLegend>
-                </RimCurveStyleSettings>
-                <RimCurveStyleSettings>
-                    <Name>Color by case, symbol by well</Name>
-                    <ColorDimension>CASE</ColorDimension>
-                    <SymbolDimension>WELL</SymbolDimension>
-                    <Rules/>
-                    <ColorBaseStyle>
-                        <RimCurveStyleRule>
-                            <Dimension>NONE</Dimension>
-                            <ItemName></ItemName>
-                            <Mode>CUSTOM</Mode>
-                            <Highlighted>False </Highlighted>
-                            <CurveAppearance>
-                                <PlotCurveAppearance>
-                                    <Color>0 0 0</Color>
-                                    <CurveColorOpacity>1</CurveColorOpacity>
-                                    <FillColor>-1 -1 -1</FillColor>
-                                    <FillColorOpacity>1</FillColorOpacity>
-                                    <Thickness>2</Thickness>
-                                    <CurveInterpolation>INTERPOLATION_POINT_TO_POINT</CurveInterpolation>
-                                    <LineStyle>STYLE_SOLID</LineStyle>
-                                    <FillStyle>NO_FILL</FillStyle>
-                                    <PointSymbol>SYMBOL_NONE</PointSymbol>
-                                    <SymbolEdgeColor>0 0 0</SymbolEdgeColor>
-                                    <SymbolSkipPxDist>0</SymbolSkipPxDist>
-                                    <CurveFittingTolerance>1</CurveFittingTolerance>
-                                    <SymbolLabel></SymbolLabel>
-                                    <SymbolSize>6</SymbolSize>
-                                    <SymbolLabelPosition>LABEL_ABOVE_SYMBOL</SymbolLabelPosition>
-                                </PlotCurveAppearance>
-                            </CurveAppearance>
-                        </RimCurveStyleRule>
-                    </ColorBaseStyle>
-                    <SymbolBaseStyle>
-                        <RimCurveStyleRule>
-                            <Dimension>NONE</Dimension>
-                            <ItemName></ItemName>
-                            <Mode>CUSTOM</Mode>
-                            <Highlighted>False </Highlighted>
-                            <CurveAppearance>
-                                <PlotCurveAppearance>
-                                    <Color>0 0 0</Color>
-                                    <CurveColorOpacity>1</CurveColorOpacity>
-                                    <FillColor>-1 -1 -1</FillColor>
-                                    <FillColorOpacity>1</FillColorOpacity>
-                                    <Thickness>1</Thickness>
-                                    <CurveInterpolation>INTERPOLATION_POINT_TO_POINT</CurveInterpolation>
-                                    <LineStyle>STYLE_SOLID</LineStyle>
-                                    <FillStyle>NO_FILL</FillStyle>
-                                    <PointSymbol>SYMBOL_NONE</PointSymbol>
-                                    <SymbolEdgeColor>0 0 0</SymbolEdgeColor>
-                                    <SymbolSkipPxDist>100</SymbolSkipPxDist>
-                                    <CurveFittingTolerance>1</CurveFittingTolerance>
-                                    <SymbolLabel></SymbolLabel>
-                                    <SymbolSize>10</SymbolSize>
-                                    <SymbolLabelPosition>LABEL_ABOVE_SYMBOL</SymbolLabelPosition>
-                                </PlotCurveAppearance>
-                            </CurveAppearance>
-                        </RimCurveStyleRule>
-                    </SymbolBaseStyle>
-                    <AutoColorLegend></AutoColorLegend>
-                </RimCurveStyleSettings>
-                <RimCurveStyleSettings>
-                    <Name>Color by vector, symbol by case</Name>
-                    <ColorDimension>VECTOR</ColorDimension>
-                    <SymbolDimension>CASE</SymbolDimension>
-                    <Rules/>
-                    <ColorBaseStyle>
-                        <RimCurveStyleRule>
-                            <Dimension>NONE</Dimension>
-                            <ItemName></ItemName>
-                            <Mode>CUSTOM</Mode>
-                            <Highlighted>False </Highlighted>
-                            <CurveAppearance>
-                                <PlotCurveAppearance>
-                                    <Color>0 0 0</Color>
-                                    <CurveColorOpacity>1</CurveColorOpacity>
-                                    <FillColor>-1 -1 -1</FillColor>
-                                    <FillColorOpacity>1</FillColorOpacity>
-                                    <Thickness>2</Thickness>
-                                    <CurveInterpolation>INTERPOLATION_POINT_TO_POINT</CurveInterpolation>
-                                    <LineStyle>STYLE_SOLID</LineStyle>
-                                    <FillStyle>NO_FILL</FillStyle>
-                                    <PointSymbol>SYMBOL_NONE</PointSymbol>
-                                    <SymbolEdgeColor>0 0 0</SymbolEdgeColor>
-                                    <SymbolSkipPxDist>0</SymbolSkipPxDist>
-                                    <CurveFittingTolerance>1</CurveFittingTolerance>
-                                    <SymbolLabel></SymbolLabel>
-                                    <SymbolSize>6</SymbolSize>
-                                    <SymbolLabelPosition>LABEL_ABOVE_SYMBOL</SymbolLabelPosition>
-                                </PlotCurveAppearance>
-                            </CurveAppearance>
-                        </RimCurveStyleRule>
-                    </ColorBaseStyle>
-                    <SymbolBaseStyle>
-                        <RimCurveStyleRule>
-                            <Dimension>NONE</Dimension>
-                            <ItemName></ItemName>
-                            <Mode>CUSTOM</Mode>
-                            <Highlighted>False </Highlighted>
-                            <CurveAppearance>
-                                <PlotCurveAppearance>
-                                    <Color>0 0 0</Color>
-                                    <CurveColorOpacity>1</CurveColorOpacity>
-                                    <FillColor>-1 -1 -1</FillColor>
-                                    <FillColorOpacity>1</FillColorOpacity>
-                                    <Thickness>1</Thickness>
-                                    <CurveInterpolation>INTERPOLATION_POINT_TO_POINT</CurveInterpolation>
-                                    <LineStyle>STYLE_SOLID</LineStyle>
-                                    <FillStyle>NO_FILL</FillStyle>
-                                    <PointSymbol>SYMBOL_NONE</PointSymbol>
-                                    <SymbolEdgeColor>0 0 0</SymbolEdgeColor>
-                                    <SymbolSkipPxDist>100</SymbolSkipPxDist>
-                                    <CurveFittingTolerance>1</CurveFittingTolerance>
-                                    <SymbolLabel></SymbolLabel>
-                                    <SymbolSize>10</SymbolSize>
-                                    <SymbolLabelPosition>LABEL_ABOVE_SYMBOL</SymbolLabelPosition>
-                                </PlotCurveAppearance>
-                            </CurveAppearance>
-                        </RimCurveStyleRule>
-                    </SymbolBaseStyle>
-                    <AutoColorLegend></AutoColorLegend>
-                </RimCurveStyleSettings>
-            </Presets>
-            <NamedRules>
-                <RimNamedCurveStyleRule>
-                    <Name>Producers by well</Name>
-                    <Dimension>WELL</Dimension>
-                    <Settings>.. Presets 0</Settings>
-                    <AppliesTo>COLOR</AppliesTo>
-                    <Items>PROD-2 PROD-3 PROD-4 </Items>
                 </RimNamedCurveStyleRule>
                 <RimNamedCurveStyleRule>
                     <Name>Symbol by case</Name>
-                    <Dimension>CASE</Dimension>
-                    <Settings>.. Presets 2</Settings>
                     <AppliesTo>SYMBOL</AppliesTo>
-                    <Items></Items>
+                    <Dimension>CASE</Dimension>
+                    <Rules/>
+                    <AutoColorLegend></AutoColorLegend>
                 </RimNamedCurveStyleRule>
                 <RimNamedCurveStyleRule>
                     <Name>Color by vector</Name>
-                    <Dimension>VECTOR</Dimension>
-                    <Settings>.. Presets 2</Settings>
                     <AppliesTo>COLOR</AppliesTo>
-                    <Items></Items>
+                    <Dimension>VECTOR</Dimension>
+                    <Rules/>
+                    <AutoColorLegend></AutoColorLegend>
                 </RimNamedCurveStyleRule>
             </NamedRules>
             <CaseOrder></CaseOrder>

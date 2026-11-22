@@ -22,7 +22,7 @@
 #include "Summary/RiaSummaryDefines.h"
 
 #include "RimCurveStyleRules.h"
-#include "RimCurveStyleSettings.h"
+#include "RimNamedCurveStyleRule.h"
 #include "RimProject.h"
 
 #include <QRegularExpression>
@@ -157,8 +157,8 @@ std::vector<caf::PdmUiTreeViewItemTag> RimSummaryAddress::treeItemTags()
     auto project = RimProject::current();
     if ( !project || !project->curveStyleRules() ) return {};
 
-    const auto value = RimCurveStyleSettings::dimensionValue( RimCurveStyleSettings::Dimension::VECTOR, address(), "" );
-    return project->curveStyleRules()->curveStyleRuleTags( RimCurveStyleSettings::Dimension::VECTOR, QString::fromStdString( value ) );
+    const auto value = RimNamedCurveStyleRule::dimensionValue( RimNamedCurveStyleRule::Dimension::VECTOR, address(), "" );
+    return project->curveStyleRules()->curveStyleRuleTags( RimNamedCurveStyleRule::Dimension::VECTOR, QString::fromStdString( value ) );
 }
 
 //--------------------------------------------------------------------------------------------------

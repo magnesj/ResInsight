@@ -44,10 +44,11 @@ public:
     // The saved curve or curve set, nullptr if it no longer exists
     caf::PdmObject* object() const;
 
-    // Updates the saved settings and restores the curve to match which settings the global appearance controls
-    void update( bool colorControlled, bool symbolControlled );
+    // Updates the saved settings and restores the curve to match which settings the global appearance controls. The other
+    // settings are all settings not in the color and symbol groups.
+    void update( bool colorControlled, bool symbolControlled, bool otherControlled );
 
-    // True if the global appearance controls the color or symbol
+    // True if the global appearance controls any of the settings
     bool isControlled() const;
 
 private:
@@ -59,4 +60,5 @@ private:
 
     bool m_colorControlled  = false;
     bool m_symbolControlled = false;
+    bool m_otherControlled  = false;
 };

@@ -23,7 +23,7 @@
 #include "RifEclipseSummaryAddress.h"
 
 #include "RimCurveStyleRules.h"
-#include "RimCurveStyleSettings.h"
+#include "RimNamedCurveStyleRule.h"
 #include "RimProject.h"
 #include "RimSummaryAddress.h"
 
@@ -550,7 +550,7 @@ std::vector<RimSummaryAddressCollection*> RimSummaryAddressCollection::subFolder
 //--------------------------------------------------------------------------------------------------
 std::vector<caf::PdmUiTreeViewItemTag> RimSummaryAddressCollection::treeItemTags()
 {
-    using Dimension = RimCurveStyleSettings::Dimension;
+    using Dimension = RimNamedCurveStyleRule::Dimension;
 
     auto project = RimProject::current();
     if ( !project || !project->curveStyleRules() || m_adresses.empty() ) return {};
@@ -595,7 +595,7 @@ std::vector<caf::PdmUiTreeViewItemTag> RimSummaryAddressCollection::treeItemTags
             return {};
     }
 
-    const auto value = RimCurveStyleSettings::dimensionValue( dimension, m_adresses.childrenByType().front()->address(), "" );
+    const auto value = RimNamedCurveStyleRule::dimensionValue( dimension, m_adresses.childrenByType().front()->address(), "" );
     return project->curveStyleRules()->curveStyleRuleTags( dimension, QString::fromStdString( value ) );
 }
 

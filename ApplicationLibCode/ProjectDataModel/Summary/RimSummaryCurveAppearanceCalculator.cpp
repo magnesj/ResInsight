@@ -27,7 +27,6 @@
 #include "RiuQwtPlotCurve.h"
 
 #include "RifSummaryReaderInterface.h"
-#include "RimCurveStyleSettings.h"
 #include "RimSummaryCase.h"
 #include "RimSummaryCurve.h"
 
@@ -467,7 +466,7 @@ void RimSummaryCurveAppearanceCalculator::setOneCurveAppearance( CurveAppearance
         case NONE:
             break;
         case COLOR:
-            m_currentCurveBaseColor = cycledPaletteColor( appeaIdx, m_paletteSettings );
+            m_currentCurveBaseColor = cycledPaletteColor( appeaIdx );
             break;
         case GRADIENT:
             m_currentCurveGradient = gradient( totalCount, appeaIdx );
@@ -487,14 +486,9 @@ void RimSummaryCurveAppearanceCalculator::setOneCurveAppearance( CurveAppearance
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::Color3f RimSummaryCurveAppearanceCalculator::cycledPaletteColor( int colorIndex, const RimCurveStyleSettings* settings )
+cvf::Color3f RimSummaryCurveAppearanceCalculator::cycledPaletteColor( int colorIndex )
 {
     if ( colorIndex < 0 ) return cvf::Color3f::BLACK;
-
-    if ( settings )
-    {
-        if ( auto legendColor = settings->autoLegendColor( colorIndex ) ) return *legendColor;
-    }
 
     return RiaColorTables::summaryCurveDefaultPaletteColors().cycledColor3f( colorIndex );
 }
