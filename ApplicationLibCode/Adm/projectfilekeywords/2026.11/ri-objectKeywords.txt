@@ -340,6 +340,7 @@ RimMultiPlotCollection
 RimMultipleEclipseResults
 RimMultipleLocations
 RimMultipleValveLocations
+RimNamedCurveStyleRule
 RimNonDarcyPerforationParameters
 RimObjectiveFunction
 RimObservedEclipseUserData

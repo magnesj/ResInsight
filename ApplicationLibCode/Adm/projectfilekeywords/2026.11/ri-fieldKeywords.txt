@@ -1771,7 +1771,8 @@ MultiSummaryPlot - class RimSummaryMultiPlot
   Allow3DSelectionLink
   ReadOutSettings
   AxisRangeAggregation
-  GlobalAppearance
+  GlobalSettings
+  NamedRules
   PlotFilterYAxisThreshold
   DefaultStepDimension
 
@@ -3384,16 +3385,19 @@ RimCurveStyleRule - class RimCurveStyleRule
   CurveAppearance
 
 RimCurveStyleRules - class RimCurveStyleRules
-  Settings
+  Presets
+  NamedRules
   CaseOrder
   WellOrder
+
+RimCurveStyleSettings - class RimCurveStyleSettings
+  Name
+  ColorDimension
+  SymbolDimension
+  Rules
   ColorBaseStyle
   SymbolBaseStyle
   AutoColorLegend
-
-RimCurveStyleSettings - class RimCurveStyleSettings
-  ColorDimension
-  SymbolDimension
 
 RimCustomObjectiveFunction - class RimCustomObjectiveFunction
   CustomFunctionTitle
@@ -4120,6 +4124,13 @@ RimMultipleValveLocations - class RimMultipleValveLocations
   ValveSpacing
   RangeValveCount
   LocationOfValves
+
+RimNamedCurveStyleRule - class RimNamedCurveStyleRule
+  Name
+  Dimension
+  Settings
+  AppliesTo
+  Items
 
 RimNonDarcyPerforationParameters - class RimNonDarcyPerforationParameters
   NonDarcyFlowType
