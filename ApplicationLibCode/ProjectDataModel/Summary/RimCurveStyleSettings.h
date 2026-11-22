@@ -138,6 +138,7 @@ public:
 
     // Color from the selected color palette, if one is selected
     std::optional<cvf::Color3f> autoLegendColor( int index ) const;
+    void                        setColorPalette( RimColorLegend* palette );
 
     // The color and symbol assigned to each item of the dimension, including the custom ones
     std::map<QString, ItemAppearance> itemAppearances( Dimension dimension ) const;

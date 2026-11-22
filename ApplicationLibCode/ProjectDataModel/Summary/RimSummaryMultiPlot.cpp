@@ -155,6 +155,14 @@ void RimSummaryMultiPlot::clearNamedRules()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimSummaryMultiPlot::setNamedRules( const std::vector<RimNamedCurveStyleRule*>& rules )
+{
+    m_namedRules.setValue( rules );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 bool RimSummaryMultiPlot::usesSettings( const RimCurveStyleSettings* settings ) const
 {
     if ( !settings ) return false;

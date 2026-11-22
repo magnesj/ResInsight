@@ -446,6 +446,14 @@ std::optional<cvf::Color3f> RimCurveStyleSettings::autoLegendColor( int index ) 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimCurveStyleSettings::setColorPalette( RimColorLegend* palette )
+{
+    m_autoColorLegend = palette;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 int RimCurveStyleSettings::symbolSize() const
 {
     return m_symbolBaseStyle() ? m_symbolBaseStyle()->symbolSize() : 0;

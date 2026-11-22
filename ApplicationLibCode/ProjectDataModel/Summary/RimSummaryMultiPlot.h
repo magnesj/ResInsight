@@ -66,6 +66,7 @@ public:
     void                                       setGlobalSettings( RimCurveStyleSettings* settings );
     std::vector<const RimNamedCurveStyleRule*> namedRules() const;
     void                                       clearNamedRules();
+    void                                       setNamedRules( const std::vector<RimNamedCurveStyleRule*>& rules );
     bool                                       usesSettings( const RimCurveStyleSettings* settings ) const;
     bool                                       isGlobalAppearanceActive() const;
 
