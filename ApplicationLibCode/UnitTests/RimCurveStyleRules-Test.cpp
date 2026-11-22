@@ -194,20 +194,35 @@ TEST( RimCurveStyleRulesTest, CopyAppearance )
 }
 
 //--------------------------------------------------------------------------------------------------
-/// The saved appearance is restored, and not applied after the curve is deleted
+/// Only the settings the global appearance controlled are restored, local edits of the others are kept
 //--------------------------------------------------------------------------------------------------
 TEST( RimCurveStyleRulesTest, SavedAppearanceRestore )
 {
     auto curve = new RimSummaryCurve;
     curve->setColor( cvf::Color3f::RED );
+    curve->setSymbol( RiuPlotCurveSymbol::SYMBOL_NONE );
 
     RimSavedCurveAppearance saved;
     saved.setCurve( curve );
+    EXPECT_FALSE( saved.isControlled() );
+
+    // The color is taken over by the global appearance, the symbol is edited locally
+    saved.update( true, false );
+    EXPECT_TRUE( saved.isControlled() );
+    curve->setColor( cvf::Color3f::BLUE );
+    curve->setSymbol( RiuPlotCurveSymbol::SYMBOL_DIAMOND );
+
+    // Still controlled, values left by rules that no longer apply are removed
+    saved.update( true, false );
+    EXPECT_TRUE( curve->color() == cvf::Color3f::RED );
+    EXPECT_EQ( RiuPlotCurveSymbol::SYMBOL_DIAMOND, curve->symbol() );
 
     curve->setColor( cvf::Color3f::BLUE );
-    EXPECT_EQ( curve, saved.restore() );
+    saved.update( false, false );
+    EXPECT_FALSE( saved.isControlled() );
     EXPECT_TRUE( curve->color() == cvf::Color3f::RED );
+    EXPECT_EQ( RiuPlotCurveSymbol::SYMBOL_DIAMOND, curve->symbol() );
 
     delete curve;
-    EXPECT_EQ( nullptr, saved.restore() );
+    EXPECT_EQ( nullptr, saved.object() );
 }

@@ -188,11 +188,11 @@ public:
     void showPlotInfoLabel( bool show );
     void updatePlotInfoLabel();
 
-    size_t                                     singleColorCurveCount() const;
-    void                                       applyDefaultCurveAppearances();
-    void                                       applyDefaultCurveAppearances( std::vector<RimSummaryCurve*> curvesToUpdate );
-    void                                       applyDefaultCurveAppearances( std::vector<RimEnsembleCurveSet*> ensembleCurvesToUpdate );
-    bool                                       useGlobalCurveAppearance() const;
+    size_t singleColorCurveCount() const;
+    void   applyDefaultCurveAppearances();
+    void   applyDefaultCurveAppearances( std::vector<RimSummaryCurve*> curvesToUpdate, bool assignLocalDefaults = true );
+    void   applyDefaultCurveAppearances( std::vector<RimEnsembleCurveSet*> ensembleCurvesToUpdate, bool assignLocalDefaults = true );
+    bool   useGlobalCurveAppearance() const;
     const RimCurveStyleSettings*               globalCurveSettings() const;
     std::vector<const RimNamedCurveStyleRule*> namedCurveRules() const;
     bool                                       usesCurveStyleSettings( const RimCurveStyleSettings* settings ) const;

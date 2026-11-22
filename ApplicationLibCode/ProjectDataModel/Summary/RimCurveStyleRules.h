@@ -89,6 +89,11 @@ public:
     std::vector<caf::PdmUiTreeViewItemTag> curveStyleRuleTags( RimCurveStyleRule::Dimension dimension, const QString& name ) const;
     void                                   applyGlobalAppearance( const std::vector<RimSummaryPlot*>& plots );
 
+    // Saves the settings the global appearance takes control of, and restores those it no longer controls. Called before the
+    // global appearance is applied to a curve.
+    void updateSavedAppearance( RimPlotCurve* curve, bool colorControlled, bool symbolControlled );
+    void updateSavedAppearance( RimEnsembleCurveSet* curveSet, bool colorControlled );
+
 protected:
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
@@ -104,11 +109,13 @@ private:
     caf::PdmField<std::vector<QString>>*       itemOrder( RimCurveStyleRule::Dimension dimension );
     const caf::PdmField<std::vector<QString>>* itemOrder( RimCurveStyleRule::Dimension dimension ) const;
 
-    void saveAppearance( RimSummaryPlot* plot );
-    void restoreAppearances( const std::vector<RimSummaryPlot*>& plots, bool applyDefaultsToUnsaved );
+    RimSavedCurveAppearance* findSavedAppearance( caf::PdmObject* object );
+    void                     removeSavedAppearance( caf::PdmObject* object, RimSavedCurveAppearance* saved );
+    void                     releaseAppearances( RimSummaryPlot* plot );
 
-    // The curve appearance before the global appearance was enabled, restored when disabled
-    caf::PdmChildArrayField<RimSavedCurveAppearance*> m_savedAppearances;
+    // The settings of curves and curve sets before the global appearance took control of them
+    caf::PdmChildArrayField<RimSavedCurveAppearance*>   m_savedAppearances;
+    std::map<caf::PdmObject*, RimSavedCurveAppearance*> m_savedLookup;
 
     caf::PdmChildArrayField<RimCurveStyleSettings*>  m_presets;
     caf::PdmChildArrayField<RimNamedCurveStyleRule*> m_namedRules;

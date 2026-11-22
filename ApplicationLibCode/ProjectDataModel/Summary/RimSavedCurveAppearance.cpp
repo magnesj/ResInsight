@@ -65,21 +65,43 @@ caf::PdmObject* RimSavedCurveAppearance::object() const
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// The saved settings of a group are the settings before the global appearance took control of it. They are stored when
+/// the group becomes controlled, so edits made while it was not controlled are kept. Restoring also when the group is
+/// still controlled removes values left by rules that no longer apply.
 //--------------------------------------------------------------------------------------------------
-caf::PdmObject* RimSavedCurveAppearance::restore() const
+void RimSavedCurveAppearance::update( bool colorControlled, bool symbolControlled )
 {
     if ( m_curve() && m_appearance() )
     {
-        m_curve()->curveAppearance()->copyFrom( *m_appearance() );
-        return m_curve();
+        auto* current = m_curve()->curveAppearance();
+
+        if ( colorControlled && !m_colorControlled )
+            m_appearance()->copyColorSettingsFrom( *current );
+        else if ( m_colorControlled )
+            current->copyColorSettingsFrom( *m_appearance() );
+
+        if ( symbolControlled && !m_symbolControlled )
+            m_appearance()->copySymbolSettingsFrom( *current );
+        else if ( m_symbolControlled )
+            current->copySymbolSettingsFrom( *m_appearance() );
     }
 
     if ( m_ensembleCurveSet() )
     {
-        m_ensembleCurveSet()->setColorAndUpdateCurves( m_ensembleColor() );
-        return m_ensembleCurveSet();
+        if ( colorControlled && !m_colorControlled )
+            m_ensembleColor = m_ensembleCurveSet()->color();
+        else if ( m_colorControlled )
+            m_ensembleCurveSet()->setColorAndUpdateCurves( m_ensembleColor() );
     }
 
-    return nullptr;
+    m_colorControlled  = colorControlled;
+    m_symbolControlled = symbolControlled;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimSavedCurveAppearance::isControlled() const
+{
+    return m_colorControlled || m_symbolControlled;
 }

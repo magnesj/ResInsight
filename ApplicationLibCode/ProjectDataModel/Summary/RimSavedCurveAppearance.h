@@ -28,8 +28,8 @@ class RimPlotCurve;
 class RimPlotCurveAppearance;
 
 //==================================================================================================
-/// The appearance of a curve or ensemble curve set before the global curve appearance was enabled. Stored in the
-/// project so it can be restored after a reload, and referenced by PDM pointers so deleted objects are not matched.
+/// The color and symbol settings of a curve, or the color of an ensemble curve set, from before the global curve appearance
+/// took control of them. Curves are referenced by PDM pointers so deleted objects are not matched.
 //==================================================================================================
 class RimSavedCurveAppearance : public caf::PdmObject
 {
@@ -44,8 +44,11 @@ public:
     // The saved curve or curve set, nullptr if it no longer exists
     caf::PdmObject* object() const;
 
-    // Restores the saved appearance and returns the curve or curve set, nullptr if it no longer exists
-    caf::PdmObject* restore() const;
+    // Updates the saved settings and restores the curve to match which settings the global appearance controls
+    void update( bool colorControlled, bool symbolControlled );
+
+    // True if the global appearance controls the color or symbol
+    bool isControlled() const;
 
 private:
     caf::PdmPtrField<RimPlotCurve*>             m_curve;
@@ -53,4 +56,7 @@ private:
 
     caf::PdmPtrField<RimEnsembleCurveSet*> m_ensembleCurveSet;
     caf::PdmField<cvf::Color3f>            m_ensembleColor;
+
+    bool m_colorControlled  = false;
+    bool m_symbolControlled = false;
 };

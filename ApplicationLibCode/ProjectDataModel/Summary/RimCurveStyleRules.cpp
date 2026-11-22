@@ -517,27 +517,23 @@ std::vector<caf::PdmUiTreeViewItemTag> RimCurveStyleRules::curveStyleRuleTags( R
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Applies the global appearance to the plots when enabled for them, and restores the original appearance when disabled
+/// Applies the global appearance to the plots when enabled for them, and gives the curves of the other plots back the
+/// settings the global appearance has controlled
 //--------------------------------------------------------------------------------------------------
 void RimCurveStyleRules::applyGlobalAppearance( const std::vector<RimSummaryPlot*>& plots )
 {
     RimCurveStyleRule::AvailableNamesCache namesCache;
 
-    // Restore saved appearances first, so properties no longer controlled globally (e.g. color when changing from color
-    // and symbol to symbol only) go back to their original values before the global appearance is applied again.
-    // Plots still using the global appearance keep curves without a saved appearance as they are.
-    std::vector<RimSummaryPlot*> enabledPlots;
-    std::vector<RimSummaryPlot*> disabledPlots;
     for ( auto plot : plots )
-        ( plot->useGlobalCurveAppearance() ? enabledPlots : disabledPlots ).push_back( plot );
-
-    restoreAppearances( enabledPlots, false );
-    restoreAppearances( disabledPlots, true );
-
-    for ( auto plot : enabledPlots )
     {
-        saveAppearance( plot );
-        plot->updateCurveAppearanceFromGlobalSettings();
+        if ( plot->useGlobalCurveAppearance() )
+        {
+            plot->updateCurveAppearanceFromGlobalSettings();
+        }
+        else
+        {
+            releaseAppearances( plot );
+        }
     }
 
     updateSummaryCaseTags();
@@ -545,88 +541,97 @@ void RimCurveStyleRules::applyGlobalAppearance( const std::vector<RimSummaryPlot
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Appearances saved earlier are kept, they are the appearance before the global appearance was used
+/// The settings are saved when the global appearance takes control of them, so they can be restored when it no
+/// longer does. Settings the global appearance does not control are never saved, they stay editable per curve.
 //--------------------------------------------------------------------------------------------------
-void RimCurveStyleRules::saveAppearance( RimSummaryPlot* plot )
+void RimCurveStyleRules::updateSavedAppearance( RimPlotCurve* curve, bool colorControlled, bool symbolControlled )
 {
-    std::set<caf::PdmObject*> alreadySaved;
-    for ( auto saved : m_savedAppearances )
+    auto saved = findSavedAppearance( curve );
+    if ( !saved )
     {
-        if ( auto object = saved->object() ) alreadySaved.insert( object );
+        if ( !colorControlled && !symbolControlled ) return;
+
+        saved = new RimSavedCurveAppearance;
+        saved->setCurve( curve );
+        m_savedAppearances.push_back( saved );
+        m_savedLookup[curve] = saved;
     }
+
+    saved->update( colorControlled, symbolControlled );
+    if ( !saved->isControlled() ) removeSavedAppearance( curve, saved );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCurveStyleRules::updateSavedAppearance( RimEnsembleCurveSet* curveSet, bool colorControlled )
+{
+    auto saved = findSavedAppearance( curveSet );
+    if ( !saved )
+    {
+        if ( !colorControlled ) return;
+
+        saved = new RimSavedCurveAppearance;
+        saved->setEnsembleCurveSet( curveSet );
+        m_savedAppearances.push_back( saved );
+        m_savedLookup[curveSet] = saved;
+    }
+
+    saved->update( colorControlled, false );
+    if ( !saved->isControlled() ) removeSavedAppearance( curveSet, saved );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// The lookup can hold entries for deleted objects, which are not matched as the saved appearance is also checked
+//--------------------------------------------------------------------------------------------------
+RimSavedCurveAppearance* RimCurveStyleRules::findSavedAppearance( caf::PdmObject* object )
+{
+    const auto it = m_savedLookup.find( object );
+    if ( it == m_savedLookup.end() ) return nullptr;
+
+    if ( it->second->object() == object ) return it->second;
+
+    removeSavedAppearance( object, it->second );
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCurveStyleRules::removeSavedAppearance( caf::PdmObject* object, RimSavedCurveAppearance* saved )
+{
+    m_savedLookup.erase( object );
+    m_savedAppearances.removeChild( saved );
+    delete saved;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Restores the settings the global appearance controlled for the curves of a plot not using it
+//--------------------------------------------------------------------------------------------------
+void RimCurveStyleRules::releaseAppearances( RimSummaryPlot* plot )
+{
+    bool changed = false;
 
     for ( auto curve : plot->summaryCurves() )
     {
-        if ( alreadySaved.contains( curve ) ) continue;
+        if ( !findSavedAppearance( curve ) ) continue;
 
-        auto saved = new RimSavedCurveAppearance;
-        saved->setCurve( curve );
-        m_savedAppearances.push_back( saved );
+        updateSavedAppearance( curve, false, false );
+        changed = true;
     }
 
     for ( auto curveSet : plot->ensembleCurveSetCollection()->curveSets() )
     {
-        if ( alreadySaved.contains( curveSet ) ) continue;
+        if ( !findSavedAppearance( curveSet ) ) continue;
 
-        auto saved = new RimSavedCurveAppearance;
-        saved->setEnsembleCurveSet( curveSet );
-        m_savedAppearances.push_back( saved );
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Curves without a saved appearance, typically created while the global appearance was enabled, get the
-/// calculated default appearance
-//--------------------------------------------------------------------------------------------------
-void RimCurveStyleRules::restoreAppearances( const std::vector<RimSummaryPlot*>& plots, bool applyDefaultsToUnsaved )
-{
-    std::set<caf::PdmObject*> plotObjects;
-    for ( auto plot : plots )
-    {
-        for ( auto curve : plot->summaryCurves() )
-            plotObjects.insert( curve );
-        for ( auto curveSet : plot->ensembleCurveSetCollection()->curveSets() )
-            plotObjects.insert( curveSet );
+        updateSavedAppearance( curveSet, false );
+        changed = true;
     }
 
-    std::set<caf::PdmObject*>             restored;
-    std::vector<RimSavedCurveAppearance*> consumed;
-    for ( auto saved : m_savedAppearances )
-    {
-        const auto object = saved->object();
-        if ( !object || !plotObjects.contains( object ) ) continue;
+    if ( !changed ) return;
 
-        if ( saved->restore() ) restored.insert( object );
-        consumed.push_back( saved );
-    }
-
-    for ( auto saved : consumed )
-    {
-        m_savedAppearances.removeChild( saved );
-        delete saved;
-    }
-
-    if ( !applyDefaultsToUnsaved ) return;
-
-    for ( auto plot : plots )
-    {
-        std::vector<RimSummaryCurve*> curves;
-        for ( auto curve : plot->summaryCurves() )
-        {
-            if ( !restored.contains( curve ) ) curves.push_back( curve );
-        }
-        if ( !curves.empty() ) plot->applyDefaultCurveAppearances( curves );
-
-        std::vector<RimEnsembleCurveSet*> curveSets;
-        for ( auto curveSet : plot->ensembleCurveSetCollection()->curveSets() )
-        {
-            if ( !restored.contains( curveSet ) ) curveSets.push_back( curveSet );
-        }
-        if ( !curveSets.empty() ) plot->applyDefaultCurveAppearances( curveSets );
-
-        plot->updateConnectedEditors();
-        plot->loadDataAndUpdate();
-    }
+    plot->updateConnectedEditors();
+    plot->loadDataAndUpdate();
 }
 
 //--------------------------------------------------------------------------------------------------

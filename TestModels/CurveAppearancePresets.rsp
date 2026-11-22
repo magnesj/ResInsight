@@ -7241,7 +7241,7 @@
                             <LegendPosition>ABOVE</LegendPosition>
                             <ProjectFileVersionString>2026.11.2-dev.01</ProjectFileVersionString>
                             <ShowTitleInPlot>True </ShowTitleInPlot>
-                            <PlotDescription>Named rules only</PlotDescription>
+                            <PlotDescription>Named rule only, local settings for the rest</PlotDescription>
                             <Plots>
                                 <SummaryPlot>
                                     <WindowController/>
@@ -8910,8 +8910,7 @@
                             </ReadOutSettings>
                             <AxisRangeAggregation>NONE</AxisRangeAggregation>
                             <GlobalSettings></GlobalSettings>
-                            <NamedRules>$ROOT$ CurveStyleRules 0 NamedRules 2 | 
-	$ROOT$ CurveStyleRules 0 NamedRules 1</NamedRules>
+                            <NamedRules>$ROOT$ CurveStyleRules 0 NamedRules 0</NamedRules>
                             <PlotFilterYAxisThreshold>0</PlotFilterYAxisThreshold>
                             <DefaultStepDimension>VECTOR</DefaultStepDimension>
                         </MultiSummaryPlot>

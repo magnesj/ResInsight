@@ -902,16 +902,22 @@ void RimSummaryCurve::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering
     const auto plot     = firstAncestorOrThisOfType<RimSummaryPlot>();
     const auto caseName = RimCurveStyleSettings::caseName( summaryCaseY() );
 
-    // Curves without a value for the selected dimensions are not changed by the global appearance
-    const bool isAppearanceGlobal =
-        plot && firstAncestorOrThisOfType<RimSummaryCurveCollection>() &&
-        ( plot->controlsGlobalColor( summaryAddressY(), caseName ) || plot->controlsGlobalSymbol( summaryAddressY(), caseName ) );
-    m_curveAppearance->setUiLocked( isAppearanceGlobal );
+    // Only the settings controlled by the global appearance are locked, all others can be edited per curve
+    const bool isColorGlobal = plot && firstAncestorOrThisOfType<RimSummaryCurveCollection>() &&
+                               plot->controlsGlobalColor( summaryAddressY(), caseName );
+    const bool isSymbolGlobal = plot && firstAncestorOrThisOfType<RimSummaryCurveCollection>() &&
+                                plot->controlsGlobalSymbol( summaryAddressY(), caseName );
+    m_curveAppearance->setUiLocked( isColorGlobal, isSymbolGlobal );
 
     caf::PdmUiGroup* appearanceGroup = uiOrdering.addNewGroup( "Appearance" );
-    if ( isAppearanceGlobal )
+    if ( isColorGlobal || isSymbolGlobal )
+    {
+        const QString what = isColorGlobal && isSymbolGlobal ? "The color and symbol are"
+                             : isColorGlobal                 ? "The color is"
+                                                             : "The symbol is";
         RimCurveStyleRules::addGlobalAppearanceLink( *appearanceGroup,
-                                                     "The appearance is controlled by the <a href=\"dummy\">global curve appearance</a>." );
+                                                     what + " controlled by the <a href=\"dummy\">global curve appearance</a>." );
+    }
     RimPlotCurve::appearanceUiOrdering( *appearanceGroup );
 
     caf::PdmUiGroup* nameGroup = uiOrdering.addNewGroup( "Curve Name" );
