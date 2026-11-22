@@ -23,11 +23,15 @@
 
 #include "cafPdmChildField.h"
 #include "cafPdmObject.h"
+#include "cafPdmPtrArrayField.h"
+#include "cafPdmPtrField.h"
 #include "cafPdmUiItem.h"
 #include <QList>
 
 #include <vector>
 
+class RimCurveStyleSettings;
+class RimNamedCurveStyleRule;
 class RimSummaryPlot;
 class RimSummaryPlotSourceStepping;
 class RimSummaryPlotNameHelper;
@@ -53,19 +57,17 @@ public:
         REALIZATIONS
     };
 
-    enum class GlobalAppearance
-    {
-        LOCAL,
-        GLOBAL
-    };
-
     RimSummaryMultiPlot();
     ~RimSummaryMultiPlot() override;
 
-    GlobalAppearance globalAppearance() const;
-    void             setGlobalAppearance( GlobalAppearance appearance );
-    bool             useGlobalColor() const;
-    bool             useGlobalSymbol() const;
+    // The global setting and the named rules selected for the plot. Named rules are returned in increasing precedence,
+    // and are empty when the curve appearance feature is disabled
+    RimCurveStyleSettings*                     globalSettings() const;
+    void                                       setGlobalSettings( RimCurveStyleSettings* settings );
+    std::vector<const RimNamedCurveStyleRule*> namedRules() const;
+    void                                       clearNamedRules();
+    bool                                       usesSettings( const RimCurveStyleSettings* settings ) const;
+    bool                                       isGlobalAppearanceActive() const;
 
     const RimSummaryNameHelper* nameHelper() const;
 
@@ -137,6 +139,8 @@ protected:
     void prefetchPlotData() override;
 
 private:
+    QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
+
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
 
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
@@ -171,8 +175,6 @@ private:
     RimSummaryPlotReadOut* activeReadoutSettings() const;
 
 private:
-    bool isGlobalAppearanceActive() const;
-
     caf::PdmField<bool> m_autoPlotTitle;
     caf::PdmField<bool> m_autoSubPlotTitle;
     caf::PdmField<bool> m_disableWheelZoom;
@@ -197,7 +199,9 @@ private:
     caf::PdmField<caf::AppEnum<RimSummaryDataSourceStepping::SourceSteppingDimension>> m_defaultStepDimension;
 
     caf::PdmField<caf::AppEnum<AxisRangeAggregation>> m_axisRangeAggregation;
-    caf::PdmField<caf::AppEnum<GlobalAppearance>>     m_globalAppearance;
+
+    caf::PdmPtrField<RimCurveStyleSettings*>       m_globalSettings;
+    caf::PdmPtrArrayField<RimNamedCurveStyleRule*> m_namedRules;
 
     caf::PdmChildField<RimSummaryPlotSourceStepping*> m_sourceStepping;
 

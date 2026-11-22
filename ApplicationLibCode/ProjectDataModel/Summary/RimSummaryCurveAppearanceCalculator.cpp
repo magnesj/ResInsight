@@ -27,8 +27,7 @@
 #include "RiuQwtPlotCurve.h"
 
 #include "RifSummaryReaderInterface.h"
-#include "RimCurveStyleRules.h"
-#include "RimProject.h"
+#include "RimCurveStyleSettings.h"
 #include "RimSummaryCase.h"
 #include "RimSummaryCurve.h"
 
@@ -468,7 +467,7 @@ void RimSummaryCurveAppearanceCalculator::setOneCurveAppearance( CurveAppearance
         case NONE:
             break;
         case COLOR:
-            m_currentCurveBaseColor = cycledPaletteColor( appeaIdx );
+            m_currentCurveBaseColor = cycledPaletteColor( appeaIdx, m_paletteSettings );
             break;
         case GRADIENT:
             m_currentCurveGradient = gradient( totalCount, appeaIdx );
@@ -488,18 +487,13 @@ void RimSummaryCurveAppearanceCalculator::setOneCurveAppearance( CurveAppearance
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::Color3f RimSummaryCurveAppearanceCalculator::cycledPaletteColor( int colorIndex, bool forceGlobalPalette )
+cvf::Color3f RimSummaryCurveAppearanceCalculator::cycledPaletteColor( int colorIndex, const RimCurveStyleSettings* settings )
 {
     if ( colorIndex < 0 ) return cvf::Color3f::BLACK;
 
-    // The palette selected for the global appearance is only used by plots using it, or when previewing the global appearance
-    if ( auto project = RimProject::current() )
+    if ( settings )
     {
-        auto rules = project->curveStyleRules();
-        if ( rules && ( forceGlobalPalette || rules->isGlobalColorUsed() ) )
-        {
-            if ( auto legendColor = rules->autoLegendColor( colorIndex ) ) return *legendColor;
-        }
+        if ( auto legendColor = settings->autoLegendColor( colorIndex ) ) return *legendColor;
     }
 
     return RiaColorTables::summaryCurveDefaultPaletteColors().cycledColor3f( colorIndex );

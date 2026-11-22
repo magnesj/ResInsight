@@ -85,14 +85,10 @@ public:
         bool m_isOwner;
     };
 
-    struct PlotAppearance
-    {
-        std::optional<cvf::Color3f>                        color;
-        std::optional<RiuPlotCurveSymbol::PointSymbolEnum> symbol;
-    };
+    using PlotAppearance = RimCurveStyleSettings::ItemAppearance;
 
-    // The appearance of the first curve for each item in plots using the global appearance
-    static std::map<QString, PlotAppearance> appearancesFromPlots( Dimension dimension );
+    // The appearance of the first curve for each item in plots using the settings
+    static std::map<QString, PlotAppearance> appearancesFromPlots( Dimension dimension, const RimCurveStyleSettings* settings );
 
     static caf::IconProvider swatchIcon( const cvf::Color3f& color );
     static caf::IconProvider paletteIcon();

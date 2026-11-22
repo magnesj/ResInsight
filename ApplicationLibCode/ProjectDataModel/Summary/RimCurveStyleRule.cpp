@@ -309,7 +309,8 @@ QStringList RimCurveStyleRule::availableNames( Dimension dimension )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::map<QString, RimCurveStyleRule::PlotAppearance> RimCurveStyleRule::appearancesFromPlots( Dimension dimension )
+std::map<QString, RimCurveStyleRule::PlotAppearance> RimCurveStyleRule::appearancesFromPlots( Dimension                    dimension,
+                                                                                              const RimCurveStyleSettings* settings )
 {
     std::map<QString, PlotAppearance> appearances;
 
@@ -318,7 +319,7 @@ std::map<QString, RimCurveStyleRule::PlotAppearance> RimCurveStyleRule::appearan
 
     for ( auto plot : project->descendantsIncludingThisOfType<RimSummaryPlot>() )
     {
-        if ( !plot->useGlobalCurveAppearance() ) continue;
+        if ( !plot->usesCurveStyleSettings( settings ) ) continue;
 
         for ( auto curve : plot->summaryCurves() )
         {

@@ -50,6 +50,8 @@ class RimSummaryEnsemble;
 class RimSummaryCurve;
 class RimSummaryCurveCollection;
 class RimEnsembleCurveSet;
+class RimCurveStyleSettings;
+class RimNamedCurveStyleRule;
 class RimEnsembleCurveSetCollection;
 class RimSummaryCurveFilter_OBSOLETE;
 class RimSummaryTimeAxisProperties;
@@ -186,17 +188,18 @@ public:
     void showPlotInfoLabel( bool show );
     void updatePlotInfoLabel();
 
-    size_t singleColorCurveCount() const;
-    void   applyDefaultCurveAppearances();
-    void   applyDefaultCurveAppearances( std::vector<RimSummaryCurve*> curvesToUpdate );
-    void   applyDefaultCurveAppearances( std::vector<RimEnsembleCurveSet*> ensembleCurvesToUpdate );
-    bool   useGlobalCurveAppearance() const;
-    bool   useGlobalColor() const;
-    bool   useGlobalSymbol() const;
-    bool   controlsGlobalColor( const RifEclipseSummaryAddress& address, const std::string& caseName ) const;
-    bool   controlsGlobalSymbol( const RifEclipseSummaryAddress& address, const std::string& caseName ) const;
-    void   updateCurveAppearanceFromGlobalSettings();
-    void   applyGlobalCurveAppearance();
+    size_t                                     singleColorCurveCount() const;
+    void                                       applyDefaultCurveAppearances();
+    void                                       applyDefaultCurveAppearances( std::vector<RimSummaryCurve*> curvesToUpdate );
+    void                                       applyDefaultCurveAppearances( std::vector<RimEnsembleCurveSet*> ensembleCurvesToUpdate );
+    bool                                       useGlobalCurveAppearance() const;
+    const RimCurveStyleSettings*               globalCurveSettings() const;
+    std::vector<const RimNamedCurveStyleRule*> namedCurveRules() const;
+    bool                                       usesCurveStyleSettings( const RimCurveStyleSettings* settings ) const;
+    bool controlsGlobalColor( const RifEclipseSummaryAddress& address, const std::string& caseName ) const;
+    bool controlsGlobalSymbol( const RifEclipseSummaryAddress& address, const std::string& caseName ) const;
+    void updateCurveAppearanceFromGlobalSettings();
+    void applyGlobalCurveAppearance();
 
     void setNormalizationEnabled( bool enable );
     bool isNormalizationEnabled();

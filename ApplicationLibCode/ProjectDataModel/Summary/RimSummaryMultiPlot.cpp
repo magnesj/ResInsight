@@ -42,10 +42,12 @@
 
 #include "RimAnnotationLineAppearance.h"
 #include "RimCurveStyleRules.h"
+#include "RimCurveStyleSettings.h"
 #include "RimEnsembleCurveSet.h"
 #include "RimMainPlotCollection.h"
 #include "RimMultiPlotCollection.h"
 #include "RimMultipleSummaryPlotNameHelper.h"
+#include "RimNamedCurveStyleRule.h"
 #include "RimPlotAxisProperties.h"
 #include "RimProject.h"
 #include "RimSummaryAddress.h"
@@ -81,6 +83,7 @@
 
 #include <QKeyEvent>
 
+#include <algorithm>
 #include <cmath>
 
 namespace caf
@@ -95,57 +98,82 @@ void AppEnum<RimSummaryMultiPlot::AxisRangeAggregation>::setUp()
     addItem( RimSummaryMultiPlot::AxisRangeAggregation::REALIZATIONS, "REALIZATIONS", "All Realizations" );
     setDefault( RimSummaryMultiPlot::AxisRangeAggregation::NONE );
 }
-
-template <>
-void AppEnum<RimSummaryMultiPlot::GlobalAppearance>::setUp()
-{
-    addItem( RimSummaryMultiPlot::GlobalAppearance::LOCAL, "LOCAL", "Local" );
-    addItem( RimSummaryMultiPlot::GlobalAppearance::GLOBAL, "GLOBAL", "Global" );
-    setDefault( RimSummaryMultiPlot::GlobalAppearance::LOCAL );
-}
 } // namespace caf
 
 CAF_PDM_SOURCE_INIT( RimSummaryMultiPlot, "MultiSummaryPlot" );
 
 //--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimSummaryMultiPlot::setGlobalAppearance( GlobalAppearance appearance )
-{
-    m_globalAppearance = appearance;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimSummaryMultiPlot::GlobalAppearance RimSummaryMultiPlot::globalAppearance() const
-{
-    return m_globalAppearance();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimSummaryMultiPlot::useGlobalColor() const
-{
-    return isGlobalAppearanceActive();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimSummaryMultiPlot::useGlobalSymbol() const
-{
-    return isGlobalAppearanceActive();
-}
-
-//--------------------------------------------------------------------------------------------------
 /// The global appearance is ignored when the curve appearance feature is disabled, as it can not be edited then
+//--------------------------------------------------------------------------------------------------
+static bool isCurveAppearanceEnabled()
+{
+    return RiaPreferencesSystem::current()->isFeatureEnabled( RiaExperimentalFeatures::curveAppearanceKeyword );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimCurveStyleSettings* RimSummaryMultiPlot::globalSettings() const
+{
+    return isCurveAppearanceEnabled() ? m_globalSettings() : nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryMultiPlot::setGlobalSettings( RimCurveStyleSettings* settings )
+{
+    m_globalSettings = settings;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Ordered as in the project, so the precedence of the rules does not depend on the order they were selected in
+//--------------------------------------------------------------------------------------------------
+std::vector<const RimNamedCurveStyleRule*> RimSummaryMultiPlot::namedRules() const
+{
+    std::vector<const RimNamedCurveStyleRule*> rules;
+    auto                                       project = RimProject::current();
+    if ( !isCurveAppearanceEnabled() || !project || !project->curveStyleRules() ) return rules;
+
+    const auto selected = m_namedRules.ptrReferencedObjectsByType();
+    for ( auto rule : project->curveStyleRules()->namedRules() )
+    {
+        if ( std::find( selected.begin(), selected.end(), rule ) != selected.end() ) rules.push_back( rule );
+    }
+
+    return rules;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryMultiPlot::clearNamedRules()
+{
+    m_namedRules.clearWithoutDelete();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimSummaryMultiPlot::usesSettings( const RimCurveStyleSettings* settings ) const
+{
+    if ( !settings ) return false;
+    if ( globalSettings() == settings ) return true;
+
+    for ( auto rule : namedRules() )
+    {
+        if ( rule->settings() == settings ) return true;
+    }
+
+    return false;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
 //--------------------------------------------------------------------------------------------------
 bool RimSummaryMultiPlot::isGlobalAppearanceActive() const
 {
-    return m_globalAppearance() == GlobalAppearance::GLOBAL &&
-           RiaPreferencesSystem::current()->isFeatureEnabled( RiaExperimentalFeatures::curveAppearanceKeyword );
+    return globalSettings() != nullptr || !namedRules().empty();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -228,7 +256,11 @@ RimSummaryMultiPlot::RimSummaryMultiPlot()
 
     CAF_PDM_InitFieldNoDefault( &m_axisRangeAggregation, "AxisRangeAggregation", "Y Axis Range" );
 
-    CAF_PDM_InitFieldNoDefault( &m_globalAppearance, "GlobalAppearance", "Curve Appearance" );
+    CAF_PDM_InitFieldNoDefault( &m_globalSettings, "GlobalSettings", "Global Setting" );
+    CAF_PDM_InitFieldNoDefault( &m_namedRules, "NamedRules", "Named Rules" );
+    m_namedRules.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
+    m_namedRules.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::TOP );
+    m_namedRules.uiCapability()->setAttribute( caf::PdmUiTreeSelectionEditor::Keys::SHOW_TEXT_FILTER, false );
 
     CAF_PDM_InitField( &m_plotFilterYAxisThreshold, "PlotFilterYAxisThreshold", 0.0, "Y-Axis Filter Threshold" );
 
@@ -458,6 +490,36 @@ void RimSummaryMultiPlot::populateNameHelper( RimSummaryPlotNameHelper* nameHelp
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+QList<caf::PdmOptionItemInfo> RimSummaryMultiPlot::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
+{
+    if ( fieldNeedingOptions != &m_globalSettings && fieldNeedingOptions != &m_namedRules )
+    {
+        return RimMultiPlot::calculateValueOptions( fieldNeedingOptions );
+    }
+
+    QList<caf::PdmOptionItemInfo> options;
+
+    auto rules = RimProject::current() ? RimProject::current()->curveStyleRules() : nullptr;
+    if ( !rules ) return options;
+
+    if ( fieldNeedingOptions == &m_globalSettings )
+    {
+        options.push_back( caf::PdmOptionItemInfo( "Local", nullptr ) );
+        for ( auto settings : rules->presets() )
+            options.push_back( caf::PdmOptionItemInfo( settings->name(), settings ) );
+    }
+    else
+    {
+        for ( auto rule : rules->namedRules() )
+            options.push_back( caf::PdmOptionItemInfo( rule->name(), rule ) );
+    }
+
+    return options;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimSummaryMultiPlot::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     auto axesGroup = uiOrdering.addNewGroup( "Axes" );
@@ -505,7 +567,11 @@ void RimSummaryMultiPlot::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
     if ( RiaPreferencesSystem::current()->isFeatureEnabled( RiaExperimentalFeatures::curveAppearanceKeyword ) )
     {
         auto appearanceGroup = uiOrdering.addNewGroup( "Curve Appearance" );
-        appearanceGroup->add( &m_globalAppearance );
+        appearanceGroup->add( &m_globalSettings );
+        appearanceGroup->add( &m_namedRules );
+        RimCurveStyleRules::addGlobalAppearanceLink( *appearanceGroup,
+                                                     "Named rules take precedence over the global setting. Edit them in the <a "
+                                                     "href=\"dummy\">curve appearance</a> view." );
     }
 
     auto legendsGroup = uiOrdering.addNewGroup( "Legends" );
@@ -564,7 +630,7 @@ void RimSummaryMultiPlot::fieldChangedByUi( const caf::PdmFieldHandle* changedFi
         analyzePlotsAndAdjustAppearanceSettings();
         zoomAll();
     }
-    else if ( changedField == &m_globalAppearance )
+    else if ( changedField == &m_globalSettings || changedField == &m_namedRules )
     {
         if ( auto rules = RimProject::current() ? RimProject::current()->curveStyleRules() : nullptr )
         {
