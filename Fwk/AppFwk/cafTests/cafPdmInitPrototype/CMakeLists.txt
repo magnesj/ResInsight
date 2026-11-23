@@ -35,9 +35,7 @@ add_library(
   compile_bench/bench_include_macro.cpp
   compile_bench/bench_include_function.cpp
 )
-set_target_properties(
-  ${PROJECT_NAME}_CompileBench PROPERTIES UNITY_BUILD OFF
-)
+set_target_properties(${PROJECT_NAME}_CompileBench PROPERTIES UNITY_BUILD OFF)
 target_link_libraries(
   ${PROJECT_NAME}_CompileBench PRIVATE ${PROJECT_NAME} cafPdmScripting
                                        Qt6::Core Qt6::Widgets
