@@ -51,8 +51,8 @@ def command(compiler, source, include_dir, case, output_dir):
     if is_msvc(compiler):
         cmd = [compiler, "/nologo", "/std:c++latest", "/EHsc", "/W4", "/I", include_dir, f"/DCASE={case}"]
         if case == 0:
-            return cmd + [source, f"/Fo{output_dir}{os.sep}", f"/Fe{os.path.join(output_dir, 'keyword_cases.exe')}"]
-        return cmd + ["/c", source, f"/Fo{output_dir}{os.sep}"]
+            return cmd + [source, f"/Fo{output_dir}{os.sep}", f"/Fe{os.path.join(output_dir, 'keyword_cases.exe')}"]  # codespell:ignore
+        return cmd + ["/c", source, f"/Fo{output_dir}{os.sep}"]  # codespell:ignore
 
     cmd = [compiler, "-std=c++23", "-Wall", "-Wextra", "-I", include_dir, f"-DCASE={case}"]
     if case == 0:

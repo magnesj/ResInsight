@@ -93,7 +93,7 @@ TEST( ProtoParity, UiInformation )
     EXPECT_EQ( macroObj.uiWhatsThis().toStdString(), fnObj.uiWhatsThis().toStdString() );
     EXPECT_EQ( macroObj.uiIconProvider().valid(), fnObj.uiIconProvider().valid() );
     EXPECT_EQ( "Parity Object", fnObj.uiName().toStdString() );
-    EXPECT_EQ( "Object whats this", fnObj.uiWhatsThis().toStdString() );
+    EXPECT_EQ( "Object help text", fnObj.uiWhatsThis().toStdString() );
 
     auto macroFields = macroObj.fields();
     auto fnFields    = fnObj.fields();
@@ -121,7 +121,7 @@ TEST( ProtoParity, UiInformation )
     EXPECT_EQ( "Available through python/rips as the attribute 'legacy_count'",
                fnObj.m_legacy.uiCapability()->uiToolTip().toStdString() );
     EXPECT_EQ( "", fnObj.m_count.uiCapability()->uiToolTip().toStdString() );
-    EXPECT_EQ( "Flag whats this", fnObj.m_flag.uiCapability()->uiWhatsThis().toStdString() );
+    EXPECT_EQ( "Flag help text", fnObj.m_flag.uiCapability()->uiWhatsThis().toStdString() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -223,7 +223,7 @@ TEST( ProtoParity, ScriptingAndGeneratedPython )
 
     EXPECT_TRUE( Register::isScriptable( &fnObj ) );
     EXPECT_EQ( "ParityFnObj", Register::scriptClassNameFromClassKeyword( "ParityFnObj" ).toStdString() );
-    EXPECT_EQ( "Object whats this", Register::scriptClassComment( "ParityFnObj" ).toStdString() );
+    EXPECT_EQ( "Object help text", Register::scriptClassComment( "ParityFnObj" ).toStdString() );
     EXPECT_EQ( "ParityFnBaseScript", Register::scriptClassNameFromClassKeyword( "ParityFnBase" ).toStdString() );
     EXPECT_EQ( "Base script comment", Register::scriptClassComment( "ParityFnBase" ).toStdString() );
     EXPECT_EQ( Register::scriptClassComment( "ParityMacroObj" ).toStdString(),

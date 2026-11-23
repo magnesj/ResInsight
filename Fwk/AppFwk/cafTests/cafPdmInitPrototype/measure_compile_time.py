@@ -70,9 +70,9 @@ def prepare_command(command, output_dir):
     command = re.sub(r"^\S*(buildcache|ccache|sccache)\S*\s+", "", command, flags=re.IGNORECASE)
 
     obj = os.path.join(output_dir, "bench.obj")
-    if re.search(r"(^|\s)/Fo\S+", command):
+    if re.search(r"(^|\s)/Fo\S+", command):  # codespell:ignore
         # MSVC. /MP is removed to make sure that the compilation runs in the measured process.
-        command = re.sub(r"(^|\s)/Fo\S+", lambda m: f"{m.group(1)}/Fo{obj}", command)
+        command = re.sub(r"(^|\s)/Fo\S+", lambda m: f"{m.group(1)}/Fo{obj}", command)  # codespell:ignore
         command = re.sub(r"(^|\s)/Fd\S+", lambda m: f"{m.group(1)}/Fd{output_dir}{os.sep}", command)
         command = re.sub(r"(^|\s)/showIncludes", r"\1", command)
         command = re.sub(r"(^|\s)/MP\S*", r"\1", command)

@@ -30,7 +30,7 @@ def main():
             exe = os.path.join(output_dir, "unique_slot.exe")
             if msvc:
                 cmd = [args.compiler, "/nologo", "/std:c++latest", "/EHsc", optimization] + sources
-                cmd += [f"/Fo{output_dir}{os.sep}", f"/Fe{exe}"]
+                cmd += [f"/Fo{output_dir}{os.sep}", f"/Fe{exe}"]  # codespell:ignore
             else:
                 cmd = [args.compiler, "-std=c++23", optimization] + sources + ["-o", exe]
 

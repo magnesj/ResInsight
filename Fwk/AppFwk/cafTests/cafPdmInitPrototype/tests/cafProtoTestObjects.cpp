@@ -32,11 +32,11 @@ ParityMacroBase::ParityMacroBase()
     CAF_PDM_InitScriptableObjectWithNameAndComment( "Parity Base",
                                                     ":/Base.svg",
                                                     "Base tool tip",
-                                                    "Base whats this",
+                                                    "Base help text",
                                                     "ParityMacroBaseScript",
                                                     "Base script comment" );
 
-    CAF_PDM_InitScriptableField( &m_name, "Name", QString( "Unnamed" ), "Name", "", "Name tool tip", "Name whats this" );
+    CAF_PDM_InitScriptableField( &m_name, "Name", QString( "Unnamed" ), "Name", "", "Name tool tip", "Name help text" );
     m_name.registerKeywordAlias( "OldName" );
 }
 
@@ -45,11 +45,11 @@ ParityMacroBase::ParityMacroBase()
 //--------------------------------------------------------------------------------------------------
 ParityMacroObj::ParityMacroObj()
 {
-    CAF_PDM_InitScriptableObject( "Parity Object", ":/Object.svg", "Object tool tip", "Object whats this" );
+    CAF_PDM_InitScriptableObject( "Parity Object", ":/Object.svg", "Object tool tip", "Object help text" );
 
     CAF_PDM_InitField( &m_count, "Count", 3, "Count" );
     CAF_PDM_InitScriptableField( &m_radius, "Radius", 1.5, "Radius", ":/Radius.svg", "Radius tool tip" );
-    CAF_PDM_InitField( &m_flag, "Flag", true, "Flag", "", "", "Flag whats this" );
+    CAF_PDM_InitField( &m_flag, "Flag", true, "Flag", "", "", "Flag help text" );
     CAF_PDM_InitFieldNoDefault( &m_text, "Text", "Text" );
     CAF_PDM_InitScriptableField( &m_enum, "EnumValue", ParityEnum::B, "Enum" );
     CAF_PDM_InitScriptableFieldNoDefault( &m_values, "Values", "Values" );
@@ -67,12 +67,12 @@ ParityFnBase::ParityFnBase()
     initObject( "Parity Base" )
         .withIcon( ":/Base.svg" )
         .withToolTip( "Base tool tip" )
-        .withWhatsThis( "Base whats this" )
+        .withWhatsThis( "Base help text" )
         .withScripting( "ParityFnBaseScript", "Base script comment" );
 
     initScriptableField( m_name, "Name", QString( "Unnamed" ), "Name" )
         .withToolTip( "Name tool tip" )
-        .withWhatsThis( "Name whats this" )
+        .withWhatsThis( "Name help text" )
         .withKeywordAlias( "OldName" );
 }
 
@@ -84,12 +84,12 @@ ParityFnObj::ParityFnObj()
     initObject( "Parity Object" )
         .withIcon( ":/Object.svg" )
         .withToolTip( "Object tool tip" )
-        .withWhatsThis( "Object whats this" )
+        .withWhatsThis( "Object help text" )
         .withScripting();
 
     initField( m_count, "Count", 3, "Count" );
     initScriptableField( m_radius, "Radius", "Radius" ).withDefault( 1.5 ).withIcon( ":/Radius.svg" ).withToolTip( "Radius tool tip" );
-    initField( m_flag, "Flag", "Flag" ).withWhatsThis( "Flag whats this" ).withDefault( true );
+    initField( m_flag, "Flag", "Flag" ).withWhatsThis( "Flag help text" ).withDefault( true );
     initField( m_text, "Text", "Text" );
     initScriptableField( m_enum, "EnumValue", ParityEnum::B, "Enum" );
     initScriptableField( m_values, "Values", "Values" );

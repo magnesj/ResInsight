@@ -55,6 +55,9 @@ add_subdirectory(cafProjectDataModel/cafProjectDataModel_UnitTests)
 add_subdirectory(cafUserInterface/cafUserInterface_UnitTests)
 add_subdirectory(cafPdmScripting/cafPdmScripting_UnitTests)
 
+# Prototype for replacing the init macros with functions
+add_subdirectory(cafTests/cafPdmInitPrototype)
+
 # Organize sub-projects into folders on Visual Studio Turn on using solution
 # folders
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
