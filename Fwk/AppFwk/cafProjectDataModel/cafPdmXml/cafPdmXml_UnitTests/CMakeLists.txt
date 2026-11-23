@@ -27,6 +27,7 @@ set(PROJECT_FILES
     cafPdmXmlNumberTest.cpp
     cafPdmPtrArrayTest.cpp
     cafPdmSettingsTest.cpp
+    cafPdmKeywordAliasTest.cpp
 )
 
 qt_add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${PROJECT_FILES})
