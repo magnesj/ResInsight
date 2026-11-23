@@ -32,6 +32,8 @@ add_library(
   compile_bench/bench_scriptable_macro.cpp
   compile_bench/bench_scriptable_function.cpp
   compile_bench/bench_scriptable_fixedstring.cpp
+  compile_bench/bench_include_macro.cpp
+  compile_bench/bench_include_function.cpp
 )
 set_target_properties(
   ${PROJECT_NAME}_CompileBench PROPERTIES UNITY_BUILD OFF

@@ -8,6 +8,8 @@
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 
+// The keywords are unique for each class, as in application code
+
 #include <QString>
 #include <optional>
 #include <vector>
@@ -23,17 +25,17 @@ public: \
     BenchMixedFnObj##N() \
     { \
         initObject( "BenchMixedObj" #N ); \
-        initField( m_intVal,  "IntVal",  "Int" ).withDefault( 0 ); \
-        initField( m_dblVal,  "DblVal",  "Double" ).withDefault( 0.0 ); \
-        initField( m_boolVal, "BoolVal", "Bool" ).withDefault( false ); \
-        initField( m_strVal,  "StrVal",  "String" ).withDefault( QString() ); \
-        initField( m_enumVal, "EnumVal", "Enum" ).withDefault( BenchMixedFnEnum##N::Alpha ); \
-        initField( m_vecDbl,  "VecDbl",  "Vector of doubles" ); \
-        initField( m_vecStr,  "VecStr",  "Vector of strings" ); \
-        initField( m_optDbl,  "OptDbl",  "Optional double" ); \
-        initField( m_fileA,   "FileA",   "File A" ); \
+        initField( m_intVal,  "IntVal" #N,  "Int" ).withDefault( 0 ); \
+        initField( m_dblVal,  "DblVal" #N,  "Double" ).withDefault( 0.0 ); \
+        initField( m_boolVal, "BoolVal" #N, "Bool" ).withDefault( false ); \
+        initField( m_strVal,  "StrVal" #N,  "String" ).withDefault( QString() ); \
+        initField( m_enumVal, "EnumVal" #N, "Enum" ).withDefault( BenchMixedFnEnum##N::Alpha ); \
+        initField( m_vecDbl,  "VecDbl" #N,  "Vector of doubles" ); \
+        initField( m_vecStr,  "VecStr" #N,  "Vector of strings" ); \
+        initField( m_optDbl,  "OptDbl" #N,  "Optional double" ); \
+        initField( m_fileA,   "FileA" #N,   "File A" ); \
         auto pairInit = std::make_pair( false, 0.0 ); \
-        initField( m_pairVal, "PairVal", "Pair" ).withDefault( pairInit ); \
+        initField( m_pairVal, "PairVal" #N, "Pair" ).withDefault( pairInit ); \
     } \
     caf::PdmField<int>                                m_intVal; \
     caf::PdmField<double>                             m_dblVal; \
