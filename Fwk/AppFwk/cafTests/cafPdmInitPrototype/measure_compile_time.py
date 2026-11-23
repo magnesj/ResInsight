@@ -38,6 +38,32 @@ def compile_commands(build_dir, ninja):
     return json.loads(output)
 
 
+def outputs_depending_on(build_dir, ninja, header):
+    """Return the object files with a recorded dependency on a header with the given file name."""
+    output = subprocess.run([ninja, "-C", build_dir, "-t", "deps"], capture_output=True, text=True, check=True).stdout
+    outputs = set()
+    current = None
+    for line in output.splitlines():
+        if line and not line.startswith(" "):
+            current = line.split(":", 1)[0].replace("\\", "/")
+        elif current and line.strip().replace("\\", "/").endswith("/" + header):
+            outputs.add(current)
+    return outputs
+
+
+def outputs_depending_on(build_dir, ninja, header):
+    """Return the object files with a recorded dependency on a header with the given file name."""
+    output = subprocess.run([ninja, "-C", build_dir, "-t", "deps"], capture_output=True, text=True, check=True).stdout
+    outputs = set()
+    current = None
+    for line in output.splitlines():
+        if line and not line.startswith(" "):
+            current = line.split(":", 1)[0].replace("\\", "/")
+        elif current and line.strip().replace("\\", "/").endswith("/" + header):
+            outputs.add(current)
+    return outputs
+
+
 def prepare_command(command, output_dir):
     """Remove the compiler launcher and redirect all output files to output_dir."""
     # Compiler launcher, for example buildcache or ccache
@@ -107,22 +133,39 @@ def main():
     parser.add_argument("--build-dir", default="build")
     parser.add_argument("--runs", type=int, default=5)
     parser.add_argument("--baseline", help="Text identifying the file used as reference for the ratio column")
-    parser.add_argument("filters", nargs="+", help="Select files with a path containing one of these texts")
+    parser.add_argument("--depends-on", help="Select all files including a header with this file name")
+    parser.add_argument("--sample", type=int, help="Measure a random sample of the selected files")
+    parser.add_argument("--seed", type=int, default=1202, help="Seed for the random sample")
+    parser.add_argument("filters", nargs="*", help="Select files with a path containing one of these texts")
     args = parser.parse_args()
 
     build_dir = os.path.abspath(args.build_dir)
     ninja = find_ninja(build_dir)
     run = run_windows if os.name == "nt" else run_posix
 
+    dependents = outputs_depending_on(build_dir, ninja, args.depends_on) if args.depends_on else None
+
     selected = {}
     for entry in compile_commands(build_dir, ninja):
         path = entry["file"].replace("\\", "/")
-        if any(text in path for text in args.filters) and path.endswith((".cpp", ".cc", ".cxx")):
-            selected.setdefault(path, entry)
+        if not path.endswith((".cpp", ".cc", ".cxx")):
+            continue
+        if dependents is not None and entry.get("output", "").replace("\\", "/") not in dependents:
+            continue
+        if args.filters and not any(text in path for text in args.filters):
+            continue
+        selected.setdefault(path, entry)
 
     if not selected:
         print("No files selected")
         return 1
+
+    selected_count = len(selected)
+    if args.sample and args.sample < selected_count:
+        import random
+
+        names = random.Random(args.seed).sample(sorted(selected), args.sample)
+        selected = {name: selected[name] for name in names}
 
     results = []
     with tempfile.TemporaryDirectory() as output_dir:
@@ -157,6 +200,12 @@ def main():
         if reference:
             row += f" {median / reference[1]:.2f} | {peak / reference[3]:.2f} |"
         print(row)
+
+    if args.depends_on:
+        mean = statistics.mean(r[1] for r in results)
+        print(f"\nFiles depending on {args.depends_on}: {selected_count}")
+        print(f"Measured files: {len(results)}, mean compile time {mean * 1000:.0f} ms")
+        print(f"Estimated compile time for all dependent files: {mean * selected_count / 60:.0f} CPU minutes")
     return 0
 
 
