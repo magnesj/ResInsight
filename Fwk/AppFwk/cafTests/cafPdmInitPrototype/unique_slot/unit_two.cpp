@@ -11,7 +11,8 @@ public:
     {
         m_slotA = slotForCallSite( m_a );
         m_slotB = slotForCallSite( m_b );
-        m_slotC = slotForCallSite( m_c ); m_slotD = slotForCallSite( m_d );
+        m_slotC = slotForCallSite( m_c );
+        m_slotD = slotForCallSite( m_d );
     }
 
     int    m_a = 0;
