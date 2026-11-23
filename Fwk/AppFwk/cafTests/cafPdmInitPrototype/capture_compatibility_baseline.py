@@ -14,15 +14,18 @@ Capture a baseline before a change, capture again after the change, and compare:
     python capture_compatibility_baseline.py capture --resinsight build/ResInsight.exe --output candidate
     python capture_compatibility_baseline.py compare baseline candidate
 
-Both captures must be made from the same checkout folder, because project files contain file paths.
-Requires the Python packages used by rips (grpcio and protobuf).
+The file name of the project and date fields with the current time as default value are removed from
+the saved project files. Other file paths are kept, so both captures must be made from the same
+checkout folder. Requires the Python packages used by rips (grpcio and protobuf).
 """
 
 import argparse
+import datetime
 import difflib
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -43,12 +46,36 @@ def sha256(path):
         return hashlib.sha256(file.read()).hexdigest()
 
 
+def normalized_project_text(path, capture_time):
+    """Remove the content that differs between two captures of the same project.
+
+    The file name of the project is stored in the file, and some date fields have the time the
+    object was created as default value.
+    """
+    with open(path, encoding="utf-8") as file:
+        text = file.read()
+
+    text = re.sub(r"<DocumentFileName>.*?</DocumentFileName>", "<DocumentFileName></DocumentFileName>", text)
+
+    def mask_current_time(match):
+        try:
+            value = datetime.datetime.strptime(match.group(0), "%Y_%m_%d-%H:%M:%S")
+        except ValueError:
+            return match.group(0)
+        if abs((value - capture_time).total_seconds()) < 3600:
+            return "CURRENT_TIME"
+        return match.group(0)
+
+    return re.sub(r"\d{4}_\d{2}_\d{2}-\d{2}:\d{2}:\d{2}", mask_current_time, text)
+
+
 def capture(args):
     output = os.path.abspath(args.output)
     os.makedirs(os.path.join(output, "projects"), exist_ok=True)
     executable = os.path.abspath(args.resinsight)
 
     manifest = {"files": {}, "errors": []}
+    capture_time = datetime.datetime.now()
 
     generated = os.path.join(output, "generated_classes.py")
     subprocess.run([executable, "--console", "--generate", generated], check=True)
@@ -76,14 +103,15 @@ def capture(args):
             instance.project.save(second)
             instance.project.close()
 
-            with open(first, encoding="utf-8") as file:
-                first_text = file.read()
-            with open(second, encoding="utf-8") as file:
-                second_text = file.read()
+            first_text = normalized_project_text(first, capture_time)
+            second_text = normalized_project_text(second, capture_time)
 
-            # The second file contains its own file name
-            if first_text != second_text.replace(name + ".second", name):
+            if first_text != second_text:
                 manifest["errors"].append(f"{name}: project file changes when it is saved a second time")
+
+            # The normalized file is the one to compare with another capture
+            with open(first, "w", encoding="utf-8") as file:
+                file.write(first_text)
 
             manifest["files"]["projects/" + name + ".rsp"] = sha256(first)
             os.remove(second)
