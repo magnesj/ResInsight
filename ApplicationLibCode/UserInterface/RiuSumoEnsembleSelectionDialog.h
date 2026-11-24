@@ -32,12 +32,16 @@ class QLabel;
 class QLineEdit;
 class QListWidget;
 class QListWidgetItem;
+class QPushButton;
 class QTableView;
-class RiaSumoExplore;
+class RiaSumoConnector;
+class RiaSumoExploreCache;
 
 //==================================================================================================
 /// Pick ensembles from the cases of an asset. The selection is kept per case, so ensembles of several
 /// cases can be picked before Apply. Ensembles already in the project start out selected.
+///
+/// What Sumo holds is requested asynchronously, so the dialog stays responsive while the lists load.
 //==================================================================================================
 class RiuSumoEnsembleSelectionDialog : public QDialog
 {
@@ -52,9 +56,11 @@ public:
         QString ensembleName;
     };
 
-    RiuSumoEnsembleSelectionDialog( RiaSumoExplore&                                      explore,
+    RiuSumoEnsembleSelectionDialog( RiaSumoConnector&                                    connector,
+                                    RiaSumoExploreCache&                                 cache,
                                     const std::set<RiuSumoCaseTableModel::CaseEnsemble>& existing,
                                     QWidget*                                             parent = nullptr );
+    ~RiuSumoEnsembleSelectionDialog() override;
 
     std::vector<Entry> entriesToAdd() const;
     std::vector<Entry> entriesToRemove() const;
@@ -65,19 +71,28 @@ private slots:
     void ensembleItemChanged( QListWidgetItem* item );
     void setAllEnsembles( bool selected );
     void applyFilters();
+    void refresh();
 
 private:
+    void               loadAssets();
+    void               loadCases( bool forceRefresh );
+    void               showCases( const QString& assetName );
+    void               updateStatus();
     QString            currentCaseId() const;
     std::vector<Entry> toEntries( const std::vector<RiuSumoCaseTableModel::CaseEnsemble>& keys ) const;
 
 private:
-    RiaSumoExplore& m_explore;
+    RiaSumoConnector&    m_connector;
+    RiaSumoExploreCache& m_cache;
 
     RiuSumoCaseTableModel       m_model;
     RiuSumoCaseFilterProxyModel m_proxy;
 
     QComboBox*   m_assetCombo;
+    QCheckBox*   m_myCasesCheckBox;
     QCheckBox*   m_officialCheckBox;
+    QPushButton* m_refreshButton;
+    QLabel*      m_statusLabel;
     QLineEdit*   m_caseFilter;
     QLineEdit*   m_ensembleFilter;
     QTableView*  m_caseView;
@@ -85,7 +100,7 @@ private:
 
     // Case id to asset and case name, for every case seen, as the selection outlives the asset being shown
     std::map<QString, std::pair<QString, QString>> m_caseInfo;
-    // Ensemble names of cases that did not come with them
-    std::map<QString, std::vector<QString>> m_fetchedEnsembleNames;
-    bool                                    m_updatingList;
+
+    int  m_pendingRequests;
+    bool m_updatingList;
 };

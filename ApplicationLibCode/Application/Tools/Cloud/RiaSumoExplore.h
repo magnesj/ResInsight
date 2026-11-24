@@ -23,6 +23,7 @@
 #include <QByteArray>
 #include <QString>
 
+#include <functional>
 #include <vector>
 
 class RiaSumoConnector;
@@ -67,6 +68,23 @@ public:
     std::vector<SumoCase>  cases( const QString& assetName );
     std::vector<QString>   ensembleNames( const SumoCaseId& caseId );
     std::vector<QString>   realizationIds( const SumoCaseId& caseId, const QString& ensembleName );
+
+    // The signed-in user, empty when unknown. Needs a service that has the whoami endpoint.
+    QString userName();
+
+    // Asynchronous variants for dialogs that must stay responsive. onFinished is called once, on the connector
+    // thread. Requests made with the same cancelGroup are aborted by RiaSumoConnector::cancelGroup, in which
+    // case onFinished receives an empty result.
+    void casesAsync( const QString&                                             assetName,
+                     const std::function<void( const std::vector<SumoCase>& )>& onFinished,
+                     const void*                                                cancelGroup = nullptr );
+    void ensembleNamesAsync( const SumoCaseId&                                         caseId,
+                             const std::function<void( const std::vector<QString>& )>& onFinished,
+                             const void*                                               cancelGroup = nullptr );
+    void userNameAsync( const std::function<void( const QString& )>& onFinished, const void* cancelGroup = nullptr );
+    void assetsAsync( const std::function<void( const std::vector<SumoAsset>& )>& onFinished, const void* cancelGroup = nullptr );
+
+    static QString parseUserName( const QByteArray& body );
 
     static std::vector<SumoAsset> parseAssets( const QByteArray& body );
     static std::vector<SumoCase>  parseCases( const QByteArray& body );

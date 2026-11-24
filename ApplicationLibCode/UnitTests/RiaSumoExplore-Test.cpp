@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "Cloud/RiaSumoExplore.h"
+#include "Cloud/RiaSumoExploreCache.h"
 #include "RiuSumoCaseTableModel.h"
 
 namespace
@@ -23,6 +24,29 @@ std::vector<SumoCase> testCases()
     return { a, b };
 }
 } // namespace
+
+TEST( RiaSumoExploreTest, ParseUserName )
+{
+    EXPECT_EQ( QString( "jdoe" ), RiaSumoExplore::parseUserName( R"({"name":"jdoe"})" ) );
+    EXPECT_TRUE( RiaSumoExplore::parseUserName( R"({"name":null})" ).isEmpty() );
+    EXPECT_TRUE( RiaSumoExplore::parseUserName( "" ).isEmpty() );
+}
+
+TEST( RiaSumoExploreTest, CacheKeepsPerAssetAndClears )
+{
+    RiaSumoExploreCache cache;
+    EXPECT_EQ( nullptr, cache.cases( "a" ) );
+
+    cache.setCases( "a", testCases() );
+    ASSERT_NE( nullptr, cache.cases( "a" ) );
+    EXPECT_EQ( 2u, cache.cases( "a" )->size() );
+    EXPECT_EQ( nullptr, cache.cases( "b" ) );
+    EXPECT_TRUE( cache.casesUpdated( "a" ).has_value() );
+
+    cache.clearCases( "a" );
+    EXPECT_EQ( nullptr, cache.cases( "a" ) );
+    EXPECT_FALSE( cache.casesUpdated( "a" ).has_value() );
+}
 
 TEST( RiuSumoCaseTableModelTest, FilterProxy )
 {

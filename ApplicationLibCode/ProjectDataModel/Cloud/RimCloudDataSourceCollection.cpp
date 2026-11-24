@@ -257,12 +257,15 @@ QList<caf::PdmOptionItemInfo> RimCloudDataSourceCollection::calculateValueOption
 //--------------------------------------------------------------------------------------------------
 const std::vector<SumoAsset>& RimCloudDataSourceCollection::cachedAssets()
 {
-    if ( m_assets.empty() && m_sumoConnector )
+    if ( !m_exploreCache.assets() && m_sumoConnector )
     {
-        m_assets = m_sumoConnector->explore().assets();
+        // An empty answer is not stored, it cannot be told from a failed request
+        if ( auto assets = m_sumoConnector->explore().assets(); !assets.empty() ) m_exploreCache.setAssets( assets );
     }
 
-    return m_assets;
+    static const std::vector<SumoAsset> empty;
+    auto                                cached = m_exploreCache.assets();
+    return cached ? *cached : empty;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -270,13 +273,14 @@ const std::vector<SumoAsset>& RimCloudDataSourceCollection::cachedAssets()
 //--------------------------------------------------------------------------------------------------
 const std::vector<SumoCase>& RimCloudDataSourceCollection::cachedCases( const QString& assetName )
 {
-    if ( m_casesAssetName != assetName && m_sumoConnector )
+    if ( !m_exploreCache.cases( assetName ) && m_sumoConnector )
     {
-        m_cases          = m_sumoConnector->explore().cases( assetName );
-        m_casesAssetName = assetName;
+        m_exploreCache.setCases( assetName, m_sumoConnector->explore().cases( assetName ) );
     }
 
-    return m_cases;
+    static const std::vector<SumoCase> empty;
+    auto                               cached = m_exploreCache.cases( assetName );
+    return cached ? *cached : empty;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -284,23 +288,30 @@ const std::vector<SumoCase>& RimCloudDataSourceCollection::cachedCases( const QS
 //--------------------------------------------------------------------------------------------------
 const std::vector<QString>& RimCloudDataSourceCollection::cachedEnsembleNames( const SumoCaseId& caseId )
 {
-    if ( m_ensembleNamesCaseId != caseId.get() && m_sumoConnector )
+    if ( !m_exploreCache.ensembleNames( caseId.get() ) && m_sumoConnector )
     {
-        m_ensembleNames       = m_sumoConnector->explore().ensembleNames( caseId );
-        m_ensembleNamesCaseId = caseId.get();
+        m_exploreCache.setEnsembleNames( caseId.get(), m_sumoConnector->explore().ensembleNames( caseId ) );
     }
 
-    return m_ensembleNames;
+    static const std::vector<QString> empty;
+    auto                              cached = m_exploreCache.ensembleNames( caseId.get() );
+    return cached ? *cached : empty;
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Forget the cases Sumo answered with, so the next request for them asks again. Called when the asset they
-/// belong to is left behind.
+///
+//--------------------------------------------------------------------------------------------------
+RiaSumoExploreCache& RimCloudDataSourceCollection::exploreCache()
+{
+    return m_exploreCache;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Forget the cases Sumo answered with, so the next request for them asks again.
 //--------------------------------------------------------------------------------------------------
 void RimCloudDataSourceCollection::clearCachedCases()
 {
-    m_casesAssetName.clear();
-    m_cases.clear();
+    m_exploreCache.clearCases();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -308,8 +319,7 @@ void RimCloudDataSourceCollection::clearCachedCases()
 //--------------------------------------------------------------------------------------------------
 void RimCloudDataSourceCollection::clearCachedEnsembleNames()
 {
-    m_ensembleNamesCaseId.clear();
-    m_ensembleNames.clear();
+    m_exploreCache.clearEnsembleNames();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -582,7 +592,7 @@ void RimCloudDataSourceCollection::selectEnsemblesInDialog()
         existing.insert( { dataSource->caseId().get(), dataSource->ensembleName() } );
     }
 
-    RiuSumoEnsembleSelectionDialog dialog( m_sumoConnector->explore(), existing, RiuPlotMainWindow::instance() );
+    RiuSumoEnsembleSelectionDialog dialog( *m_sumoConnector, m_exploreCache, existing, RiuPlotMainWindow::instance() );
     if ( dialog.exec() != QDialog::Accepted ) return;
 
     const auto toRemove = dialog.entriesToRemove();

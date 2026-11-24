@@ -536,6 +536,52 @@ QByteArray RiaSumoConnector::getBlocking( const QString& path, const QString& pr
 }
 
 //--------------------------------------------------------------------------------------------------
+/// The asynchronous counterpart of getBlocking: the request is issued on the transfer thread and the body is
+/// handed back on the connector thread.
+//--------------------------------------------------------------------------------------------------
+void RiaSumoConnector::getAsync( const QString& path, const std::function<void( const QByteArray& )>& onFinished, const void* cancelGroup )
+{
+    if ( !onFinished ) return;
+
+    requestTokenBlocking();
+
+    const QString baseUrl = serviceBaseUrl();
+    if ( baseUrl.isEmpty() )
+    {
+        onFinished( {} );
+        return;
+    }
+
+    const QString url = baseUrl + path;
+
+    runOnTransferThread(
+        [this, url, onFinished, cancelGroup]()
+        {
+            QNetworkRequest networkRequest;
+            networkRequest.setUrl( QUrl( url ) );
+            addStandardHeader( networkRequest, transferToken(), RiaCloudDefines::contentTypeJson() );
+
+            auto reply = getAndTrackReply( backgroundNetworkAccessManager(), networkRequest, cancelGroup );
+            if ( !reply )
+            {
+                invokeOnConnectorThread( [onFinished]() { onFinished( {} ); } );
+                return;
+            }
+
+            abortIfNotFinishedWithin( reply, RiaSumoDefines::requestTimeoutMillis() );
+
+            QObject::connect( reply,
+                              &QNetworkReply::finished,
+                              m_transferContext,
+                              [this, reply, url, onFinished]()
+                              {
+                                  const QByteArray body = replyBody( reply, url );
+                                  invokeOnConnectorThread( [onFinished, body]() { onFinished( body ); } );
+                              } );
+        } );
+}
+
+//--------------------------------------------------------------------------------------------------
 /// The REST API returns a blob id as a plain string, quoted by FastAPI.
 //--------------------------------------------------------------------------------------------------
 QString RiaSumoConnector::blobIdFromBody( const QByteArray& body )

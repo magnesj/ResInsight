@@ -23,6 +23,7 @@
 #include "cafPdmObject.h"
 
 #include "Cloud/RiaSumoConnector.h"
+#include "Cloud/RiaSumoExploreCache.h"
 
 #include <QPointer>
 #include <QString>
@@ -54,6 +55,9 @@ public:
 
     // Deletes the data source and the ensembles that use it.
     void removeDataSource( RimSumoDataSource* dataSource );
+
+    // What Sumo answered, shared with the selection dialog
+    RiaSumoExploreCache& exploreCache();
 
     static void createEnsemblesFromSelectedDataSources( const std::vector<RimSumoDataSource*>& dataSources );
 
@@ -94,11 +98,5 @@ private:
 
     QPointer<RiaSumoConnector> m_sumoConnector;
 
-    std::vector<SumoAsset> m_assets;
-
-    QString               m_casesAssetName;
-    std::vector<SumoCase> m_cases;
-
-    QString              m_ensembleNamesCaseId;
-    std::vector<QString> m_ensembleNames;
+    RiaSumoExploreCache m_exploreCache;
 };
