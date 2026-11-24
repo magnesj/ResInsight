@@ -22,6 +22,7 @@
 
 #include "Cloud/RiaCloudApiService.h"
 #include "RiaApplication.h"
+#include "RiaColorTables.h"
 #include "Summary/RiaSummaryPlotTools.h"
 #include "Summary/RiaSummaryTools.h"
 
@@ -166,6 +167,15 @@ void RimCloudDataSourceCollection::createEnsemblesFromSelectedDataSources( const
         RimSummaryEnsembleSumo* ensemble = new RimSummaryEnsembleSumo();
         ensemble->setUsePathKey1( true );
         ensemble->setSumoDataSource( dataSource );
+
+        // Pick the next color in the category palette, based on the ensembles that already have a color
+        size_t coloredCount = 0;
+        for ( auto existing : sumCaseMainColl->summaryEnsembles() )
+        {
+            if ( existing->customColor().has_value() ) coloredCount++;
+        }
+        ensemble->setCustomColor( RiaColorTables::categoryPaletteColors().cycledColor3f( coloredCount ) );
+
         sumCaseMainColl->addEnsemble( ensemble );
         ensemble->loadDataAndUpdate();
 
