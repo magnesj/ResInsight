@@ -71,6 +71,7 @@ private:
 
     std::vector<RimSumoDataSource*> addDataSources();
     void                            addEnsembles();
+    void                            selectEnsemblesInDialog();
 
     static bool isCloudApiServerAvailable();
 

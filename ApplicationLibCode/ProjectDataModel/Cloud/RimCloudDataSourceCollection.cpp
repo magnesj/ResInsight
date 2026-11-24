@@ -32,7 +32,9 @@
 #include "RimSummaryCaseMainCollection.h"
 #include "RimSumoDataSource.h"
 
+#include "RiuPlotMainWindow.h"
 #include "RiuPlotMainWindowTools.h"
+#include "RiuSumoEnsembleSelectionDialog.h"
 
 #include "cafPdmUiButton.h"
 #include "cafPdmUiPropertyViewDialog.h"
@@ -41,6 +43,7 @@
 #include "cafSelectionManager.h"
 
 #include <QDialogButtonBox>
+#include <QMessageBox>
 
 #include <set>
 
@@ -402,6 +405,9 @@ void RimCloudDataSourceCollection::defineUiOrdering( QString uiConfigName, caf::
         uiOrdering.add( &m_sumoCaseId, layout );
         uiOrdering.add( &m_sumoEnsembleNames, layout );
 
+        auto* selectButton = uiOrdering.addNewButton( "Select Ensembles...", [this]() { selectEnsemblesInDialog(); } );
+        selectButton->setUiToolTip( "Pick ensembles from several cases in a table" );
+
         auto* addDataSourcesButton = uiOrdering.addNewButton( "Add Data Sources(s)", [this]() { addDataSources(); } );
         addDataSourcesButton->setUiToolTip( "Add Data Sources without Ensembles" );
 
@@ -560,6 +566,54 @@ void RimCloudDataSourceCollection::removeDataSource( RimSumoDataSource* dataSour
     for ( auto obj : toDelete )
         delete obj;
     delete dataSource;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Open the selection dialog. Ensembles unchecked in it are removed from the project together with what
+/// uses them, and newly checked ones are added with a summary ensemble.
+//--------------------------------------------------------------------------------------------------
+void RimCloudDataSourceCollection::selectEnsemblesInDialog()
+{
+    if ( !m_sumoConnector ) return;
+
+    std::set<RiuSumoCaseTableModel::CaseEnsemble> existing;
+    for ( auto dataSource : sumoDataSources() )
+    {
+        existing.insert( { dataSource->caseId().get(), dataSource->ensembleName() } );
+    }
+
+    RiuSumoEnsembleSelectionDialog dialog( m_sumoConnector->explore(), existing, RiuPlotMainWindow::instance() );
+    if ( dialog.exec() != QDialog::Accepted ) return;
+
+    const auto toRemove = dialog.entriesToRemove();
+    const auto toAdd    = dialog.entriesToAdd();
+
+    if ( !toRemove.empty() )
+    {
+        QString text = "The following ensembles and the summary and grid ensembles using them will be deleted:\n";
+        for ( const auto& entry : toRemove )
+        {
+            text += QString( "\n%1 / %2" ).arg( entry.caseName.isEmpty() ? entry.caseId : entry.caseName ).arg( entry.ensembleName );
+        }
+
+        if ( QMessageBox::question( RiuPlotMainWindow::instance(), "Remove Ensembles", text ) != QMessageBox::Yes ) return;
+
+        for ( const auto& entry : toRemove )
+        {
+            removeDataSource( findDataSource( SumoCaseId( entry.caseId ), entry.ensembleName ) );
+        }
+    }
+
+    std::vector<RimSumoDataSource*> added;
+    for ( const auto& entry : toAdd )
+    {
+        if ( auto dataSource = addDataSource( entry.assetName, SumoCaseId( entry.caseId ), entry.caseName, entry.ensembleName ) )
+        {
+            added.push_back( dataSource );
+        }
+    }
+
+    createEnsemblesFromSelectedDataSources( added );
 }
 
 //--------------------------------------------------------------------------------------------------
