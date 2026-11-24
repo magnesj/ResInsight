@@ -81,6 +81,8 @@ RiuSumoEnsembleManagementDialog::RiuSumoEnsembleManagementDialog( RimCloudDataSo
     m_table->horizontalHeader()->setStretchLastSection( true );
     m_table->horizontalHeader()->setSectionResizeMode( ColName, QHeaderView::Stretch );
     m_table->setColumnWidth( ColColor, 60 );
+    m_table->horizontalHeader()->setStyleSheet( "QHeaderView::section { background-color: palette(midlight); padding: 4px; border: none; "
+                                                "border-right: 1px solid palette(mid); }" );
     layout->addWidget( m_table );
 
     auto* buttonRow = new QHBoxLayout();

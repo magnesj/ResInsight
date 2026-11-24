@@ -79,6 +79,9 @@ RiuSumoEnsembleSelectionDialog::RiuSumoEnsembleSelectionDialog( RiaSumoConnector
     m_caseView->setEditTriggers( QAbstractItemView::NoEditTriggers );
     m_caseView->horizontalHeader()->setStretchLastSection( true );
     m_caseView->verticalHeader()->hide();
+    m_caseView->horizontalHeader()->setStyleSheet(
+        "QHeaderView::section { background-color: palette(midlight); padding: 4px; border: none; "
+        "border-right: 1px solid palette(mid); }" );
 
     m_ensembleList = new QListWidget;
 
