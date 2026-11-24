@@ -25,15 +25,19 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDialogButtonBox>
+#include <QEvent>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QItemSelectionModel>
 #include <QLabel>
 #include <QLineEdit>
 #include <QListWidget>
+#include <QMenu>
 #include <QPointer>
 #include <QPushButton>
+#include <QScrollBar>
 #include <QTableView>
+#include <QToolButton>
 #include <QVBoxLayout>
 
 #include <algorithm>
@@ -64,9 +68,7 @@ RiuSumoEnsembleSelectionDialog::RiuSumoEnsembleSelectionDialog( RiaSumoConnector
     m_officialCheckBox = new QCheckBox( "Only official cases" );
     m_refreshButton    = new QPushButton( "Refresh" );
     m_statusLabel      = new QLabel;
-    m_caseFilter       = new QLineEdit;
-    m_caseFilter->setPlaceholderText( "Filter cases" );
-    m_ensembleFilter = new QLineEdit;
+    m_ensembleFilter   = new QLineEdit;
     m_ensembleFilter->setPlaceholderText( "Filter ensembles" );
 
     m_caseView = new QTableView;
@@ -91,7 +93,7 @@ RiuSumoEnsembleSelectionDialog::RiuSumoEnsembleSelectionDialog( RiaSumoConnector
     topRow->addWidget( m_assetCombo );
     topRow->addWidget( m_myCasesCheckBox );
     topRow->addWidget( m_officialCheckBox );
-    topRow->addWidget( m_caseFilter, 1 );
+    topRow->addStretch( 1 );
     topRow->addWidget( m_refreshButton );
 
     auto* ensembleButtons = new QHBoxLayout;
@@ -104,8 +106,15 @@ RiuSumoEnsembleSelectionDialog::RiuSumoEnsembleSelectionDialog( RiaSumoConnector
     ensembleColumn->addWidget( m_ensembleList );
     ensembleColumn->addLayout( ensembleButtons );
 
+    createFilterRow();
+
+    auto* caseColumn = new QVBoxLayout;
+    caseColumn->setSpacing( 0 );
+    caseColumn->addWidget( m_filterRow );
+    caseColumn->addWidget( m_caseView );
+
     auto* middle = new QHBoxLayout;
-    middle->addWidget( m_caseView, 3 );
+    middle->addLayout( caseColumn, 3 );
     middle->addLayout( ensembleColumn, 1 );
 
     auto* layout = new QVBoxLayout( this );
@@ -117,7 +126,6 @@ RiuSumoEnsembleSelectionDialog::RiuSumoEnsembleSelectionDialog( RiaSumoConnector
     connect( m_assetCombo, &QComboBox::currentIndexChanged, this, &RiuSumoEnsembleSelectionDialog::assetChanged );
     connect( m_myCasesCheckBox, &QCheckBox::toggled, this, &RiuSumoEnsembleSelectionDialog::applyFilters );
     connect( m_officialCheckBox, &QCheckBox::toggled, this, &RiuSumoEnsembleSelectionDialog::applyFilters );
-    connect( m_caseFilter, &QLineEdit::textChanged, this, &RiuSumoEnsembleSelectionDialog::applyFilters );
     connect( m_refreshButton, &QPushButton::clicked, this, &RiuSumoEnsembleSelectionDialog::refresh );
     connect( m_ensembleFilter, &QLineEdit::textChanged, this, &RiuSumoEnsembleSelectionDialog::currentCaseChanged );
     connect( m_caseView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &RiuSumoEnsembleSelectionDialog::currentCaseChanged );
@@ -283,6 +291,7 @@ void RiuSumoEnsembleSelectionDialog::showCases( const QString& assetName )
     }
 
     m_model.setCases( *cases );
+    updateValueFilters();
     updateStatus();
     currentCaseChanged();
 }
@@ -394,9 +403,145 @@ void RiuSumoEnsembleSelectionDialog::setAllEnsembles( bool selected )
 //--------------------------------------------------------------------------------------------------
 void RiuSumoEnsembleSelectionDialog::applyFilters()
 {
-    m_proxy.setColumnFilter( RiuSumoCaseTableModel::CaseName, m_caseFilter->text() );
+    applyColumnFilters();
     m_proxy.setOnlyOfficial( m_officialCheckBox->isChecked() );
     m_proxy.setOnlyUser( m_myCasesCheckBox->isChecked() ? m_cache.userName() : QString() );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuSumoEnsembleSelectionDialog::applyColumnFilters()
+{
+    for ( const auto& [column, edit] : m_textFilters )
+    {
+        m_proxy.setColumnFilter( column, edit->text() );
+    }
+    for ( const auto& [column, values] : m_checkedValues )
+    {
+        m_proxy.setAllowedValues( column, values );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// A filter row above the table, with a widget for each column kept aligned to the header sections
+//--------------------------------------------------------------------------------------------------
+void RiuSumoEnsembleSelectionDialog::createFilterRow()
+{
+    m_filterRow = new QWidget;
+    m_filterRow->setFixedHeight( 28 );
+
+    for ( int column = RiuSumoCaseTableModel::CaseName; column < RiuSumoCaseTableModel::ColumnCount; column++ )
+    {
+        const bool isValueColumn = column == RiuSumoCaseTableModel::Status || column == RiuSumoCaseTableModel::Model ||
+                                   column == RiuSumoCaseTableModel::Revision;
+        if ( isValueColumn )
+        {
+            auto* button = new QToolButton( m_filterRow );
+            button->setPopupMode( QToolButton::InstantPopup );
+            button->setMenu( new QMenu( button ) );
+            button->setText( "All" );
+            m_valueFilters[column] = button;
+        }
+        else
+        {
+            auto* edit = new QLineEdit( m_filterRow );
+            edit->setPlaceholderText( "Filter ..." );
+            edit->setClearButtonEnabled( true );
+            connect( edit, &QLineEdit::textChanged, this, &RiuSumoEnsembleSelectionDialog::applyFilters );
+            m_textFilters[column] = edit;
+        }
+    }
+
+    auto* header = m_caseView->horizontalHeader();
+    connect( header, &QHeaderView::sectionResized, this, [this]() { layoutFilterRow(); } );
+    connect( header, &QHeaderView::geometriesChanged, this, [this]() { layoutFilterRow(); } );
+    connect( m_caseView->horizontalScrollBar(), &QScrollBar::valueChanged, this, [this]() { layoutFilterRow(); } );
+    header->installEventFilter( this );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuSumoEnsembleSelectionDialog::layoutFilterRow()
+{
+    auto* header = m_caseView->horizontalHeader();
+
+    const int offset = m_caseView->viewport()->mapTo( this, QPoint( 0, 0 ) ).x() - m_filterRow->mapTo( this, QPoint( 0, 0 ) ).x();
+
+    auto place = [&]( int column, QWidget* widget )
+    {
+        const int x = header->sectionViewportPosition( column ) + offset;
+        widget->setGeometry( x, 2, header->sectionSize( column ), m_filterRow->height() - 4 );
+        widget->setVisible( !header->isSectionHidden( column ) && x + header->sectionSize( column ) > offset );
+    };
+
+    for ( const auto& [column, edit] : m_textFilters )
+        place( column, edit );
+    for ( const auto& [column, button] : m_valueFilters )
+        place( column, button );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Offers the values found in the loaded cases, keeping the ones checked before when still present
+//--------------------------------------------------------------------------------------------------
+void RiuSumoEnsembleSelectionDialog::updateValueFilters()
+{
+    for ( const auto& [column, button] : m_valueFilters )
+    {
+        std::set<QString> values;
+        for ( const auto& sumoCase : m_model.cases() )
+        {
+            const auto text = RiuSumoCaseTableModel::columnText( sumoCase, column );
+            if ( !text.isEmpty() ) values.insert( text );
+        }
+
+        auto&             checked = m_checkedValues[column];
+        std::set<QString> kept;
+        for ( const auto& value : checked )
+        {
+            if ( values.count( value ) ) kept.insert( value );
+        }
+        checked = kept;
+
+        auto* menu = button->menu();
+        menu->clear();
+        for ( const auto& value : values )
+        {
+            auto* action = menu->addAction( value );
+            action->setCheckable( true );
+            action->setChecked( checked.count( value ) > 0 );
+            connect( action,
+                     &QAction::toggled,
+                     this,
+                     [this, column, value, button]( bool on )
+                     {
+                         auto& set = m_checkedValues[column];
+                         if ( on )
+                             set.insert( value );
+                         else
+                             set.erase( value );
+                         button->setText( set.empty() ? QString( "All" ) : QString( "%1 selected" ).arg( set.size() ) );
+                         applyFilters();
+                     } );
+        }
+        button->setText( checked.empty() ? QString( "All" ) : QString( "%1 selected" ).arg( checked.size() ) );
+    }
+
+    applyFilters();
+    layoutFilterRow();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RiuSumoEnsembleSelectionDialog::eventFilter( QObject* watched, QEvent* event )
+{
+    if ( watched == m_caseView->horizontalHeader() && ( event->type() == QEvent::Resize || event->type() == QEvent::Show ) )
+    {
+        layoutFilterRow();
+    }
+    return QDialog::eventFilter( watched, event );
 }
 
 //--------------------------------------------------------------------------------------------------

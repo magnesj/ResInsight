@@ -34,6 +34,7 @@ class QListWidget;
 class QListWidgetItem;
 class QPushButton;
 class QTableView;
+class QToolButton;
 class RiaSumoConnector;
 class RiaSumoExploreCache;
 
@@ -62,6 +63,8 @@ public:
                                     QWidget*                                             parent = nullptr );
     ~RiuSumoEnsembleSelectionDialog() override;
 
+    bool eventFilter( QObject* watched, QEvent* event ) override;
+
     std::vector<Entry> entriesToAdd() const;
     std::vector<Entry> entriesToRemove() const;
 
@@ -78,6 +81,10 @@ private:
     void               loadCases( bool forceRefresh );
     void               showCases( const QString& assetName );
     void               updateStatus();
+    void               createFilterRow();
+    void               layoutFilterRow();
+    void               updateValueFilters();
+    void               applyColumnFilters();
     QString            currentCaseId() const;
     std::vector<Entry> toEntries( const std::vector<RiuSumoCaseTableModel::CaseEnsemble>& keys ) const;
 
@@ -93,13 +100,18 @@ private:
     QCheckBox*   m_officialCheckBox;
     QPushButton* m_refreshButton;
     QLabel*      m_statusLabel;
-    QLineEdit*   m_caseFilter;
     QLineEdit*   m_ensembleFilter;
+    QWidget*     m_filterRow;
     QTableView*  m_caseView;
     QListWidget* m_ensembleList;
 
     // Case id to asset and case name, for every case seen, as the selection outlives the asset being shown
     std::map<QString, std::pair<QString, QString>> m_caseInfo;
+
+    // One filter widget per column below the header: line edits for text, menu buttons for values
+    std::map<int, QLineEdit*>        m_textFilters;
+    std::map<int, QToolButton*>      m_valueFilters;
+    std::map<int, std::set<QString>> m_checkedValues;
 
     int  m_pendingRequests;
     bool m_updatingList;
