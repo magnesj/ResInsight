@@ -62,6 +62,8 @@ RiuSumoEnsembleSelectionDialog::RiuSumoEnsembleSelectionDialog( RiaSumoConnector
     m_proxy.setSourceModel( &m_model );
 
     m_assetCombo      = new QComboBox;
+    m_assetCombo->setMinimumWidth( 220 );
+    m_assetCombo->setSizeAdjustPolicy( QComboBox::AdjustToContents );
     m_myCasesCheckBox = new QCheckBox( "Only my cases" );
     m_myCasesCheckBox->setEnabled( false );
     m_myCasesCheckBox->setToolTip( "Available when the signed-in user is known to the cloud service" );
