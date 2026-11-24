@@ -27,6 +27,7 @@
 #include "RiaStdStringTools.h"
 #include "RiaTextStringTools.h"
 #include "RigStatisticsTools.h"
+#include "RiuGuiTheme.h"
 #include "RiuMessageDialog.h"
 #include "Summary/Ensemble/RimSummaryEnsembleParameterCollection.h"
 #include "Summary/RiaSummaryAddressAnalyzer.h"
@@ -1023,6 +1024,7 @@ void RimSummaryEnsemble::setCustomColor( const cvf::Color3f& color )
     m_color          = color;
     m_hasCustomColor = true;
 
+    updateConnectedEditors();
     for ( auto curveSet : objectsWithReferringPtrFieldsOfType<RimEnsembleCurveSet>() )
     {
         if ( curveSet->summaryEnsemble() == this ) curveSet->setColorAndUpdateCurves( color );
@@ -1132,6 +1134,16 @@ void RimSummaryEnsemble::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrd
 std::vector<caf::PdmUiTreeViewItemTag> RimSummaryEnsemble::treeItemTags()
 {
     std::vector<caf::PdmUiTreeViewItemTag> tags;
+
+    if ( auto color = customColor() )
+    {
+        auto tag     = caf::PdmUiTreeViewItemTag::create( RiaColorTools::toQColor( *color ),
+                                                      RiuGuiTheme::getColorByVariableName( "backgroundColor1" ),
+                                                      "---" );
+        tag.position = caf::PdmUiTreeViewItemTag::Position::AT_END;
+        tag.toolTip  = "Ensemble color";
+        tags.push_back( tag );
+    }
 
     if ( m_includeInAutoReload() )
     {

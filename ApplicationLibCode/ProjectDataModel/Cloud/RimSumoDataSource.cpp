@@ -18,9 +18,11 @@
 
 #include "RimSumoDataSource.h"
 
+#include "RiaColorTools.h"
 #include "RiaLogging.h"
 #include "RiaStdStringTools.h"
 
+#include "Cloud/RimCloudDataSourceCollection.h"
 #include "Cloud/RimSummaryEnsembleSumo.h"
 #include "Rim3dOverlayInfoConfig.h"
 #include "RimEclipseView.h"
@@ -28,6 +30,8 @@
 #include "RimProject.h"
 #include "RimReservoirGridEnsembleSumo.h"
 #include "RimRoffCaseSumo.h"
+#include "RimSummaryEnsemble.h"
+#include "RiuGuiTheme.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmPointer.h"
@@ -306,6 +310,32 @@ void RimSumoDataSource::updateName()
     auto name = QString( "%1 (%2)" ).arg( ensembleName(), caseName() );
 
     setName( name );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Shows the color of the summary ensemble made from this data source, if it has one
+//--------------------------------------------------------------------------------------------------
+std::vector<caf::PdmUiTreeViewItemTag> RimSumoDataSource::treeItemTags()
+{
+    std::vector<caf::PdmUiTreeViewItemTag> tags;
+
+    for ( auto* obj : RimCloudDataSourceCollection::dependentEnsembles( this ) )
+    {
+        auto* ensemble = dynamic_cast<RimSummaryEnsemble*>( obj );
+        if ( !ensemble ) continue;
+
+        if ( auto color = ensemble->customColor() )
+        {
+            auto tag     = caf::PdmUiTreeViewItemTag::create( RiaColorTools::toQColor( *color ),
+                                                          RiuGuiTheme::getColorByVariableName( "backgroundColor1" ),
+                                                          "---" );
+            tag.position = caf::PdmUiTreeViewItemTag::Position::AT_END;
+            tag.toolTip  = "Ensemble color";
+            tags.push_back( tag );
+        }
+    }
+
+    return tags;
 }
 
 //--------------------------------------------------------------------------------------------------

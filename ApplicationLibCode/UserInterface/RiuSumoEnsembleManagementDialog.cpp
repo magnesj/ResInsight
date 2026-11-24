@@ -220,6 +220,7 @@ void RiuSumoEnsembleManagementDialog::onCellDoubleClicked( int row, int column )
 
     ensemble->setCustomColor( RiaColorTools::fromQColorTo3f( chosen ) );
     ensemble->updateConnectedEditors();
+    m_collection->updateConnectedEditors();
     populate();
 }
 
