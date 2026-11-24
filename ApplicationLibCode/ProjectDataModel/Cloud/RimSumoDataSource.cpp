@@ -326,11 +326,15 @@ std::vector<caf::PdmUiTreeViewItemTag> RimSumoDataSource::treeItemTags()
 
         if ( auto color = ensemble->customColor() )
         {
-            auto tag     = caf::PdmUiTreeViewItemTag::create( RiaColorTools::toQColor( *color ),
-                                                          RiuGuiTheme::getColorByVariableName( "backgroundColor1" ),
-                                                          "---" );
+            auto tag     = caf::PdmUiTreeViewItemTag::create( RiuGuiTheme::getColorByVariableName( "backgroundColor1" ),
+                                                          RiaColorTools::toQColor( *color ),
+                                                          "        " );
             tag.position = caf::PdmUiTreeViewItemTag::Position::AT_END;
-            tag.toolTip  = "Ensemble color";
+            tag.toolTip  = "Ensemble color. Click to change";
+            tag.clicked  = [ensemblePtr = caf::PdmPointer<RimSummaryEnsemble>( ensemble )]( size_t )
+            {
+                if ( ensemblePtr ) ensemblePtr->editCustomColor();
+            };
             tags.push_back( tag );
         }
     }

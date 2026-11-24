@@ -105,6 +105,9 @@ public:
     std::optional<cvf::Color3f> customColor() const;
     void                        setCustomColor( const cvf::Color3f& color );
 
+    // Asks the user for a color and applies it
+    void editCustomColor();
+
     std::vector<RigEnsembleParameter> variationSortedEnsembleParameters( bool excludeNoVariation = false ) const;
     std::vector<std::pair<RigEnsembleParameter, double>> correlationSortedEnsembleParameters( const RifEclipseSummaryAddress& address ) const;
     std::vector<std::pair<RigEnsembleParameter, double>> correlationSortedEnsembleParameters( const RifEclipseSummaryAddress& address,

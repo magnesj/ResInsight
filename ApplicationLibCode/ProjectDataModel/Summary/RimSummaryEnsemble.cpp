@@ -28,10 +28,12 @@
 #include "RiaTextStringTools.h"
 #include "RigStatisticsTools.h"
 #include "RiuGuiTheme.h"
+
 #include "RiuMessageDialog.h"
 #include "Summary/Ensemble/RimSummaryEnsembleParameterCollection.h"
 #include "Summary/RiaSummaryAddressAnalyzer.h"
 #include "Summary/RiaSummaryTools.h"
+#include "cafPdmUiColorEditor.h"
 
 #include "RifSummaryReaderInterface.h"
 
@@ -1131,17 +1133,32 @@ void RimSummaryEnsemble::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrd
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimSummaryEnsemble::editCustomColor()
+{
+    const QColor sourceColor = RiaColorTools::toQColor( m_color() );
+    const QColor newColor    = caf::PdmUiColorEditor::getColor( sourceColor );
+
+    if ( newColor.isValid() && newColor != sourceColor )
+    {
+        setCustomColor( RiaColorTools::fromQColorTo3f( newColor ) );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 std::vector<caf::PdmUiTreeViewItemTag> RimSummaryEnsemble::treeItemTags()
 {
     std::vector<caf::PdmUiTreeViewItemTag> tags;
 
     if ( auto color = customColor() )
     {
-        auto tag     = caf::PdmUiTreeViewItemTag::create( RiaColorTools::toQColor( *color ),
-                                                      RiuGuiTheme::getColorByVariableName( "backgroundColor1" ),
-                                                      "---" );
+        auto tag     = caf::PdmUiTreeViewItemTag::create( RiuGuiTheme::getColorByVariableName( "backgroundColor1" ),
+                                                      RiaColorTools::toQColor( *color ),
+                                                      "        " );
         tag.position = caf::PdmUiTreeViewItemTag::Position::AT_END;
-        tag.toolTip  = "Ensemble color";
+        tag.toolTip  = "Ensemble color. Click to change";
+        tag.clicked  = [this]( size_t ) { editCustomColor(); };
         tags.push_back( tag );
     }
 
