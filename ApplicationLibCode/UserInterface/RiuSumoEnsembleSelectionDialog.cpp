@@ -84,6 +84,7 @@ RiuSumoEnsembleSelectionDialog::RiuSumoEnsembleSelectionDialog( RiaSumoConnector
     m_caseView->setSelectionMode( QAbstractItemView::SingleSelection );
     m_caseView->setEditTriggers( QAbstractItemView::NoEditTriggers );
     m_caseView->horizontalHeader()->setStretchLastSection( true );
+    m_caseView->setColumnWidth( RiuSumoCaseTableModel::CaseName, 450 );
     m_caseView->verticalHeader()->hide();
     m_caseView->horizontalHeader()->setStyleSheet(
         "QHeaderView::section { background-color: palette(midlight); padding: 4px; border: none; "
