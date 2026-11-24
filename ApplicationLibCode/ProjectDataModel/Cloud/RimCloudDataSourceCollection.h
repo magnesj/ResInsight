@@ -44,6 +44,17 @@ public:
 
     std::vector<RimSumoDataSource*> sumoDataSources() const;
 
+    RimSumoDataSource* findDataSource( const SumoCaseId& caseId, const QString& ensembleName ) const;
+
+    // Creates a data source for one ensemble. Returns nullptr if it already exists or there is no connection.
+    RimSumoDataSource* addDataSource( const QString& assetName, const SumoCaseId& caseId, const QString& caseName, const QString& ensembleName );
+
+    // The summary and grid ensembles that use the data source, and so are deleted with it.
+    static std::vector<caf::PdmObject*> dependentEnsembles( const RimSumoDataSource* dataSource );
+
+    // Deletes the data source and the ensembles that use it.
+    void removeDataSource( RimSumoDataSource* dataSource );
+
     static void createEnsemblesFromSelectedDataSources( const std::vector<RimSumoDataSource*>& dataSources );
 
 private:

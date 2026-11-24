@@ -114,10 +114,22 @@ std::vector<SumoCase> RiaSumoExplore::parseCases( const QByteArray& body )
     {
         QJsonObject caseObj = value.toObject();
 
-        QString id   = caseObj["id"].toString();
-        QString kind = "";
-        QString name = caseObj["name"].toString();
-        cases.push_back( SumoCase{ SumoCaseId( id ), kind, name } );
+        SumoCase sumoCase;
+        sumoCase.caseId        = SumoCaseId( caseObj["id"].toString() );
+        sumoCase.name          = caseObj["name"].toString();
+        sumoCase.author        = caseObj["user"].toString();
+        sumoCase.status        = caseObj["status"].toString();
+        sumoCase.description   = caseObj["description"].toString();
+        sumoCase.date          = caseObj["timestamp"].toString();
+        sumoCase.modelName     = caseObj["model_name"].toString();
+        sumoCase.modelRevision = caseObj["model_revision"].toString();
+
+        for ( const QJsonValue& ensembleName : caseObj["ensemble_names"].toArray() )
+        {
+            sumoCase.ensembleNames.push_back( ensembleName.toString() );
+        }
+
+        cases.push_back( sumoCase );
     }
 
     RiaLogging::debug( std::format( "Case count : {}", cases.size() ) );

@@ -41,6 +41,15 @@ struct SumoCase
 
     QString kind;
     QString name;
+
+    // Metadata from the cloud service. All of it is optional, an older service leaves it empty.
+    QString              author;
+    QString              status;
+    QString              description;
+    QString              date;
+    QString              modelName;
+    QString              modelRevision;
+    std::vector<QString> ensembleNames;
 };
 
 //==================================================================================================
@@ -59,7 +68,6 @@ public:
     std::vector<QString>   ensembleNames( const SumoCaseId& caseId );
     std::vector<QString>   realizationIds( const SumoCaseId& caseId, const QString& ensembleName );
 
-private:
     static std::vector<SumoAsset> parseAssets( const QByteArray& body );
     static std::vector<SumoCase>  parseCases( const QByteArray& body );
     static std::vector<QString>   parseEnsembleNames( const QByteArray& body );

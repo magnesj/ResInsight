@@ -97,6 +97,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiuTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiuMohrsCirclePlot.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiuPlotMainWindowTools.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RiuSumoCaseTableModel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/Riu3DMainWindowTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiuDockWidgetTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiuQwtCurveSelectorFilter.cpp

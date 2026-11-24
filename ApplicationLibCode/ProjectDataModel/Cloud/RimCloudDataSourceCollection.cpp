@@ -28,6 +28,7 @@
 #include "Cloud/RimSummaryEnsembleSumo.h"
 #include "RimOilField.h"
 #include "RimProject.h"
+#include "RimReservoirGridEnsembleSumo.h"
 #include "RimSummaryCaseMainCollection.h"
 #include "RimSumoDataSource.h"
 
@@ -37,6 +38,7 @@
 #include "cafPdmUiPropertyViewDialog.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafSelectionManager.h"
 
 #include <QDialogButtonBox>
 
@@ -419,71 +421,145 @@ std::vector<RimSumoDataSource*> RimCloudDataSourceCollection::addDataSources()
 
     std::vector<RimSumoDataSource*> dataSources;
 
-    RimSumoDataSource* objectToSelect = nullptr;
-    auto               sumoCaseId     = SumoCaseId( m_sumoCaseId );
+    const auto sumoCaseId = SumoCaseId( m_sumoCaseId );
+
+    QString caseName;
+    for ( const auto& sumoCase : cachedCases( m_sumoFieldName ) )
+    {
+        if ( sumoCase.caseId == sumoCaseId )
+        {
+            caseName = sumoCase.name;
+            break;
+        }
+    }
 
     for ( const auto& ensembleName : m_sumoEnsembleNames() )
     {
-        bool createNewDataSource = true;
-        for ( const auto dataSource : sumoDataSources() )
+        if ( auto dataSource = addDataSource( m_sumoFieldName, sumoCaseId, caseName, ensembleName ) )
         {
-            if ( dataSource->caseId() == sumoCaseId && dataSource->ensembleName() == ensembleName )
-            {
-                createNewDataSource = false;
-                break;
-            }
+            dataSources.push_back( dataSource );
         }
-
-        if ( !createNewDataSource )
-        {
-            continue;
-        }
-
-        QString caseName;
-        for ( const auto& sumoCase : cachedCases( m_sumoFieldName ) )
-        {
-            if ( sumoCase.caseId == sumoCaseId )
-            {
-                caseName = sumoCase.name;
-                break;
-            }
-        }
-
-        const auto availableRealizationIds = m_sumoConnector->explore().realizationIds( sumoCaseId, ensembleName );
-        const auto gridNames               = m_sumoConnector->grid().gridNames( sumoCaseId, ensembleName );
-        const auto vectorNames             = m_sumoConnector->summary().vectorNames( sumoCaseId, ensembleName );
-
-        auto dataSource = new RimSumoDataSource();
-        dataSource->setCaseId( sumoCaseId );
-        dataSource->setAssetName( m_sumoFieldName );
-        dataSource->setCaseName( caseName );
-        dataSource->setEnsembleName( ensembleName );
-        dataSource->setAvailableRealizationIds( availableRealizationIds );
-        dataSource->setVectorNames( vectorNames );
-        dataSource->setGridNames( gridNames );
-
-        if ( !gridNames.empty() )
-        {
-            dataSource->setSelectedGridName( gridNames.front() );
-        }
-
-        dataSource->updateName();
-
-        objectToSelect = dataSource;
-
-        m_sumoDataSources.push_back( dataSource );
-        dataSources.push_back( dataSource );
     }
 
-    uiCapability()->updateAllRequiredEditors();
-
-    if ( objectToSelect )
+    if ( !dataSources.empty() )
     {
-        RiuPlotMainWindowTools::setExpanded( objectToSelect );
-        RiuPlotMainWindowTools::selectAsCurrentItem( objectToSelect );
+        RiuPlotMainWindowTools::setExpanded( dataSources.back() );
+        RiuPlotMainWindowTools::selectAsCurrentItem( dataSources.back() );
     }
 
     return dataSources;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Creates a data source for the ensemble and fetches what it needs from Sumo. Returns nullptr if the
+/// ensemble already has a data source, or if there is no connection.
+//--------------------------------------------------------------------------------------------------
+RimSumoDataSource* RimCloudDataSourceCollection::addDataSource( const QString&    assetName,
+                                                                const SumoCaseId& caseId,
+                                                                const QString&    caseName,
+                                                                const QString&    ensembleName )
+{
+    if ( !m_sumoConnector ) return nullptr;
+
+    if ( findDataSource( caseId, ensembleName ) ) return nullptr;
+
+    const auto availableRealizationIds = m_sumoConnector->explore().realizationIds( caseId, ensembleName );
+    const auto gridNames               = m_sumoConnector->grid().gridNames( caseId, ensembleName );
+    const auto vectorNames             = m_sumoConnector->summary().vectorNames( caseId, ensembleName );
+
+    auto dataSource = new RimSumoDataSource();
+    dataSource->setCaseId( caseId );
+    dataSource->setAssetName( assetName );
+    dataSource->setCaseName( caseName );
+    dataSource->setEnsembleName( ensembleName );
+    dataSource->setAvailableRealizationIds( availableRealizationIds );
+    dataSource->setVectorNames( vectorNames );
+    dataSource->setGridNames( gridNames );
+
+    if ( !gridNames.empty() )
+    {
+        dataSource->setSelectedGridName( gridNames.front() );
+    }
+
+    dataSource->updateName();
+
+    m_sumoDataSources.push_back( dataSource );
+
+    uiCapability()->updateAllRequiredEditors();
+
+    return dataSource;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimSumoDataSource* RimCloudDataSourceCollection::findDataSource( const SumoCaseId& caseId, const QString& ensembleName ) const
+{
+    for ( auto dataSource : sumoDataSources() )
+    {
+        if ( dataSource->caseId() == caseId && dataSource->ensembleName() == ensembleName ) return dataSource;
+    }
+
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// The summary and grid ensembles that use the data source.
+//--------------------------------------------------------------------------------------------------
+std::vector<caf::PdmObject*> RimCloudDataSourceCollection::dependentEnsembles( const RimSumoDataSource* dataSource )
+{
+    std::vector<caf::PdmObject*> ensembles;
+    if ( !dataSource ) return ensembles;
+
+    for ( auto obj : dataSource->objectsWithReferringPtrFieldsOfType<RimSummaryEnsembleSumo>() )
+        ensembles.push_back( obj );
+    for ( auto obj : dataSource->objectsWithReferringPtrFieldsOfType<RimReservoirGridEnsembleSumo>() )
+        ensembles.push_back( obj );
+
+    return ensembles;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Deletes the data source together with the summary and grid ensembles that use it.
+//--------------------------------------------------------------------------------------------------
+void RimCloudDataSourceCollection::removeDataSource( RimSumoDataSource* dataSource )
+{
+    if ( !dataSource ) return;
+
+    const auto ensembles = dependentEnsembles( dataSource );
+
+    std::vector<caf::PdmObjectHandle*> toDelete;
+    for ( auto ensemble : ensembles )
+    {
+        caf::SelectionManager::instance()->removeObjectFromAllSelections( ensemble );
+
+        if ( auto summaryEnsemble = dynamic_cast<RimSummaryEnsembleSumo*>( ensemble ) )
+        {
+            if ( auto mainColl = summaryEnsemble->firstAncestorOrThisOfType<RimSummaryCaseMainCollection>() )
+            {
+                mainColl->removeEnsemble( summaryEnsemble );
+            }
+            summaryEnsemble->cleanupBeforeDelete();
+            toDelete.push_back( summaryEnsemble );
+        }
+        else if ( auto parentField = ensemble->parentField() )
+        {
+            parentField->removeChild( ensemble );
+            toDelete.push_back( ensemble );
+        }
+    }
+
+    caf::SelectionManager::instance()->removeObjectFromAllSelections( dataSource );
+    m_sumoDataSources.removeChild( dataSource );
+
+    // Update the tree while the detached objects are alive, then delete them
+    RiaSummaryTools::updateSummaryEnsembleNames();
+    if ( auto mainColl = RiaSummaryTools::summaryCaseMainCollection() ) mainColl->updateConnectedEditors();
+    updateConnectedEditors();
+
+    for ( auto obj : toDelete )
+        delete obj;
+    delete dataSource;
 }
 
 //--------------------------------------------------------------------------------------------------
