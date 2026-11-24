@@ -25,13 +25,13 @@
 #include "Cloud/RimCloudDataSourceCollection.h"
 #include "Cloud/RimSummaryEnsembleSumo.h"
 #include "Rim3dOverlayInfoConfig.h"
+#include "RimCurveStyleRule.h"
 #include "RimEclipseView.h"
 #include "RimEclipseViewCollection.h"
 #include "RimProject.h"
 #include "RimReservoirGridEnsembleSumo.h"
 #include "RimRoffCaseSumo.h"
 #include "RimSummaryEnsemble.h"
-#include "RiuGuiTheme.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmPointer.h"
@@ -326,9 +326,8 @@ std::vector<caf::PdmUiTreeViewItemTag> RimSumoDataSource::treeItemTags()
 
         if ( auto color = ensemble->customColor() )
         {
-            auto tag     = caf::PdmUiTreeViewItemTag::create( RiuGuiTheme::getColorByVariableName( "backgroundColor1" ),
-                                                          RiaColorTools::toQColor( *color ),
-                                                          "        " );
+            auto tag     = caf::PdmUiTreeViewItemTag::create();
+            tag.icon     = RimCurveStyleRule::swatchIcon( *color );
             tag.position = caf::PdmUiTreeViewItemTag::Position::AT_END;
             tag.toolTip  = "Ensemble color. Click to change";
             tag.clicked  = [ensemblePtr = caf::PdmPointer<RimSummaryEnsemble>( ensemble )]( size_t )

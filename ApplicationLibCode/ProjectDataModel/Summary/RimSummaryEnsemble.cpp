@@ -1153,9 +1153,8 @@ std::vector<caf::PdmUiTreeViewItemTag> RimSummaryEnsemble::treeItemTags()
 
     if ( auto color = customColor() )
     {
-        auto tag     = caf::PdmUiTreeViewItemTag::create( RiuGuiTheme::getColorByVariableName( "backgroundColor1" ),
-                                                      RiaColorTools::toQColor( *color ),
-                                                      "        " );
+        auto tag     = caf::PdmUiTreeViewItemTag::create();
+        tag.icon     = RimCurveStyleRule::swatchIcon( *color );
         tag.position = caf::PdmUiTreeViewItemTag::Position::AT_END;
         tag.toolTip  = "Ensemble color. Click to change";
         tag.clicked  = [this]( size_t ) { editCustomColor(); };
