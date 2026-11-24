@@ -29,6 +29,10 @@
 #include <QString>
 
 class RimSumoDataSource;
+namespace caf
+{
+class CmdFeatureMenuBuilder;
+}
 
 //==================================================================================================
 ///
@@ -56,6 +60,17 @@ public:
     // Deletes the data source and the ensembles that use it.
     void removeDataSource( RimSumoDataSource* dataSource );
 
+    // Gives the data source a name of its own, empty for the generated one, and updates what shows it.
+    void renameDataSource( RimSumoDataSource* dataSource, const QString& name );
+
+    // Opens the ensemble selection dialog and applies what is picked. Returns true if it was applied.
+    bool selectEnsemblesInDialog();
+
+    RiaSumoConnector* sumoConnector() const;
+
+    // Opens the dialog listing the data sources, for adding, renaming and removing them.
+    void manageEnsemblesInDialog();
+
     // What Sumo answered, shared with the selection dialog
     RiaSumoExploreCache& exploreCache();
 
@@ -72,10 +87,10 @@ private:
 
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void                          defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
+    void                          appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
 
     std::vector<RimSumoDataSource*> addDataSources();
     void                            addEnsembles();
-    void                            selectEnsemblesInDialog();
 
     static bool isCloudApiServerAvailable();
 

@@ -158,6 +158,23 @@ void RimSumoDataSource::setEnsembleName( const QString& ensembleName )
 }
 
 //--------------------------------------------------------------------------------------------------
+/// An empty name goes back to the generated one.
+//--------------------------------------------------------------------------------------------------
+void RimSumoDataSource::setCustomName( const QString& customName )
+{
+    m_customName = customName;
+    updateName();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimSumoDataSource::customName() const
+{
+    return m_customName();
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 std::vector<QString> RimSumoDataSource::availableRealizationIds() const

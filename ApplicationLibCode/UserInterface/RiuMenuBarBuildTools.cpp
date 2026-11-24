@@ -166,6 +166,7 @@ void RiuMenuBarBuildTools::addImportMenuForPlotWindow( QObject* parent, QMenu* m
 
     importMenu->addAction( cmdFeatureMgr->action( "RicImportSummaryCaseFeature" ) );
     importMenu->addAction( cmdFeatureMgr->action( "RicImportGridAndSummaryEnsembleFeature" ) );
+    importMenu->addAction( cmdFeatureMgr->action( "RicSumoEnsembleManagementFeature" ) );
     QMenu* importSummaryMenu = importMenu->addMenu( QIcon( ":/import.svg" ), "More" );
     importSummaryMenu->addAction( cmdFeatureMgr->action( "RicImportRevealSummaryCaseFeature" ) );
     importSummaryMenu->addAction( cmdFeatureMgr->action( "RicImportStimPlanSummaryCaseFeature" ) );

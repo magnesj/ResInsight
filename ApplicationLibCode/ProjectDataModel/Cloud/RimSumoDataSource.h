@@ -53,6 +53,9 @@ public:
     QString ensembleName() const;
     void    setEnsembleName( const QString& ensembleName );
 
+    QString customName() const;
+    void    setCustomName( const QString& customName );
+
     // All realizations available for the ensemble (the source of truth).
     std::vector<QString> availableRealizationIds() const;
     void                 setAvailableRealizationIds( const std::vector<QString>& realizationIds );

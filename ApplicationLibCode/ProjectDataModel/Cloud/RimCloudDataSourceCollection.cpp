@@ -34,7 +34,10 @@
 
 #include "RiuPlotMainWindow.h"
 #include "RiuPlotMainWindowTools.h"
+#include "RiuSumoEnsembleManagementDialog.h"
 #include "RiuSumoEnsembleSelectionDialog.h"
+
+#include "cafCmdFeatureMenuBuilder.h"
 
 #include "cafPdmUiButton.h"
 #include "cafPdmUiPropertyViewDialog.h"
@@ -410,19 +413,9 @@ void RimCloudDataSourceCollection::defineUiOrdering( QString uiConfigName, caf::
     // Cloud selector. Both a token and a running service are required to browse the Sumo content.
     if ( isGranted && isCloudApiServerAvailable() )
     {
-        caf::PdmUiOrdering::LayoutOptions layout = { .newRow = true, .totalColumnSpan = 3, .leftLabelColumnSpan = 1 };
-        uiOrdering.add( &m_sumoFieldName, layout );
-        uiOrdering.add( &m_sumoCaseId, layout );
-        uiOrdering.add( &m_sumoEnsembleNames, layout );
-
-        auto* selectButton = uiOrdering.addNewButton( "Select Ensembles...", [this]() { selectEnsemblesInDialog(); } );
-        selectButton->setUiToolTip( "Pick ensembles from several cases in a table" );
-
-        auto* addDataSourcesButton = uiOrdering.addNewButton( "Add Data Sources(s)", [this]() { addDataSources(); } );
-        addDataSourcesButton->setUiToolTip( "Add Data Sources without Ensembles" );
-
-        auto* addEnsemblesButton = uiOrdering.addNewButton( "Add Ensemble(s)", [this]() { addEnsembles(); } );
-        addEnsemblesButton->setUiToolTip( "Add Data Sources and Create Summary Ensemble Plots" );
+        // The three selection fields are kept in the project file for one release, but are no longer shown.
+        auto* manageButton = uiOrdering.addNewButton( "Manage Ensembles...", [this]() { manageEnsemblesInDialog(); } );
+        manageButton->setUiToolTip( "Add, rename and remove SUMO ensembles" );
     }
 
     uiOrdering.skipRemainingFields();
@@ -582,9 +575,9 @@ void RimCloudDataSourceCollection::removeDataSource( RimSumoDataSource* dataSour
 /// Open the selection dialog. Ensembles unchecked in it are removed from the project together with what
 /// uses them, and newly checked ones are added with a summary ensemble.
 //--------------------------------------------------------------------------------------------------
-void RimCloudDataSourceCollection::selectEnsemblesInDialog()
+bool RimCloudDataSourceCollection::selectEnsemblesInDialog()
 {
-    if ( !m_sumoConnector ) return;
+    if ( !m_sumoConnector ) return false;
 
     std::set<RiuSumoCaseTableModel::CaseEnsemble> existing;
     for ( auto dataSource : sumoDataSources() )
@@ -593,7 +586,7 @@ void RimCloudDataSourceCollection::selectEnsemblesInDialog()
     }
 
     RiuSumoEnsembleSelectionDialog dialog( *m_sumoConnector, m_exploreCache, existing, RiuPlotMainWindow::instance() );
-    if ( dialog.exec() != QDialog::Accepted ) return;
+    if ( dialog.exec() != QDialog::Accepted ) return false;
 
     const auto toRemove = dialog.entriesToRemove();
     const auto toAdd    = dialog.entriesToAdd();
@@ -606,7 +599,7 @@ void RimCloudDataSourceCollection::selectEnsemblesInDialog()
             text += QString( "\n%1 / %2" ).arg( entry.caseName.isEmpty() ? entry.caseId : entry.caseName ).arg( entry.ensembleName );
         }
 
-        if ( QMessageBox::question( RiuPlotMainWindow::instance(), "Remove Ensembles", text ) != QMessageBox::Yes ) return;
+        if ( QMessageBox::question( RiuPlotMainWindow::instance(), "Remove Ensembles", text ) != QMessageBox::Yes ) return false;
 
         for ( const auto& entry : toRemove )
         {
@@ -624,6 +617,47 @@ void RimCloudDataSourceCollection::selectEnsemblesInDialog()
     }
 
     createEnsemblesFromSelectedDataSources( added );
+
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCloudDataSourceCollection::renameDataSource( RimSumoDataSource* dataSource, const QString& name )
+{
+    if ( !dataSource ) return;
+
+    dataSource->setCustomName( name );
+
+    RiaSummaryTools::updateSummaryEnsembleNames();
+    if ( auto mainColl = RiaSummaryTools::summaryCaseMainCollection() ) mainColl->updateConnectedEditors();
+    updateConnectedEditors();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaSumoConnector* RimCloudDataSourceCollection::sumoConnector() const
+{
+    return m_sumoConnector;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCloudDataSourceCollection::manageEnsemblesInDialog()
+{
+    RiuSumoEnsembleManagementDialog dialog( this, RiuPlotMainWindow::instance() );
+    dialog.exec();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCloudDataSourceCollection::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
+{
+    menuBuilder.addCmdFeature( "RicSumoEnsembleManagementFeature" );
 }
 
 //--------------------------------------------------------------------------------------------------
