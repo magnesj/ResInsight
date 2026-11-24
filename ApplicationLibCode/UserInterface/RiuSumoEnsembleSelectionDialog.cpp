@@ -26,6 +26,7 @@
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QEvent>
+#include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QItemSelectionModel>
@@ -35,6 +36,7 @@
 #include <QMenu>
 #include <QPointer>
 #include <QPushButton>
+#include <QScreen>
 #include <QScrollBar>
 #include <QTableView>
 #include <QToolButton>
@@ -56,12 +58,14 @@ RiuSumoEnsembleSelectionDialog::RiuSumoEnsembleSelectionDialog( RiaSumoConnector
     , m_updatingList( false )
 {
     setWindowTitle( "Select Sumo Ensembles" );
-    resize( 1000, 600 );
+    const auto* screen = parent ? parent->screen() : QGuiApplication::primaryScreen();
+    const int   width  = screen ? static_cast<int>( screen->availableGeometry().width() * 0.8 ) : 1000;
+    resize( width, 600 );
 
     m_model.setExistingEnsembles( existing );
     m_proxy.setSourceModel( &m_model );
 
-    m_assetCombo      = new QComboBox;
+    m_assetCombo = new QComboBox;
     m_assetCombo->setMinimumWidth( 220 );
     m_assetCombo->setSizeAdjustPolicy( QComboBox::AdjustToContents );
     m_myCasesCheckBox = new QCheckBox( "Only my cases" );
