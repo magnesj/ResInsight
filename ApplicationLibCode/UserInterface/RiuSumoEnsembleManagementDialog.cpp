@@ -20,7 +20,11 @@
 
 #include "Cloud/RimCloudDataSourceCollection.h"
 #include "Cloud/RimSumoDataSource.h"
+#include "RimSummaryEnsemble.h"
 
+#include "RiaColorTools.h"
+
+#include <QColorDialog>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -32,8 +36,23 @@
 
 namespace
 {
+//--------------------------------------------------------------------------------------------------
+/// The summary ensemble made from the data source, if there is one
+//--------------------------------------------------------------------------------------------------
+RimSummaryEnsemble* summaryEnsembleFor( const RimSumoDataSource* dataSource )
+{
+    if ( !dataSource ) return nullptr;
+
+    for ( auto* obj : RimCloudDataSourceCollection::dependentEnsembles( dataSource ) )
+    {
+        if ( auto* ensemble = dynamic_cast<RimSummaryEnsemble*>( obj ) ) return ensemble;
+    }
+    return nullptr;
+}
+
 enum Column
 {
+    ColColor,
     ColName,
     ColAsset,
     ColCase,
@@ -56,11 +75,12 @@ RiuSumoEnsembleManagementDialog::RiuSumoEnsembleManagementDialog( RimCloudDataSo
     auto* layout = new QVBoxLayout( this );
 
     m_table = new QTableWidget( 0, ColCount, this );
-    m_table->setHorizontalHeaderLabels( { "Name", "Asset", "Case", "Ensemble", "Realizations" } );
+    m_table->setHorizontalHeaderLabels( { "Color", "Name", "Asset", "Case", "Ensemble", "Realizations" } );
     m_table->setSelectionBehavior( QAbstractItemView::SelectRows );
     m_table->setSelectionMode( QAbstractItemView::ExtendedSelection );
     m_table->horizontalHeader()->setStretchLastSection( true );
     m_table->horizontalHeader()->setSectionResizeMode( ColName, QHeaderView::Stretch );
+    m_table->setColumnWidth( ColColor, 60 );
     layout->addWidget( m_table );
 
     auto* buttonRow = new QHBoxLayout();
@@ -78,6 +98,7 @@ RiuSumoEnsembleManagementDialog::RiuSumoEnsembleManagementDialog( RimCloudDataSo
     connect( m_removeButton, &QPushButton::clicked, this, &RiuSumoEnsembleManagementDialog::onRemoveClicked );
     connect( buttons, &QDialogButtonBox::rejected, this, &QDialog::reject );
     connect( m_table, &QTableWidget::itemChanged, this, &RiuSumoEnsembleManagementDialog::onItemChanged );
+    connect( m_table, &QTableWidget::cellDoubleClicked, this, &RiuSumoEnsembleManagementDialog::onCellDoubleClicked );
 
     populate();
 }
@@ -106,6 +127,15 @@ void RiuSumoEnsembleManagementDialog::populate()
             item->setFlags( item->flags() & ~Qt::ItemIsEditable );
             m_table->setItem( row, column, item );
         };
+
+        auto* colorItem = new QTableWidgetItem();
+        colorItem->setFlags( colorItem->flags() & ~Qt::ItemIsEditable );
+        colorItem->setToolTip( "Double-click to change the color" );
+        if ( auto ensemble = summaryEnsembleFor( ds ); ensemble && ensemble->customColor() )
+        {
+            colorItem->setBackground( RiaColorTools::toQColor( *ensemble->customColor() ) );
+        }
+        m_table->setItem( row, ColColor, colorItem );
 
         addReadOnly( ColAsset, ds->assetName() );
         addReadOnly( ColCase, ds->caseName() );
@@ -170,6 +200,26 @@ void RiuSumoEnsembleManagementDialog::onRemoveClicked()
     {
         m_collection->removeDataSource( ds );
     }
+    populate();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuSumoEnsembleManagementDialog::onCellDoubleClicked( int row, int column )
+{
+    if ( column != ColColor ) return;
+
+    auto* ds       = dataSourceForRow( row );
+    auto* ensemble = summaryEnsembleFor( ds );
+    if ( !ensemble ) return;
+
+    const QColor initial = ensemble->customColor() ? RiaColorTools::toQColor( *ensemble->customColor() ) : Qt::gray;
+    const QColor chosen  = QColorDialog::getColor( initial, this, "Ensemble Color" );
+    if ( !chosen.isValid() ) return;
+
+    ensemble->setCustomColor( RiaColorTools::fromQColorTo3f( chosen ) );
+    ensemble->updateConnectedEditors();
     populate();
 }
 

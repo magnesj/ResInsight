@@ -884,6 +884,11 @@ void RimEnsembleCurveSet::setSummaryEnsemble( RimSummaryEnsemble* sumCaseCollect
 {
     m_yValuesSummaryEnsemble = sumCaseCollection;
     m_xAddressSelector->setEnsemble( sumCaseCollection );
+
+    if ( sumCaseCollection )
+    {
+        if ( auto color = sumCaseCollection->customColor() ) setColor( *color );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------

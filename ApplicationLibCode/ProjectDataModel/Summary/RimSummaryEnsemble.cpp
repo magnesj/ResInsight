@@ -18,6 +18,7 @@
 
 #include "RimSummaryEnsemble.h"
 
+#include "RiaColorTools.h"
 #include "RiaEnsembleNameTools.h"
 #include "RiaFieldHandleTools.h"
 #include "RiaFilePathTools.h"
@@ -105,6 +106,9 @@ RimSummaryEnsemble::RimSummaryEnsemble()
     m_ensembleId.uiCapability()->setUiReadOnly( true );
     m_ensembleId.capability<caf::PdmAbstractFieldScriptingCapability>()->setIOWriteable( false );
 
+    CAF_PDM_InitField( &m_color, "EnsembleColor", RiaColorTools::textColor3f(), "Color" );
+    CAF_PDM_InitField( &m_hasCustomColor, "HasCustomColor", false, "Has Custom Color" );
+    m_hasCustomColor.uiCapability()->setUiHidden( true );
     CAF_PDM_InitFieldNoDefault( &m_dataVectorFolders, "DataVectorFolders", "Data Folders" );
     m_dataVectorFolders = new RimSummaryAddressCollection();
     m_dataVectorFolders.uiCapability()->setUiHidden( true );
@@ -996,6 +1000,33 @@ void RimSummaryEnsemble::fieldChangedByUi( const caf::PdmFieldHandle* changedFie
     {
         RiaSummaryTools::updateSummaryEnsembleNames();
     }
+    if ( changedField == &m_color )
+    {
+        setCustomColor( m_color() );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::optional<cvf::Color3f> RimSummaryEnsemble::customColor() const
+{
+    if ( !m_hasCustomColor() ) return std::nullopt;
+    return m_color();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryEnsemble::setCustomColor( const cvf::Color3f& color )
+{
+    m_color          = color;
+    m_hasCustomColor = true;
+
+    for ( auto curveSet : objectsWithReferringPtrFieldsOfType<RimEnsembleCurveSet>() )
+    {
+        if ( curveSet->summaryEnsemble() == this ) curveSet->setColorAndUpdateCurves( color );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1060,6 +1091,7 @@ void RimSummaryEnsemble::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
     m_name.uiCapability()->setUiReadOnly( true );
 
     if ( m_isEnsemble() ) uiOrdering.add( &m_ensembleId );
+    if ( m_isEnsemble() ) uiOrdering.add( &m_color );
 
     uiOrdering.add( &m_ensembleDescription );
 

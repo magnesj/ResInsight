@@ -40,6 +40,7 @@ private slots:
     void onAddClicked();
     void onRemoveClicked();
     void onItemChanged( QTableWidgetItem* item );
+    void onCellDoubleClicked( int row, int column );
 
 private:
     void               populate();
