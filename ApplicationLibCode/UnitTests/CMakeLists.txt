@@ -19,6 +19,7 @@ set(SOURCE_UNITTEST_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseContourMapProjection-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifcCommandCore-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaGrpcFieldSerialization-Test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RiaSumoExplore-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifEclipseInputFileTools-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifEclipseOutputFileTools-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifOpmFlowDeckFile-Test.cpp

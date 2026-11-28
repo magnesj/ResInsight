@@ -86,6 +86,11 @@ public:
     // Composing the full URL at the call site would capture the address before the service has one.
     QByteArray getBlocking( const QString& path, const QString& progressText = {} );
 
+    // The same request without waiting. onFinished is called exactly once, on the connector thread, with the
+    // body, which is empty when the request failed or was cancelled. Pass a cancelGroup to abort it early with
+    // cancelGroup(), in which case onFinished is still called.
+    void getAsync( const QString& path, const std::function<void( const QByteArray& )>& onFinished, const void* cancelGroup = nullptr );
+
     // The base URL of the local cloud API service, empty when it could not be made ready. May block while
     // the service starts, so call it from the calling thread and not from the transfer thread.
     QString serviceBaseUrl();

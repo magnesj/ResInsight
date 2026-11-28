@@ -22,6 +22,7 @@
 #include "Cloud/RiaSumoConnector.h"
 
 #include "cafPdmProxyValueField.h"
+#include "cafPdmUiTreeAttributes.h"
 
 //==================================================================================================
 //
@@ -52,6 +53,9 @@ public:
 
     QString ensembleName() const;
     void    setEnsembleName( const QString& ensembleName );
+
+    QString customName() const;
+    void    setCustomName( const QString& customName );
 
     // All realizations available for the ensemble (the source of truth).
     std::vector<QString> availableRealizationIds() const;
@@ -84,9 +88,10 @@ public:
     void updateName();
 
 private:
-    void                          appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
-    void                          defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
-    QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
+    void                                   appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
+    std::vector<caf::PdmUiTreeViewItemTag> treeItemTags() override;
+    void                                   defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
+    QList<caf::PdmOptionItemInfo>          calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
 
     void onRealizationFilterChanged();

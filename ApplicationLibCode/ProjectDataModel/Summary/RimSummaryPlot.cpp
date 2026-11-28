@@ -1235,6 +1235,15 @@ void RimSummaryPlot::applyDefaultCurveAppearances( std::vector<RimEnsembleCurveS
         {
             if ( RimEnsembleCurveSetColorManager::hasSameColorForAllRealizationCurves( curveSet->colorMode() ) )
             {
+                if ( curveSet->summaryEnsemble() )
+                {
+                    if ( auto ensembleColor = curveSet->summaryEnsemble()->customColor() )
+                    {
+                        curveSet->setColorAndUpdateCurves( *ensembleColor );
+                        continue;
+                    }
+                }
+
                 if ( globalColorIndexer )
                 {
                     const auto caseName = curveSet->summaryEnsemble() ? curveSet->summaryEnsemble()->name().toStdString() : std::string();

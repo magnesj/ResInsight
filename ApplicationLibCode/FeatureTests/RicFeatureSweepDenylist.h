@@ -59,6 +59,7 @@ inline const std::map<std::string, std::string>& featureSweepDenylist()
         { "RicHoloLensTerminateSessionFeature", "acts on a live network session" },
         { "RicDeleteOsduTokenFeature", "modifies stored OSDU credentials" },
         { "RicDeleteSumoTokenFeature", "modifies stored Sumo credentials" },
+        { "RicSumoEnsembleManagementFeature", "opens a modal dialog that talks to Sumo" },
 
         // Recursive test / regression machinery
         { "RicLaunchRegressionTestsFeature", "recursively runs the regression-test suite" },

@@ -18,16 +18,20 @@
 
 #include "RimSumoDataSource.h"
 
+#include "RiaColorTools.h"
 #include "RiaLogging.h"
 #include "RiaStdStringTools.h"
 
+#include "Cloud/RimCloudDataSourceCollection.h"
 #include "Cloud/RimSummaryEnsembleSumo.h"
 #include "Rim3dOverlayInfoConfig.h"
+#include "RimCurveStyleRule.h"
 #include "RimEclipseView.h"
 #include "RimEclipseViewCollection.h"
 #include "RimProject.h"
 #include "RimReservoirGridEnsembleSumo.h"
 #include "RimRoffCaseSumo.h"
+#include "RimSummaryEnsemble.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmPointer.h"
@@ -155,6 +159,23 @@ QString RimSumoDataSource::ensembleName() const
 void RimSumoDataSource::setEnsembleName( const QString& ensembleName )
 {
     m_ensembleName = ensembleName;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// An empty name goes back to the generated one.
+//--------------------------------------------------------------------------------------------------
+void RimSumoDataSource::setCustomName( const QString& customName )
+{
+    m_customName = customName;
+    updateName();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimSumoDataSource::customName() const
+{
+    return m_customName();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -289,6 +310,35 @@ void RimSumoDataSource::updateName()
     auto name = QString( "%1 (%2)" ).arg( ensembleName(), caseName() );
 
     setName( name );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Shows the color of the summary ensemble made from this data source, if it has one
+//--------------------------------------------------------------------------------------------------
+std::vector<caf::PdmUiTreeViewItemTag> RimSumoDataSource::treeItemTags()
+{
+    std::vector<caf::PdmUiTreeViewItemTag> tags;
+
+    for ( auto* obj : RimCloudDataSourceCollection::dependentEnsembles( this ) )
+    {
+        auto* ensemble = dynamic_cast<RimSummaryEnsemble*>( obj );
+        if ( !ensemble ) continue;
+
+        if ( auto color = ensemble->customColor() )
+        {
+            auto tag     = caf::PdmUiTreeViewItemTag::create();
+            tag.icon     = RimCurveStyleRule::swatchIcon( *color );
+            tag.position = caf::PdmUiTreeViewItemTag::Position::AT_END;
+            tag.toolTip  = "Ensemble color. Click to change";
+            tag.clicked  = [ensemblePtr = caf::PdmPointer<RimSummaryEnsemble>( ensemble )]( size_t )
+            {
+                if ( ensemblePtr ) ensemblePtr->editCustomColor();
+            };
+            tags.push_back( tag );
+        }
+    }
+
+    return tags;
 }
 
 //--------------------------------------------------------------------------------------------------

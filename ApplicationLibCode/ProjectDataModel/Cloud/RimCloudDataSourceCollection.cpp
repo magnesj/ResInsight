@@ -22,23 +22,32 @@
 
 #include "Cloud/RiaCloudApiService.h"
 #include "RiaApplication.h"
+#include "RiaColorTables.h"
 #include "Summary/RiaSummaryPlotTools.h"
 #include "Summary/RiaSummaryTools.h"
 
 #include "Cloud/RimSummaryEnsembleSumo.h"
 #include "RimOilField.h"
 #include "RimProject.h"
+#include "RimReservoirGridEnsembleSumo.h"
 #include "RimSummaryCaseMainCollection.h"
 #include "RimSumoDataSource.h"
 
+#include "RiuPlotMainWindow.h"
 #include "RiuPlotMainWindowTools.h"
+#include "RiuSumoEnsembleManagementDialog.h"
+#include "RiuSumoEnsembleSelectionDialog.h"
+
+#include "cafCmdFeatureMenuBuilder.h"
 
 #include "cafPdmUiButton.h"
 #include "cafPdmUiPropertyViewDialog.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafSelectionManager.h"
 
 #include <QDialogButtonBox>
+#include <QMessageBox>
 
 #include <set>
 
@@ -158,6 +167,15 @@ void RimCloudDataSourceCollection::createEnsemblesFromSelectedDataSources( const
         RimSummaryEnsembleSumo* ensemble = new RimSummaryEnsembleSumo();
         ensemble->setUsePathKey1( true );
         ensemble->setSumoDataSource( dataSource );
+
+        // Pick the next color in the category palette, based on the ensembles that already have a color
+        size_t coloredCount = 0;
+        for ( auto existing : sumCaseMainColl->summaryEnsembles() )
+        {
+            if ( existing->customColor().has_value() ) coloredCount++;
+        }
+        ensemble->setCustomColor( RiaColorTables::categoryPaletteColors().cycledColor3f( coloredCount ) );
+
         sumCaseMainColl->addEnsemble( ensemble );
         ensemble->loadDataAndUpdate();
 
@@ -252,12 +270,15 @@ QList<caf::PdmOptionItemInfo> RimCloudDataSourceCollection::calculateValueOption
 //--------------------------------------------------------------------------------------------------
 const std::vector<SumoAsset>& RimCloudDataSourceCollection::cachedAssets()
 {
-    if ( m_assets.empty() && m_sumoConnector )
+    if ( !m_exploreCache.assets() && m_sumoConnector )
     {
-        m_assets = m_sumoConnector->explore().assets();
+        // An empty answer is not stored, it cannot be told from a failed request
+        if ( auto assets = m_sumoConnector->explore().assets(); !assets.empty() ) m_exploreCache.setAssets( assets );
     }
 
-    return m_assets;
+    static const std::vector<SumoAsset> empty;
+    auto                                cached = m_exploreCache.assets();
+    return cached ? *cached : empty;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -265,13 +286,14 @@ const std::vector<SumoAsset>& RimCloudDataSourceCollection::cachedAssets()
 //--------------------------------------------------------------------------------------------------
 const std::vector<SumoCase>& RimCloudDataSourceCollection::cachedCases( const QString& assetName )
 {
-    if ( m_casesAssetName != assetName && m_sumoConnector )
+    if ( !m_exploreCache.cases( assetName ) && m_sumoConnector )
     {
-        m_cases          = m_sumoConnector->explore().cases( assetName );
-        m_casesAssetName = assetName;
+        m_exploreCache.setCases( assetName, m_sumoConnector->explore().cases( assetName ) );
     }
 
-    return m_cases;
+    static const std::vector<SumoCase> empty;
+    auto                               cached = m_exploreCache.cases( assetName );
+    return cached ? *cached : empty;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -279,23 +301,30 @@ const std::vector<SumoCase>& RimCloudDataSourceCollection::cachedCases( const QS
 //--------------------------------------------------------------------------------------------------
 const std::vector<QString>& RimCloudDataSourceCollection::cachedEnsembleNames( const SumoCaseId& caseId )
 {
-    if ( m_ensembleNamesCaseId != caseId.get() && m_sumoConnector )
+    if ( !m_exploreCache.ensembleNames( caseId.get() ) && m_sumoConnector )
     {
-        m_ensembleNames       = m_sumoConnector->explore().ensembleNames( caseId );
-        m_ensembleNamesCaseId = caseId.get();
+        m_exploreCache.setEnsembleNames( caseId.get(), m_sumoConnector->explore().ensembleNames( caseId ) );
     }
 
-    return m_ensembleNames;
+    static const std::vector<QString> empty;
+    auto                              cached = m_exploreCache.ensembleNames( caseId.get() );
+    return cached ? *cached : empty;
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Forget the cases Sumo answered with, so the next request for them asks again. Called when the asset they
-/// belong to is left behind.
+///
+//--------------------------------------------------------------------------------------------------
+RiaSumoExploreCache& RimCloudDataSourceCollection::exploreCache()
+{
+    return m_exploreCache;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Forget the cases Sumo answered with, so the next request for them asks again.
 //--------------------------------------------------------------------------------------------------
 void RimCloudDataSourceCollection::clearCachedCases()
 {
-    m_casesAssetName.clear();
-    m_cases.clear();
+    m_exploreCache.clearCases();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -303,8 +332,7 @@ void RimCloudDataSourceCollection::clearCachedCases()
 //--------------------------------------------------------------------------------------------------
 void RimCloudDataSourceCollection::clearCachedEnsembleNames()
 {
-    m_ensembleNamesCaseId.clear();
-    m_ensembleNames.clear();
+    m_exploreCache.clearEnsembleNames();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -395,16 +423,9 @@ void RimCloudDataSourceCollection::defineUiOrdering( QString uiConfigName, caf::
     // Cloud selector. Both a token and a running service are required to browse the Sumo content.
     if ( isGranted && isCloudApiServerAvailable() )
     {
-        caf::PdmUiOrdering::LayoutOptions layout = { .newRow = true, .totalColumnSpan = 3, .leftLabelColumnSpan = 1 };
-        uiOrdering.add( &m_sumoFieldName, layout );
-        uiOrdering.add( &m_sumoCaseId, layout );
-        uiOrdering.add( &m_sumoEnsembleNames, layout );
-
-        auto* addDataSourcesButton = uiOrdering.addNewButton( "Add Data Sources(s)", [this]() { addDataSources(); } );
-        addDataSourcesButton->setUiToolTip( "Add Data Sources without Ensembles" );
-
-        auto* addEnsemblesButton = uiOrdering.addNewButton( "Add Ensemble(s)", [this]() { addEnsembles(); } );
-        addEnsemblesButton->setUiToolTip( "Add Data Sources and Create Summary Ensemble Plots" );
+        // The three selection fields are kept in the project file for one release, but are no longer shown.
+        auto* manageButton = uiOrdering.addNewButton( "Manage Ensembles...", [this]() { manageEnsemblesInDialog(); } );
+        manageButton->setUiToolTip( "Add, rename and remove SUMO ensembles" );
     }
 
     uiOrdering.skipRemainingFields();
@@ -419,71 +440,234 @@ std::vector<RimSumoDataSource*> RimCloudDataSourceCollection::addDataSources()
 
     std::vector<RimSumoDataSource*> dataSources;
 
-    RimSumoDataSource* objectToSelect = nullptr;
-    auto               sumoCaseId     = SumoCaseId( m_sumoCaseId );
+    const auto sumoCaseId = SumoCaseId( m_sumoCaseId );
+
+    QString caseName;
+    for ( const auto& sumoCase : cachedCases( m_sumoFieldName ) )
+    {
+        if ( sumoCase.caseId == sumoCaseId )
+        {
+            caseName = sumoCase.name;
+            break;
+        }
+    }
 
     for ( const auto& ensembleName : m_sumoEnsembleNames() )
     {
-        bool createNewDataSource = true;
-        for ( const auto dataSource : sumoDataSources() )
+        if ( auto dataSource = addDataSource( m_sumoFieldName, sumoCaseId, caseName, ensembleName ) )
         {
-            if ( dataSource->caseId() == sumoCaseId && dataSource->ensembleName() == ensembleName )
-            {
-                createNewDataSource = false;
-                break;
-            }
+            dataSources.push_back( dataSource );
         }
-
-        if ( !createNewDataSource )
-        {
-            continue;
-        }
-
-        QString caseName;
-        for ( const auto& sumoCase : cachedCases( m_sumoFieldName ) )
-        {
-            if ( sumoCase.caseId == sumoCaseId )
-            {
-                caseName = sumoCase.name;
-                break;
-            }
-        }
-
-        const auto availableRealizationIds = m_sumoConnector->explore().realizationIds( sumoCaseId, ensembleName );
-        const auto gridNames               = m_sumoConnector->grid().gridNames( sumoCaseId, ensembleName );
-        const auto vectorNames             = m_sumoConnector->summary().vectorNames( sumoCaseId, ensembleName );
-
-        auto dataSource = new RimSumoDataSource();
-        dataSource->setCaseId( sumoCaseId );
-        dataSource->setAssetName( m_sumoFieldName );
-        dataSource->setCaseName( caseName );
-        dataSource->setEnsembleName( ensembleName );
-        dataSource->setAvailableRealizationIds( availableRealizationIds );
-        dataSource->setVectorNames( vectorNames );
-        dataSource->setGridNames( gridNames );
-
-        if ( !gridNames.empty() )
-        {
-            dataSource->setSelectedGridName( gridNames.front() );
-        }
-
-        dataSource->updateName();
-
-        objectToSelect = dataSource;
-
-        m_sumoDataSources.push_back( dataSource );
-        dataSources.push_back( dataSource );
     }
 
-    uiCapability()->updateAllRequiredEditors();
-
-    if ( objectToSelect )
+    if ( !dataSources.empty() )
     {
-        RiuPlotMainWindowTools::setExpanded( objectToSelect );
-        RiuPlotMainWindowTools::selectAsCurrentItem( objectToSelect );
+        RiuPlotMainWindowTools::setExpanded( dataSources.back() );
+        RiuPlotMainWindowTools::selectAsCurrentItem( dataSources.back() );
     }
 
     return dataSources;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Creates a data source for the ensemble and fetches what it needs from Sumo. Returns nullptr if the
+/// ensemble already has a data source, or if there is no connection.
+//--------------------------------------------------------------------------------------------------
+RimSumoDataSource* RimCloudDataSourceCollection::addDataSource( const QString&    assetName,
+                                                                const SumoCaseId& caseId,
+                                                                const QString&    caseName,
+                                                                const QString&    ensembleName )
+{
+    if ( !m_sumoConnector ) return nullptr;
+
+    if ( findDataSource( caseId, ensembleName ) ) return nullptr;
+
+    const auto availableRealizationIds = m_sumoConnector->explore().realizationIds( caseId, ensembleName );
+    const auto gridNames               = m_sumoConnector->grid().gridNames( caseId, ensembleName );
+    const auto vectorNames             = m_sumoConnector->summary().vectorNames( caseId, ensembleName );
+
+    auto dataSource = new RimSumoDataSource();
+    dataSource->setCaseId( caseId );
+    dataSource->setAssetName( assetName );
+    dataSource->setCaseName( caseName );
+    dataSource->setEnsembleName( ensembleName );
+    dataSource->setAvailableRealizationIds( availableRealizationIds );
+    dataSource->setVectorNames( vectorNames );
+    dataSource->setGridNames( gridNames );
+
+    if ( !gridNames.empty() )
+    {
+        dataSource->setSelectedGridName( gridNames.front() );
+    }
+
+    dataSource->updateName();
+
+    m_sumoDataSources.push_back( dataSource );
+
+    uiCapability()->updateAllRequiredEditors();
+
+    return dataSource;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimSumoDataSource* RimCloudDataSourceCollection::findDataSource( const SumoCaseId& caseId, const QString& ensembleName ) const
+{
+    for ( auto dataSource : sumoDataSources() )
+    {
+        if ( dataSource->caseId() == caseId && dataSource->ensembleName() == ensembleName ) return dataSource;
+    }
+
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// The summary and grid ensembles that use the data source.
+//--------------------------------------------------------------------------------------------------
+std::vector<caf::PdmObject*> RimCloudDataSourceCollection::dependentEnsembles( const RimSumoDataSource* dataSource )
+{
+    std::vector<caf::PdmObject*> ensembles;
+    if ( !dataSource ) return ensembles;
+
+    for ( auto obj : dataSource->objectsWithReferringPtrFieldsOfType<RimSummaryEnsembleSumo>() )
+        ensembles.push_back( obj );
+    for ( auto obj : dataSource->objectsWithReferringPtrFieldsOfType<RimReservoirGridEnsembleSumo>() )
+        ensembles.push_back( obj );
+
+    return ensembles;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Deletes the data source together with the summary and grid ensembles that use it.
+//--------------------------------------------------------------------------------------------------
+void RimCloudDataSourceCollection::removeDataSource( RimSumoDataSource* dataSource )
+{
+    if ( !dataSource ) return;
+
+    const auto ensembles = dependentEnsembles( dataSource );
+
+    std::vector<caf::PdmObjectHandle*> toDelete;
+    for ( auto ensemble : ensembles )
+    {
+        caf::SelectionManager::instance()->removeObjectFromAllSelections( ensemble );
+
+        if ( auto summaryEnsemble = dynamic_cast<RimSummaryEnsembleSumo*>( ensemble ) )
+        {
+            if ( auto mainColl = summaryEnsemble->firstAncestorOrThisOfType<RimSummaryCaseMainCollection>() )
+            {
+                mainColl->removeEnsemble( summaryEnsemble );
+            }
+            summaryEnsemble->cleanupBeforeDelete();
+            toDelete.push_back( summaryEnsemble );
+        }
+        else if ( auto parentField = ensemble->parentField() )
+        {
+            parentField->removeChild( ensemble );
+            toDelete.push_back( ensemble );
+        }
+    }
+
+    caf::SelectionManager::instance()->removeObjectFromAllSelections( dataSource );
+    m_sumoDataSources.removeChild( dataSource );
+
+    // Update the tree while the detached objects are alive, then delete them
+    RiaSummaryTools::updateSummaryEnsembleNames();
+    if ( auto mainColl = RiaSummaryTools::summaryCaseMainCollection() ) mainColl->updateConnectedEditors();
+    updateConnectedEditors();
+
+    for ( auto obj : toDelete )
+        delete obj;
+    delete dataSource;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Open the selection dialog. Ensembles unchecked in it are removed from the project together with what
+/// uses them, and newly checked ones are added with a summary ensemble.
+//--------------------------------------------------------------------------------------------------
+bool RimCloudDataSourceCollection::selectEnsemblesInDialog()
+{
+    if ( !m_sumoConnector ) return false;
+
+    std::set<RiuSumoCaseTableModel::CaseEnsemble> existing;
+    for ( auto dataSource : sumoDataSources() )
+    {
+        existing.insert( { dataSource->caseId().get(), dataSource->ensembleName() } );
+    }
+
+    RiuSumoEnsembleSelectionDialog dialog( *m_sumoConnector, m_exploreCache, existing, RiuPlotMainWindow::instance() );
+    if ( dialog.exec() != QDialog::Accepted ) return false;
+
+    const auto toRemove = dialog.entriesToRemove();
+    const auto toAdd    = dialog.entriesToAdd();
+
+    if ( !toRemove.empty() )
+    {
+        QString text = "The following ensembles and the summary and grid ensembles using them will be deleted:\n";
+        for ( const auto& entry : toRemove )
+        {
+            text += QString( "\n%1 / %2" ).arg( entry.caseName.isEmpty() ? entry.caseId : entry.caseName ).arg( entry.ensembleName );
+        }
+
+        if ( QMessageBox::question( RiuPlotMainWindow::instance(), "Remove Ensembles", text ) != QMessageBox::Yes ) return false;
+
+        for ( const auto& entry : toRemove )
+        {
+            removeDataSource( findDataSource( SumoCaseId( entry.caseId ), entry.ensembleName ) );
+        }
+    }
+
+    std::vector<RimSumoDataSource*> added;
+    for ( const auto& entry : toAdd )
+    {
+        if ( auto dataSource = addDataSource( entry.assetName, SumoCaseId( entry.caseId ), entry.caseName, entry.ensembleName ) )
+        {
+            added.push_back( dataSource );
+        }
+    }
+
+    createEnsemblesFromSelectedDataSources( added );
+
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCloudDataSourceCollection::renameDataSource( RimSumoDataSource* dataSource, const QString& name )
+{
+    if ( !dataSource ) return;
+
+    dataSource->setCustomName( name );
+
+    RiaSummaryTools::updateSummaryEnsembleNames();
+    if ( auto mainColl = RiaSummaryTools::summaryCaseMainCollection() ) mainColl->updateConnectedEditors();
+    updateConnectedEditors();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaSumoConnector* RimCloudDataSourceCollection::sumoConnector() const
+{
+    return m_sumoConnector;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCloudDataSourceCollection::manageEnsemblesInDialog()
+{
+    RiuSumoEnsembleManagementDialog dialog( this, RiuPlotMainWindow::instance() );
+    dialog.exec();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCloudDataSourceCollection::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
+{
+    menuBuilder.addCmdFeature( "RicSumoEnsembleManagementFeature" );
 }
 
 //--------------------------------------------------------------------------------------------------

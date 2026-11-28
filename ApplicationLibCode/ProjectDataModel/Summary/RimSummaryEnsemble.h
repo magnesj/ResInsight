@@ -32,9 +32,12 @@
 #include "cafPdmObject.h"
 #include "cafPdmProxyValueField.h"
 
+#include "cvfColor3.h"
+
 #include <QString>
 
 #include <memory>
+#include <optional>
 #include <utility>
 #include <vector>
 
@@ -97,6 +100,13 @@ public:
     void setEnsembleId( int ensembleId );
     int  ensembleId() const;
     bool hasEnsembleParameters() const;
+
+    // Color chosen for the ensemble, used by the curve sets showing it. Nullopt until one is set.
+    std::optional<cvf::Color3f> customColor() const;
+    void                        setCustomColor( const cvf::Color3f& color );
+
+    // Asks the user for a color and applies it
+    void editCustomColor();
 
     std::vector<RigEnsembleParameter> variationSortedEnsembleParameters( bool excludeNoVariation = false ) const;
     std::vector<std::pair<RigEnsembleParameter, double>> correlationSortedEnsembleParameters( const RifEclipseSummaryAddress& address ) const;
@@ -191,6 +201,9 @@ private:
     caf::PdmChildField<RimSummaryEnsembleParameterCollection*> m_ensembleParameters;
 
     caf::PdmField<int> m_ensembleId;
+
+    caf::PdmField<cvf::Color3f> m_color;
+    caf::PdmField<bool>         m_hasCustomColor;
 
     mutable std::vector<RigEnsembleParameter>  m_cachedSortedEnsembleParameters;
     std::unique_ptr<RiaSummaryAddressAnalyzer> m_analyzer;

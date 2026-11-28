@@ -23,11 +23,16 @@
 #include "cafPdmObject.h"
 
 #include "Cloud/RiaSumoConnector.h"
+#include "Cloud/RiaSumoExploreCache.h"
 
 #include <QPointer>
 #include <QString>
 
 class RimSumoDataSource;
+namespace caf
+{
+class CmdFeatureMenuBuilder;
+}
 
 //==================================================================================================
 ///
@@ -44,6 +49,31 @@ public:
 
     std::vector<RimSumoDataSource*> sumoDataSources() const;
 
+    RimSumoDataSource* findDataSource( const SumoCaseId& caseId, const QString& ensembleName ) const;
+
+    // Creates a data source for one ensemble. Returns nullptr if it already exists or there is no connection.
+    RimSumoDataSource* addDataSource( const QString& assetName, const SumoCaseId& caseId, const QString& caseName, const QString& ensembleName );
+
+    // The summary and grid ensembles that use the data source, and so are deleted with it.
+    static std::vector<caf::PdmObject*> dependentEnsembles( const RimSumoDataSource* dataSource );
+
+    // Deletes the data source and the ensembles that use it.
+    void removeDataSource( RimSumoDataSource* dataSource );
+
+    // Gives the data source a name of its own, empty for the generated one, and updates what shows it.
+    void renameDataSource( RimSumoDataSource* dataSource, const QString& name );
+
+    // Opens the ensemble selection dialog and applies what is picked. Returns true if it was applied.
+    bool selectEnsemblesInDialog();
+
+    RiaSumoConnector* sumoConnector() const;
+
+    // Opens the dialog listing the data sources, for adding, renaming and removing them.
+    void manageEnsemblesInDialog();
+
+    // What Sumo answered, shared with the selection dialog
+    RiaSumoExploreCache& exploreCache();
+
     static void createEnsemblesFromSelectedDataSources( const std::vector<RimSumoDataSource*>& dataSources );
 
 private:
@@ -57,6 +87,7 @@ private:
 
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void                          defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
+    void                          appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
 
     std::vector<RimSumoDataSource*> addDataSources();
     void                            addEnsembles();
@@ -82,11 +113,5 @@ private:
 
     QPointer<RiaSumoConnector> m_sumoConnector;
 
-    std::vector<SumoAsset> m_assets;
-
-    QString               m_casesAssetName;
-    std::vector<SumoCase> m_cases;
-
-    QString              m_ensembleNamesCaseId;
-    std::vector<QString> m_ensembleNames;
+    RiaSumoExploreCache m_exploreCache;
 };

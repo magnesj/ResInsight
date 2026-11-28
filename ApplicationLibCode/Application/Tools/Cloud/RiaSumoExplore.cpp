@@ -78,6 +78,62 @@ std::vector<QString> RiaSumoExplore::realizationIds( const SumoCaseId& caseId, c
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+QString RiaSumoExplore::userName()
+{
+    return parseUserName( m_connector.getBlocking( "/whoami" ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaSumoExplore::casesAsync( const QString&                                             assetName,
+                                 const std::function<void( const std::vector<SumoCase>& )>& onFinished,
+                                 const void*                                                cancelGroup )
+{
+    const QString path = QString( "/cases?asset_name=%1" ).arg( QString( QUrl::toPercentEncoding( assetName ) ) );
+
+    m_connector.getAsync( path, [onFinished]( const QByteArray& body ) { onFinished( parseCases( body ) ); }, cancelGroup );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaSumoExplore::ensembleNamesAsync( const SumoCaseId&                                         caseId,
+                                         const std::function<void( const std::vector<QString>& )>& onFinished,
+                                         const void*                                               cancelGroup )
+{
+    const QString path = QString( "/cases/%1/ensembles" ).arg( caseId.get() );
+
+    m_connector.getAsync( path, [onFinished]( const QByteArray& body ) { onFinished( parseEnsembleNames( body ) ); }, cancelGroup );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaSumoExplore::userNameAsync( const std::function<void( const QString& )>& onFinished, const void* cancelGroup )
+{
+    m_connector.getAsync( "/whoami", [onFinished]( const QByteArray& body ) { onFinished( parseUserName( body ) ); }, cancelGroup );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaSumoExplore::assetsAsync( const std::function<void( const std::vector<SumoAsset>& )>& onFinished, const void* cancelGroup )
+{
+    m_connector.getAsync( "/assets", [onFinished]( const QByteArray& body ) { onFinished( parseAssets( body ) ); }, cancelGroup );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RiaSumoExplore::parseUserName( const QByteArray& body )
+{
+    return QJsonDocument::fromJson( body ).object()["name"].toString();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 std::vector<SumoAsset> RiaSumoExplore::parseAssets( const QByteArray& body )
 {
     std::vector<SumoAsset> assets;
@@ -114,10 +170,22 @@ std::vector<SumoCase> RiaSumoExplore::parseCases( const QByteArray& body )
     {
         QJsonObject caseObj = value.toObject();
 
-        QString id   = caseObj["id"].toString();
-        QString kind = "";
-        QString name = caseObj["name"].toString();
-        cases.push_back( SumoCase{ SumoCaseId( id ), kind, name } );
+        SumoCase sumoCase;
+        sumoCase.caseId        = SumoCaseId( caseObj["id"].toString() );
+        sumoCase.name          = caseObj["name"].toString();
+        sumoCase.author        = caseObj["user"].toString();
+        sumoCase.status        = caseObj["status"].toString();
+        sumoCase.description   = caseObj["description"].toString();
+        sumoCase.date          = caseObj["timestamp"].toString();
+        sumoCase.modelName     = caseObj["model_name"].toString();
+        sumoCase.modelRevision = caseObj["model_revision"].toString();
+
+        for ( const QJsonValue& ensembleName : caseObj["ensemble_names"].toArray() )
+        {
+            sumoCase.ensembleNames.push_back( ensembleName.toString() );
+        }
+
+        cases.push_back( sumoCase );
     }
 
     RiaLogging::debug( std::format( "Case count : {}", cases.size() ) );

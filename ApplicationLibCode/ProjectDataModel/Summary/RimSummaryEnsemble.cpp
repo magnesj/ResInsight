@@ -18,6 +18,7 @@
 
 #include "RimSummaryEnsemble.h"
 
+#include "RiaColorTools.h"
 #include "RiaEnsembleNameTools.h"
 #include "RiaFieldHandleTools.h"
 #include "RiaFilePathTools.h"
@@ -26,10 +27,13 @@
 #include "RiaStdStringTools.h"
 #include "RiaTextStringTools.h"
 #include "RigStatisticsTools.h"
+#include "RiuGuiTheme.h"
+
 #include "RiuMessageDialog.h"
 #include "Summary/Ensemble/RimSummaryEnsembleParameterCollection.h"
 #include "Summary/RiaSummaryAddressAnalyzer.h"
 #include "Summary/RiaSummaryTools.h"
+#include "cafPdmUiColorEditor.h"
 
 #include "RifSummaryReaderInterface.h"
 
@@ -105,6 +109,9 @@ RimSummaryEnsemble::RimSummaryEnsemble()
     m_ensembleId.uiCapability()->setUiReadOnly( true );
     m_ensembleId.capability<caf::PdmAbstractFieldScriptingCapability>()->setIOWriteable( false );
 
+    CAF_PDM_InitField( &m_color, "EnsembleColor", RiaColorTools::textColor3f(), "Color" );
+    CAF_PDM_InitField( &m_hasCustomColor, "HasCustomColor", false, "Has Custom Color" );
+    m_hasCustomColor.uiCapability()->setUiHidden( true );
     CAF_PDM_InitFieldNoDefault( &m_dataVectorFolders, "DataVectorFolders", "Data Folders" );
     m_dataVectorFolders = new RimSummaryAddressCollection();
     m_dataVectorFolders.uiCapability()->setUiHidden( true );
@@ -996,6 +1003,34 @@ void RimSummaryEnsemble::fieldChangedByUi( const caf::PdmFieldHandle* changedFie
     {
         RiaSummaryTools::updateSummaryEnsembleNames();
     }
+    if ( changedField == &m_color )
+    {
+        setCustomColor( m_color() );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::optional<cvf::Color3f> RimSummaryEnsemble::customColor() const
+{
+    if ( !m_hasCustomColor() ) return std::nullopt;
+    return m_color();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryEnsemble::setCustomColor( const cvf::Color3f& color )
+{
+    m_color          = color;
+    m_hasCustomColor = true;
+
+    updateConnectedEditors();
+    for ( auto curveSet : objectsWithReferringPtrFieldsOfType<RimEnsembleCurveSet>() )
+    {
+        if ( curveSet->summaryEnsemble() == this ) curveSet->setColorAndUpdateCurves( color );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1060,6 +1095,7 @@ void RimSummaryEnsemble::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
     m_name.uiCapability()->setUiReadOnly( true );
 
     if ( m_isEnsemble() ) uiOrdering.add( &m_ensembleId );
+    if ( m_isEnsemble() ) uiOrdering.add( &m_color );
 
     uiOrdering.add( &m_ensembleDescription );
 
@@ -1097,9 +1133,33 @@ void RimSummaryEnsemble::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrd
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimSummaryEnsemble::editCustomColor()
+{
+    const QColor sourceColor = RiaColorTools::toQColor( m_color() );
+    const QColor newColor    = caf::PdmUiColorEditor::getColor( sourceColor );
+
+    if ( newColor.isValid() && newColor != sourceColor )
+    {
+        setCustomColor( RiaColorTools::fromQColorTo3f( newColor ) );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 std::vector<caf::PdmUiTreeViewItemTag> RimSummaryEnsemble::treeItemTags()
 {
     std::vector<caf::PdmUiTreeViewItemTag> tags;
+
+    if ( auto color = customColor() )
+    {
+        auto tag     = caf::PdmUiTreeViewItemTag::create();
+        tag.icon     = RimCurveStyleRule::swatchIcon( *color );
+        tag.position = caf::PdmUiTreeViewItemTag::Position::AT_END;
+        tag.toolTip  = "Ensemble color. Click to change";
+        tag.clicked  = [this]( size_t ) { editCustomColor(); };
+        tags.push_back( tag );
+    }
 
     if ( m_includeInAutoReload() )
     {

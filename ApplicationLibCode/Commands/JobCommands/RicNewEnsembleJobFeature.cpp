@@ -46,8 +46,12 @@ CAF_CMD_SOURCE_INIT( RicNewEnsembleJobFeature, "RicNewEnsembleJobFeature" );
 bool RicNewEnsembleJobFeature::isCommandEnabled() const
 {
     std::vector<RimReservoirGridEnsemble*> selectedEnsembles = caf::SelectionManager::instance()->objectsByType<RimReservoirGridEnsemble>();
-    return RiaPreferencesOpm::current()->validateFlowSettings() && selectedEnsembles.size() == 1 &&
-           selectedEnsembles[0]->ensembleFileSet()->groupingMode() == RiaDefines::EnsembleGroupingMode::FMU_FOLDER_STRUCTURE;
+    if ( selectedEnsembles.size() != 1 ) return false;
+
+    // Ensembles that do not come from files, such as SUMO ensembles, have no file set
+    auto* fileSet = selectedEnsembles[0]->ensembleFileSet();
+    return RiaPreferencesOpm::current()->validateFlowSettings() && fileSet &&
+           fileSet->groupingMode() == RiaDefines::EnsembleGroupingMode::FMU_FOLDER_STRUCTURE;
 }
 
 //--------------------------------------------------------------------------------------------------
