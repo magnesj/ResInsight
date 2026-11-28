@@ -68,6 +68,8 @@ set(PROJECT_FILES
     PdmObjects/ReentrantEditorRebuild.cpp
     PdmObjects/GroupVisibilityByEnum.h
     PdmObjects/GroupVisibilityByEnum.cpp
+    PdmObjects/InitFunctionDemo.h
+    PdmObjects/InitFunctionDemo.cpp
 )
 
 qt_add_executable(
@@ -82,7 +84,7 @@ qt_add_executable(
 
 set_target_properties(${PROJECT_NAME} PROPERTIES AUTORCC ON)
 
-set(TAP_LINK_LIBRARIES cafUserInterface)
+set(TAP_LINK_LIBRARIES cafUserInterface cafPdmInitPrototype)
 
 if(USE_COMMAND_FRAMEWORK)
   set(TAP_LINK_LIBRARIES

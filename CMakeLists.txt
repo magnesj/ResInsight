@@ -1149,6 +1149,9 @@ if(RESINSIGHT_INCLUDE_APPFWK_TESTS)
   # Compile-time benchmark
   add_subdirectory(Fwk/AppFwk/cafProjectDataModel/cafPdm_CompileBench)
 
+  # Prototype for replacing the init macros with functions
+  add_subdirectory(Fwk/AppFwk/cafTests/cafPdmInitPrototype)
+
   # Unit Tests
   add_subdirectory(Fwk/AppFwk/cafProjectDataModel/cafProjectDataModel_UnitTests)
   add_subdirectory(

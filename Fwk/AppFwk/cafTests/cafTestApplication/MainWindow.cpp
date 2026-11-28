@@ -10,6 +10,7 @@
 #include "PdmObjects/DemoPdmObject.h"
 #include "PdmObjects/DemoPdmObjectGroup.h"
 #include "PdmObjects/GroupVisibilityByEnum.h"
+#include "PdmObjects/InitFunctionDemo.h"
 #include "PdmObjects/LabelsAndHyperlinks.h"
 #include "PdmObjects/LineEditAndPushButtons.h"
 #include "PdmObjects/ManyGroups.h"
@@ -200,6 +201,8 @@ void MainWindow::buildTestModel()
     m_testRoot->objects.push_back( new OptionalFields );
     m_testRoot->objects.push_back( new ReentrantEditorRebuild );
     m_testRoot->objects.push_back( new GroupVisibilityByEnum );
+    m_testRoot->objects.push_back( new InitMacroDemo );
+    m_testRoot->objects.push_back( new InitFunctionDemo );
 
     auto tamComboBox = new TamComboBox;
     m_testRoot->objects.push_back( tamComboBox );

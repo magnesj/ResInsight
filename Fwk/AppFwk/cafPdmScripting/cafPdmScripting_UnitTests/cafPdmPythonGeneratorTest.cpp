@@ -194,6 +194,27 @@ public:
     }
 };
 CAF_PDM_OBJECT_METHOD_SOURCE_INIT( FolderRootObj, FolderRootObj_addSubFolder, "AddSubFolder" );
+
+//==================================================================================================
+/// Scriptable class with class keyword aliases and a field keyword alias. Aliases are an XML concept
+/// and must not be visible in generated Python code.
+//==================================================================================================
+class ScriptAliasObj : public caf::PdmObject
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    ScriptAliasObj()
+    {
+        CAF_PDM_InitScriptableObject( "Script Alias Object" );
+
+        CAF_PDM_InitScriptableField( &m_radius, "WellRadius", 1.5, "Well Radius" );
+        m_radius.registerKeywordAlias( "LegacyRadius" );
+    }
+
+    caf::PdmField<double> m_radius;
+};
+CAF_PDM_SOURCE_INIT( ScriptAliasObj, "ScriptAliasObj", "LegacyScriptAliasObj" );
 } // namespace caf
 
 namespace
@@ -527,4 +548,26 @@ TEST( PdmPythonGenerator, ReportsTypedOverrideThatIsNotASubclassOfDeclaredType )
     EXPECT_TRUE( errorMessages.front().contains( "declared return type 'FolderRootObj'" ) );
 
     EXPECT_FALSE( generatedClassCode( generatedCode, "FolderUnrelatedReturnObj" ).contains( "def add_sub_folder" ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Compatibility baseline: class and field keyword aliases do not change generated Python names
+//--------------------------------------------------------------------------------------------------
+TEST( PdmPythonGenerator, KeywordAliasesAreNotVisibleInGeneratedCode )
+{
+    caf::PdmPythonGenerator generator;
+    std::vector<QString>    errorMessages;
+    QString generatedCode = generator.generate( caf::PdmDefaultObjectFactory::instance(), errorMessages );
+
+    EXPECT_TRUE( errorMessages.empty() );
+
+    QString classCode = generatedClassCode( generatedCode, "ScriptAliasObj" );
+    ASSERT_FALSE( classCode.isEmpty() );
+    EXPECT_TRUE( classCode.contains( "well_radius" ) );
+    EXPECT_TRUE( classCode.contains( "1.5" ) );
+
+    EXPECT_FALSE( generatedCode.contains( "LegacyScriptAliasObj" ) );
+    EXPECT_FALSE( generatedCode.contains( "LegacyRadius" ) );
+    EXPECT_FALSE( generatedCode.contains( "legacy_radius" ) );
+    EXPECT_EQ( 1, generatedCode.count( "class ScriptAliasObj(" ) );
 }

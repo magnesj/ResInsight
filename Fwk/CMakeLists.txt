@@ -60,6 +60,9 @@ add_subdirectory(AppFwk/cafUserInterface/cafUserInterface_UnitTests)
 # Compile-time benchmark (measures per-file compile cost of PDM field types)
 add_subdirectory(AppFwk/cafProjectDataModel/cafPdm_CompileBench)
 
+# Prototype for replacing the init macros with functions
+add_subdirectory(AppFwk/cafTests/cafPdmInitPrototype)
+
 # Executables
 add_subdirectory(AppFwk/cafTests/cafTestApplication)
 
